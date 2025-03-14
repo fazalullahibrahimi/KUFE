@@ -6,14 +6,14 @@ const {
   updateEnrollment,
   deleteEnrollment,
 } = require("../controllers/enrollmentController")
-const { protect } = require("../middleware/auth")
+const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize, checkPermission } = require("../middleware/roleCheck")
 const roles = require("../config/roles")
 
 const router = express.Router()
 
 // All enrollment routes are protected
-router.use(protect)
+router.use(authMiddleware)
 
 // Students can view their own enrollments
 router.get("/my-enrollments", getEnrollments)

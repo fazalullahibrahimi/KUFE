@@ -2,14 +2,14 @@ const FacultyMember = require("../models/FacultyMember")
 const User = require("../models/User")
 const Department = require("../models/Department")
 const apiResponse = require("../utils/apiResponse")
-const  asyncHandler = require("../middleware/asyncHandler.js")
+const asyncHandler = require("../middleware/asyncHandler")
 const validateMongodbId = require("../utils/validateMongoDBId")
-const sendEmail = require("../utils/email")
+const { sendEmail } = require("../utils/email")
 
 // @desc    Get all faculty members
 // @route   GET /api/faculty-members
 // @access  Public
-exports.getFacultyMembers = asyncHandler(async (req, res) => {
+const getFacultyMembers = asyncHandler(async (req, res) => {
   let query
 
   // Copy req.query
@@ -97,7 +97,7 @@ exports.getFacultyMembers = asyncHandler(async (req, res) => {
 // @desc    Get single faculty member
 // @route   GET /api/faculty-members/:id
 // @access  Public
-exports.getFacultyMember = asyncHandler(async (req, res) => {
+const getFacultyMember = asyncHandler(async (req, res) => {
   // Validate MongoDB ID
   if (!validateMongodbId(req.params.id)) {
     return res.status(400).json(apiResponse.error("Invalid faculty member ID", 400))
@@ -117,7 +117,7 @@ exports.getFacultyMember = asyncHandler(async (req, res) => {
 // @desc    Create new faculty member
 // @route   POST /api/faculty-members
 // @access  Private/Admin
-exports.createFacultyMember = asyncHandler(async (req, res) => {
+const createFacultyMember = asyncHandler(async (req, res) => {
   const { user_id, name, position, department_id, contact_info, profile } = req.body
 
   // Validate MongoDB IDs
@@ -180,7 +180,7 @@ exports.createFacultyMember = asyncHandler(async (req, res) => {
 // @desc    Update faculty member
 // @route   PUT /api/faculty-members/:id
 // @access  Private/Admin
-exports.updateFacultyMember = asyncHandler(async (req, res) => {
+const updateFacultyMember = asyncHandler(async (req, res) => {
   const { name, position, department_id, contact_info, profile } = req.body
 
   // Validate MongoDB IDs
@@ -229,7 +229,7 @@ exports.updateFacultyMember = asyncHandler(async (req, res) => {
 // @desc    Delete faculty member
 // @route   DELETE /api/faculty-members/:id
 // @access  Private/Admin
-exports.deleteFacultyMember = asyncHandler(async (req, res) => {
+const deleteFacultyMember = asyncHandler(async (req, res) => {
   // Validate MongoDB ID
   if (!validateMongodbId(req.params.id)) {
     return res.status(400).json(apiResponse.error("Invalid faculty member ID", 400))
@@ -245,4 +245,12 @@ exports.deleteFacultyMember = asyncHandler(async (req, res) => {
 
   res.status(200).json(apiResponse.success("Faculty member deleted successfully", {}))
 })
+
+module.exports = {
+  getFacultyMembers,
+  getFacultyMember,
+  createFacultyMember,
+  updateFacultyMember,
+  deleteFacultyMember,
+}
 

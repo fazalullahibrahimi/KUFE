@@ -6,14 +6,14 @@ const {
   updateStudent,
   deleteStudent,
 } = require("../controllers/studentController")
-const { protect } = require("../middleware/auth")
-const { authorize, checkPermission } = require("../middleware/roleCheck")
+const { authMiddleware, authorize } = require("../middleware/authMiddleware")
+const { checkPermission } = require("../middleware/roleCheck")
 const roles = require("../config/roles")
 
 const router = express.Router()
 
 // Protected routes
-router.use(protect)
+router.use(authMiddleware)
 
 // Faculty and admin can view students
 router.get("/", authorize(roles.ADMIN, roles.FACULTY), checkPermission("view_students"), getStudents)

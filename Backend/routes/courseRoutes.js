@@ -1,6 +1,6 @@
 const express = require("express")
 const { getCourses, getCourse, createCourse, updateCourse, deleteCourse } = require("../controllers/courseController")
-const { protect } = require("../middleware/auth")
+const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize, checkPermission } = require("../middleware/roleCheck")
 const { courseValidationRules, validate } = require("../utils/validators")
 const roles = require("../config/roles")
@@ -12,7 +12,7 @@ router.get("/", getCourses)
 router.get("/:id", getCourse)
 
 // Protected routes
-router.use(protect)
+router.use(authMiddleware)
 
 // Admin and faculty can create/update/delete courses
 router.post(

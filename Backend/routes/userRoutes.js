@@ -1,45 +1,44 @@
-const express = require('express');
-const router = express.Router();
+const express = require("express")
+const router = express.Router()
 
-const userController = require('../controllers/userController.js');
-const { authMiddlewarey, authorizeAdmin } = require('../middleware/authMiddleware'); // ✅ Corrected import
+const userController = require("../controllers/userController.js")
+const { authMiddleware, authorizeAdmin } = require("../middleware/authMiddleware") // Corrected import
 
 // Public routes
-router.post('/register', 
-  userController.registerUser,
-  userController.uploadUserPhoto, 
-  userController.resizeUserPhoto
-);
-router.post('/login', userController.loginUser);
-router.post('/forgotPassword', userController.forgotPassword);
-router.post('/resetPassword/:token', userController.resetPassword);
+router.post("/register", userController.uploadUserPhoto, userController.resizeUserPhoto, userController.registerUser)
+router.post("/login", userController.loginUser)
+router.post("/forgotpassword", userController.forgotPassword)
+router.put("/resetpassword/:token", userController.resetPassword)
 
 // Protected routes (require authentication)
-router.use(authMiddlewarey); // ✅ Corrected function name
+router.use(authMiddleware) // Corrected middleware name
 
-router.post('/logout', userController.logoutCurrentUser);
-router.get('/profile', userController.getCurrentUserProfile);
-router.patch('/profile', userController.updateCurrentUserProfile);
-router.patch('/updatePassword', userController.updatePassword);
-router.patch('/updatePhoto', 
-  userController.uploadUserPhoto, 
-  userController.resizeUserPhoto, 
-  userController.updateUserPhoto
-);
+router.post("/logout", userController.logoutCurrentUser)
+router.get("/profile", userController.getCurrentUserProfile)
+router.put(
+  "/profile",
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  userController.updateCurrentUserProfile,
+)
+router.put("/password", userController.updatePassword)
+router.put("/photo", userController.uploadUserPhoto, userController.resizeUserPhoto, userController.updateUserPhoto)
 
 // Contact routes
-router.post('/contacts', userController.addContact); 
-router.patch('/contacts/:contactId', userController.updateContact); 
-router.delete('/contacts/:contactId', userController.removeContact); 
-router.get('/contacts', userController.getAllContacts); 
+router.post("/contacts", userController.addContact)
+router.put("/contacts/:contactId", userController.updateContact)
+router.delete("/contacts/:contactId", userController.removeContact)
+router.get("/contacts", userController.getAllContacts)
 
 // Admin routes
-router.use(authorizeAdmin);
+router.use(authorizeAdmin)
 
-router.get('/', userController.getAllUsers);
-router.route('/:id')
+router.get("/", userController.getAllUsers)
+router
+  .route("/:id")
   .get(userController.findUserByID)
-  .patch(userController.updateUserById)
-  .delete(userController.deleteUserByID);
+  .put(userController.updateUserById)
+  .delete(userController.deleteUserByID)
 
-module.exports = router;
+module.exports = router
+

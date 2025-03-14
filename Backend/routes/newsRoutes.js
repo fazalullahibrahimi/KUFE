@@ -1,6 +1,6 @@
 const express = require("express")
 const { getNews, getSingleNews, createNews, updateNews, deleteNews } = require("../controllers/newsController")
-const { protect } = require("../middleware/auth")
+const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize } = require("../middleware/roleCheck")
 const roles = require("../config/roles")
 
@@ -11,7 +11,7 @@ router.get("/", getNews)
 router.get("/:id", getSingleNews)
 
 // Protected routes
-router.use(protect)
+router.use(authMiddleware)
 
 // Admin and faculty can create/update/delete news
 router.post("/", authorize(roles.ADMIN, roles.FACULTY), createNews)

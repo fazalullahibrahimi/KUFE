@@ -1,6 +1,6 @@
 const express = require("express")
 const { getEvents, getEvent, createEvent, updateEvent, deleteEvent } = require("../controllers/eventController")
-const { protect } = require("../middleware/auth")
+const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize } = require("../middleware/roleCheck")
 const roles = require("../config/roles")
 
@@ -11,7 +11,7 @@ router.get("/", getEvents)
 router.get("/:id", getEvent)
 
 // Protected routes
-router.use(protect)
+router.use(authMiddleware)
 
 // Admin and faculty can create/update/delete events
 router.post("/", authorize(roles.ADMIN, roles.FACULTY), createEvent)

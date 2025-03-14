@@ -6,7 +6,7 @@ const {
   updateCourseOffering,
   deleteCourseOffering,
 } = require("../controllers/courseOfferingController")
-const { protect } = require("../middleware/auth")
+const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize, checkPermission } = require("../middleware/roleCheck")
 const roles = require("../config/roles")
 
@@ -17,7 +17,7 @@ router.get("/", getCourseOfferings)
 router.get("/:id", getCourseOffering)
 
 // Protected routes
-router.use(protect)
+router.use(authMiddleware)
 
 // Admin and faculty can create/update/delete course offerings
 router.post("/", authorize(roles.ADMIN, roles.FACULTY), checkPermission("manage_courses"), createCourseOffering)

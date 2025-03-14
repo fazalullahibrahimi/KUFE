@@ -6,7 +6,7 @@ const {
   updateResource,
   deleteResource,
 } = require("../controllers/resourceController")
-const { protect } = require("../middleware/auth")
+const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize, checkPermission } = require("../middleware/roleCheck")
 const upload = require("../middleware/upload")
 const roles = require("../config/roles")
@@ -14,7 +14,7 @@ const roles = require("../config/roles")
 const router = express.Router()
 
 // Protected routes
-router.use(protect)
+router.use(authMiddleware)
 
 // All users can view resources
 router.get("/", getResources)

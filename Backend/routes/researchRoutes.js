@@ -6,7 +6,7 @@ const {
   updateResearch,
   deleteResearch,
 } = require("../controllers/researchController")
-const { protect } = require("../middleware/auth")
+const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize, checkPermission } = require("../middleware/roleCheck")
 const upload = require("../middleware/upload")
 const roles = require("../config/roles")
@@ -18,7 +18,7 @@ router.get("/", getResearch)
 router.get("/:id", getSingleResearch)
 
 // Protected routes
-router.use(protect)
+router.use(authMiddleware)
 
 // All roles can create research
 router.post("/", upload.single("research_file"), checkPermission("submit_research"), createResearch)

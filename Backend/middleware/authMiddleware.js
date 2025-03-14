@@ -5,7 +5,7 @@ const apiResponse = require("../utils/apiResponse")
 const validateMongodbId = require("../utils/validateMongoDBId")
 
 // Authentication middleware
-const authMiddlewarey = asyncHandler(async (req, res, next) => {
+const authMiddleware = asyncHandler(async (req, res, next) => {
   let token
 
   // Get token from Authorization header
@@ -95,7 +95,7 @@ const authorize = (...roles) => {
 }
 
 module.exports = {
-  authMiddlewarey,
+  authMiddleware,
   authorizeAdmin,
   authorizeFaculty,
   authorizeStudent,
