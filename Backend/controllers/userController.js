@@ -45,7 +45,7 @@ const uploadUserPhoto = upload.single("image");
 // Define the validation schema
 const userValidationSchema = Joi.object({
   fullName: Joi.string()
-    .min(3) // Must be at least 3 characters long
+    .min(3)
     .required()
     .messages({
       'string.base': `"fullName" should be a type of 'text'`,
@@ -53,9 +53,8 @@ const userValidationSchema = Joi.object({
       'string.min': `"fullName" should have a minimum length of {#limit}`,
       'any.required': `"fullName" is a required field`
     }),
-  
   email: Joi.string()
-    .email() // Valid email format
+    .email()
     .required()
     .messages({
       'string.base': `"email" should be a type of 'text'`,
@@ -63,9 +62,8 @@ const userValidationSchema = Joi.object({
       'string.email': `"email" must be a valid email`,
       'any.required': `"email" is a required field`
     }),
-  
   password: Joi.string()
-    .min(8) // Minimum length of 8 characters
+    .min(8)
     .required()
     .messages({
       'string.base': `"password" should be a type of 'text'`,
@@ -73,17 +71,16 @@ const userValidationSchema = Joi.object({
       'string.min': `"password" should have a minimum length of {#limit}`,
       'any.required': `"password" is a required field`
     }),
-
   role: Joi.string()
-    .valid('user', 'admin', 'guide') // Enum validation
-    .default('user'),
-
+    .valid('admin', 'faculty', 'student')
+    .default('student'),
   image: Joi.string()
+    .allow(null)
     .optional()
     .messages({
       'string.base': `"image" should be a type of 'text'`,
     })
-});
+}).default({ image: 'default-user.jpg' }); // Set default image
 
 // Define the validation schema for contact
 const contactValidationSchema = Joi.object({
@@ -449,7 +446,7 @@ const getCurrentUserProfile = asyncHandler(async (req, res, next) => {
       status: "success",
       data: {
         _id: user._id,
-        FullName: user.firstName,
+        FullName: user.fullName,
         email: user.email,
         image: user.image,
         role: user.role,
