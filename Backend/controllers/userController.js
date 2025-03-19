@@ -730,22 +730,29 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     passwordResetExpires: { $gt: Date.now() },
   });
 
-  // 2) If the token has not expired and then is the user, set the new password
+  // 2) If token is invalid or expired
   if (!user) {
     return res.status(400).send({
-      success:false,
-      message:"Token is invalid or has expired!"
-    })
-    
+      success: false,
+      message: "Token is invalid or has expired!"
+    });
   }
+
+  // 3) Check if passwords match
+  if (req.body.password !== req.body.confirmPassword) {
+    return res.status(400).send({
+      success: false,
+      message: "Passwords do not match!"
+    });
+  }
+
+  // 4) Set new password
   user.password = req.body.password;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
 
-  // 3) Update passwordChangedAt property for the user
-  // 4) Log the user in, send JWT
-  generateToken(res, user._id);
+  // 5) Send success response
   res.status(200).json({
     status: 'success',
     message: 'Your password was reset successfully',
