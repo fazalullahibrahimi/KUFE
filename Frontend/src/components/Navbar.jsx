@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Logo from "../../public/Logo.jpg";
 
 const Navbar = () => {
@@ -20,18 +21,18 @@ const Navbar = () => {
         </div>
         <ul className='hidden md:flex space-x-6'>
           {[
-            "Home",
-            "Academics",
-            "Research",
-            "Admissions",
-            "About",
-            "Contact",
+            { name: "Home", path: "/" },
+            { name: "Academics", path: "/academics" },
+            { name: "Research", path: "/research" },
+            { name: "Admissions", path: "/admissions" },
+            { name: "About", path: "/about" },
+            { name: "Contact", path: "/contact" },
           ].map((item) => (
             <li
-              key={item}
+              key={item.name}
               className='text-gray-700 hover:text-blue-600 cursor-pointer'
             >
-              {item}
+              <Link to={item.path}>{item.name}</Link>
             </li>
           ))}
         </ul>
