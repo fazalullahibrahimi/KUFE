@@ -7,6 +7,7 @@ import AcademicPage from "./pages/AcademicPage";
 // import Register from "./pages/";
 // import ForgotPassword from "./pages/ForgotPassword";
 
+
 function App() {
   return (
     <Router>
@@ -17,6 +18,7 @@ function App() {
         <Route path='/academics' element={<AcademicPage />} />
         {/* <Route path='/register' element={<Register />} /> */}
         {/* <Route path='/forgotpassword' element={<ForgotPassword />} /> */}
+
       </Routes>
     </Router>
   );

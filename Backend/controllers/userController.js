@@ -45,7 +45,7 @@ const uploadUserPhoto = upload.single("image");
 // Define the validation schema
 const userValidationSchema = Joi.object({
   fullName: Joi.string()
-    .min(3) // Must be at least 3 characters long
+    .min(3)
     .required()
     .messages({
       'string.base': `"fullName" should be a type of 'text'`,
@@ -53,9 +53,8 @@ const userValidationSchema = Joi.object({
       'string.min': `"fullName" should have a minimum length of {#limit}`,
       'any.required': `"fullName" is a required field`
     }),
-  
   email: Joi.string()
-    .email() // Valid email format
+    .email()
     .required()
     .messages({
       'string.base': `"email" should be a type of 'text'`,
@@ -63,9 +62,8 @@ const userValidationSchema = Joi.object({
       'string.email': `"email" must be a valid email`,
       'any.required': `"email" is a required field`
     }),
-  
   password: Joi.string()
-    .min(8) // Minimum length of 8 characters
+    .min(8)
     .required()
     .messages({
       'string.base': `"password" should be a type of 'text'`,
@@ -73,17 +71,16 @@ const userValidationSchema = Joi.object({
       'string.min': `"password" should have a minimum length of {#limit}`,
       'any.required': `"password" is a required field`
     }),
-
   role: Joi.string()
-    .valid('user', 'admin', 'guide') // Enum validation
-    .default('user'),
-
+    .valid('admin', 'faculty', 'student')
+    .default('student'),
   image: Joi.string()
+    .allow(null)
     .optional()
     .messages({
       'string.base': `"image" should be a type of 'text'`,
     })
-});
+}).default({ image: 'default-user.jpg' }); // Set default image
 
 // Define the validation schema for contact
 const contactValidationSchema = Joi.object({
@@ -449,7 +446,7 @@ const getCurrentUserProfile = asyncHandler(async (req, res, next) => {
       status: "success",
       data: {
         _id: user._id,
-        FullName: user.firstName,
+        FullName: user.fullName,
         email: user.email,
         image: user.image,
         role: user.role,
@@ -733,22 +730,29 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     passwordResetExpires: { $gt: Date.now() },
   });
 
-  // 2) If the token has not expired and then is the user, set the new password
+  // 2) If token is invalid or expired
   if (!user) {
     return res.status(400).send({
-      success:false,
-      message:"Token is invalid or has expired!"
-    })
-    
+      success: false,
+      message: "Token is invalid or has expired!"
+    });
   }
+
+  // 3) Check if passwords match
+  if (req.body.password !== req.body.confirmPassword) {
+    return res.status(400).send({
+      success: false,
+      message: "Passwords do not match!"
+    });
+  }
+
+  // 4) Set new password
   user.password = req.body.password;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
 
-  // 3) Update passwordChangedAt property for the user
-  // 4) Log the user in, send JWT
-  generateToken(res, user._id);
+  // 5) Send success response
   res.status(200).json({
     status: 'success',
     message: 'Your password was reset successfully',

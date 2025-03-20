@@ -38,22 +38,10 @@ const FacultyMemberSchema = new mongoose.Schema(
       ],
       research_interests: [String],
     },
-    created_at: {
-      type: Date,
-      default: Date.now,
-    },
-    updated_at: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  {
-    timestamps: {
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-    },
-  },
-)
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("FacultyMember", FacultyMemberSchema)
 
+ const FacultyMember = mongoose.model("FacultyMember", FacultyMemberSchema);
+ module.exports = FacultyMember;

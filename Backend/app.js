@@ -38,8 +38,13 @@ if (process.env.NODE_ENV === "development") {
 // Security headers
 app.use(helmet())
 
-// Enable CORS
-app.use(cors())
+
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Frontend URL
+    credentials: true, // Allow credentials (cookies, authorization headers)
+  })
+);
 
 // Compress responses
 app.use(compression())
@@ -48,19 +53,19 @@ app.use(compression())
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 // Mount routers
-app.use("/api/users", userRoutes)
-app.use("/api/faculty", facultyRoutes)
-app.use("/api/departments", departmentRoutes)
-app.use("/api/faculty-members", facultyMemberRoutes)
-app.use("/api/teachers", teacherRoutes)
-app.use("/api/students", studentRoutes)
-app.use("/api/courses", courseRoutes)
-app.use("/api/course-offerings", courseOfferingRoutes)
-app.use("/api/enrollments", enrollmentRoutes)
-app.use("/api/research", researchRoutes)
-app.use("/api/events", eventRoutes)
-app.use("/api/news", newsRoutes)
-app.use("/api/resources", resourceRoutes)
+app.use("/api/v1/user", userRoutes)
+app.use("/api/v1/faculty", facultyRoutes)
+app.use("/api/v1/departments", departmentRoutes)
+app.use("//v1/faculty-members", facultyMemberRoutes)
+app.use("//v1/teachers", teacherRoutes)
+app.use("/api/v1/students", studentRoutes)
+app.use("/api/v1/courses", courseRoutes)
+app.use("/api/v1/course-offerings", courseOfferingRoutes)
+app.use("/api/v1/enrollments", enrollmentRoutes)
+app.use("/api/v1/research", researchRoutes)
+app.use("/api/v1/events", eventRoutes)
+app.use("/api/v1/news", newsRoutes)
+app.use("/api/v1/resources", resourceRoutes)
 
 // Error handler middleware
 app.use(errorHandler)

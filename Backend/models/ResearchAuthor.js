@@ -17,25 +17,14 @@ const ResearchAuthorSchema = new mongoose.Schema(
       enum: ["faculty", "student"],
       required: true,
     },
-    created_at: {
-      type: Date,
-      default: Date.now,
-    },
-    updated_at: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  {
-    timestamps: {
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-    },
-  },
-)
+  { timestamps: true }
+);
 
 // Ensure an author is only listed once per research
 ResearchAuthorSchema.index({ research_id: 1, author_id: 1 }, { unique: true })
 
-module.exports = mongoose.model("ResearchAuthor", ResearchAuthorSchema)
+
+const ResearchAuthor = mongoose.model("ResearchAuthor", ResearchAuthorSchema);
+module.exports =ResearchAuthor;
 
