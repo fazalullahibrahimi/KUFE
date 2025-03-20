@@ -32,22 +32,10 @@ const CourseOfferingSchema = new mongoose.Schema(
       end_time: String,
       location: String,
     },
-    created_at: {
-      type: Date,
-      default: Date.now,
-    },
-    updated_at: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  {
-    timestamps: {
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-    },
-  },
-)
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("CourseOffering", CourseOfferingSchema)
 
+const CourseOffering = mongoose.model("CourseOffering", CourseOfferingSchema);
+ module.exports = CourseOfferingSchema;

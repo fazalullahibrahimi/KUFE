@@ -27,22 +27,10 @@ const StudentSchema = new mongoose.Schema(
       required: [true, "Please add a student ID number"],
       unique: true,
     },
-    created_at: {
-      type: Date,
-      default: Date.now,
-    },
-    updated_at: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  {
-    timestamps: {
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-    },
-  },
-)
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("Student", StudentSchema)
-
+ 
+const Student= mongoose.model("Student", StudentSchema);
+module.exports=Student;

@@ -30,22 +30,9 @@ const ResourceSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
     },
-    created_at: {
-      type: Date,
-      default: Date.now,
-    },
-    updated_at: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  {
-    timestamps: {
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-    },
-  },
-)
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("Resource", ResourceSchema)
-
+const Resource= mongoose.model("Resource", ResourceSchema);
+module.exports =Resource;

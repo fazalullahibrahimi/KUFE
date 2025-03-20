@@ -23,22 +23,11 @@ const ResearchSchema = new mongoose.Schema(
       enum: ["submitted", "under review", "published"],
       default: "submitted",
     },
-    created_at: {
-      type: Date,
-      default: Date.now,
-    },
-    updated_at: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  {
-    timestamps: {
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-    },
-  },
-)
+  { timestamps: true }
+  
+);
 
-module.exports = mongoose.model("Research", ResearchSchema)
 
+const Research = mongoose.model("Research", ResearchSchema);
+module.exports =Research;

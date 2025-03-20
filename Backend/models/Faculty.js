@@ -22,22 +22,10 @@ const FacultySchema = new mongoose.Schema(
     history: {
       type: String,
     },
-    created_at: {
-      type: Date,
-      default: Date.now,
-    },
-    updated_at: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  {
-    timestamps: {
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-    },
-  },
-)
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("Faculty", FacultySchema)
 
+const Faculty= mongoose.model("Faculty", FacultySchema);
+module.exports = Faculty;

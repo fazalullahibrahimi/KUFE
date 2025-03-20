@@ -27,22 +27,10 @@ const CourseSchema = new mongoose.Schema(
       ref: "Department",
       required: true,
     },
-    created_at: {
-      type: Date,
-      default: Date.now,
-    },
-    updated_at: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  {
-    timestamps: {
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-    },
-  },
-)
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("Course", CourseSchema)
 
+const Course = mongoose.model("Course", CourseSchema);
+ module.exports = Course;
