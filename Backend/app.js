@@ -27,6 +27,7 @@ const courseRoutes = require("./routes/courseRoutes");
 const courseOfferingRoutes = require("./routes/courseOfferingRoutes");
 const enrollmentRoutes = require("./routes/enrollmentRoutes");
 const researchRoutes = require("./routes/researchRoutes");
+const researchAuthorRoutes = require("./routes/researchAuthorRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 const resourceRoutes = require("./routes/resourceRoutes");
 const eventRoutes = require("./routes/eventRoutes");
@@ -88,19 +89,20 @@ app.use(compression());
 
 
 // Mount routers
-app.use("/api/v1/user", userRoutes)
-app.use("/api/v1/faculty", facultyRoutes)
-app.use("/api/v1/departments", departmentRoutes)
-app.use("//v1/faculty-members", facultyMemberRoutes)
-app.use("//v1/teachers", teacherRoutes)
-app.use("/api/v1/students", studentRoutes)
-app.use("/api/v1/courses", courseRoutes)
-app.use("/api/v1/course-offerings", courseOfferingRoutes)
-app.use("/api/v1/enrollments", enrollmentRoutes)
-app.use("/api/v1/research", researchRoutes)
-app.use("/api/v1/events", eventRoutes)
-app.use("/api/v1/news", newsRoutes)
-app.use("/api/v1/resources", resourceRoutes)
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/faculty", facultyRoutes);
+app.use("/api/v1/departments", departmentRoutes);
+app.use("//v1/faculty-members", facultyMemberRoutes);
+app.use("//v1/teachers", teacherRoutes);
+app.use("/api/v1/students", studentRoutes);
+app.use("/api/v1/courses", courseRoutes);
+app.use("/api/v1/course-offerings", courseOfferingRoutes);
+app.use("/api/v1/enrollments", enrollmentRoutes);
+app.use("/api/v1/research", researchRoutes);
+app.use("/api/v1/researchAuthor",researchAuthorRoutes);
+app.use("/api/v1/events", eventRoutes);
+app.use("/api/v1/news", newsRoutes);
+app.use("/api/v1/resources", resourceRoutes);
 
 // Error handler middleware
 app.use(errorHandler);
