@@ -68,7 +68,8 @@ const AcademicPage = () => {
                 day: 'numeric'
               }),
               location: newsEventsResponse.data.data.latestEvent.location,
-              type: newsEventsResponse.data.data.latestEvent.type
+              type: newsEventsResponse.data.data.latestEvent.type,
+              image:newsEventsResponse.data.data.latestEvent.image,
             }]);
           } 
           // Handle array of events case
@@ -83,7 +84,8 @@ const AcademicPage = () => {
                 day: 'numeric'
               }),
               location: event.location,
-              type: event.type
+              type: event.type,
+              image:event.image
             })));
           }
           // Handle other possible structures
@@ -98,7 +100,8 @@ const AcademicPage = () => {
                 day: 'numeric'
               }),
               location: event.location,
-              type: event.type
+              type: event.type,
+              image:event.image
             })));
           }
 
@@ -200,7 +203,7 @@ const AcademicPage = () => {
       </section>
 
       {/* Latest News & Events */}
-      <section className='py-16 px-6 max-w-6xl mx-auto'>
+      {/* <section className='py-16 px-6 max-w-6xl mx-auto'>
         <h2 className='text-3xl font-bold text-center mb-10'>Latest News & Events</h2>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
           {Array.isArray(newsEvents) &&
@@ -223,7 +226,32 @@ const AcademicPage = () => {
               </div>
             ))}
         </div>
-      </section>
+      </section> */}
+      <section className='py-16 px-6 max-w-6xl mx-auto'>
+  <h2 className='text-3xl font-bold text-center mb-10'>Latest News & Events</h2>
+  <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+    {Array.isArray(newsEvents) &&
+      newsEvents.map((event, index) => (
+        <div key={index} className='bg-white p-4 shadow-md rounded-lg'>
+          <img
+            src={`/img/event/${event.image}`}
+            alt={event.title}
+            className='rounded-lg mb-3 w-full h-40 object-cover'
+          />
+          <p className='text-gray-500 text-sm'>{event.date}</p>
+          <h3 className='text-xl font-semibold'>{event.title}</h3>
+          <p className='text-gray-600'>{event.description}</p>
+          <a
+            href='#'
+            className='text-blue-600 font-semibold mt-3 inline-block'
+          >
+            Read more +
+          </a>
+        </div>
+      ))}
+  </div>
+</section>
+
 
       {/* Footer Section */}
       <footer className='bg-blue-900 text-white py-10 px-6'>
