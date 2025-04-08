@@ -1,11 +1,11 @@
 import React from "react";
-import { useState } from 'react';
-import axios from 'axios';
+import { useState } from "react";
+import axios from "axios";
 
 function Login() {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     rememberMe: false,
   });
 
@@ -18,7 +18,7 @@ function Login() {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     });
 
     if (errors[name]) {
@@ -33,15 +33,15 @@ function Login() {
     const newErrors = {};
 
     if (!formData.email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = "Email is invalid";
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     return newErrors;
@@ -61,7 +61,7 @@ function Login() {
 
     try {
       const response = await axios.post(
-        'http://127.0.0.1:4400/api/v1/user/login',
+        "http://127.0.0.1:4400/api/v1/user/login",
         {
           email: formData.email,
           password: formData.password,
@@ -73,11 +73,11 @@ function Login() {
         setLoginSuccess(true);
 
         // Store the JWT in localStorage
-        localStorage.setItem('token', response.data.user.token);
-        
+        localStorage.setItem("token", response.data.user.token);
+
         // Redirect based on user role
         const userRole = response.data.user.role; // Adjust according to your response structure
-        const redirectPath = userRole === 'admin' ? '/dashboard' : '/';
+        const redirectPath = userRole === "admin" ? "/dashboard" : "/";
 
         setTimeout(() => {
           window.location.href = redirectPath; // Redirect to the appropriate page
@@ -85,7 +85,7 @@ function Login() {
       }
     } catch (error) {
       setLoginError(
-        error.response ? error.response.data.message : 'Something went wrong'
+        error.response ? error.response.data.message : "Something went wrong"
       );
     } finally {
       setIsSubmitting(false);
@@ -138,7 +138,7 @@ function Login() {
                 value={formData.email}
                 onChange={handleChange}
                 className={`appearance-none block w-full px-3 py-2 border ${
-                  errors.email ? 'border-red-300' : 'border-gray-300'
+                  errors.email ? "border-red-300" : "border-gray-300"
                 } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
               />
               {errors.email && (
@@ -164,7 +164,7 @@ function Login() {
                 value={formData.password}
                 onChange={handleChange}
                 className={`appearance-none block w-full px-3 py-2 border ${
-                  errors.password ? 'border-red-300' : 'border-gray-300'
+                  errors.password ? "border-red-300" : "border-gray-300"
                 } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
               />
               {errors.password && (
@@ -210,7 +210,7 @@ function Login() {
               {isSubmitting ? (
                 <span className='flex items-center'>Processing...</span>
               ) : (
-                'Sign in'
+                "Sign in"
               )}
             </button>
           </div>
