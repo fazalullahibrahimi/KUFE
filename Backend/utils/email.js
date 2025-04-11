@@ -5,7 +5,7 @@ class Email {
     this.to = user.email;
     this.firstName = user.firstName;
     this.url = url;
-    this.from = `Your Company <${process.env.EMAIL_FROM}>`;
+    this.from = `Kandahar Univercity Faculty of Ecconomic <${process.env.EMAIL_FROM}>`;
   }
 
   newTransport() {

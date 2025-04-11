@@ -18,9 +18,8 @@ router.get("/", getFaculties)
 router.get("/:id", getFaculty)
 
 // Protected routes
-router.use(authMiddleware)
-router.use(authorize(roles.ADMIN))
 
+router.use(authMiddleware);
 router.post("/", facultyValidationRules(), validate, createFaculty)
 router.put("/:id", updateFaculty)
 router.delete("/:id", deleteFaculty)

@@ -29,6 +29,10 @@ const EventSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Faculty",
     },
+    image: {
+      type: String,
+      default: 'default-event.jpg',
+    }
 
   },
   { timestamps: true }
