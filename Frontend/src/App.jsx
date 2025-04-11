@@ -1,5 +1,7 @@
+
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
 import Home from "./pages/Home"; // Make sure this file exists
 import About from "./pages/About"; // Example additional route
 import Login from "./pages/Login";
@@ -8,7 +10,10 @@ import Registration from "./pages/Registration";
 import ForgatPassword from "./pages/ForgatPassword";
 import ResetPassword from "./pages/ResetPassword.jsx";
 
+<<<<<<< HEAD
 import ResearchPage from "./pages/ResearchPage.jsx";
+=======
+>>>>>>> fcb8ccbe8ed4dd3ec3874a57ce683175734aa676
 
 function App() {
   return (
@@ -17,14 +22,17 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='/about' element={<About />} />
         <Route path='/login' element={<Login />} />
+
         <Route path='/academics' element={<AcademicPage />} />
         <Route path='/research' element={<ResearchPage />} />
         <Route path='registration' element={<Registration />} />
         <Route path='/forgotPassword' element={<ForgatPassword />} />
         <Route path='/resetPassword/:token' element={<ResetPassword />} />
+
       </Routes>
     </Router>
   );
 }
 
 export default App;
+

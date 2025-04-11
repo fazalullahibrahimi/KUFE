@@ -27,17 +27,16 @@ const getFaculty = asyncHandler(async (req, res) => {
     return res.status(404).json(apiResponse.error(`Faculty not found with id of ${req.params.id}`, 404))
   }
 
-  res.status(200).json(apiResponse.success("Faculty retrieved successfully", { faculty }))
-})
+  res.status(200).json(apiResponse.success("Faculty retrieved successfully", { faculty }));
+});
 
 // @desc    Create new faculty
 // @route   POST /api/faculty
 // @access  Private/Admin
 const createFaculty = asyncHandler(async (req, res) => {
   const faculty = await Faculty.create(req.body)
-
-  res.status(201).json(apiResponse.success("Faculty created successfully", { faculty }, 201))
-})
+  res.status(201).json(apiResponse.success("Faculty created successfully", { faculty }, 201));
+});
 
 // @desc    Update faculty
 // @route   PUT /api/faculty/:id

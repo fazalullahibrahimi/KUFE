@@ -14,8 +14,7 @@ const ResearchAuthorSchema = new mongoose.Schema(
     },
     author_type: {
       type: String,
-      enum: ["faculty", "student"],
-      required: true,
+      enum: ["faculty", "student","admin"],
     },
   },
   { timestamps: true }
