@@ -1,6 +1,7 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import Kandahar_Economic from "../../public/Kandahar_Economic.jpg";
+import { Link } from "react-router-dom";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -68,20 +69,16 @@ function Login() {
         }
       );
 
-      // Handle successful login response
       if (response.data.success) {
         setLoginSuccess(true);
-
-        // Store the JWT in localStorage
         localStorage.setItem("token", response.data.user.token);
 
-        // Redirect based on user role
-        const userRole = response.data.user.role; // Adjust according to your response structure
+        const userRole = response.data.user.role;
         const redirectPath = userRole === "admin" ? "/dashboard" : "/";
 
         setTimeout(() => {
-          window.location.href = redirectPath; // Redirect to the appropriate page
-        }, 3000); // Redirect after 3 seconds
+          window.location.href = redirectPath;
+        }, 3000);
       }
     } catch (error) {
       setLoginError(
@@ -93,138 +90,127 @@ function Login() {
   };
 
   return (
-    <div className='flex items-center w-screen h-screen justify-center'>
-      <div className='w-full max-w-md p-8 space-y-8 bg-white rounded-lg border'>
-        <div className='text-center'>
-          <h1 className='text-4xl font-extrabold tracking-tight text-gray-900'>
-            Welcome Back
-          </h1>
-          <p className='mt-2 text-sm text-gray-600'>Sign in to your account</p>
+    <div className='min-h-screen grid grid-cols-1 md:grid-cols-2'>
+      <div
+        className='hidden md:flex relative flex-col justify-center px-10 text-white bg-cover bg-center before:absolute before:inset-0 before:bg-black before:opacity-60 before:z-0'
+        style={{
+          backgroundImage: `url(${Kandahar_Economic})`,
+        }}
+      >
+        <div className='relative z-10'>
+          <h1 className='text-4xl font-bold mb-2'>Kandahar University</h1>
+          <h2 className='text-2xl font-semibold mb-4'>Faculty of Economics</h2>
+          <p className='text-sm max-w-sm'>
+            Empowering minds, building futures through excellence in economic
+            education.
+          </p>
         </div>
+      </div>
 
-        {loginSuccess && (
-          <div
-            className='p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg'
-            role='alert'
-          >
-            Login successful! Redirecting...
+      <div className='flex items-center justify-center bg-gray-50 p-6'>
+        <div className='w-full max-w-sm'>
+          <div className='text-center mb-6'>
+            <div className='w-24 h-24 mx-auto bg-gray-200 rounded-full mb-4' />
+            <h1 className='text-xl font-semibold text-gray-800'>
+              Welcome Back
+            </h1>
+            <p className='text-sm text-gray-500 mt-1'>
+              Please sign in to your account
+            </p>
           </div>
-        )}
 
-        {loginError && (
-          <div
-            className='p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg'
-            role='alert'
-          >
-            {loginError}
-          </div>
-        )}
+          {loginSuccess && (
+            <div className='p-3 mb-4 text-sm text-green-800 bg-green-100 rounded-lg'>
+              Login successful! Redirecting...
+            </div>
+          )}
 
-        <form className='mt-8 space-y-6' onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor='email'
-              className='block text-sm font-medium text-gray-700'
-            >
-              Email address
-            </label>
-            <div className='mt-1'>
+          {loginError && (
+            <div className='p-3 mb-4 text-sm text-red-800 bg-red-100 rounded-lg'>
+              {loginError}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className='space-y-4'>
+            <div>
+              <label
+                htmlFor='email'
+                className='block text-sm font-medium text-gray-700'
+              >
+                Email Address
+              </label>
               <input
-                id='email'
-                name='email'
                 type='email'
-                autoComplete='email'
-                required
+                name='email'
+                id='email'
                 value={formData.email}
                 onChange={handleChange}
-                className={`appearance-none block w-full px-3 py-2 border ${
-                  errors.email ? "border-red-300" : "border-gray-300"
-                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder='your@email.com'
               />
               {errors.email && (
-                <p className='mt-2 text-sm text-red-600'>{errors.email}</p>
+                <p className='mt-1 text-xs text-red-600'>{errors.email}</p>
               )}
             </div>
-          </div>
 
-          <div>
-            <label
-              htmlFor='password'
-              className='block text-sm font-medium text-gray-700'
-            >
-              Password
-            </label>
-            <div className='mt-1'>
+            <div>
+              <label
+                htmlFor='password'
+                className='block text-sm font-medium text-gray-700'
+              >
+                Password
+              </label>
               <input
-                id='password'
-                name='password'
                 type='password'
-                autoComplete='current-password'
-                required
+                name='password'
+                id='password'
                 value={formData.password}
                 onChange={handleChange}
-                className={`appearance-none block w-full px-3 py-2 border ${
-                  errors.password ? "border-red-300" : "border-gray-300"
-                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder='••••••••'
               />
               {errors.password && (
-                <p className='mt-2 text-sm text-red-600'>{errors.password}</p>
+                <p className='mt-1 text-xs text-red-600'>{errors.password}</p>
               )}
             </div>
-          </div>
 
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center'>
-              <input
-                id='remember-me'
-                name='rememberMe'
-                type='checkbox'
-                checked={formData.rememberMe}
-                onChange={handleChange}
-                className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
-              />
-              <label
-                htmlFor='remember-me'
-                className='ml-2 block text-sm text-gray-900'
-              >
-                Remember me
+            <div className='flex items-center justify-between'>
+              <label className='flex items-center space-x-2 text-sm text-gray-600'>
+                <input
+                  type='checkbox'
+                  name='rememberMe'
+                  checked={formData.rememberMe}
+                  onChange={handleChange}
+                  className='rounded border-gray-300 focus:ring-blue-400'
+                />
+                <span>Remember me</span>
               </label>
-            </div>
-
-            <div className='text-sm'>
-              <a
-                href='/forgatPassword'
-                className='font-medium text-blue-600 hover:text-blue-500'
+              <Link
+                to='/forgotPassword'
+                className='text-sm text-blue-600 hover:underline'
               >
-                Forgot your password?
-              </a>
+                Forgot password?
+              </Link>
             </div>
-          </div>
 
-          <div>
             <button
               type='submit'
               disabled={isSubmitting}
-              className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'
+              className='w-full py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 transition-all rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50'
             >
-              {isSubmitting ? (
-                <span className='flex items-center'>Processing...</span>
-              ) : (
-                "Sign in"
-              )}
+              {isSubmitting ? "Signing in..." : "Sign In"}
             </button>
-          </div>
-        </form>
+          </form>
 
-        <div className='text-center mt-4'>
-          <p className='text-sm text-gray-600'>
-            Don't have an account?
-            <a
-              href='/registration'
-              className='font-medium text-blue-600 hover:text-blue-500'
-            >
-              Sign up
-            </a>
+          <p className='text-sm text-center text-gray-500 mt-6'>
+            Don’t have an account?{" "}
+            <Link to='/registration' className='text-blue-600 hover:underline'>
+              Register here
+            </Link>
           </p>
         </div>
       </div>
