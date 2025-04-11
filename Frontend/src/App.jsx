@@ -8,6 +8,8 @@ import Registration from "./pages/Registration";
 import ForgatPassword from "./pages/ForgatPassword";
 import ResetPassword from "./pages/ResetPassword.jsx";
 
+import ResearchPage from "./pages/ResearchPage.jsx";
+
 function App() {
   return (
     <Router>
@@ -16,6 +18,7 @@ function App() {
         <Route path='/about' element={<About />} />
         <Route path='/login' element={<Login />} />
         <Route path='/academics' element={<AcademicPage />} />
+        <Route path='/research' element={<ResearchPage />} />
         <Route path='registration' element={<Registration />} />
         <Route path='/forgotPassword' element={<ForgatPassword />} />
         <Route path='/resetPassword/:token' element={<ResetPassword />} />
