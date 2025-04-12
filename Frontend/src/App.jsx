@@ -9,13 +9,9 @@ import AcademicPage from "./pages/AcademicPage";
 import Registration from "./pages/Registration";
 import ForgatPassword from "./pages/ForgatPassword";
 import ResetPassword from "./pages/ResetPassword.jsx";
-import CoursesPage from "./pages/CoursesPage"
-import CourseDetailPage from "./pages/CourseDetailPage"
 
-<<<<<<< HEAD
 import ResearchPage from "./pages/ResearchPage.jsx";
-=======
->>>>>>> fcb8ccbe8ed4dd3ec3874a57ce683175734aa676
+
 
 function App() {
   return (
@@ -29,8 +25,8 @@ function App() {
         <Route path='registration' element={<Registration />} />
         <Route path='/forgotPassword' element={<ForgatPassword />} />
         <Route path='/resetPassword/:token' element={<ResetPassword />} />
-        <Route path="/courses" element={<CoursesPage />} />
-        <Route path="/courses/:id" element={<CourseDetailPage />} />
+      
+      
 
       </Routes>
     </Router>
