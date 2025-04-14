@@ -8,8 +8,13 @@ import AcademicPage from "./pages/AcademicPage";
 import Registration from "./pages/Registration";
 import ForgatPassword from "./pages/ForgatPassword";
 import ResetPassword from "./pages/ResetPassword.jsx";
+
 import ResearchPage from "./pages/ResearchPage.jsx";
 import CoursesPage from "./pages/CoursesPage.jsx";
+
+
+import ResearchPage from "./pages/ResearchPage.jsx";
+
 
 function App() {
   return (
@@ -18,12 +23,11 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='/about' element={<About />} />
         <Route path='/login' element={<Login />} />
-
         <Route path='/academics' element={<AcademicPage />} />
         <Route path='/research' element={<ResearchPage />} />
         <Route path='registration' element={<Registration />} />
         <Route path='/forgotPassword' element={<ForgatPassword />} />
-        <Route path='/resetPassword/:token' element={<ResetPassword />} />
+        <Route path='/resetPassword/:token' element={<ResetPassword />} 
         <Route path='/courses' element={<CoursesPage />} />
       </Routes>
     </Router>
