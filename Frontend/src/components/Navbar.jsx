@@ -24,7 +24,7 @@ const Navbar = () => {
             { name: "Home", path: "/" },
             { name: "Academics", path: "/academics" },
             { name: "Research", path: "/research" },
-            { name: "Admissions", path: "/admissions" },
+            { name: "Courses", path: "/courses" },
             { name: "About", path: "/about" },
             { name: "Contact", path: "/contact" },
           ].map((item) => (
