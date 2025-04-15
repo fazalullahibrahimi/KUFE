@@ -1,5 +1,6 @@
 const express = require("express")
-const { getCourses, getCourse, createCourse, updateCourse, deleteCourse } = require("../controllers/courseController")
+const { getCourses, getCourse, createCourse, updateCourse, deleteCourse, uploadCoursePhoto,
+  resizeCoursePhoto } = require("../controllers/courseController")
 const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize, checkPermission } = require("../middleware/roleCheck")
 const { courseValidationRules, validate } = require("../utils/validators")
@@ -9,6 +10,7 @@ const router = express.Router()
 
 // Public routes
 router.get("/", getCourses)
+
 router.get("/:id", getCourse)
 
 // Protected routes
@@ -21,6 +23,8 @@ router.post(
   checkPermission("manage_courses"),
   courseValidationRules(),
   validate,
+  uploadCoursePhoto,
+  resizeCoursePhoto,
   createCourse,
 )
 
