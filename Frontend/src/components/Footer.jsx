@@ -1,71 +1,66 @@
 import React from "react";
+import { MapPin, Phone, Mail } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className='bg-blue-900 text-white py-10 px-6'>
-    <div className='max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6'>
-      <div>
-        <h3 className='text-lg font-bold'>Contact Us</h3>
-        <p>Kandahar University, Afghanistan</p>
-        <p>📞 +93 700 000 000</p>
-        <p>📧 info@kufe.edu.af</p>
-      </div>
-      <div>
-        <h3 className='text-lg font-bold'>Quick Links</h3>
-        <ul className='text-gray-300'>
-          <li>
-            <a href='#'>Academic Calendar</a>
-          </li>
-          <li>
-            <a href='#'>Library</a>
-          </li>
-          <li>
-            <a href='#'>Research</a>
-          </li>
-          <li>
-            <a href='#'>Student Life</a>
-          </li>
-        </ul>
-      </div>
-      <div>
-        <h3 className='text-lg font-bold'>Resources</h3>
-        <ul className='text-gray-300'>
-          <li>
-            <a href='#'>Student Portal</a>
-          </li>
-          <li>
-            <a href='#'>Faculty Portal</a>
-          </li>
-          <li>
-            <a href='#'>E-Learning</a>
-          </li>
-          <li>
-            <a href='#'>Downloads</a>
-          </li>
-        </ul>
-      </div>
-      <div>
-        <h3 className='text-lg font-bold'>Follow Us</h3>
-        <div className='flex space-x-4'>
-          <a href='#'>
-            <i className='fab fa-facebook-f'></i>
-          </a>
-          <a href='#'>
-            <i className='fab fa-twitter'></i>
-          </a>
-          <a href='#'>
-            <i className='fab fa-instagram'></i>
-          </a>
-          <a href='#'>
-            <i className='fab fa-linkedin'></i>
-          </a>
+    <footer className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white mt-20'>
+      <div className='container mx-auto px-4 py-16'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-10'>
+          <div>
+            <h3 className='text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#F7B500]'>
+              KUFE
+            </h3>
+            <p className='text-[#E8ECEF] leading-relaxed'>
+              Kandahar University Faculty of Economics provides quality
+              education in economics, finance, business management, and
+              statistics.
+            </p>
+          </div>
+
+          <div>
+            <h3 className='text-xl font-bold mb-6 text-white'>Quick Links</h3>
+            <ul className='space-y-3 text-[#E8ECEF]'>
+              {["Home", "About", "Academics", "Contact"].map((item, i) => (
+                <li key={i}>
+                  <a
+                    href={`/${item.toLowerCase()}`}
+                    className='hover:text-[#F7B500] transition-colors flex items-center'
+                  >
+                    <span className='bg-black h-1.5 w-1.5 rounded-full mr-2'></span>
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className='text-xl font-bold mb-6 text-white'>Contact</h3>
+            <ul className='space-y-4 text-[#E8ECEF]'>
+              <li className='flex items-center'>
+                <MapPin className='h-5 w-5 text-[#F7B500] mr-3' />
+                <span>Kandahar University, Afghanistan</span>
+              </li>
+              <li className='flex items-center'>
+                <Phone className='h-5 w-5 text-[#F7B500] mr-3' />
+                <span>+93 70 000 0000</span>
+              </li>
+              <li className='flex items-center'>
+                <Mail className='h-5 w-5 text-[#F7B500] mr-3' />
+                <span>info@kufe.edu.af</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className='border-t border-white/10 mt-10 pt-8 text-center text-[#E8ECEF]'>
+          <p>
+            &copy; {new Date().getFullYear()} Kandahar University Faculty of
+            Economics. All rights reserved.
+          </p>
         </div>
       </div>
-    </div>
-    <p className='text-center mt-6 text-gray-300'>
-      © 2025 Kandahar University Faculty of Economics. All rights reserved.
-    </p>
-  </footer>
+    </footer>
   );
 };
 

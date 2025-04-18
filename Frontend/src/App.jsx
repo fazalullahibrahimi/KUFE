@@ -5,8 +5,6 @@ import Home from "./pages/Home"; // Make sure this file exists
 
 import About from "./pages/AboutPage.jsx"; // Example additional route
 
-import About from "./pages/About";
-
 import Login from "./pages/Login";
 import AcademicPage from "./pages/AcademicPage";
 import Registration from "./pages/Registration";
