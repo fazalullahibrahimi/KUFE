@@ -36,7 +36,7 @@ export default function CourseDetail({ course, onBackClick }) {
       <div className='relative'>
         <div className='h-48 md:h-64 bg-gray-200 relative'>
           <img
-            src={course.image || "/placeholder.svg"}
+            src={`/img/course/${course.image}` || "/placeholder.svg"}
             alt={course.title}
             className='w-full h-[300px] object-cover rounded-md'
           />
@@ -52,7 +52,7 @@ export default function CourseDetail({ course, onBackClick }) {
               </span>
             </div>
             <h1 className='text-2xl md:text-3xl font-bold font-[Poppins]'>
-              {course.title}
+              {course.name}
             </h1>
           </div>
         </div>
@@ -173,7 +173,7 @@ export default function CourseDetail({ course, onBackClick }) {
                       Department
                     </p>
                     <p className='font-medium text-[#333333] font-[Roboto]'>
-                      {course.department}
+                      {course.department_id.name}
                     </p>
                   </div>
                 </div>

@@ -9,7 +9,7 @@ export default function CourseCard({ course, onClick }) {
     >
       <div className='relative h-40'>
         <image
-          src={course.image || "/placeholder.svg?height=200&width=300"}
+          src={`/img/course/${course.image}`|| "/placeholder.svg?height=200&width=300"}
           alt={course.title}
           className='w-full'
         />
@@ -29,7 +29,7 @@ export default function CourseCard({ course, onClick }) {
         </div>
 
         <h3 className='text-lg font-semibold mb-2 font-[Poppins] text-[#333333] line-clamp-2'>
-          {course.title}
+          {course.name}
         </h3>
 
         <div className='flex items-center gap-2 mb-2'>
@@ -42,7 +42,7 @@ export default function CourseCard({ course, onClick }) {
         <div className='flex items-center gap-2 mb-2'>
           <BookOpen size={16} className='text-gray-500' />
           <span className='text-sm text-gray-700 font-[Roboto]'>
-            {course.department}
+            {course.department_id.name}
           </span>
         </div>
 
