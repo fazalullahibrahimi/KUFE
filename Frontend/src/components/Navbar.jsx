@@ -27,6 +27,7 @@ const Navbar = () => {
             { name: "Courses", path: "/courses" },
             { name: "About", path: "/about" },
             { name: "Contact", path: "/contact" },
+            { name: "Announcements & Events", path: "/anounce" },
           ].map((item) => (
             <li
               key={item.name}

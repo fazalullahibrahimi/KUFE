@@ -15,6 +15,7 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 import ResearchPage from "./pages/ResearchPage.jsx";
 import CoursesPage from "./pages/CoursesPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
+import AnnouncementsEventsPage from "./pages/AnnouncementsEventsPage.jsx";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path='/resetPassword/:token' element={<ResetPassword />} />
         <Route path='/courses' element={<CoursesPage />} />
         <Route path='/contact' element={<ContactPage />} />
+        <Route path='/anounce' element={<AnnouncementsEventsPage />} />
       </Routes>
     </Router>
   );
