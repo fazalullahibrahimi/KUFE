@@ -31,6 +31,8 @@ const researchAuthorRoutes = require("./routes/researchAuthorRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 const resourceRoutes = require("./routes/resourceRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const announcement = require("./routes/announcementsRoute");
+
 const app = express();
 app.use("/public", express.static(path.join(__dirname, "public")));
 // Security headereventRoutess
@@ -103,6 +105,7 @@ app.use("/api/v1/researchAuthor",researchAuthorRoutes);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/news", newsRoutes);
 app.use("/api/v1/resources", resourceRoutes);
+app.use("/api/v1/announcement", announcement);
 
 // Error handler middleware
 app.use(errorHandler);
