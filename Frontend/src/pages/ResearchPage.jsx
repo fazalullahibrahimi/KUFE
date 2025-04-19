@@ -31,23 +31,25 @@ export default function ResearchPage() {
 
         // Maintain the existing API call
         const response = await axios.get(
-          "http://localhost:4400/api/v1/research/papers"
+          "http://127.0.0.1:4400/api/v1/research/"
         );
-        console.log("Research Papers:", response.data);
+        console.log("Research Papers:", response.data.data.research);
 
         // Handle different response structures
         if (
           response.data &&
           response.data.data &&
-          Array.isArray(response.data.data.papers)
+          Array.isArray(response.data.data.research
+            )
         ) {
-          setResearchPapers(response.data.data.papers);
+          setResearchPapers(response.data.data.research);
         } else if (response.data && Array.isArray(response.data.data)) {
           setResearchPapers(response.data.data);
         } else if (
           response.data &&
           response.data.data &&
-          response.data.data.paper
+          response.data.data.research
+          
         ) {
           // Handle single paper case
           setResearchPapers([response.data.data.paper]);
@@ -251,12 +253,12 @@ export default function ResearchPage() {
                       </h2>
                       <div className='flex items-center text-sm text-gray-600 mb-3'>
                         <User className='h-4 w-4 mr-1 text-[#1D3D6F]' />
-                        <span>{paper.author}</span>
+                        {paper.authors[0]?.author_id?.fullName}
                       </div>
                       <div className='flex items-center text-sm text-gray-600 mb-3'>
                         <Calendar className='h-4 w-4 mr-1 text-[#1D3D6F]' />
                         <span>
-                          {formatDate(paper.publicationDate || paper.date)}
+                          {formatDate(paper.publicationDate || paper.createdAt)}
                         </span>
                       </div>
                       <p className='text-sm text-gray-600 mb-4 line-clamp-3'>

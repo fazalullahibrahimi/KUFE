@@ -10,6 +10,7 @@ import {
   MapPin,
   Calendar,
   Users,
+  Divide,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -43,6 +44,7 @@ export default function CoursesPage() {
         const courseData = Array.isArray(response.data?.data?.courses)
           ? response.data.data.courses
           : [];
+          console.log(courseData);
         setTimeout(() => {
           setCourses(courseData);
           setFilteredCourses(courseData);
@@ -416,20 +418,20 @@ function CourseCard({ course, onClick }) {
       <div className='h-40 bg-[#1D3D6F] relative'>
         <img
           src={course.image || "/placeholder.svg?height=200&width=300"}
-          alt={course.title}
+          alt={course.name}
           className='w-full h-full object-cover opacity-50'
         />
         <div className='absolute top-0 left-0 w-full h-full p-4 flex flex-col justify-between'>
           <div className='flex justify-between'>
             <span className='bg-[#F7B500] text-[#1D3D6F] text-xs font-bold px-2 py-1 rounded-md'>
-              {course.department}
+              {course.department_id.name}
             </span>
             <span className='bg-white text-[#1D3D6F] text-xs font-bold px-2 py-1 rounded-md'>
               {course.code}
             </span>
           </div>
           <h3 className='text-white text-xl font-semibold line-clamp-2'>
-            {course.title}
+            {course.name}
           </h3>
         </div>
       </div>
@@ -474,7 +476,7 @@ function CourseDetail({ course, onBackClick }) {
           <div>
             <div className='flex items-center gap-2 mb-2'>
               <span className='bg-[#F7B500] text-[#1D3D6F] text-xs font-bold px-2 py-1 rounded-md'>
-                {course.department}
+                {course.department_id.name}
               </span>
               <span className='bg-white text-[#1D3D6F] text-xs font-bold px-2 py-1 rounded-md'>
                 {course.code}
@@ -483,7 +485,7 @@ function CourseDetail({ course, onBackClick }) {
                 {course.level}
               </span>
             </div>
-            <h1 className='text-2xl md:text-3xl font-bold'>{course.title}</h1>
+            <h1 className='text-2xl md:text-3xl font-bold'>{course.name}</h1>
             <p className='mt-2 text-white opacity-90'>
               Instructor: {course.instructor}
             </p>
@@ -555,7 +557,7 @@ function CourseDetail({ course, onBackClick }) {
                 <li className='flex justify-between'>
                   <span className='text-gray-600'>Department:</span>
                   <span className='font-medium text-[#1D3D6F]'>
-                    {course.department}
+                    {course.department_id.name}
                   </span>
                 </li>
                 <li className='flex justify-between'>
@@ -609,138 +611,3 @@ function CourseDetail({ course, onBackClick }) {
   );
 }
 
-// Sample data for demonstration - preserved from the original implementation
-const sampleCourses = [
-  {
-    id: 1,
-    code: "ECON101",
-    title: "Principles of Microeconomics",
-    instructor: "Dr. Ahmad Ahmadi",
-    department: "Economics",
-    semester: "Fall",
-    level: "Undergraduate",
-    credits: 3,
-    description:
-      "This course introduces students to the principles of microeconomics, focusing on the behavior of individuals and firms in making decisions regarding the allocation of limited resources.",
-    schedule: "Monday, Wednesday 10:00 AM - 11:30 AM",
-    location: "Room 203, Economics Building",
-    materials: [
-      { id: 1, title: "Course Syllabus", type: "pdf", size: "420 KB" },
-      { id: 2, title: "Lecture Notes Week 1", type: "pdf", size: "1.2 MB" },
-      { id: 3, title: "Assignment 1", type: "docx", size: "350 KB" },
-    ],
-    prerequisites: ["None"],
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: 2,
-    code: "ECON201",
-    title: "Macroeconomic Theory",
-    instructor: "Prof. Sarah Johnson",
-    department: "Economics",
-    semester: "Spring",
-    level: "Undergraduate",
-    credits: 4,
-    description:
-      "This course examines the economy as a whole, including topics such as economic growth, inflation, unemployment, and monetary and fiscal policy.",
-    schedule: "Tuesday, Thursday 1:00 PM - 2:30 PM",
-    location: "Room 105, Economics Building",
-    materials: [
-      { id: 1, title: "Course Syllabus", type: "pdf", size: "380 KB" },
-      { id: 2, title: "Macroeconomics Textbook", type: "pdf", size: "15.7 MB" },
-    ],
-    prerequisites: ["ECON101"],
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: 3,
-    code: "FIN301",
-    title: "Financial Management",
-    instructor: "Dr. Mohammad Karimi",
-    department: "Finance",
-    semester: "Fall",
-    level: "Undergraduate",
-    credits: 3,
-    description:
-      "This course provides an introduction to the theory, methods, and concepts of business finance, with an emphasis on financial decision-making.",
-    schedule: "Monday, Wednesday, Friday 9:00 AM - 10:00 AM",
-    location: "Room 302, Business Building",
-    materials: [
-      { id: 1, title: "Course Syllabus", type: "pdf", size: "450 KB" },
-      {
-        id: 2,
-        title: "Financial Calculator Guide",
-        type: "pdf",
-        size: "2.3 MB",
-      },
-    ],
-    prerequisites: ["ECON101", "ACCT201"],
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: 4,
-    code: "STAT202",
-    title: "Business Statistics",
-    instructor: "Prof. Fatima Ahmadi",
-    department: "Statistics",
-    semester: "Spring",
-    level: "Undergraduate",
-    credits: 3,
-    description:
-      "This course covers statistical concepts and methods useful in analyzing business and economic data, including probability, sampling, estimation, and hypothesis testing.",
-    schedule: "Tuesday, Thursday 10:00 AM - 11:30 AM",
-    location: "Room 201, Mathematics Building",
-    materials: [
-      { id: 1, title: "Course Syllabus", type: "pdf", size: "320 KB" },
-      { id: 2, title: "Statistical Tables", type: "pdf", size: "1.5 MB" },
-      { id: 3, title: "Practice Problems", type: "pdf", size: "2.1 MB" },
-    ],
-    prerequisites: ["MATH101"],
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: 5,
-    code: "ECON405",
-    title: "International Economics",
-    instructor: "Dr. John Smith",
-    department: "Economics",
-    semester: "Fall",
-    level: "Graduate",
-    credits: 4,
-    description:
-      "This course examines international trade theory and policy, balance of payments, foreign exchange markets, and international monetary systems.",
-    schedule: "Monday, Wednesday 2:00 PM - 3:30 PM",
-    location: "Room 405, Economics Building",
-    materials: [
-      { id: 1, title: "Course Syllabus", type: "pdf", size: "410 KB" },
-      {
-        id: 2,
-        title: "International Trade Models",
-        type: "pptx",
-        size: "5.3 MB",
-      },
-    ],
-    prerequisites: ["ECON201", "ECON301"],
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: 6,
-    code: "MGT301",
-    title: "Principles of Management",
-    instructor: "Prof. Zahra Noori",
-    department: "Management",
-    semester: "Spring",
-    level: "Undergraduate",
-    credits: 3,
-    description:
-      "This course introduces students to the fundamental concepts of management, including planning, organizing, leading, and controlling.",
-    schedule: "Tuesday, Thursday 3:00 PM - 4:30 PM",
-    location: "Room 203, Business Building",
-    materials: [
-      { id: 1, title: "Course Syllabus", type: "pdf", size: "380 KB" },
-      { id: 2, title: "Case Studies", type: "pdf", size: "3.2 MB" },
-    ],
-    prerequisites: ["None"],
-    image: "/placeholder.svg?height=200&width=300",
-  },
-];

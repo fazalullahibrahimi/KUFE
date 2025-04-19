@@ -11,19 +11,19 @@ const mongoose = require("mongoose");
 const getResearch = asyncHandler(async (req, res) => {
   let query;
 
-  // For public access, only show published research
+  // For public access, only show accepted research
   if (!req.user) {
-    query = Research.find({ status: "published" });
+    query = Research.find({ status: "accepted" });
   } else if (req.user.role === "admin") {
     // Admin can see all research
     query = Research.find();
   } else {
-    // Faculty and students can see published research and their own research
+    // Faculty and students can see accepted research and their own research
     const authoredResearch = await ResearchAuthor.find({ author_id: req.user.id }).select("research_id");
     const authoredIds = authoredResearch.map((item) => item.research_id);
 
     query = Research.find({
-      $or: [{ status: "published" }, { _id: { $in: authoredIds } }],
+      $or: [{ status: "accepted" }, { _id: { $in: authoredIds } }],
     });
   }
 
@@ -39,15 +39,16 @@ const getResearch = asyncHandler(async (req, res) => {
 
       // Convert Mongoose document to plain object
       const paperObj = paper.toObject();
-      
-      // Add authors to the research paper object
+
       return {
         ...paperObj,
         authors: authors.map(author => ({
           _id: author._id,
           author_id: author.author_id,
           author_type: author.author_type
-        }))
+        })),
+        pages: paper.pages,
+        category: paper.category
       };
     })
   );
@@ -59,6 +60,7 @@ const getResearch = asyncHandler(async (req, res) => {
     })
   );
 });
+
 
 // @desc    Get single research
 // @route   GET /api/research/:id
@@ -109,14 +111,16 @@ const getSingleResearch = asyncHandler(async (req, res) => {
 // @route   POST /api/research
 // @access  Private
 const createResearch = asyncHandler(async (req, res) => {
-  const { title, abstract, co_authors } = req.body;
+  const { title, abstract, status, pages, category, co_authors } = req.body;
 
   // Create research
   const research = await Research.create({
     title,
     abstract,
     file_path: req.file ? req.file.path : null,
-    status: "submitted",
+    status: req.user.role === "admin" ? status || "pending" : "pending", // control status access
+    pages,
+    category,
   });
 
   // Add current user as author
@@ -139,42 +143,37 @@ const createResearch = asyncHandler(async (req, res) => {
     await Promise.all(authorPromises);
   }
 
-  // Get the created research with authors
   const createdResearch = await Research.findById(research._id);
   const authors = await ResearchAuthor.find({ research_id: research._id })
     .populate("author_id", "fullName email role");
 
-  // Convert Mongoose document to plain object
   const researchObj = createdResearch.toObject();
 
   res.status(201).json(
-    apiResponse.success("Research submitted successfully", { 
+    apiResponse.success("Research submitted successfully", {
       research: {
         ...researchObj,
-        authors
-      }
+        authors,
+      },
     }, 201)
   );
 });
+
 
 // @desc    Update research
 // @route   PUT /api/research/:id
 // @access  Private
 const updateResearch = asyncHandler(async (req, res) => {
-  // Validate MongoDB ID
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json(apiResponse.error("Invalid research ID", 400));
   }
 
   let research = await Research.findById(req.params.id);
-
   if (!research) {
     return res.status(404).json(apiResponse.error(`Research not found with id of ${req.params.id}`, 404));
   }
 
-  // Check if user is authorized to update this research
   if (req.user.role !== "admin") {
-    // Check if user is an author
     const isAuthor = await ResearchAuthor.findOne({
       research_id: research._id,
       author_id: req.user.id,
@@ -185,20 +184,19 @@ const updateResearch = asyncHandler(async (req, res) => {
     }
   }
 
-  // Update fields
-  const { title, abstract, status } = req.body;
+  const { title, abstract, status, pages, category } = req.body;
 
   const updateData = {
     title: title || research.title,
     abstract: abstract || research.abstract,
+    pages: pages || research.pages,
+    category: category || research.category,
   };
 
-  // Only admin can change status
   if (status && req.user.role === "admin") {
     updateData.status = status;
   }
 
-  // Update file if provided
   if (req.file) {
     updateData.file_path = req.file.path;
   }
@@ -208,19 +206,17 @@ const updateResearch = asyncHandler(async (req, res) => {
     runValidators: true,
   });
 
-  // Get authors
   const authors = await ResearchAuthor.find({ research_id: research._id })
     .populate("author_id", "fullName email role");
 
-  // Convert Mongoose document to plain object
   const researchObj = research.toObject();
 
   res.status(200).json(
-    apiResponse.success("Research updated successfully", { 
+    apiResponse.success("Research updated successfully", {
       research: {
         ...researchObj,
-        authors
-      }
+        authors,
+      },
     })
   );
 });
@@ -254,29 +250,23 @@ const deleteResearch = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 const getResearchByStatus = asyncHandler(async (req, res) => {
   const { status } = req.params;
-  
-  // Validate status
-  const validStatuses = ["submitted", "under review", "published"];
+
+  const validStatuses = ["pending", "accepted", "rejected"];
   if (!validStatuses.includes(status)) {
     return res.status(400).json(
       apiResponse.error(`Invalid status. Must be one of: ${validStatuses.join(", ")}`, 400)
     );
   }
 
-  // Find research with the specified status
   const researchPapers = await Research.find({ status });
 
-  // Fetch authors for each research paper
   const researchWithAuthors = await Promise.all(
     researchPapers.map(async (paper) => {
-      // Get authors for this research
       const authors = await ResearchAuthor.find({ research_id: paper._id })
         .populate("author_id", "fullName email role");
 
-      // Convert Mongoose document to plain object
       const paperObj = paper.toObject();
-      
-      // Add authors to the research paper object
+
       return {
         ...paperObj,
         authors: authors.map(author => ({
@@ -295,6 +285,7 @@ const getResearchByStatus = asyncHandler(async (req, res) => {
     })
   );
 });
+
 
 module.exports = {
   getResearch,

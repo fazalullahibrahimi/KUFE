@@ -18,11 +18,20 @@ const ResearchSchema = new mongoose.Schema(
     file_path: {
       type: String,
     },
+    pages: {
+      type: Number,
+      min: 1,
+    },
+    category: {
+        type: String,
+        required: true
+    },
+    
     status: {
       type: String,
-      enum: ["submitted", "under review", "published"],
-      default: "submitted",
-    },
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    }
   },
   { timestamps: true }
   

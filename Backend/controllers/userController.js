@@ -714,7 +714,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
       message:"There was an error sending the email. Try again later!"
     })
  
-  }
+  }  
 });
 
 
