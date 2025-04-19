@@ -32,6 +32,7 @@ const newsRoutes = require("./routes/newsRoutes");
 const resourceRoutes = require("./routes/resourceRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const announcement = require("./routes/announcementsRoute");
+const contact = require("./routes/contactRoute");
 
 const app = express();
 app.use("/public", express.static(path.join(__dirname, "public")));
@@ -106,6 +107,7 @@ app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/news", newsRoutes);
 app.use("/api/v1/resources", resourceRoutes);
 app.use("/api/v1/announcement", announcement);
+app.use("/api/v1/contact", contact)
 
 // Error handler middleware
 app.use(errorHandler);

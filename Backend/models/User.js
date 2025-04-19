@@ -2,26 +2,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
-const contactSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Please provide your name'],
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: [true, 'Please provide your email address'],
-      trim: true,
-    },
-    message: {
-      type: String,
-      required: [true, 'Please provide your message'],
-      trim: true,
-    },
-  },
-  { timestamps: true }
-);
 
 const userSchema = new mongoose.Schema(
   {
@@ -55,7 +35,6 @@ const userSchema = new mongoose.Schema(
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
-    contacts: [contactSchema], // Array of contact subdocuments
   },
   { timestamps: true }
 );

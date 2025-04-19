@@ -91,6 +91,24 @@ const getDepartments = asyncHandler(async (req, res) => {
   )
 })
 
+const getDepartmentName = asyncHandler(async (req, res) => {
+  // Fetch only the 'name' field, excluding '_id'
+  const departments = await Department.find().select("name");
+
+  // Extract just the names into a plain array
+  const departmentNames = departments.map(dep => dep.name);
+
+  res.status(200).json(
+    apiResponse.success("Departments retrieved successfully", {
+      count: departmentNames.length,
+      departments: departmentNames,
+    })
+  );
+});
+
+module.exports = { getDepartments };
+
+
 // @desc    Get single department
 // @route   GET /api/departments/:id
 // @access  Public
@@ -448,5 +466,6 @@ module.exports = {
   getDepartmentFacultyMembers,
   getFeaturedDepartments,
   getDepartmentStatistics,
-  getUniversityStatistics
+  getUniversityStatistics,
+  getDepartmentName
 }

@@ -30,13 +30,6 @@ router.patch("/photo",
   userController.uploadUserPhoto, 
   userController.resizeUserPhoto, 
   userController.updateUserPhoto);
-
-// Contact routes
-router.post("/contacts", userController.addContact);
-router.patch("/contacts/:contactId", userController.updateContact);
-router.delete("/contacts/:contactId", userController.removeContact);
-router.get("/contacts", userController.getAllContacts);
-
 // Admin routes
 router.use(authorizeAdmin);
 

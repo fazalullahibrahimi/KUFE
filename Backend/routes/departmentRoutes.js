@@ -15,6 +15,7 @@ router.get("/statistics", departmentController.getDepartmentStatistics);
 router.get("/:id/courses", departmentController.getDepartmentWithCourses);
 router.get("/:id/faculty-members", departmentController.getDepartmentFacultyMembers);
 router.get("/university-statistics", departmentController.getUniversityStatistics);
+router.get("/getdepartmentName", departmentController.getDepartmentName);
 
 // Standard public routes
 router.get("/", departmentController.getDepartments);
