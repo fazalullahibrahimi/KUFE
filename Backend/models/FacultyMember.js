@@ -1,12 +1,7 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const FacultyMemberSchema = new mongoose.Schema(
   {
-    user_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
     name: {
       type: String,
       required: [true, "Please add a name"],
@@ -42,6 +37,5 @@ const FacultyMemberSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
- const FacultyMember = mongoose.model("FacultyMember", FacultyMemberSchema);
- module.exports = FacultyMember;
+const FacultyMember = mongoose.model("FacultyMember", FacultyMemberSchema);
+module.exports = FacultyMember;

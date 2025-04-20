@@ -1,211 +1,269 @@
-const Student = require("../models/Student")
-const User = require("../models/User")
-const Department = require("../models/Department")
-const apiResponse = require("../utils/apiResponse")
-const asyncHandler = require("../middleware/asyncHandler")
+const Student = require("../models/Student");
+const Department = require("../models/Department");
+const apiResponse = require("../utils/apiResponse");
+const asyncHandler = require("../middleware/asyncHandler");
 
+const multer = require("multer");
+const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs");
+
+
+
+const multerStorage = multer.memoryStorage();
+
+// Filter to ensure only images are uploaded
+const multerFilter = (req, file, cb) => {
+
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb("Not an image! Please upload only images.", false);
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb('Not an image! Please upload only images.', false);
+  }
+};}
+
+// Multer upload configuration
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// Middleware to handle single image file upload with name 'image'
+
+const uploasStudentPhoto = upload.single("image");
 // @desc    Get all students
 // @route   GET /api/students
 // @access  Private/Admin/Faculty
 const getStudents = asyncHandler(async (req, res) => {
-  let query
+  let query;
 
-  // Copy req.query
-  const reqQuery = { ...req.query }
+  const reqQuery = { ...req.query };
+  const removeFields = ["select", "sort", "page", "limit"];
+  removeFields.forEach(param => delete reqQuery[param]);
 
-  // Fields to exclude
-  const removeFields = ["select", "sort", "page", "limit"]
+  let queryStr = JSON.stringify(reqQuery);
+  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
-  // Loop over removeFields and delete them from reqQuery
-  removeFields.forEach((param) => delete reqQuery[param])
+  query = Student.find(JSON.parse(queryStr));
 
-  // Create query string
-  let queryStr = JSON.stringify(reqQuery)
-
-  // Create operators ($gt, $gte, etc)
-  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`)
-
-  // Finding resource
-  query = Student.find(JSON.parse(queryStr))
-
-  // Select Fields
   if (req.query.select) {
-    const fields = req.query.select.split(",").join(" ")
-    query = query.select(fields)
+    const fields = req.query.select.split(",").join(" ");
+    query = query.select(fields);
   }
 
-  // Sort
   if (req.query.sort) {
-    const sortBy = req.query.sort.split(",").join(" ")
-    query = query.sort(sortBy)
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = query.sort(sortBy);
   } else {
-    query = query.sort("-created_at")
+    query = query.sort("-createdAt");
   }
 
-  // Pagination
-  const page = Number.parseInt(req.query.page, 10) || 1
-  const limit = Number.parseInt(req.query.limit, 10) || 25
-  const startIndex = (page - 1) * limit
-  const endIndex = page * limit
-  const total = await Student.countDocuments()
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 25;
+  const startIndex = (page - 1) * limit;
+  const total = await Student.countDocuments();
 
-  query = query.skip(startIndex).limit(limit)
+  query = query.skip(startIndex).limit(limit);
 
-  // Populate
-  query = query.populate([
-    {
-      path: "user_id",
-      select: "username email",
-    },
-    {
-      path: "department_id",
-      select: "name",
-    },
-  ])
+  query = query.populate("department_id", "name");
 
-  // Executing query
-  const students = await query
+  const students = await query;
 
-  // Pagination result
-  const pagination = {}
+  const pagination = {};
+  if ((page * limit) < total) pagination.next = { page: page + 1, limit };
+  if (startIndex > 0) pagination.prev = { page: page - 1, limit };
 
-  if (endIndex < total) {
-    pagination.next = {
-      page: page + 1,
-      limit,
-    }
-  }
-
-  if (startIndex > 0) {
-    pagination.prev = {
-      page: page - 1,
-      limit,
-    }
-  }
-
-  res.status(200).json(
-    apiResponse.success("Students retrieved successfully", {
-      count: students.length,
-      pagination,
-      students,
-    }),
-  )
-})
+  res.status(200).json(apiResponse.success("Students retrieved successfully", {
+    count: students.length,
+    pagination,
+    students,
+  }));
+});
 
 // @desc    Get single student
 // @route   GET /api/students/:id
 // @access  Private/Admin/Faculty
 const getStudent = asyncHandler(async (req, res) => {
   const student = await Student.findById(req.params.id)
-    .populate("user_id", "username email")
-    .populate("department_id", "name")
+    .populate("department_id", "name");
 
   if (!student) {
-    return res.status(404).json(apiResponse.error(`Student not found with id of ${req.params.id}`, 404))
+    return res.status(404).json(apiResponse.error(`Student not found with id of ${req.params.id}`, 404));
   }
 
-  res.status(200).json(apiResponse.success("Student retrieved successfully", { student }))
-})
+  res.status(200).json(apiResponse.success("Student retrieved successfully", { student }));
+});
 
 // @desc    Create new student
 // @route   POST /api/students
 // @access  Private/Admin
 const createStudent = asyncHandler(async (req, res) => {
-  const { user_id, name, department_id, enrollment_year, student_id_number } = req.body
-
-  // Check if user exists
-  const user = await User.findById(user_id)
-  if (!user) {
-    return res.status(404).json(apiResponse.error("User not found", 404))
-  }
-
-  // Check if department exists
-  const department = await Department.findById(department_id)
-  if (!department) {
-    return res.status(404).json(apiResponse.error("Department not found", 404))
-  }
-
-  // Check if student already exists for this user
-  const existingStudent = await Student.findOne({ user_id })
-  if (existingStudent) {
-    return res.status(400).json(apiResponse.error("Student already exists for this user", 400))
-  }
-
-  // Check if student ID number is already in use
-  const studentWithSameId = await Student.findOne({ student_id_number })
-  if (studentWithSameId) {
-    return res.status(400).json(apiResponse.error("Student ID number is already in use", 400))
-  }
-
-  // Create student
-  const student = await Student.create({
-    user_id,
+  const {
     name,
     department_id,
-    enrollment_year,
     student_id_number,
-  })
+    enrollment_year,
+    date_of_birth,
+    gender,
+    email,
+    phone,
+    address,
+    status,
+    profile_image,
+  } = req.body;
 
-  // Update user role if not already student
-  if (user.role !== "student") {
-    await User.findByIdAndUpdate(user_id, { role: "student" })
+  const department = await Department.findById(department_id);
+  if (!department) {
+    return res.status(404).json(apiResponse.error("Department not found", 404));
   }
 
-  res.status(201).json(apiResponse.success("Student created successfully", { student }, 201))
-})
+  const existingStudentId = await Student.findOne({ student_id_number });
+  if (existingStudentId) {
+    return res.status(400).json(apiResponse.error("Student ID number is already in use", 400));
+  }
+
+  const existingEmail = await Student.findOne({ email });
+  if (existingEmail) {
+    return res.status(400).json(apiResponse.error("Email is already associated with another student", 400));
+  }
+
+  const student = await Student.create({
+    name,
+    department_id,
+    student_id_number,
+    enrollment_year,
+    date_of_birth,
+    gender,
+    email,
+    phone,
+    address,
+    status,
+    profile_image,
+  });
+
+  res.status(201).json(apiResponse.success("Student created successfully", { student }, 201));
+});
 
 // @desc    Update student
 // @route   PUT /api/students/:id
 // @access  Private/Admin
 const updateStudent = asyncHandler(async (req, res) => {
-  const { name, department_id, enrollment_year } = req.body
+  const {
+    name,
+    department_id,
+    enrollment_year,
+    date_of_birth,
+    gender,
+    email,
+    phone,
+    address,
+    status,
+    profile_image,
+  } = req.body;
 
-  // Check if department exists if provided
   if (department_id) {
-    const department = await Department.findById(department_id)
+    const department = await Department.findById(department_id);
     if (!department) {
-      return res.status(404).json(apiResponse.error("Department not found", 404))
+      return res.status(404).json(apiResponse.error("Department not found", 404));
     }
   }
 
-  // Find student to update
-  let student = await Student.findById(req.params.id)
-
+  let student = await Student.findById(req.params.id);
   if (!student) {
-    return res.status(404).json(apiResponse.error(`Student not found with id of ${req.params.id}`, 404))
+    return res.status(404).json(apiResponse.error(`Student not found with id of ${req.params.id}`, 404));
   }
 
-  // Build update object
-  const updateData = {}
-  if (name) updateData.name = name
-  if (department_id) updateData.department_id = department_id
-  if (enrollment_year) updateData.enrollment_year = enrollment_year
+  const updateData = {
+    name,
+    department_id,
+    enrollment_year,
+    date_of_birth,
+    gender,
+    email,
+    phone,
+    address,
+    status,
+    profile_image,
+  };
 
-  // Update student
   student = await Student.findByIdAndUpdate(req.params.id, updateData, {
     new: true,
     runValidators: true,
-  })
-    .populate("user_id", "username email")
-    .populate("department_id", "name")
+  }).populate("department_id", "name");
 
-  res.status(200).json(apiResponse.success("Student updated successfully", { student }))
-})
+  res.status(200).json(apiResponse.success("Student updated successfully", { student }));
+});
 
 // @desc    Delete student
 // @route   DELETE /api/students/:id
 // @access  Private/Admin
 const deleteStudent = asyncHandler(async (req, res) => {
-  const student = await Student.findById(req.params.id)
-
+  const student = await Student.findById(req.params.id);
   if (!student) {
-    return res.status(404).json(apiResponse.error(`Student not found with id of ${req.params.id}`, 404))
+    return res.status(404).json(apiResponse.error(`Student not found with id of ${req.params.id}`, 404));
   }
 
-  await student.remove()
+  await student.deleteOne();
 
-  res.status(200).json(apiResponse.success("Student deleted successfully", {}))
-})
+  res.status(200).json(apiResponse.success("Student deleted successfully", {}));
+});
+
+const resizeStudentPhoto = asyncHandler(async (req, res, next) => {
+  if (!req.file) return next();
+
+  const dir = path.join(__dirname, '../.././frontend/public/img/users');
+  if (!fs.existsSync(dir)) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+    } catch (error) {
+      console.error('Error creating image directory:', error);
+      return res.status(500).send({
+        success:false,
+        message:"Failed to create image directory"
+      })
+      
+    }
+  }
+
+  const filename = `user-${Date.now()}-${Math.random()
+    .toString(36)
+    .substr(2, 9)}.jpeg`;
+  req.file.filename = filename;
+
+  try {
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(path.join(dir, filename));
+  } catch (error) {
+    console.error('Error processing image:', error);
+    return res.status(500).send({
+      success:false,
+      message:"Error processing image"
+    })
+   
+  }
+
+  next();
+});
+
+
+
+// Get total number of students
+const getStudentCount = async (req, res) => {
+  try {
+    const count = await Student.countDocuments();
+    res.status(200).json(count);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to get student count", error });
+  }
+};
+
 
 module.exports = {
   getStudents,
@@ -213,5 +271,7 @@ module.exports = {
   createStudent,
   updateStudent,
   deleteStudent,
-}
-
+  uploasStudentPhoto,
+  resizeStudentPhoto,
+  getStudentCount
+};

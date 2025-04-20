@@ -21,7 +21,7 @@ router.get("/:id", getFaculty)
 
 router.use(authMiddleware);
 router.post("/", facultyValidationRules(), validate, createFaculty)
-router.put("/:id", updateFaculty)
+router.patch("/:id", updateFaculty)
 router.delete("/:id", deleteFaculty)
 
 module.exports = router

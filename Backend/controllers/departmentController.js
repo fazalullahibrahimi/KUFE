@@ -208,6 +208,21 @@ const getAcademicPrograms = asyncHandler(async (req, res) => {
   );
 });
 
+
+const getAcademicProgramCount = asyncHandler(async (req, res) => {
+  const departments = await Department.find().select("name description")
+  // Transform departments into programs format without icons
+  const programs = departments.map((dept) => {
+    return {
+      title: dept.name,
+      description: dept.description || "Program offered by the department",
+      department_id: dept._id
+    };
+  });
+
+  res.status(200).json(programs.length);
+});
+
 const getDepartmentWithCourses = asyncHandler(async (req, res) => {
   // Validate MongoDB ID
   if (!validateMongodbId(req.params.id)) {
@@ -455,6 +470,23 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
   }
 });
 
+
+const getResearchPaperCount = asyncHandler(async (req, res) => {
+  try {
+    const Research = require("../models/Research");
+
+    const researchCount = await Research.countDocuments();
+
+
+    res.status(200).json(researchCount);
+  } catch (error) {
+    console.error("Error fetching research paper count:", error);
+    res.status(500).json(
+      apiResponse.error("Failed to retrieve research paper count", 500)
+    );
+  }
+});
+
 module.exports = {
   getDepartments,
   getDepartment,
@@ -467,5 +499,7 @@ module.exports = {
   getFeaturedDepartments,
   getDepartmentStatistics,
   getUniversityStatistics,
-  getDepartmentName
+  getDepartmentName,
+  getAcademicProgramCount,
+  getResearchPaperCount
 }

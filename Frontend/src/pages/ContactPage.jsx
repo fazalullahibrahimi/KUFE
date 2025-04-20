@@ -23,7 +23,7 @@ function ContactPage() {
   const [departments, setDepartments] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
-  console.log("Departments Data:"+departments)
+  console.log("Departments Data:", departments)
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -84,23 +84,6 @@ function ContactPage() {
       setFormSubmitted(true)
 
       // Reset form after 3 seconds
-      useEffect(() => {
-        if (formSubmitted) {
-          const timer = setTimeout(() => {
-            setFormSubmitted(false);
-            setFormData({
-              name: "",
-              email: "",
-              subject: "",
-              department: "",
-              message: "",
-            });
-          }, 3000);
-      
-          return () => clearTimeout(timer); // Cleanup timer on component unmount or state change
-        }
-      }, [formSubmitted]);
-      
     } catch (err) {
       console.error("Error submitting form:", err)
       setError(err.message)
@@ -108,6 +91,23 @@ function ContactPage() {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (formSubmitted) {
+      const timer = setTimeout(() => {
+        setFormSubmitted(false)
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          department: "",
+          message: "",
+        })
+      }, 3000)
+
+      return () => clearTimeout(timer) // Cleanup timer on component unmount or state change
+    }
+  }, [formSubmitted])
 
   return (
     <div className="min-h-screen bg-[#E8ECEF]">
@@ -218,46 +218,41 @@ function ContactPage() {
                             className="border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20"
                           />
                         </div>
-                  <div className="space-y-3">
-  <Label htmlFor="department" className="text-[#1D3D6F] font-medium">
-    Department
-  </Label>
-  <Select
-    name="department"
-    value={formData.department ?? ""}
-    onValueChange={(value) => setFormData({ ...formData, department: value })}
-  >
-    <SelectTrigger className="border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20">
-      <SelectValue placeholder="Select Department" />
-    </SelectTrigger>
-    <SelectContent className="bg-white border-[#E8ECEF] z-50">
-      {isLoading ? (
-        <SelectItem value="" disabled>
-          Loading departments...
-        </SelectItem>
-      ) : error ? (
-        <SelectItem value="" disabled>
-          Error loading departments
-        </SelectItem>
-      ) : departments && departments.length > 0 ? (
-        departments.map((department, index) => (
-          <SelectItem
-            key={index}
-            value={department}
-            className="hover:bg-[#E8ECEF] rounded-md"
-          >
-            {department}
-          </SelectItem>
-        ))
-      ) : (
-        <SelectItem value="" disabled>
-          No departments available
-        </SelectItem>
-      )}
-    </SelectContent>
-  </Select>
-</div>
-
+                        <div className="space-y-3">
+                          <Label htmlFor="department" className="text-[#1D3D6F] font-medium">
+                            Department
+                          </Label>
+                          <Select
+                            name="department"
+                            value={formData.department ?? ""}
+                            onValueChange={(value) => setFormData({ ...formData, department: value })}
+                          >
+                            <SelectTrigger className="border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20">
+                              <SelectValue placeholder="Select Department" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white border-[#E8ECEF] z-50">
+                              {isLoading ? (
+                                <SelectItem value="" disabled>
+                                  Loading departments...
+                                </SelectItem>
+                              ) : error ? (
+                                <SelectItem value="" disabled>
+                                  Error loading departments
+                                </SelectItem>
+                              ) : departments && departments.length > 0 ? (
+                                departments.map((department, index) => (
+                                  <SelectItem key={index} value={department} className="hover:bg-[#E8ECEF] rounded-md">
+                                    {department}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="" disabled>
+                                  No departments available
+                                </SelectItem>
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
 
                       <div className="space-y-3">

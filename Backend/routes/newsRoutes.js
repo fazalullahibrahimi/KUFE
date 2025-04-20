@@ -16,7 +16,7 @@ router.use(authMiddleware)
 // Admin and faculty can create/update/delete news
 router.post("/", authorize(roles.ADMIN, roles.FACULTY), createNews)
 
-router.put("/:id", authorize(roles.ADMIN, roles.FACULTY), updateNews)
+router.patch("/:id", authorize(roles.ADMIN, roles.FACULTY), updateNews)
 
 router.delete("/:id", authorize(roles.ADMIN), deleteNews)
 
