@@ -14,12 +14,9 @@ const { authMiddleware, authorize } = require("../middleware/authMiddleware");
 const { checkPermission } = require("../middleware/roleCheck");
 const roles = require("../config/roles");
 
-
 const router = express.Router();
 
 // Apply auth middleware to all routes
-
-
 
 router.get("/onestudent",getStudent);
 router.get("/studentcount",getStudentCount)
