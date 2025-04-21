@@ -5,7 +5,6 @@ import Home from "./pages/Home"; // Make sure this file exists
 
 import About from "./pages/AboutPage.jsx"; // Example additional route
 
-
 import Login from "./pages/Login";
 import AcademicPage from "./pages/AcademicPage";
 import Registration from "./pages/Registration";
@@ -15,6 +14,7 @@ import ResearchPage from "./pages/ResearchPage.jsx";
 import CoursesPage from "./pages/CoursesPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 import AnnouncementsEventsPage from "./pages/AnnouncementsEventsPage.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 
 function App() {
   return (
@@ -31,6 +31,7 @@ function App() {
         <Route path='/courses' element={<CoursesPage />} />
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/anounce' element={<AnnouncementsEventsPage />} />
+        <Route path='/dashboard' element={<Dashboard />} />
       </Routes>
     </Router>
   );
