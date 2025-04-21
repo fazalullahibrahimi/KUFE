@@ -9,7 +9,7 @@ export default function CourseCard({ course, onClick }) {
     >
       <div className='relative h-40'>
         <image
-          src={`/img/course/${course.image}`|| "/placeholder.svg?height=200&width=300"}
+          src={`http://localhost:4400/public/img/course/${course.image}`|| "/placeholder.svg?height=200&width=300"}
           alt={course.title}
           className='w-full'
         />

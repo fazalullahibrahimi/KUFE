@@ -515,7 +515,7 @@ function AnnouncementsEventsPage() {
                           <CardContent className="p-0">
                             <div className="relative h-48 overflow-hidden">
                               <img
-                                src={`/img/news/${item.image}`|| "/placeholder.svg?height=200&width=400"}
+                                src={`http://localhost:4400/public/img/news/${item.image}`|| "/placeholder.svg?height=200&width=400"}
                                 alt={item.title}
                                 className="w-full h-full object-cover"
                               />
@@ -704,7 +704,7 @@ function AnnouncementsEventsPage() {
                         <CardContent className="p-0">
                           <div className="relative h-48 overflow-hidden">
                             <img
-                              src={`/img/news/${item.image}` || "/placeholder.svg?height=200&width=400"}
+                              src={`http://localhost:4400/public/img/news/${item.image}` || "/placeholder.svg?height=200&width=400"}
                               alt={item.title}
                               className="w-full h-full object-cover"
                             />

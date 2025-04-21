@@ -166,7 +166,7 @@ const deleteCourse = asyncHandler(async (req, res) => {
 const resizeCoursePhoto = asyncHandler(async (req, res, next) => {
   if (!req.file) return next();
 
-  const dir = path.join(__dirname, '../.././frontend/public/img/courses');
+  const dir = path.join(__dirname, '.././public/img/courses');
   if (!fs.existsSync(dir)) {
     try {
       fs.mkdirSync(dir, { recursive: true });

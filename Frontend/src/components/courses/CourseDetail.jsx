@@ -38,7 +38,7 @@ export default function CourseDetail({ course, onBackClick }) {
         <div className='relative'>
           <div className='h-48 md:h-64 bg-gray-200 relative'>
             <img
-              src={`/img/course/${course.image}` || "/placeholder.svg"}
+              src={`http://localhost:4400/public/img/course/${course.image}` || "/placeholder.svg"}
               alt={course.title}
               className='w-full h-[300px] object-cover rounded-md'
             />

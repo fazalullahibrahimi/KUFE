@@ -297,7 +297,7 @@ const AcademicPage = () => {
                 >
                   <div className='h-48 relative'>
                     <img
-                      src={`/img/event/${event.image}`}
+                      src={`http://localhost:4400/public/img/event/${event.image}`}
                       alt={event.title}
                       className='w-full h-full object-cover'
                       onError={(e) => {
