@@ -15,6 +15,7 @@ import CoursesPage from "./pages/CoursesPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 import AnnouncementsEventsPage from "./pages/AnnouncementsEventsPage.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import Dashboardv1 from "./pages/Dashboardv1.jsx";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path='/contact' element={<ContactPage />} />
         <Route path='/anounce' element={<AnnouncementsEventsPage />} />
         <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/dashboardv1' element={<Dashboardv1 />} />
       </Routes>
     </Router>
   );
