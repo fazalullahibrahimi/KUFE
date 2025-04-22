@@ -191,7 +191,7 @@ const resizeUserPhoto = asyncHandler(async (req, res, next) => {
 
   const dir = path.join(__dirname, '.././public/img/users');
   if (!fs.existsSync(dir)) {
-    try {
+    try { 
       fs.mkdirSync(dir, { recursive: true });
     } catch (error) {
       console.error('Error creating image directory:', error);
