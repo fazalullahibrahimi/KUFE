@@ -113,24 +113,18 @@ const createStudent = asyncHandler(async (req, res) => {
     phone,
     address,
     status,
-    profile_image,
   } = req.body;
 
+  // Check if department exists
   const department = await Department.findById(department_id);
   if (!department) {
     return res.status(404).json(apiResponse.error("Department not found", 404));
   }
 
-  const existingStudentId = await Student.findOne({ student_id_number });
-  if (existingStudentId) {
-    return res.status(400).json(apiResponse.error("Student ID number is already in use", 400));
-  }
+  // Check if student ID number is unique
 
-  const existingEmail = await Student.findOne({ email });
-  if (existingEmail) {
-    return res.status(400).json(apiResponse.error("Email is already associated with another student", 400));
-  }
 
+  // Create student with or without image
   const student = await Student.create({
     name,
     department_id,
@@ -142,11 +136,14 @@ const createStudent = asyncHandler(async (req, res) => {
     phone,
     address,
     status,
-    profile_image,
+    profile_image: req.file ? req.file.filename : undefined,
   });
 
-  res.status(201).json(apiResponse.success("Student created successfully", { student }, 201));
+  res
+    .status(201)
+    .json(apiResponse.success("Student created successfully", { student }, 201));
 });
+
 
 // @desc    Update student
 // @route   PUT /api/students/:id
@@ -162,9 +159,9 @@ const updateStudent = asyncHandler(async (req, res) => {
     phone,
     address,
     status,
-    profile_image,
   } = req.body;
 
+  // Check if department_id is provided and valid
   if (department_id) {
     const department = await Department.findById(department_id);
     if (!department) {
@@ -172,11 +169,13 @@ const updateStudent = asyncHandler(async (req, res) => {
     }
   }
 
+  // Check if student exists
   let student = await Student.findById(req.params.id);
   if (!student) {
     return res.status(404).json(apiResponse.error(`Student not found with id of ${req.params.id}`, 404));
   }
 
+  // Prepare update data
   const updateData = {
     name,
     department_id,
@@ -187,9 +186,14 @@ const updateStudent = asyncHandler(async (req, res) => {
     phone,
     address,
     status,
-    profile_image,
   };
 
+  // If a new profile image is uploaded, update it
+  if (req.file) {
+    updateData.profile_image = req.file.filename;
+  }
+
+  // Update student document
   student = await Student.findByIdAndUpdate(req.params.id, updateData, {
     new: true,
     runValidators: true,
@@ -197,6 +201,7 @@ const updateStudent = asyncHandler(async (req, res) => {
 
   res.status(200).json(apiResponse.success("Student updated successfully", { student }));
 });
+
 
 // @desc    Delete student
 // @route   DELETE /api/students/:id
@@ -215,7 +220,7 @@ const deleteStudent = asyncHandler(async (req, res) => {
 const resizeStudentPhoto = asyncHandler(async (req, res, next) => {
   if (!req.file) return next();
 
-  const dir = path.join(__dirname, '.././public/img/users');
+  const dir = path.join(__dirname, '.././public/img/students');
   if (!fs.existsSync(dir)) {
     try {
       fs.mkdirSync(dir, { recursive: true });

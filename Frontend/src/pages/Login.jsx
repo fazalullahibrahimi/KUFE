@@ -74,7 +74,7 @@ function Login() {
         localStorage.setItem("token", response.data.user.token);
 
         const userRole = response.data.user.role;
-        const redirectPath = userRole === "admin" ? "/dashboard" : "/";
+        const redirectPath = userRole === "admin" ? "/dashboardv1" : "/";
 
         setTimeout(() => {
           window.location.href = redirectPath;

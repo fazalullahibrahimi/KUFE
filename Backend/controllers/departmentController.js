@@ -174,20 +174,27 @@ const updateDepartment = asyncHandler(async (req, res) => {
 const deleteDepartment = asyncHandler(async (req, res) => {
   // Validate MongoDB ID
   if (!validateMongodbId(req.params.id)) {
-    return res.status(400).json(apiResponse.error("Invalid department ID", 400))
+    return res.status(400).json(apiResponse.error("Invalid department ID", 400));
   }
 
-  const department = await Department.findById(req.params.id)
+  const department = await Department.findById(req.params.id);
 
   if (!department) {
-    return res.status(404).json(apiResponse.error(`Department not found with id of ${req.params.id}`, 404))
+    return res.status(404).json(apiResponse.error(`Department not found with id of ${req.params.id}`, 404));
   }
 
-  await department.remove()
+  // Replace department.remove() with deleteOne() method
+  await department.deleteOne();
+  
+  // Alternative approaches if the above doesn't work:
+  // Option 1: Use findByIdAndDelete directly
+  // await Department.findByIdAndDelete(req.params.id);
+  
+  // Option 2: Use findOneAndDelete
+  // await Department.findOneAndDelete({ _id: req.params.id });
 
-  res.status(200).json(apiResponse.success("Department deleted successfully", {}))
+  res.status(200).json(apiResponse.success("Department deleted successfully", {}));
 });
-
 
 const getAcademicPrograms = asyncHandler(async (req, res) => {
   const departments = await Department.find().select("name description")

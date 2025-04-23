@@ -5,6 +5,7 @@ const {
   createFaculty,
   updateFaculty,
   deleteFaculty,
+  getFacultiesCount,
 } = require("../controllers/facultyController")
 const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize } = require("../middleware/roleCheck")
@@ -15,6 +16,7 @@ const router = express.Router()
 
 // Public routes
 router.get("/", getFaculties)
+router.get("/count",getFacultiesCount)
 router.get("/:id", getFaculty)
 
 // Protected routes

@@ -27,7 +27,10 @@ router.post("/", authorize(roles.ADMIN),
  resizeStudentPhoto,
  createStudent);
 
-router.put("/:id", authorize(roles.ADMIN), updateStudent);
+router.patch("/:id", authorize(roles.ADMIN),
+uploasStudentPhoto,
+resizeStudentPhoto,
+updateStudent);
 
 router.delete("/:id", authorize(roles.ADMIN), deleteStudent);
 

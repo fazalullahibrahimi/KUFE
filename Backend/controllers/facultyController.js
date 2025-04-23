@@ -9,9 +9,15 @@ const validateMongodbId = require("../utils/validateMongoDBId")
 const getFaculties = asyncHandler(async (req, res) => {
   const faculties = await Faculty.find()
 
-  res.status(200).json(apiResponse.success("Faculties retrieved successfully", { faculties, count: faculties.length }))
+  res.status(200).json(apiResponse.success("Faculties retrieved successfully", 
+    { faculties, count: faculties.length }))
 })
 
+const getFacultiesCount = asyncHandler(async (req, res) => {
+  const faculties = await Faculty.find()
+  res.status(200).json(apiResponse.success("Faculties retrieved successfully", { count: faculties.length }
+  ))
+})
 // @desc    Get single faculty
 // @route   GET /api/faculty/:id
 // @access  Public
@@ -59,25 +65,24 @@ const updateFaculty = asyncHandler(async (req, res) => {
   res.status(200).json(apiResponse.success("Faculty updated successfully", { faculty }))
 })
 
-// @desc    Delete faculty
-// @route   DELETE /api/faculty/:id
-// @access  Private/Admin
+
 const deleteFaculty = asyncHandler(async (req, res) => {
   // Validate MongoDB ID
   if (!validateMongodbId(req.params.id)) {
-    return res.status(400).json(apiResponse.error("Invalid faculty ID", 400))
+    return res.status(400).json(apiResponse.error("Invalid faculty ID", 400));
   }
 
-  const faculty = await Faculty.findById(req.params.id)
+  const faculty = await Faculty.findById(req.params.id);
 
   if (!faculty) {
-    return res.status(404).json(apiResponse.error(`Faculty not found with id of ${req.params.id}`, 404))
+    return res.status(404).json(apiResponse.error(`Faculty not found with id of ${req.params.id}`, 404));
   }
 
-  await faculty.remove()
+  await faculty.deleteOne(); // Use deleteOne instead of remove
 
-  res.status(200).json(apiResponse.success("Faculty deleted successfully", {}))
-})
+  res.status(200).json(apiResponse.success("Faculty deleted successfully", {}));
+});
+
 
 module.exports = {
   getFaculties,
@@ -85,5 +90,6 @@ module.exports = {
   createFaculty,
   updateFaculty,
   deleteFaculty,
+  getFacultiesCount
 }
 

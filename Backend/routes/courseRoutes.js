@@ -3,7 +3,6 @@ const { getCourses, getCourse, createCourse, updateCourse, deleteCourse, uploadC
   resizeCoursePhoto } = require("../controllers/courseController")
 const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize, checkPermission } = require("../middleware/roleCheck")
-const { courseValidationRules, validate } = require("../utils/validators")
 const roles = require("../config/roles")
 
 const router = express.Router()
@@ -20,15 +19,16 @@ router.use(authMiddleware)
 router.post(
   "/",
   authorize(roles.ADMIN, roles.FACULTY),
-  checkPermission("manage_courses"),
-  courseValidationRules(),
-  validate,
   uploadCoursePhoto,
   resizeCoursePhoto,
   createCourse,
 )
 
-router.put("/:id", authorize(roles.ADMIN, roles.FACULTY), checkPermission("manage_courses"), updateCourse)
+router.patch("/:id", authorize(roles.ADMIN, roles.FACULTY), checkPermission("manage_courses"), 
+uploadCoursePhoto,
+resizeCoursePhoto,
+updateCourse
+);
 
 router.delete("/:id", authorize(roles.ADMIN), deleteCourse)
 
