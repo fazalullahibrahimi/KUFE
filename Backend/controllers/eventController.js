@@ -5,6 +5,38 @@ const News = require("../models/News");
 const apiResponse = require("../utils/apiResponse");
 const asyncHandler = require("../middleware/asyncHandler");
 
+
+const multer = require("multer");
+const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs");
+
+
+const multerStorage = multer.memoryStorage();
+
+// Filter to ensure only images are uploaded
+const multerFilter = (req, file, cb) => {
+
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb("Not an image! Please upload only images.", false);
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb('Not an image! Please upload only images.', false);
+  }
+};}
+
+// Multer upload configuration
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// Middleware to handle single image file upload with name 'image'
+
+const uploadEventPhoto = upload.single("image");
 // @desc    Get all events
 // @route   GET /api/events
 // @access  Public
@@ -99,25 +131,33 @@ const getEvent = asyncHandler(async (req, res) => {
   res.status(200).json(apiResponse.success("Event retrieved successfully", { event }));
 });
 
-// @desc    Create new event
-// @route   POST /api/events
-// @access  Private/Admin/Faculty
+
 const createEvent = asyncHandler(async (req, res) => {
   const { title, description, date, location, type, faculty_id } = req.body;
 
-  // Check if faculty exists if provided
+  // Validate faculty_id if provided
   if (faculty_id && !mongoose.Types.ObjectId.isValid(faculty_id)) {
     return res.status(400).json(apiResponse.error("Invalid faculty ID", 400));
   }
 
-  const event = await Event.create({ title, description, date, location, type, faculty_id });
+  // Handle uploaded image if available
+  const image = req.file ? req.file.filename : "default-event.jpg";
+
+  const event = await Event.create({
+    title,
+    description,
+    date,
+    location,
+    type,
+    faculty_id,
+    image,
+  });
 
   res.status(201).json(apiResponse.success("Event created successfully", { event }, 201));
 });
 
-// @desc    Update event
-// @route   PUT /api/events/:id
-// @access  Private/Admin/Faculty
+
+
 const updateEvent = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { title, description, date, location, type, faculty_id } = req.body;
@@ -128,16 +168,23 @@ const updateEvent = asyncHandler(async (req, res) => {
   }
 
   let event = await Event.findById(id);
-
   if (!event) {
     return res.status(404).json(apiResponse.error(`Event not found with id of ${id}`, 404));
   }
 
+  // Handle new image if uploaded
+  const image = req.file ? req.file.filename : event.image;
+
   // Update event
-  event = await Event.findByIdAndUpdate(id, { title, description, date, location, type, faculty_id }, { new: true, runValidators: true }).populate("faculty_id", "name");
+  event = await Event.findByIdAndUpdate(
+    id,
+    { title, description, date, location, type, faculty_id, image },
+    { new: true, runValidators: true }
+  ).populate("faculty_id", "name");
 
   res.status(200).json(apiResponse.success("Event updated successfully", { event }));
 });
+
 
 // @desc    Delete event
 // @route   DELETE /api/events/:id
@@ -179,11 +226,59 @@ const getLatestEvents = asyncHandler(async (req, res) => {
   }
 });
 
+
+
+
+
+const resizeEventPhoto = asyncHandler(async (req, res, next) => {
+  if (!req.file) return next();
+
+  const dir = path.join(__dirname, '.././public/img/event');
+  if (!fs.existsSync(dir)) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+    } catch (error) {
+      console.error('Error creating image directory:', error);
+      return res.status(500).send({
+        success:false,
+        message:"Failed to create image directory"
+      })
+      
+    }
+  }
+
+  const filename = `user-${Date.now()}-${Math.random()
+    .toString(36)
+    .substr(2, 9)}.jpeg`;
+  req.file.filename = filename;
+
+  try {
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(path.join(dir, filename));
+  } catch (error) {
+    console.error('Error processing image:', error);
+    return res.status(500).send({
+      success:false,
+      message:"Error processing image"
+    })
+   
+  }
+
+  next();
+});
+
+
+
 module.exports = {
   getEvents,
   getEvent,
   createEvent,
   updateEvent,
   deleteEvent,
-  getLatestEvents
+  getLatestEvents,
+  uploadEventPhoto,
+  resizeEventPhoto
 };

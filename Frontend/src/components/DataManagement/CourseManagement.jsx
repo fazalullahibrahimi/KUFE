@@ -715,7 +715,7 @@ const CourseManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Total Courses</p>
-            <p className="text-lg font-semibold text-gray-800">Active Courses</p>
+            <p className="text-lg font-semibold text-gray-800">{courses.length}</p>
           </div>
         </div>
 
@@ -725,7 +725,7 @@ const CourseManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Unique Instructors</p>
-            <p className="text-lg font-semibold text-gray-800">Teaching Staff</p>
+            <p className="text-lg font-semibold text-gray-800">{new Set(courses.map((course) => course.instructor)).size}</p>
           </div>
         </div>
 
@@ -737,7 +737,7 @@ const CourseManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Total Credits</p>
-            <p className="text-lg font-semibold text-gray-800">Credit Hours</p>
+            <p className="text-lg font-semibold text-gray-800"> {courses.reduce((total, course) => total + Number.parseInt(course.credits || 0), 0)}</p>
           </div>
         </div>
       </div>

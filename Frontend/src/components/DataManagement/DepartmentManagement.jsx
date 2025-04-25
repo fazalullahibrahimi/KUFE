@@ -300,7 +300,7 @@ const DepartmentManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Total Departments</p>
-            <p className="text-lg font-semibold text-gray-800">Academic Departments</p>
+            <p className="text-lg font-semibold text-gray-800">{departments.length}</p>
           </div>
         </div>
 
@@ -310,7 +310,7 @@ const DepartmentManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Faculties</p>
-            <p className="text-lg font-semibold text-gray-800">Parent Faculties</p>
+            <p className="text-lg font-semibold text-gray-800">{faculties.length}</p>
           </div>
         </div>
       </div>

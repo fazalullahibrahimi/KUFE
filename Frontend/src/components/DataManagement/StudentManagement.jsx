@@ -532,7 +532,7 @@ const StudentManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Total Students</p>
-            <p className="text-lg font-semibold text-gray-800">Enrolled Students</p>
+            <p className="text-lg font-semibold text-gray-800">{students.length}</p>
           </div>
         </div>
 
@@ -544,7 +544,7 @@ const StudentManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Male Students</p>
-            <p className="text-lg font-semibold text-gray-800">Gender Distribution</p>
+            <p className="text-lg font-semibold text-gray-800"> {students.filter((student) => student.gender === "Male").length}</p>
           </div>
         </div>
 
@@ -556,7 +556,7 @@ const StudentManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Female Students</p>
-            <p className="text-lg font-semibold text-gray-800">Gender Distribution</p>
+            <p className="text-lg font-semibold text-gray-800">{students.filter((student) => student.gender === "Female").length}</p>
           </div>
         </div>
       </div>

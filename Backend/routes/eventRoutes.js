@@ -1,5 +1,16 @@
 const express = require("express")
-const { getEvents, getEvent, createEvent, updateEvent, deleteEvent, getLatestEvents } = require("../controllers/eventController")
+const {
+    getEvents,
+    getEvent,
+    createEvent,
+    updateEvent,
+    deleteEvent,
+    getLatestEvents,
+    uploadEventPhoto,
+    resizeEventPhoto
+
+
+ } = require("../controllers/eventController")
 const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize } = require("../middleware/roleCheck")
 const roles = require("../config/roles")
@@ -15,9 +26,17 @@ router.get("/latest", getLatestEvents);
 router.use(authMiddleware)
 
 // Admin and faculty can create/update/delete events
-router.post("/", authorize(roles.ADMIN, roles.FACULTY), createEvent)
+router.post("/", authorize(roles.ADMIN, roles.FACULTY),
+uploadEventPhoto,
+resizeEventPhoto,
+createEvent
+);
 
-router.put("/:id", authorize(roles.ADMIN, roles.FACULTY), updateEvent)
+router.patch("/:id", authorize(roles.ADMIN, roles.FACULTY),
+uploadEventPhoto,
+resizeEventPhoto,
+updateEvent
+);
 
 router.delete("/:id", authorize(roles.ADMIN), deleteEvent)
 

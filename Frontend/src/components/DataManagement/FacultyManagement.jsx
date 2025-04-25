@@ -289,8 +289,8 @@ const FacultyManagement = () => {
 
           </div>
           <div>
-            <p className="text-gray-500 text-sm">Total Faculties: {facultyCount}</p>
-            <p className="text-lg font-semibold text-gray-800">Academic Units</p>
+            <p className="text-gray-800 text-sm">Total Faculties</p>
+            <p className="text-lg font-semibold text-gray-800">{facultyCount}</p>
           </div>
         </div>
       </div>

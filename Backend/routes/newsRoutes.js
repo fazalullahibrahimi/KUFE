@@ -1,5 +1,5 @@
 const express = require("express")
-const { getNews, getSingleNews, createNews, updateNews, deleteNews } = require("../controllers/newsController")
+const { getNews, getSingleNews, createNews, updateNews, deleteNews,uploadNewstPhoto,resizeNewsPhoto } = require("../controllers/newsController")
 const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize } = require("../middleware/roleCheck")
 const roles = require("../config/roles")
@@ -14,9 +14,16 @@ router.get("/:id", getSingleNews)
 router.use(authMiddleware)
 
 // Admin and faculty can create/update/delete news
-router.post("/", authorize(roles.ADMIN, roles.FACULTY), createNews)
+router.post("/", authorize(roles.ADMIN, roles.FACULTY),
+uploadNewstPhoto,
+resizeNewsPhoto,
+createNews
+);
 
-router.patch("/:id", authorize(roles.ADMIN, roles.FACULTY), updateNews)
+router.patch("/:id", authorize(roles.ADMIN, roles.FACULTY),
+uploadNewstPhoto,
+resizeNewsPhoto,
+updateNews)
 
 router.delete("/:id", authorize(roles.ADMIN), deleteNews)
 

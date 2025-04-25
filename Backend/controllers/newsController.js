@@ -3,6 +3,43 @@ const Faculty = require("../models/Faculty")
 const apiResponse = require("../utils/apiResponse")
 const asyncHandler = require("../middleware/asyncHandler")
 
+
+
+
+
+const multer = require("multer");
+const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs");
+
+
+const multerStorage = multer.memoryStorage();
+
+// Filter to ensure only images are uploaded
+const multerFilter = (req, file, cb) => {
+
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb("Not an image! Please upload only images.", false);
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb('Not an image! Please upload only images.', false);
+  }
+};}
+
+// Multer upload configuration
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// Middleware to handle single image file upload with name 'image'
+
+const uploadNewstPhoto = upload.single("image");
+
+
 // @desc    Get all news
 // @route   GET /api/news
 // @access  Public
@@ -97,19 +134,20 @@ const getSingleNews = asyncHandler(async (req, res) => {
   res.status(200).json(apiResponse.success("News retrieved successfully", { news }))
 })
 
-// @desc    Create new news
-// @route   POST /api/news
-// @access  Private/Admin/Faculty
+
 const createNews = asyncHandler(async (req, res) => {
   const { title, content, publish_date, category, faculty_id } = req.body
 
-  // Check if faculty exists if provided
+  // Validate faculty if provided
   if (faculty_id) {
     const faculty = await Faculty.findById(faculty_id)
     if (!faculty) {
       return res.status(404).json(apiResponse.error("Faculty not found", 404))
     }
   }
+
+  // Handle uploaded image
+  const image = req.file ? req.file.filename : "default-event.jpg"
 
   // Create news
   const news = await News.create({
@@ -118,14 +156,13 @@ const createNews = asyncHandler(async (req, res) => {
     publish_date: publish_date || Date.now(),
     category,
     faculty_id,
+    image,
   })
 
   res.status(201).json(apiResponse.success("News created successfully", { news }, 201))
 })
 
-// @desc    Update news
-// @route   PUT /api/news/:id
-// @access  Private/Admin/Faculty
+
 const updateNews = asyncHandler(async (req, res) => {
   const { title, content, publish_date, category, faculty_id } = req.body
 
@@ -137,22 +174,23 @@ const updateNews = asyncHandler(async (req, res) => {
     }
   }
 
-  // Find news to update
+  // Find existing news
   let news = await News.findById(req.params.id)
-
   if (!news) {
     return res.status(404).json(apiResponse.error(`News not found with id of ${req.params.id}`, 404))
   }
 
-  // Build update object
-  const updateData = {}
-  if (title) updateData.title = title
-  if (content) updateData.content = content
-  if (publish_date) updateData.publish_date = publish_date
-  if (category) updateData.category = category
-  if (faculty_id) updateData.faculty_id = faculty_id
+  // Prepare update object
+  const updateData = {
+    title: title || news.title,
+    content: content || news.content,
+    publish_date: publish_date || news.publish_date,
+    category: category || news.category,
+    faculty_id: faculty_id || news.faculty_id,
+    image: req.file ? req.file.filename : news.image, // Handle image update
+  }
 
-  // Update news
+  // Update news document
   news = await News.findByIdAndUpdate(req.params.id, updateData, {
     new: true,
     runValidators: true,
@@ -160,6 +198,7 @@ const updateNews = asyncHandler(async (req, res) => {
 
   res.status(200).json(apiResponse.success("News updated successfully", { news }))
 })
+
 
 // @desc    Delete news
 // @route   DELETE /api/news/:id
@@ -176,11 +215,54 @@ const deleteNews = asyncHandler(async (req, res) => {
   res.status(200).json(apiResponse.success("News deleted successfully", {}))
 })
 
+
+const resizeNewsPhoto = asyncHandler(async (req, res, next) => {
+  if (!req.file) return next();
+
+  const dir = path.join(__dirname, '.././public/img/news');
+  if (!fs.existsSync(dir)) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+    } catch (error) {
+      console.error('Error creating image directory:', error);
+      return res.status(500).send({
+        success:false,
+        message:"Failed to create image directory"
+      })
+      
+    }
+  }
+
+  const filename = `user-${Date.now()}-${Math.random()
+    .toString(36)
+    .substr(2, 9)}.jpeg`;
+  req.file.filename = filename;
+
+  try {
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(path.join(dir, filename));
+  } catch (error) {
+    console.error('Error processing image:', error);
+    return res.status(500).send({
+      success:false,
+      message:"Error processing image"
+    })
+   
+  }
+
+  next();
+});
+
 module.exports = {
   getNews,
   getSingleNews,
   createNews,
   updateNews,
   deleteNews,
+  uploadNewstPhoto,
+  resizeNewsPhoto
 }
 
