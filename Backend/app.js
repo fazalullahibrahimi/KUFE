@@ -1,3 +1,4 @@
+
 const express = require("express");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
@@ -15,6 +16,9 @@ const hpp = require("hpp");
 
 // Load env vars
 dotenv.config();
+
+const mongoose = require('mongoose');
+mongoose.set('strictPopulate', false);
 
 // Route files
 const userRoutes = require("./routes/userRoutes");

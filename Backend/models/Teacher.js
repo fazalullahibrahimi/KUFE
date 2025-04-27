@@ -14,8 +14,13 @@ const TeacherSchema = new mongoose.Schema(
     office_hours: {
       type: String,
     },
+    image: {
+      type: String,
+      default: 'default-event.jpg',
+    }
 
   },
+  
   { timestamps: true }
 );
 

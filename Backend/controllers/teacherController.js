@@ -4,88 +4,77 @@ const apiResponse = require("../utils/apiResponse")
 const asyncHandler = require("../middleware/asyncHandler.js")
 const validateMongodbId = require("../utils/validateMongoDBId.js")
 
-// @desc    Get all teachers
-// @route   GET /api/teachers
-// @access  Public
-const getTeachers = asyncHandler(async (req, res) => {
-  let query
 
-  // Copy req.query
-  const reqQuery = { ...req.query }
 
-  // Fields to exclude
-  const removeFields = ["select", "sort", "page", "limit"]
 
-  // Loop over removeFields and delete them from reqQuery
-  removeFields.forEach((param) => delete reqQuery[param])
+const multer = require("multer");
+const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs");
+const crypto = require("crypto");
+const Joi = require('joi');
 
-  // Create query string
-  let queryStr = JSON.stringify(reqQuery)
+// Multer and image processing setup remains the same
+// Configure Multer Storage in memory
+const multerStorage = multer.memoryStorage();
 
-  // Create operators ($gt, $gte, etc)
-  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`)
+// Filter to ensure only images are uploaded
+const multerFilter = (req, file, cb) => {
 
-  // Finding resource
-  query = Teacher.find(JSON.parse(queryStr))
-
-  // Select Fields
-  if (req.query.select) {
-    const fields = req.query.select.split(",").join(" ")
-    query = query.select(fields)
-  }
-
-  // Sort
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(",").join(" ")
-    query = query.sort(sortBy)
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
   } else {
-    query = query.sort("-created_at")
+    cb("Not an image! Please upload only images.", false);
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb('Not an image! Please upload only images.', false);
   }
+};}
 
-  // Pagination
-  const page = Number.parseInt(req.query.page, 10) || 1
-  const limit = Number.parseInt(req.query.limit, 10) || 25
-  const startIndex = (page - 1) * limit
-  const endIndex = page * limit
+// Multer upload configuration
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// Middleware to handle single image file upload with name 'image'
+
+const uploadTeacherPhoto = upload.single("image");
+
+
+
+const getTeachers = asyncHandler(async (req, res) => {
+  // Pagination & filtering logic stays the same...
+  const page = Number(req.query.page) || 1
+  const limit = Number(req.query.limit) || 25
+  const skip = (page - 1) * limit
+
+  const query = Teacher.find()
+    .populate({
+      path: "faculty_member_id",
+      select: "name position user_id department_id", // ✅ select the fields you're going to populate
+      populate: [
+        {
+          path: "user_id",
+          select: "username email",
+        },
+        {
+          path: "department_id",
+          select: "name",
+        },
+      ],
+    })
+    .skip(skip)
+    .limit(limit)
+    .sort("-createdAt")
+
+  const teachers = await query
   const total = await Teacher.countDocuments()
 
-  query = query.skip(startIndex).limit(limit)
-
-  // Populate
-  query = query.populate({
-    path: "faculty_member_id",
-    select: "name position",
-    populate: [
-      {
-        path: "user_id",
-        select: "username email",
-      },
-      {
-        path: "department_id",
-        select: "name",
-      },
-    ],
-  })
-
-  // Executing query
-  const teachers = await query
-
-  // Pagination result
   const pagination = {}
-
-  if (endIndex < total) {
-    pagination.next = {
-      page: page + 1,
-      limit,
-    }
-  }
-
-  if (startIndex > 0) {
-    pagination.prev = {
-      page: page - 1,
-      limit,
-    }
-  }
+  if (skip + limit < total) pagination.next = { page: page + 1, limit }
+  if (skip > 0) pagination.prev = { page: page - 1, limit }
 
   res.status(200).json(
     apiResponse.success("Teachers retrieved successfully", {
@@ -96,18 +85,16 @@ const getTeachers = asyncHandler(async (req, res) => {
   )
 })
 
-// @desc    Get single teacher
-// @route   GET /api/teachers/:id
-// @access  Public
+
+
 const getTeacher = asyncHandler(async (req, res) => {
-  // Validate MongoDB ID
   if (!validateMongodbId(req.params.id)) {
     return res.status(400).json(apiResponse.error("Invalid teacher ID", 400))
   }
 
   const teacher = await Teacher.findById(req.params.id).populate({
     path: "faculty_member_id",
-    select: "name position",
+    select: "name position user_id department_id", // ✅ include these in the first select
     populate: [
       {
         path: "user_id",
@@ -127,9 +114,8 @@ const getTeacher = asyncHandler(async (req, res) => {
   res.status(200).json(apiResponse.success("Teacher retrieved successfully", { teacher }))
 })
 
-// @desc    Create new teacher
-// @route   POST /api/teachers
-// @access  Private/Admin
+
+
 const createTeacher = asyncHandler(async (req, res) => {
   const { faculty_member_id, specialization, office_hours } = req.body
 
@@ -144,25 +130,26 @@ const createTeacher = asyncHandler(async (req, res) => {
     return res.status(404).json(apiResponse.error("Faculty member not found", 404))
   }
 
-  // Check if teacher already exists for this faculty member
+  // Check for existing teacher for this faculty member
   const existingTeacher = await Teacher.findOne({ faculty_member_id })
   if (existingTeacher) {
     return res.status(400).json(apiResponse.error("Teacher already exists for this faculty member", 400))
   }
+
+  // Handle uploaded image
+  const image = req.file ? req.file.filename : "default-event.jpg"
 
   // Create teacher
   const teacher = await Teacher.create({
     faculty_member_id,
     specialization,
     office_hours,
+    image,
   })
 
   res.status(201).json(apiResponse.success("Teacher created successfully", { teacher }, 201))
 })
 
-// @desc    Update teacher
-// @route   PUT /api/teachers/:id
-// @access  Private/Admin
 const updateTeacher = asyncHandler(async (req, res) => {
   const { specialization, office_hours } = req.body
 
@@ -171,19 +158,18 @@ const updateTeacher = asyncHandler(async (req, res) => {
     return res.status(400).json(apiResponse.error("Invalid teacher ID", 400))
   }
 
-  // Find teacher to update
   let teacher = await Teacher.findById(req.params.id)
-
   if (!teacher) {
     return res.status(404).json(apiResponse.error(`Teacher not found with id of ${req.params.id}`, 404))
   }
 
   // Build update object
-  const updateData = {}
-  if (specialization) updateData.specialization = specialization
-  if (office_hours) updateData.office_hours = office_hours
+  const updateData = {
+    specialization: specialization || teacher.specialization,
+    office_hours: office_hours || teacher.office_hours,
+    image: req.file ? req.file.filename : teacher.image,
+  }
 
-  // Update teacher
   teacher = await Teacher.findByIdAndUpdate(req.params.id, updateData, {
     new: true,
     runValidators: true,
@@ -191,23 +177,16 @@ const updateTeacher = asyncHandler(async (req, res) => {
     path: "faculty_member_id",
     select: "name position",
     populate: [
-      {
-        path: "user_id",
-        select: "username email",
-      },
-      {
-        path: "department_id",
-        select: "name",
-      },
+      { path: "user_id", select: "username email" },
+      { path: "department_id", select: "name" },
     ],
   })
 
   res.status(200).json(apiResponse.success("Teacher updated successfully", { teacher }))
 })
 
-// @desc    Delete teacher
-// @route   DELETE /api/teachers/:id
-// @access  Private/Admin
+
+
 const deleteTeacher = asyncHandler(async (req, res) => {
   // Validate MongoDB ID
   if (!validateMongodbId(req.params.id)) {
@@ -223,7 +202,48 @@ const deleteTeacher = asyncHandler(async (req, res) => {
   await teacher.remove()
 
   res.status(200).json(apiResponse.success("Teacher deleted successfully", {}))
-})
+});
+
+
+const resizeTeacherPhoto = asyncHandler(async (req, res, next) => {
+  if (!req.file) return next();
+
+  const dir = path.join(__dirname, '.././public/img/teachers');
+  if (!fs.existsSync(dir)) {
+    try { 
+      fs.mkdirSync(dir, { recursive: true });
+    } catch (error) {
+      console.error('Error creating image directory:', error);
+      return res.status(500).send({
+        success:false,
+        message:"Failed to create image directory"
+      })
+      
+    }
+  }
+
+  const filename = `user-${Date.now()}-${Math.random()
+    .toString(36)
+    .substr(2, 9)}.jpeg`;
+  req.file.filename = filename;
+
+  try {
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(path.join(dir, filename));
+  } catch (error) {
+    console.error('Error processing image:', error);
+    return res.status(500).send({
+      success:false,
+      message:"Error processing image"
+    })
+   
+  }
+
+  next();
+});
 
 module.exports = {
   getTeachers,
@@ -231,4 +251,7 @@ module.exports = {
   createTeacher,
   updateTeacher,
   deleteTeacher,
+  uploadTeacherPhoto,
+  resizeTeacherPhoto
+  
 }

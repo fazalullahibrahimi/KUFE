@@ -1,21 +1,29 @@
-const express = require("express")
-const teacherController = require("../controllers/teacherController.js")
-const { authorize } = require("../middleware/roleCheck")
-const roles = require("../config/roles")
+const express = require("express");
+const teacherController = require("../controllers/teacherController.js");
+const { authMiddleware, authorize } = require("../middleware/authMiddleware");;
+const roles = require("../config/roles");
 
-const router = express.Router()
+const router = express.Router();
 
 // Public routes
-router.get("/", teacherController.getTeachers)
-router.get("/:id", teacherController.getTeacher)
+router.get("/", teacherController.getTeachers);
+router.get("/:id", teacherController.getTeacher);
+router.use(authMiddleware);
 
 // Protected routes
-router.use(authorize(roles.ADMIN))
 
-router.post("/", teacherController.createTeacher);
-router.route("/:id")
-.patch(teacherController.updateTeacher)
-.delete(teacherController.deleteTeacher)
+router.post("/", authorize(roles.ADMIN),
+teacherController.uploadTeacherPhoto,
+teacherController.resizeTeacherPhoto,
+teacherController.createTeacher
+);
+
+router.patch("/:id", authorize(roles.ADMIN),
+teacherController.updateTeacher,
+teacherController.resizeTeacherPhoto,
+teacherController.updateTeacher
+);
+router.delete("/:id", authorize(roles.ADMIN), teacherController.deleteTeacher);
 
 
 module.exports = router

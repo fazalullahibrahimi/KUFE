@@ -14,6 +14,11 @@ router.post("/login", userController.loginUser);
 router.post("/forgotpassword", userController.forgotPassword);
 router.post("/resetpassword/:token", userController.resetPassword);
 
+
+router.post("/verify-email-otp", userController.verifyEmailWithOTP)
+router.get("/verify-email/:token", userController.verifyEmail)
+router.post("/resend-verification-otp", userController.resendVerificationOTP)
+
 // Protected routes (require authentication)
 router.use(authMiddleware) // Corrected middleware name
 
