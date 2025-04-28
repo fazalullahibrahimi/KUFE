@@ -12,7 +12,9 @@ import {
   Newspaper,
   Building,
   Layers,
+  User,
 } from "lucide-react";
+import FacultyDirectoryManagement from "./DataManagement/FacultyDirectoryManagement";
 // import Logo from "../../pub";
 const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
   // Menu items configuration
@@ -25,6 +27,11 @@ const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
     { id: "research", label: "Research", icon: <FileText size={20} /> },
     { id: "events", label: "Events", icon: <Calendar size={20} /> },
     { id: "news", label: "News", icon: <Newspaper size={20} /> },
+    {
+      id: "facultyDirectory",
+      label: "faculty Directory",
+      icon: <User size={20} />,
+    },
     {
       id: "announcements",
       label: "Announcements",
