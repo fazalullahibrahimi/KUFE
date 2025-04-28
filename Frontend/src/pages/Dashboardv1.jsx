@@ -12,6 +12,7 @@ import FacultyManagement from "../components/DataManagement/FacultyManagement";
 import DepartmentManagement from "../components/DataManagement/DepartmentManagement";
 import AnnouncementManagement from "../components/DataManagement/AnnouncementManagement";
 import DashboardHome from "../components/DashboardHome";
+import FacultyDirectoryManagement from "../components/DataManagement/FacultyDirectoryManagement";
 
 const Dashboardv1 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -43,6 +44,8 @@ const Dashboardv1 = () => {
         return <DepartmentManagement />;
       case "announcements":
         return <AnnouncementManagement />;
+      case "facultyDirectory":
+        return <FacultyDirectoryManagement />;
       default:
         return <DashboardHome />;
     }
