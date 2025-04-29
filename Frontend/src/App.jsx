@@ -21,6 +21,7 @@ import VerificationSuccess from "./pages/VerificationSuccess.jsx";
 import ResendVerification from "./pages/ResendVerification.jsx";
 import FacultyDirectory from "./pages/FacultyDirectory.jsx";
 import StudentResearchSubmission from "./pages/StudentResearchSubmission.jsx";
+import SecondPage from "./pages/Secondpage.jsx";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
         <Route path='/verification-success' element={<VerificationSuccess />} />
         <Route path='/resend-verification' element={<ResendVerification />} />
         <Route path='/studenSubmit' element={<StudentResearchSubmission />} />
+        <Route path='/second' element={<SecondPage />} />
       </Routes>
     </Router>
   );
