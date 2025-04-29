@@ -8,13 +8,13 @@ const { authMiddleware } = require("../middleware/authMiddleware.js");
 
 const router = express.Router();
 
-// Public routes for frontend dynamic content
+// Public routes for frontend dynamic 
+router.get("/:id", departmentController.getDepartmentDetails);
 router.get("/programs", departmentController.getAcademicPrograms);
 router.get("/programcount", departmentController.getAcademicProgramCount);
 router.get("/featured", departmentController.getFeaturedDepartments);
 router.get("/statistics", departmentController.getDepartmentStatistics);
 router.get("/:id/courses", departmentController.getDepartmentWithCourses);
-router.get("/:id/faculty-members", departmentController.getDepartmentFacultyMembers);
 router.get("/university-statistics", departmentController.getUniversityStatistics);
 router.get("/researchPaperCount", departmentController.getResearchPaperCount);
 router.get("/getdepartmentName", departmentController.getDepartmentName);

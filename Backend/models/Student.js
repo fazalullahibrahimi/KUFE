@@ -1,5 +1,57 @@
 const mongoose = require("mongoose");
 
+// Marks sub-schema
+const markSchema = new mongoose.Schema(
+  {
+    subject_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subject",
+      required: [true, "Subject ID is required for marks"],
+    },
+    semester_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Semester",
+      required: [true, "Semester ID is required for marks"],
+    },
+    midterm: {
+      type: Number,
+      min: 0,
+      max: 50,
+      default: 0,
+    },
+    final: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0,
+    },
+    assignment: {
+      type: Number,
+      min: 0,
+      max: 50,
+      default: 0,
+    },
+    total: {
+      type: Number,
+      min: 0,
+      max: 200,
+      default: function () {
+        return this.midterm + this.final + this.assignment;
+      },
+    },
+    grade: {
+      type: String,
+      enum: ["A", "B", "C", "D", "F", "Incomplete"],
+    },
+    remarks: {
+      type: String,
+      trim: true,
+    },
+  },
+  { _id: false } // prevent sub-id for each mark entry
+);
+
+// Student schema
 const studentSchema = new mongoose.Schema(
   {
     name: {
@@ -62,6 +114,12 @@ const studentSchema = new mongoose.Schema(
     profile_image: {
       type: String,
       default: "default-student.jpg",
+    },
+
+    // ✅ Marks: optional array, can be empty on create
+    marks: {
+      type: [markSchema],
+      default: [],
     },
   },
   {

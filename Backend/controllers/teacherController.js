@@ -3,7 +3,6 @@ const Department = require("../models/Department");
 const apiResponse = require("../utils/apiResponse");
 const asyncHandler = require("../middleware/asyncHandler");
 const validateMongodbId = require("../utils/validateMongoDBId");
-
 const multer = require("multer");
 const sharp = require("sharp");
 const path = require("path");
@@ -38,7 +37,7 @@ const resizeTeacherPhoto = asyncHandler(async (req, res, next) => {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  const filename = `teacher-${Date.now()}-${Math.round(Math.random() * 1E9)}.jpeg`;
+  const filename = `teacher-${Date.now()}-${Math.round(Math.random() * 1e9)}.jpeg`;
   req.file.filename = filename;
 
   await sharp(req.file.buffer)
@@ -160,10 +159,7 @@ const updateTeacher = asyncHandler(async (req, res) => {
   const updatedTeacher = await Teacher.findByIdAndUpdate(
     req.params.id,
     updateData,
-    {
-      new: true,
-      runValidators: true,
-    }
+    { new: true, runValidators: true }
   );
 
   res.status(200).json(apiResponse.success("Teacher updated successfully", { teacher: updatedTeacher }));

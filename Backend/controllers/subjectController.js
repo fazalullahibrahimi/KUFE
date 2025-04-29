@@ -1,0 +1,71 @@
+
+const Subject = require('../models/subject');
+
+// Create a new subject
+const createSubject = async (req, res) => {
+  try {
+    const { id, name, code, semester_id, credit_hours } = req.body;
+    const subject = new Subject({ id, name, code, semester_id, credit_hours });
+    await subject.save();
+    res.status(201).json({ message: 'Subject created successfully!', subject });
+  } catch (error) {
+    res.status(500).json({ error: 'Error creating subject', details: error.message });
+  }
+};
+
+// Get all subjects
+const getSubjects = async (req, res) => {
+  try {
+    const subjects = await Subject.find().populate('semester_id');
+    res.status(200).json({ subjects });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching subjects', details: error.message });
+  }
+};
+
+// Get a specific subject by ID
+const getSubjectById = async (req, res) => {
+  try {
+    const subject = await Subject.findById(req.params.id).populate('semester_id');
+    if (!subject) {
+      return res.status(404).json({ error: 'Subject not found' });
+    }
+    res.status(200).json({ subject });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching subject', details: error.message });
+  }
+};
+
+// Update a subject
+const updateSubject = async (req, res) => {
+  try {
+    const subject = await Subject.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!subject) {
+      return res.status(404).json({ error: 'Subject not found' });
+    }
+    res.status(200).json({ message: 'Subject updated successfully', subject });
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating subject', details: error.message });
+  }
+};
+
+// Delete a subject
+const deleteSubject = async (req, res) => {
+  try {
+    const subject = await Subject.findByIdAndDelete(req.params.id);
+    if (!subject) {
+      return res.status(404).json({ error: 'Subject not found' });
+    }
+    res.status(200).json({ message: 'Subject deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting subject', details: error.message });
+  }
+};
+
+module.exports={
+    createSubject,
+    getSubjects,
+    getSubjectById,
+    updateSubject,
+    deleteSubject
+}

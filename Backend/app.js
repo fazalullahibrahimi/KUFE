@@ -24,7 +24,6 @@ mongoose.set('strictPopulate', false);
 const userRoutes = require("./routes/userRoutes");
 const facultyRoutes = require("./routes/facultyRoutes");
 const departmentRoutes = require("./routes/departmentRoutes");
-const facultyMemberRoutes = require("./routes/facultyMemberRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const courseRoutes = require("./routes/courseRoutes");
@@ -36,6 +35,8 @@ const resourceRoutes = require("./routes/resourceRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const announcement = require("./routes/announcementsRoute");
 const contact = require("./routes/contactRoute");
+const semesterRoutes = require('./routes/semesterRoutes');
+const subjectRoutes = require('./routes/subjectRoutes');
 
 const app = express();
 app.use("/public", express.static(path.join(__dirname, "public")));
@@ -98,7 +99,6 @@ app.use(compression());
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/faculty", facultyRoutes);
 app.use("/api/v1/departments", departmentRoutes);
-app.use("/api/v1/faculty-members", facultyMemberRoutes);
 app.use("/api/v1/teachers", teacherRoutes);
 app.use("/api/v1/students", studentRoutes);
 app.use("/api/v1/courses", courseRoutes);
@@ -110,6 +110,8 @@ app.use("/api/v1/news", newsRoutes);
 app.use("/api/v1/resources", resourceRoutes);
 app.use("/api/v1/announcement", announcement);
 app.use("/api/v1/contact", contact)
+app.use('/api/v1/semesters', semesterRoutes);
+app.use('/api/v1/subjects', subjectRoutes);
 
 // Error handler middleware
 app.use(errorHandler);

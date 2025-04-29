@@ -5,7 +5,6 @@ const asyncHandler = require("../middleware/asyncHandler.js");
 const validateMongodbId = require("../utils/validateMongoDBId.js");
 const Enrollment = require("../models/Enrollment");
 const Student = require("../models/Student");
-const FacultyMember = require("../models/FacultyMember");
 const Research = require("../models/Research");
 const Course = require("../models/Course");
 const CourseOffering = require("../models/CourseOffering");
@@ -260,31 +259,26 @@ const getDepartmentWithCourses = asyncHandler(async (req, res) => {
 // @desc    Get department faculty members
 // @route   GET /api/departments/:id/faculty-members
 // @access  Public
-const getDepartmentFacultyMembers = asyncHandler(async (req, res) => {
+const getDepartmentDetails = asyncHandler(async (req, res) => {
   // Validate MongoDB ID
   if (!validateMongodbId(req.params.id)) {
-    return res.status(400).json(apiResponse.error("Invalid department ID", 400))
+    return res.status(400).json(apiResponse.error("Invalid department ID", 400));
   }
 
+  // Fetch the department by ID
   const department = await Department.findById(req.params.id).select("name");
 
   if (!department) {
-    return res.status(404).json(apiResponse.error(`Department not found with id of ${req.params.id}`, 404))
+    return res.status(404).json(apiResponse.error(`Department not found with ID ${req.params.id}`, 404));
   }
 
-  // Get faculty members for this department
-  const facultyMembers = await FacultyMember.find({ department_id: req.params.id })
-    .populate("user_id", "fullName email image")
-    .select("name position contact_info profile");
-
   res.status(200).json(
-    apiResponse.success("Department faculty members retrieved successfully", { 
-      department,
-      facultyMembers,
-      count: facultyMembers.length
+    apiResponse.success("Department retrieved successfully", {
+      department
     })
   );
 });
+
 
 const getFeaturedDepartments = asyncHandler(async (req, res) => {
   // Get a limited number of departments with some basic info
@@ -502,7 +496,7 @@ module.exports = {
   deleteDepartment,
   getAcademicPrograms,
   getDepartmentWithCourses,
-  getDepartmentFacultyMembers,
+  getDepartmentDetails,
   getFeaturedDepartments,
   getDepartmentStatistics,
   getUniversityStatistics,

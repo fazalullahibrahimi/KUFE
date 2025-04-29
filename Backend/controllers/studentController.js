@@ -270,13 +270,124 @@ const getStudentCount = async (req, res) => {
 };
 
 
+
+
+const createMarks = asyncHandler(async (req, res) => {
+  const { subject_id, semester_id, midterm, final, assignment, grade, remarks } = req.body;
+
+  const studentId = req.params.id; // Extract student ID from route param
+  const student = await Student.findById(studentId);
+
+  if (!student) {
+    return res.status(404).json(apiResponse.error("Student not found", 404));
+  }
+
+  const total = (midterm || 0) + (final || 0) + (assignment || 0);
+
+  const newMark = {
+    subject_id,
+    semester_id,
+    midterm,
+    final,
+    assignment,
+    total,
+    grade,
+    remarks,
+  };
+
+  student.marks.push(newMark);
+  await student.save();
+
+  res.status(201).json(apiResponse.success("Marks added successfully", { marks: student.marks }));
+});
+
+
+
+const updateMarks = asyncHandler(async (req, res) => {
+  const student = await Student.findById(req.params.studentId);
+  if (!student) {
+    return res.status(404).json(apiResponse.error("Student not found", 404));
+  }
+
+  const index = parseInt(req.params.markIndex);
+  if (isNaN(index) || index < 0 || index >= student.marks.length) {
+    return res.status(404).json(apiResponse.error("Mark entry not found", 404));
+  }
+
+  const mark = student.marks[index];
+
+  mark.subject_id = req.body.subject_id || mark.subject_id;
+  mark.semester_id = req.body.semester_id || mark.semester_id;
+  mark.midterm = req.body.midterm ?? mark.midterm;
+  mark.final = req.body.final ?? mark.final;
+  mark.assignment = req.body.assignment ?? mark.assignment;
+  mark.grade = req.body.grade || mark.grade;
+  mark.remarks = req.body.remarks || mark.remarks;
+  mark.total = (mark.midterm || 0) + (mark.final || 0) + (mark.assignment || 0);
+
+  await student.save();
+
+  res.status(200).json(apiResponse.success("Marks updated successfully", { marks: student.marks }));
+});
+
+
+
+
+
+
+const getMarksById = asyncHandler(async (req, res) => {
+  const student = await Student.findById(req.params.studentId)
+    .populate("marks.subject_id", "name")
+    .populate("marks.semester_id", "name");
+
+  if (!student) {
+    return res.status(404).json(apiResponse.error("Student not found", 404));
+  }
+
+  const index = parseInt(req.params.markIndex);
+  if (isNaN(index) || index < 0 || index >= student.marks.length) {
+    return res.status(404).json(apiResponse.error("Mark entry not found", 404));
+  }
+
+  const mark = student.marks[index];
+
+  res.status(200).json(apiResponse.success("Mark retrieved successfully", { mark }));
+});
+
+
+
+const deleteMarks = asyncHandler(async (req, res) => {
+  const student = await Student.findById(req.params.studentId);
+  if (!student) {
+    return res.status(404).json(apiResponse.error("Student not found", 404));
+  }
+
+  const index = parseInt(req.params.markIndex);
+  if (isNaN(index) || index < 0 || index >= student.marks.length) {
+    return res.status(404).json(apiResponse.error("Mark entry not found", 404));
+  }
+
+  student.marks.splice(index, 1);
+  await student.save();
+
+  res.status(200).json(apiResponse.success("Mark deleted successfully", { marks: student.marks }));
+});
+
+
+
 module.exports = {
   getStudents,
   getStudent,
+  getStudentCount,
   createStudent,
   updateStudent,
   deleteStudent,
+  createMarks,
+  updateMarks,
+  getMarksById,
+
+  deleteMarks,
   uploasStudentPhoto,
   resizeStudentPhoto,
-  getStudentCount
 };
+
