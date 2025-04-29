@@ -1,38 +1,97 @@
-// routes/researchRoutes.js
-
-const express = require("express");
+const express = require("express")
 const {
-  getResearch,
+  getPublishedResearch,
+  getAllResearch,
   getSingleResearch,
   createResearch,
   updateResearch,
   deleteResearch,
-  getResearchByStatus
-} = require("../controllers/researchController");
-const { authMiddleware } = require("../middleware/authMiddleware");
-const { authorize, checkPermission } = require("../middleware/roleCheck");
-const upload = require("../middleware/upload");
-const roles = require("../config/roles");
+  getResearchByStatus,
+  reviewResearch,
+  getResearchByStudent,
+  getResearchByDepartment,
+  searchResearch,
+} = require("../controllers/researchController")
+const { authMiddleware } = require("../middleware/authMiddleware")
+const { authorize, checkPermission } = require("../middleware/roleCheck")
+const roles = require("../config/roles")
 
-const router = express.Router();
+// Configure multer for file uploads
+const multer = require("multer")
+const path = require("path")
+const fs = require("fs")
 
-// Public routes for published research
-router.get("/", getResearch);
-router.get("/:id", getSingleResearch);
+// Configure multer storage for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = "public/uploads/research"
 
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true })
+    }
+
+    cb(null, uploadDir)
+  },
+  filename: (req, file, cb) => {
+    // Create unique filename with original extension
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9)
+    const ext = path.extname(file.originalname)
+    cb(null, file.fieldname + "-" + uniqueSuffix + ext)
+  },
+})
+
+// File filter to only allow certain file types
+const fileFilter = (req, file, cb) => {
+  const allowedFileTypes = [".pdf", ".doc", ".docx"]
+  const ext = path.extname(file.originalname).toLowerCase()
+
+  if (allowedFileTypes.includes(ext)) {
+    cb(null, true)
+  } else {
+    cb(new Error("Only PDF, DOC, and DOCX files are allowed!"), false)
+  }
+}
+
+// Configure multer upload
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB max file size
+  },
+})
+
+const router = express.Router()
+
+// Public routes
+router.get("/published", getPublishedResearch)
+router.get("/search", searchResearch)
+router.get("/:id", getSingleResearch)
+router.get("/",getAllResearch)
 // Protected routes
-router.use(authMiddleware);
+router.use(authMiddleware)
 
-// Admin can get research by status
-router.get("/status/:status", authorize(roles.ADMIN), getResearchByStatus);
+// Get all research (admin only)
 
-// All roles can create research
-router.post("/", upload.single("research_file"), checkPermission("submit_research"), createResearch);
 
-// Authors can update their research
-router.put("/:id", upload.single("research_file"), updateResearch);
+// Status filters (admin and faculty)
+router.get("/status/:status", authorize([roles.ADMIN, roles.FACULTY]), getResearchByStatus)
 
-// Admin can delete research
-router.delete("/:id", authorize(roles.ADMIN), deleteResearch);
+// Student and department filters (admin and faculty)
+router.get("/student/:student_id", authorize([roles.ADMIN, roles.FACULTY]), getResearchByStudent)
+router.get("/department/:department_id", authorize([roles.ADMIN, roles.FACULTY]), getResearchByDepartment)
 
-module.exports = router;
+// Create research (students with submit_research permission)
+router.post("/", upload.single("file"), checkPermission("submit_research"), createResearch)
+
+// Review research (faculty with manage_research permission)
+router.patch("/:id/review", checkPermission("manage_research"), reviewResearch)
+
+// Update research (admin or original author)
+router.put("/:id", upload.single("file"), updateResearch)
+
+// Delete research (admin only)
+router.delete("/:id", authorize(roles.ADMIN), deleteResearch)
+
+module.exports = router

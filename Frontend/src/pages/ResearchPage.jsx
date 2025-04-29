@@ -24,69 +24,45 @@ export default function ResearchPage() {
 
   // Fetch data from backend API
   useEffect(() => {
-    const fetchResearchPapers = async () => {
-      try {
-        setLoading(true);
-        setError("");
-
-        // Maintain the existing API call
-        const response = await axios.get(
-          "http://127.0.0.1:4400/api/v1/research/"
-        );
-        console.log("Research Papers:", response.data.data.research);
-
-        // Handle different response structures
-        if (
-          response.data &&
-          response.data.data &&
-          Array.isArray(response.data.data.research
-            )
-        ) {
-          setResearchPapers(response.data.data.research);
-        } else if (response.data && Array.isArray(response.data.data)) {
-          setResearchPapers(response.data.data);
-        } else if (
-          response.data &&
-          response.data.data &&
-          response.data.data.research
-          
-        ) {
-          // Handle single paper case
-          setResearchPapers([response.data.data.paper]);
-        } else {
-          throw new Error("Invalid data format received from server");
-        }
-      } catch (err) {
-        console.error("Error fetching research papers:", err);
-
-        if (err.response) {
-          if (err.response.status === 404) {
-            setError(
-              "The resource could not be found. Please try again later."
-            );
-          } else if (err.response.status === 500) {
-            setError(
-              "The server encountered an error. Our team has been notified."
-            );
+      const fetchResearchPapers = async () => {
+        try {
+          setLoading(true);
+          setError("");
+    
+          const response = await axios.get("http://localhost:4400/api/v1/research/");
+    
+          console.log("Research Papers:", response.data);
+    
+          if (
+            response.data &&
+            response.data.data &&
+            Array.isArray(response.data.data.research)
+          ) {
+            setResearchPapers(response.data.data.research);
           } else {
-            setError(
-              `Server error: ${
-                err.response.data?.message || "Unknown error occurred"
-              }`
-            );
+            throw new Error("Invalid data format received from server");
           }
-        } else if (err.request) {
-          setError(
-            "Unable to connect to the server. Please check your internet connection and try again."
-          );
-        } else {
-          setError("An unexpected error occurred. Please try again later.");
+        } catch (err) {
+          console.error("Error fetching research papers:", err);
+          if (err.response) {
+            if (err.response.status === 404) {
+              setError("The resource could not be found. Please try again later.");
+            } else if (err.response.status === 500) {
+              setError("The server encountered an error. Our team has been notified.");
+            } else {
+              setError(`Server error: ${err.response.data?.message || "Unknown error occurred"}`);
+            }
+          } else if (err.request) {
+            setError("Unable to connect to the server. Please check your internet connection and try again.");
+          } else {
+            setError("An unexpected error occurred. Please try again later.");
+          }
+        } finally {
+          setLoading(false);
         }
-      } finally {
-        setLoading(false);
-      }
-    };
-
+      };
+    
+      fetchResearchPapers();
     fetchResearchPapers();
   }, []);
 

@@ -139,6 +139,22 @@ const StudentResearchSubmission = () => {
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [departmentsList, setDepartmentsList] = useState([]);
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:4400/api/v1/departments/");
+
+        const data = await response.json();
+        console.log(data)
+        setDepartmentsList(data.departments || []); // Adjust if your API response format is different
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+  
+    fetchDepartments();
+  }, []);
 
   // Form data for new submission
   const [formData, setFormData] = useState({
@@ -408,22 +424,37 @@ const StudentResearchSubmission = () => {
   };
 
   // CRUD operations
-  const handleSubmitResearch = () => {
-    const newSubmission = {
-      id: researchSubmissions.length + 1,
-      ...formData,
-      submission_date: new Date().toISOString(),
-      status: "pending",
-      reviewer_comments: "",
-      reviewer_id: "",
-      review_date: null,
-      keywords: formData.keywords.split(",").map((keyword) => keyword.trim()),
-    };
-
-    setResearchSubmissions([...researchSubmissions, newSubmission]);
-    setIsSubmitModalOpen(false);
-    resetForm();
+  const handleSubmitResearch = async () => {
+    try {
+      const payload = {
+        ...formData,
+        keywords: formData.keywords.split(",").map((keyword) => keyword.trim()),
+      };
+  
+      const response = await fetch("http://localhost:4400/api/v1/research/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to submit research");
+      }
+  
+      const data = await response.json();
+      console.log("Research submitted successfully:", data);
+  
+      setIsSubmitModalOpen(false);
+      resetForm();
+      // Optionally refetch submissions here if needed
+    } catch (error) {
+      console.error("Error submitting research:", error);
+      alert("Failed to submit research. Please try again.");
+    }
   };
+  
 
   const handleReviewSubmission = () => {
     const updatedSubmissions = researchSubmissions.map((submission) =>
@@ -655,22 +686,33 @@ const StudentResearchSubmission = () => {
                   </select>
                 </div>
                 <div className='mb-4'>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    Department
-                  </label>
-                  <select
-                    className='w-full p-2 border border-gray-300 rounded-md'
-                    value={departmentFilter}
-                    onChange={(e) => setDepartmentFilter(e.target.value)}
-                  >
-                    <option value='all'>All Departments</option>
-                    {departments.map((dept) => (
-                      <option key={dept} value={dept}>
-                        {dept}
-                      </option>
-                    ))}
-                  </select>
+                <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  Department
+                </label>
+                <select
+                  name="department_id"
+                  value={formData.department_id}
+                  onChange={(e) => {
+                    const selectedDeptId = e.target.value;
+                    const selectedDept = departmentsList.find(dept => dept._id === selectedDeptId);
+                    setFormData({
+                      ...formData,
+                      department_id: selectedDeptId,
+                      department_name: selectedDept ? selectedDept.name : "",
+                    });
+                  }}
+                  className='w-full p-2 border border-gray-300 rounded-md'
+                  required
+                >
+                  <option value="">Select Department</option>
+                  {departmentsList.map((dept) => (
+                    <option key={dept._id} value={dept._id}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
                 </div>
+
                 <div className='flex justify-between'>
                   <button
                     className='text-sm text-gray-600 hover:text-gray-900'
@@ -1257,3 +1299,5 @@ const StudentResearchSubmission = () => {
 };
 
 export default StudentResearchSubmission;
+
+

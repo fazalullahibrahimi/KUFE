@@ -1,297 +1,360 @@
-const Research = require("../models/Research");
-const ResearchAuthor = require("../models/ResearchAuthor");
-const User = require("../models/User"); // Make sure to import User model
-const apiResponse = require("../utils/apiResponse");
-const asyncHandler = require("../middleware/asyncHandler");
-const mongoose = require("mongoose");
+const Research = require("../models/Research")
+const asyncHandler = require("express-async-handler")
+const path = require("path")
+const fs = require("fs")
 
-// @desc    Get all research
-// @route   GET /api/research
+// @desc    Get all published research
+// @route   GET /api/v1/research/published
 // @access  Public
-const getResearch = asyncHandler(async (req, res) => {
-  let query;
+const getPublishedResearch = asyncHandler(async (req, res) => {
+  const research = await Research.find({ status: "accepted" }).sort({ createdAt: -1 })
+  res.status(200).json({
+    status: "success",
+    results: research.length,
+    data: {
+      research,
+    },
+  })
+})
 
-  // For public access, only show accepted research
-  if (!req.user) {
-    query = Research.find({ status: "accepted" });
-  } else if (req.user.role === "admin") {
-    // Admin can see all research
-    query = Research.find();
-  } else {
-    // Faculty and students can see accepted research and their own research
-    const authoredResearch = await ResearchAuthor.find({ author_id: req.user.id }).select("research_id");
-    const authoredIds = authoredResearch.map((item) => item.research_id);
+// @desc    Get all research (for admin)
+// @route   GET /api/v1/research
+// @access  Protected
+const getAllResearch = asyncHandler(async (req, res) => {
+  const research = await Research.find().sort({ createdAt: -1 })
+  res.status(200).json({
+    status: "success",
+    results: research.length,
+    data: {
+      research,
+    },
+  })
+})
 
-    query = Research.find({
-      $or: [{ status: "accepted" }, { _id: { $in: authoredIds } }],
-    });
-  }
-
-  // Execute the query to get research papers
-  const researchPapers = await query;
-
-  // Fetch authors for each research paper
-  const researchWithAuthors = await Promise.all(
-    researchPapers.map(async (paper) => {
-      // Get authors for this research
-      const authors = await ResearchAuthor.find({ research_id: paper._id })
-        .populate("author_id", "fullName email role");
-
-      // Convert Mongoose document to plain object
-      const paperObj = paper.toObject();
-
-      return {
-        ...paperObj,
-        authors: authors.map(author => ({
-          _id: author._id,
-          author_id: author.author_id,
-          author_type: author.author_type
-        })),
-        pages: paper.pages,
-        category: paper.category
-      };
-    })
-  );
-
-  res.status(200).json(
-    apiResponse.success("Research retrieved successfully", {
-      count: researchWithAuthors.length,
-      research: researchWithAuthors,
-    })
-  );
-});
-
-
-// @desc    Get single research
-// @route   GET /api/research/:id
-// @access  Public/Private
+// @desc    Get single research by ID
+// @route   GET /api/v1/research/:id
+// @access  Public
 const getSingleResearch = asyncHandler(async (req, res) => {
-  // Validate MongoDB ID
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json(apiResponse.error("Invalid research ID", 400));
-  }
-
-  const research = await Research.findById(req.params.id);
-
+  const research = await Research.findById(req.params.id)
   if (!research) {
-    return res.status(404).json(apiResponse.error(`Research not found with id of ${req.params.id}`, 404));
+    res.status(404)
+    throw new Error("Research not found")
   }
-
-  // Check if user is authorized to view this research
-  if (research.status !== "published" && (!req.user || req.user.role !== "admin")) {
-    // Check if user is an author
-    const isAuthor = await ResearchAuthor.findOne({
-      research_id: research._id,
-      author_id: req.user ? req.user.id : null,
-    });
-
-    if (!isAuthor) {
-      return res.status(403).json(apiResponse.error("Not authorized to access this research", 403));
-    }
-  }
-
-  // Get authors
-  const authors = await ResearchAuthor.find({ research_id: research._id })
-    .populate("author_id", "fullName email role");
-
-  // Convert Mongoose document to plain object
-  const researchObj = research.toObject();
-
-  res.status(200).json(
-    apiResponse.success("Research retrieved successfully", {
-      research: {
-        ...researchObj,
-        authors,
-      },
-    })
-  );
-});
+  res.status(200).json({
+    status: "success",
+    data: {
+      research,
+    },
+  })
+})
 
 // @desc    Create new research
-// @route   POST /api/research
-// @access  Private
+// @route   POST /api/v1/research
+// @access  Protected (Authors, Researchers, etc.)
 const createResearch = asyncHandler(async (req, res) => {
-  const { title, abstract, status, pages, category, co_authors } = req.body;
+  const { title, abstract, category } = req.body
 
-  // Create research
-  const research = await Research.create({
-    title,
-    abstract,
-    file_path: req.file ? req.file.path : null,
-    status: req.user.role === "admin" ? status || "pending" : "pending", // control status access
-    pages,
-    category,
-  });
-
-  // Add current user as author
-  await ResearchAuthor.create({
-    research_id: research._id,
-    author_id: req.user.id,
-    author_type: req.user.role === "faculty" ? "faculty" : "student",
-  });
-
-  // Add co-authors if provided
-  if (co_authors && Array.isArray(co_authors)) {
-    const authorPromises = co_authors.map((author) => {
-      return ResearchAuthor.create({
-        research_id: research._id,
-        author_id: author.id,
-        author_type: author.type,
-      });
-    });
-
-    await Promise.all(authorPromises);
+  if (!title || !abstract || !category) {
+    res.status(400)
+    throw new Error("Title, abstract, and category are required")
   }
 
-  const createdResearch = await Research.findById(research._id);
-  const authors = await ResearchAuthor.find({ research_id: research._id })
-    .populate("author_id", "fullName email role");
-
-  const researchObj = createdResearch.toObject();
-
-  res.status(201).json(
-    apiResponse.success("Research submitted successfully", {
-      research: {
-        ...researchObj,
-        authors,
-      },
-    }, 201)
-  );
-});
-
-
-// @desc    Update research
-// @route   PUT /api/research/:id
-// @access  Private
-const updateResearch = asyncHandler(async (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json(apiResponse.error("Invalid research ID", 400));
+  // Handle file upload
+  let filePath = ""
+  if (req.file) {
+    filePath = `/uploads/research/${req.file.filename}`
   }
 
-  let research = await Research.findById(req.params.id);
-  if (!research) {
-    return res.status(404).json(apiResponse.error(`Research not found with id of ${req.params.id}`, 404));
+  // Parse authors if they're sent as JSON string
+  let authors = req.body.authors
+  if (typeof authors === "string") {
+    try {
+      authors = JSON.parse(authors)
+    } catch (e) {
+      // If it's not valid JSON, use the user's name or treat as single author
+      authors = req.user ? [req.user.name] : [authors]
+    }
+  } else if (!authors || !authors.length) {
+    // Default to user name if no authors provided
+    authors = req.user ? [req.user.name] : []
   }
 
-  if (req.user.role !== "admin") {
-    const isAuthor = await ResearchAuthor.findOne({
-      research_id: research._id,
-      author_id: req.user.id,
-    });
-
-    if (!isAuthor) {
-      return res.status(403).json(apiResponse.error("Not authorized to update this research", 403));
+  // Parse keywords if they're sent as JSON string
+  let keywords = req.body.keywords
+  if (typeof keywords === "string") {
+    try {
+      keywords = JSON.parse(keywords)
+    } catch (e) {
+      // If it's not valid JSON, try to split by comma
+      keywords = keywords
+        .split(",")
+        .map((k) => k.trim())
+        .filter((k) => k)
     }
   }
 
-  const { title, abstract, status, pages, category } = req.body;
+  // Create new research document with all possible fields
+  const newResearch = await Research.create({
+    title,
+    abstract,
+    publication_date: req.body.publication_date || new Date(),
+    file_path: filePath,
+    pages: req.body.pages || 1, // Default pages to 1 if not provided
+    category,
+    status: req.body.status || "pending", // Default status to 'pending' if not provided
+    authors,
+    // Additional fields for student submission
+    student_id: req.body.student_id || (req.user ? req.user._id : null),
+    student_name: req.body.student_name || (req.user ? req.user.name : null),
+    department_id: req.body.department_id || null,
+    department_name: req.body.department_name || null,
+    keywords: keywords || [],
+    reviewer_comments: "",
+    reviewer_id: "",
+    review_date: null,
+  })
 
-  const updateData = {
-    title: title || research.title,
-    abstract: abstract || research.abstract,
-    pages: pages || research.pages,
-    category: category || research.category,
-  };
+  res.status(201).json({
+    status: "success",
+    data: {
+      research: newResearch,
+    },
+  })
+})
 
-  if (status && req.user.role === "admin") {
-    updateData.status = status;
-  }
-
-  if (req.file) {
-    updateData.file_path = req.file.path;
-  }
-
-  research = await Research.findByIdAndUpdate(req.params.id, updateData, {
-    new: true,
-    runValidators: true,
-  });
-
-  const authors = await ResearchAuthor.find({ research_id: research._id })
-    .populate("author_id", "fullName email role");
-
-  const researchObj = research.toObject();
-
-  res.status(200).json(
-    apiResponse.success("Research updated successfully", {
-      research: {
-        ...researchObj,
-        authors,
-      },
-    })
-  );
-});
-
-// @desc    Delete research
-// @route   DELETE /api/research/:id
-// @access  Private/Admin
-const deleteResearch = asyncHandler(async (req, res) => {
-  // Validate MongoDB ID
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json(apiResponse.error("Invalid research ID", 400));
-  }
-
-  const research = await Research.findById(req.params.id);
+// @desc    Update research
+// @route   PUT /api/v1/research/:id
+// @access  Protected (Only author or admin)
+const updateResearch = asyncHandler(async (req, res) => {
+  const research = await Research.findById(req.params.id)
 
   if (!research) {
-    return res.status(404).json(apiResponse.error(`Research not found with id of ${req.params.id}`, 404));
+    res.status(404)
+    throw new Error("Research not found")
   }
 
-  // Delete research and all associated authors
-  await ResearchAuthor.deleteMany({ research_id: research._id });
-  
-  // Use deleteOne instead of remove (which is deprecated)
-  await research.deleteOne();
+  const roles = {
+    ADMIN: "admin",
+    FACULTY: "faculty",
+  }
 
-  res.status(200).json(apiResponse.success("Research deleted successfully", {}));
-});
+  // Only allow the original author, faculty with manage_research permission, or an admin to update
+  if (
+    req.user &&
+    research.student_id !== req.user._id.toString() &&
+    req.user.role !== roles.ADMIN &&
+    !(req.user.role === roles.FACULTY && req.user.permissions && req.user.permissions.includes("manage_research"))
+  ) {
+    res.status(403)
+    throw new Error("Not authorized to update this research")
+  }
+
+  // Handle file upload
+  if (req.file) {
+    // Delete old file if it exists
+    if (research.file_path && research.file_path.startsWith("/uploads/")) {
+      const oldFilePath = path.join(__dirname, "..", "public", research.file_path)
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath)
+      }
+    }
+    req.body.file_path = `/uploads/research/${req.file.filename}`
+  }
+
+  // Parse authors if they're sent as JSON string
+  if (req.body.authors && typeof req.body.authors === "string") {
+    try {
+      req.body.authors = JSON.parse(req.body.authors)
+    } catch (e) {
+      req.body.authors = [req.body.authors]
+    }
+  }
+
+  // Parse keywords if they're sent as JSON string
+  if (req.body.keywords && typeof req.body.keywords === "string") {
+    try {
+      req.body.keywords = JSON.parse(req.body.keywords)
+    } catch (e) {
+      req.body.keywords = req.body.keywords
+        .split(",")
+        .map((k) => k.trim())
+        .filter((k) => k)
+    }
+  }
+
+  const updatedResearch = await Research.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  })
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      research: updatedResearch,
+    },
+  })
+})
+
+// @desc    Delete research
+// @route   DELETE /api/v1/research/:id
+// @access  Admin
+const deleteResearch = asyncHandler(async (req, res) => {
+  const research = await Research.findById(req.params.id)
+
+  if (!research) {
+    res.status(404)
+    throw new Error("Research not found")
+  }
+
+  // Delete the associated file if it exists
+  if (research.file_path && research.file_path.startsWith("/uploads/")) {
+    const filePath = path.join(__dirname, "..", "public", research.file_path)
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath)
+    }
+  }
+
+  await Research.findByIdAndDelete(req.params.id)
+  res.status(200).json({
+    status: "success",
+    message: "Research deleted successfully",
+  })
+})
 
 // @desc    Get research by status
-// @route   GET /api/research/status/:status
-// @access  Private/Admin
+// @route   GET /api/v1/research/status/:status
+// @access  Admin
 const getResearchByStatus = asyncHandler(async (req, res) => {
-  const { status } = req.params;
+  const { status } = req.params
 
-  const validStatuses = ["pending", "accepted", "rejected"];
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json(
-      apiResponse.error(`Invalid status. Must be one of: ${validStatuses.join(", ")}`, 400)
-    );
+  if (!["pending", "accepted", "rejected", "all"].includes(status)) {
+    res.status(400)
+    throw new Error("Invalid status value. Must be pending, accepted, rejected, or all.")
   }
 
-  const researchPapers = await Research.find({ status });
+  const query = status === "all" ? {} : { status }
+  const research = await Research.find(query).sort({ createdAt: -1 })
 
-  const researchWithAuthors = await Promise.all(
-    researchPapers.map(async (paper) => {
-      const authors = await ResearchAuthor.find({ research_id: paper._id })
-        .populate("author_id", "fullName email role");
+  res.status(200).json({
+    status: "success",
+    results: research.length,
+    data: {
+      research,
+    },
+  })
+})
 
-      const paperObj = paper.toObject();
+// @desc    Review a research submission
+// @route   PATCH /api/v1/research/:id/review
+// @access  Protected (Committee members, Admin)
+const reviewResearch = asyncHandler(async (req, res) => {
+  const { status, reviewer_comments } = req.body
 
-      return {
-        ...paperObj,
-        authors: authors.map(author => ({
-          _id: author._id,
-          author_id: author.author_id,
-          author_type: author.author_type
-        }))
-      };
-    })
-  );
+  if (!["pending", "accepted", "rejected"].includes(status)) {
+    res.status(400)
+    throw new Error("Invalid status value. Must be pending, accepted, or rejected.")
+  }
 
-  res.status(200).json(
-    apiResponse.success(`Research with status '${status}' retrieved successfully`, {
-      count: researchWithAuthors.length,
-      research: researchWithAuthors,
-    })
-  );
-});
+  const research = await Research.findByIdAndUpdate(
+    req.params.id,
+    {
+      status,
+      reviewer_comments,
+      reviewer_id: req.user ? req.user._id : req.body.reviewer_id,
+      review_date: new Date(),
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
 
+  if (!research) {
+    res.status(404)
+    throw new Error("Research not found")
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      research,
+    },
+  })
+})
+
+// @desc    Get research by student
+// @route   GET /api/v1/research/student/:student_id
+// @access  Protected
+const getResearchByStudent = asyncHandler(async (req, res) => {
+  const { student_id } = req.params
+  const research = await Research.find({ student_id }).sort({ createdAt: -1 })
+
+  res.status(200).json({
+    status: "success",
+    results: research.length,
+    data: {
+      research,
+    },
+  })
+})
+
+// @desc    Get research by department
+// @route   GET /api/v1/research/department/:department_id
+// @access  Protected
+const getResearchByDepartment = asyncHandler(async (req, res) => {
+  const { department_id } = req.params
+  const research = await Research.find({ department_id }).sort({ createdAt: -1 })
+
+  res.status(200).json({
+    status: "success",
+    results: research.length,
+    data: {
+      research,
+    },
+  })
+})
+
+// @desc    Search research submissions
+// @route   GET /api/v1/research/search
+// @access  Public
+const searchResearch = asyncHandler(async (req, res) => {
+  const { query } = req.query
+
+  if (!query) {
+    res.status(400)
+    throw new Error("Search query is required")
+  }
+
+  const research = await Research.find({
+    $or: [
+      { title: { $regex: query, $options: "i" } },
+      { abstract: { $regex: query, $options: "i" } },
+      { authors: { $in: [new RegExp(query, "i")] } },
+      { keywords: { $in: [new RegExp(query, "i")] } },
+      { student_name: { $regex: query, $options: "i" } },
+      { department_name: { $regex: query, $options: "i" } },
+    ],
+  }).sort({ createdAt: -1 })
+
+  res.status(200).json({
+    status: "success",
+    results: research.length,
+    data: {
+      research,
+    },
+  })
+})
 
 module.exports = {
-  getResearch,
+  getPublishedResearch,
+  getAllResearch,
   getSingleResearch,
   createResearch,
   updateResearch,
   deleteResearch,
-  getResearchByStatus
-};
+  getResearchByStatus,
+  reviewResearch,
+  getResearchByStudent,
+  getResearchByDepartment,
+  searchResearch,
+}

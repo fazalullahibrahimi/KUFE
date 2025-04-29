@@ -15,7 +15,7 @@ const DepartmentSchema = new mongoose.Schema(
     },
     head_of_department: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "FacultyMember",
+      ref: "User",
     },
     faculty: {
       type: mongoose.Schema.Types.ObjectId,

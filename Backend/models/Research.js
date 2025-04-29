@@ -1,42 +1,80 @@
 const mongoose = require("mongoose")
 
-const ResearchSchema = new mongoose.Schema(
+const researchSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Please add a title"],
-      trim: true,
-      maxlength: [200, "Title cannot be more than 200 characters"],
+      required: [true, "Title is required"],
     },
     abstract: {
       type: String,
-      required: [true, "Please add an abstract"],
+      required: [true, "Abstract is required"],
     },
     publication_date: {
       type: Date,
+      required: [true, "Publication date is required"],
     },
     file_path: {
       type: String,
+      required: [false, "File path is required"],
     },
     pages: {
       type: Number,
-      min: 1,
+      required: [true, "Number of pages is required"],
     },
     category: {
-        type: String,
-        required: true
+      type: String,
+      required: [true, "Category is required"],
     },
-    
     status: {
       type: String,
       enum: ["pending", "accepted", "rejected"],
       default: "pending",
-    }
+    },
+    authors: [
+      {
+        type: String,
+        required: [true, "Authors are required"],
+      },
+    ],
+    // Additional fields for student research submission frontend
+    student_id: {
+      type: String,
+      required: false,
+    },
+    student_name: {
+      type: String,
+      required: false,
+    },
+    department_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+      required: false,
+    },
+    department_name: {
+      type: String,
+      required: false,
+    },
+    keywords: [
+      {
+        type: String,
+        required: false,
+      },
+    ],
+    reviewer_comments: {
+      type: String,
+      default: "",
+    },
+    reviewer_id: {
+      type: String,
+      default: "",
+    },
+    review_date: {
+      type: Date,
+      default: null,
+    },
   },
-  { timestamps: true }
-  
-);
+  { timestamps: true },
+)
 
-
-const Research = mongoose.model("Research", ResearchSchema);
-module.exports =Research;
+module.exports = mongoose.model("Research", researchSchema)
