@@ -1,15 +1,15 @@
+// routes/committeeMemberRoutes.js
+
 const express = require("express");
-const teacherController = require("../controllers/teacherController");
+const committeeMemberController = require("../controllers/committeeMemberController");
 const { authMiddleware, authorize } = require("../middleware/authMiddleware");
 const roles = require("../config/roles");
 
 const router = express.Router();
 
 // Public routes
-router.get("/count",teacherController.getTeacherCount);
-router.get("/", teacherController.getTeachers);
-router.get("/:id", teacherController.getTeacher);
-
+router.get("/", committeeMemberController.getAllCommitteeMembers);
+router.get("/:id", committeeMemberController.getCommitteeMemberById);
 
 // Apply authentication for protected routes
 router.use(authMiddleware);
@@ -18,23 +18,19 @@ router.use(authMiddleware);
 router.post(
   "/",
   authorize(roles.ADMIN),
-  teacherController.uploadTeacherPhoto,
-  teacherController.resizeTeacherPhoto,
-  teacherController.createTeacher
+  committeeMemberController.createCommitteeMember
 );
 
 router.patch(
   "/:id",
   authorize(roles.ADMIN),
-  teacherController.uploadTeacherPhoto,
-  teacherController.resizeTeacherPhoto,
-  teacherController.updateTeacher
+  committeeMemberController.updateCommitteeMember
 );
 
 router.delete(
   "/:id",
   authorize(roles.ADMIN),
-  teacherController.deleteTeacher
+  committeeMemberController.deleteCommitteeMember
 );
 
 module.exports = router;

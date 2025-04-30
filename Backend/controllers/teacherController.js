@@ -181,12 +181,27 @@ const deleteTeacher = asyncHandler(async (req, res) => {
   res.status(200).json(apiResponse.success("Teacher deleted successfully", {}));
 });
 
+
+const getTeacherCount = asyncHandler(async (req, res) => {
+  try {
+    const count = await Teacher.countDocuments();
+    res.status(200).json((count));
+  } catch (error) {
+    console.error("Error retrieving teacher count:", error);
+    res.status(500).json(
+      apiResponse.error("Failed to retrieve teacher count", 500)
+    );
+  }
+});
+
 module.exports = {
   getTeachers,
   getTeacher,
+ getTeacherCount,
   createTeacher,
   updateTeacher,
   deleteTeacher,
   uploadTeacherPhoto,
   resizeTeacherPhoto,
+
 };

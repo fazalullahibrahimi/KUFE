@@ -29,7 +29,7 @@ export default function ResearchPage() {
           setLoading(true);
           setError("");
     
-          const response = await axios.get("http://localhost:4400/api/v1/research/");
+          const response = await axios.get("http://localhost:4400/api/v1/research/published");
     
           console.log("Research Papers:", response.data);
     

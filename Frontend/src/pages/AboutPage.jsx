@@ -32,9 +32,9 @@ function AboutPage() {
         console.log("Student count data:", studentCountData)
 
         // Fetch faculty member count
-        const facultyMemberCountResponse = await fetch("http://localhost:4400/api/v1/faculty-members/count")
+        const facultyMemberCountResponse = await fetch("http://127.0.0.1:4400/api/v1/teachers/count")
         const facultyMemberCountData = await facultyMemberCountResponse.json()
-        console.log("Faculty member count data:", facultyMemberCountData)
+        console.log("Teacher  data:", facultyMemberCountData)
 
         // Fetch academic program count
         const academicProgramCountResponse = await fetch("http://127.0.0.1:4400/api/v1/departments/programcount")
@@ -244,7 +244,7 @@ function AboutPage() {
               <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 bg-white">
                 <CardContent className="p-6 text-center">
                   <div className="text-4xl font-bold text-[#1D3D6F] mb-2">{facultyMemberCount}+</div>
-                  <div className="text-[#1D3D6F]">Faculty Members</div>
+                  <div className="text-[#1D3D6F]">Teachers</div>
                 </CardContent>
               </Card>
               <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 bg-white">

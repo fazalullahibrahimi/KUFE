@@ -417,7 +417,7 @@ function CourseCard({ course, onClick }) {
     >
       <div className='h-40 bg-[#1D3D6F] relative'>
         <img
-          src={`http://localhost:4400/public/img/course/${course.image}` || "/placeholder.svg?height=200&width=300"}
+          src={`http://localhost:4400/public/img/courses/${course.image}` || "/placeholder.svg?height=200&width=300"}
           alt={course.name}
           className='w-full h-full object-cover opacity-50'
         />

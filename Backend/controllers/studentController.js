@@ -385,7 +385,6 @@ module.exports = {
   createMarks,
   updateMarks,
   getMarksById,
-
   deleteMarks,
   uploasStudentPhoto,
   resizeStudentPhoto,

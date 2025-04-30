@@ -184,13 +184,6 @@ const deleteDepartment = asyncHandler(async (req, res) => {
 
   // Replace department.remove() with deleteOne() method
   await department.deleteOne();
-  
-  // Alternative approaches if the above doesn't work:
-  // Option 1: Use findByIdAndDelete directly
-  // await Department.findByIdAndDelete(req.params.id);
-  
-  // Option 2: Use findOneAndDelete
-  // await Department.findOneAndDelete({ _id: req.params.id });
 
   res.status(200).json(apiResponse.success("Department deleted successfully", {}));
 });
@@ -339,69 +332,57 @@ const getDepartmentStatistics = asyncHandler(async (req, res) => {
 
 const getUniversityStatistics = asyncHandler(async (req, res) => {
   try {
-    // Import required models if not already imported
     const Student = require("../models/Student");
-    const FacultyMember = require("../models/FacultyMember");
     const Research = require("../models/Research");
     const Course = require("../models/Course");
     const Enrollment = require("../models/Enrollment");
-    
-    // Properly import CourseOffering model
+
     let CourseOffering;
     try {
       CourseOffering = require("../models/CourseOffering");
     } catch (err) {
       console.error("Error importing CourseOffering model:", err);
     }
-    
-    // Get basic counts from database
+
+    // Get basic counts
     const studentCount = await Student.countDocuments();
-    const facultyCount = await FacultyMember.countDocuments();
     const researchCount = await Research.countDocuments();
     const courseCount = await Course.countDocuments();
     const enrollmentCount = await Enrollment.countDocuments();
-    
-    // Calculate course success rate (students who passed their courses)
+
+    // Course success rate
     let successRate = "N/A";
-    
     try {
-      // Count total graded enrollments (excluding null, I, and W grades)
       const totalGradedEnrollments = await Enrollment.countDocuments({
         grade: { $nin: [null, "I", "W"] }
       });
-      
-      // Count passing grades (A, B, C, D)
       const passingGrades = await Enrollment.countDocuments({
         grade: { $in: ["A", "B", "C", "D"] }
       });
-      
-      // Calculate success rate
+
       if (totalGradedEnrollments > 0) {
         const rate = (passingGrades / totalGradedEnrollments) * 100;
         successRate = `${Math.round(rate)}%`;
       } else {
-        // Fallback if no graded enrollments
-        successRate = "85%"; // Default value
+        successRate = "85%";
       }
     } catch (err) {
       console.error("Error calculating success rate:", err);
-      successRate = "85%"; // Fallback value
+      successRate = "85%";
     }
-    
-    // Calculate average class size
+
+    // Average class size
     let averageClassSize = "N/A";
     try {
-      // Use alternative method if CourseOffering model is not available
       if (CourseOffering && typeof CourseOffering.countDocuments === 'function') {
         const courseOfferings = await CourseOffering.countDocuments();
         if (courseOfferings > 0) {
           averageClassSize = Math.round(enrollmentCount / courseOfferings);
         }
       } else {
-        // Alternative: Get distinct course offerings from enrollments
         const distinctCourseOfferings = await Enrollment.distinct("course_offering_id");
         const courseOfferingsCount = distinctCourseOfferings.length;
-        
+
         if (courseOfferingsCount > 0) {
           averageClassSize = Math.round(enrollmentCount / courseOfferingsCount);
         }
@@ -409,11 +390,10 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
     } catch (err) {
       console.error("Error calculating average class size:", err);
     }
-    
-    // Calculate average GPA if needed
+
+    // Average GPA
     let averageGPA = "N/A";
     try {
-      // Map grades to GPA points
       const gradePoints = {
         "A": 4.0,
         "B": 3.0,
@@ -421,42 +401,34 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
         "D": 1.0,
         "F": 0.0
       };
-      
-      // Get all grades
-      const enrollments = await Enrollment.find({ 
-        grade: { $in: ["A", "B", "C", "D", "F"] } 
+
+      const enrollments = await Enrollment.find({
+        grade: { $in: ["A", "B", "C", "D", "F"] }
       }).select("grade");
-      
+
       if (enrollments.length > 0) {
-        // Calculate total GPA points
         const totalPoints = enrollments.reduce((sum, enrollment) => {
           return sum + (gradePoints[enrollment.grade] || 0);
         }, 0);
-        
-        // Calculate average GPA
         averageGPA = (totalPoints / enrollments.length).toFixed(2);
       }
     } catch (err) {
       console.error("Error calculating average GPA:", err);
     }
-    
-    // Format the statistics for the frontend
+
     const statistics = [
       { number: `${studentCount}+`, label: "Students Enrolled" },
-      { number: successRate, label: "Course Success Rate" }, // Changed from Employment Rate
-      { number: `${facultyCount}+`, label: "Faculty Members" },
-      { number: `${researchCount}+`, label: "Research Papers" },
+      { number: successRate, label: "Course Success Rate" },
+      { number: `${researchCount}+`, label: "Research Papers" }
     ];
-    
-    // Additional statistics that could be used elsewhere
+
     const additionalStats = {
       courseCount,
       enrollmentCount,
       averageClassSize,
-      averageGPA,
-      // Add more as needed
+      averageGPA
     };
-    
+
     res.status(200).json(
       apiResponse.success("University statistics retrieved successfully", {
         statistics,
@@ -470,6 +442,7 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
     );
   }
 });
+
 
 
 const getResearchPaperCount = asyncHandler(async (req, res) => {
