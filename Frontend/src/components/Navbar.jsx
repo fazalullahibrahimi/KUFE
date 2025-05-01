@@ -13,13 +13,13 @@ const Navbar = () => {
 
   // Navigation items with translations
   const navItems = [
-    { name: t("home"), path: "/" },
-    { name: t("academics"), path: "/academics" },
-    { name: t("research"), path: "/research" },
-    { name: t("courses"), path: "/courses" },
-    { name: t("about"), path: "/about" },
-    { name: t("contact"), path: "/contact" },
-    { name: t("announcements_events"), path: "/anounce" },
+    { name: t("Home"), path: "/" },
+    { name: t("Academics"), path: "/academics" },
+    { name: t("Research"), path: "/research" },
+    { name: t("Courses"), path: "/courses" },
+    { name: t("About"), path: "/about" },
+    { name: t("Contact"), path: "/contact" },
+    { name: t("Announcements Events"), path: "/anounce" },
   ];
 
   // Available languages

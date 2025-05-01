@@ -96,6 +96,19 @@ const enTranslations = {
     cannot_delete_used:
       "Cannot delete subject that is being used in student marks",
   },
+  Navbar: {
+    Home: "Home",
+    Academics: "Academics",
+    Research: "Research",
+    Courses: "Courses",
+    About: "About",
+    Contact: "Contact",
+    "Announcements Events": "Announcements & Events",
+    student_portal: "Student Portal",
+    ku_logo_alt: "Kandahar University Logo",
+    kandahar_university: "Kandahar University",
+    faculty_of_economics: "Faculty of Economics",
+  },
 };
 
 export default enTranslations;

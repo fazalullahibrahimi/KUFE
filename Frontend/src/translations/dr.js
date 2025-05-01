@@ -95,6 +95,19 @@ const drTranslations = {
     cannot_delete_used:
       "نمی‌توان مضمونی را که در نمرات محصلین استفاده می‌شود حذف کرد",
   },
+  Navbar: {
+    Home: "خانه",
+    Academics: "تحصیلات",
+    Research: "تحقیقات",
+    Courses: "مضامین",
+    About: "درباره ما",
+    Contact: "ارتباط",
+    "Announcements Events": "اطلاعیه‌ها و رویدادها",
+    student_portal: "دروازه شاگردان",
+    ku_logo_alt: "لوگوی پوهنتون قندهار",
+    kandahar_university: "پوهنتون قندهار",
+    faculty_of_economics: "پوهنځی اقتصاد",
+  },
 };
 
 export default drTranslations;

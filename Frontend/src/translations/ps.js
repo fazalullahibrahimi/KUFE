@@ -96,6 +96,32 @@ const psTranslations = {
     cannot_delete_used:
       "هغه مضمون نشي ړنګیدلی چې د زده کوونکو په نمرو کې کارول کیږي",
   },
+  Navbar: {
+    Home: "خانه",
+    Academics: "تحصیلات",
+    Research: "تحقیقات",
+    Courses: "مضامین",
+    About: "درباره ما",
+    Contact: "ارتباط",
+    "Announcements Events": "اطلاعیه‌ها و رویدادها",
+    student_portal: "دروازه شاگردان",
+    ku_logo_alt: "لوگوی پوهنتون قندهار",
+    kandahar_university: "پوهنتون قندهار",
+    faculty_of_economics: "پوهنځی اقتصاد",
+  },
+  ps: {
+    Home: "کور",
+    Academics: "اکاډمیک",
+    Research: "څېړنې",
+    Courses: "مضامین",
+    About: "زموږ په اړه",
+    Contact: "اړیکه",
+    "Announcements Events": "خبرتیاوې او پېښې",
+    student_portal: "د زده کوونکو دروازه",
+    ku_logo_alt: "د کندهار پوهنتون نښه",
+    kandahar_university: "کندهار پوهنتون",
+    faculty_of_economics: "د اقتصاد پوهنځي",
+  },
 };
 
 export default psTranslations;
