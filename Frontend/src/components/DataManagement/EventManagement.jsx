@@ -146,7 +146,7 @@ const EventManagement = () => {
         <div className="flex items-center">
           {row.image ? (
             <img
-              src={`http://127.0.0.1:4400/uploads/${row.image}`}
+              src={`http://localhost:4400/public/img/event/${row.image}`}
               alt={row.title}
               className="w-10 h-10 object-cover rounded-md"
               onError={(e) => {
@@ -692,7 +692,7 @@ const EventManagement = () => {
             {currentEvent.image && (
               <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
                 <img
-                  src={`http://127.0.0.1:4400/uploads/${currentEvent.image}`}
+                  src={`http://localhost:4400/public/img/event/${currentEvent.image}`}
                   alt={currentEvent.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
