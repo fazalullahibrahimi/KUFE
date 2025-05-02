@@ -166,15 +166,12 @@ const updateEvent = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json(apiResponse.error("Invalid event ID format", 400));
   }
-
   let event = await Event.findById(id);
   if (!event) {
     return res.status(404).json(apiResponse.error(`Event not found with id of ${id}`, 404));
   }
-
   // Handle new image if uploaded
   const image = req.file ? req.file.filename : event.image;
-
   // Update event
   event = await Event.findByIdAndUpdate(
     id,
@@ -184,7 +181,6 @@ const updateEvent = asyncHandler(async (req, res) => {
 
   res.status(200).json(apiResponse.success("Event updated successfully", { event }));
 });
-
 
 // @desc    Delete event
 // @route   DELETE /api/events/:id
@@ -196,16 +192,13 @@ const deleteEvent = asyncHandler(async (req, res) => {
     return res.status(400).json(apiResponse.error("Invalid event ID format", 400));
   }
 
-  const event = await Event.findById(id);
+  const event = await Event.findByIdAndDelete(id);
 
   if (!event) {
     return res.status(404).json(apiResponse.error(`Event not found with id of ${id}`, 404));
   }
-
-  await event.remove();
   res.status(200).json(apiResponse.success("Event deleted successfully", {}));
 });
-
 // @desc    Get latest news and events for homepage
 // @route   GET /api/events/latest-updates
 // @access  Public
@@ -225,10 +218,6 @@ const getLatestEvents = asyncHandler(async (req, res) => {
     res.status(500).json(apiResponse.error("Failed to retrieve latest updates", 500));
   }
 });
-
-
-
-
 
 const resizeEventPhoto = asyncHandler(async (req, res, next) => {
   if (!req.file) return next();
@@ -269,8 +258,6 @@ const resizeEventPhoto = asyncHandler(async (req, res, next) => {
 
   next();
 });
-
-
 
 module.exports = {
   getEvents,

@@ -17,6 +17,7 @@ const EventManagement = () => {
   const fileInputRef = useRef(null)
   const [faculties, setFaculties] = useState([])
 
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -32,6 +33,7 @@ const EventManagement = () => {
     return localStorage.getItem("token")
   }
 
+
   // Create headers with auth token
   const createHeaders = (includeContentType = true) => {
     const token = getAuthToken()
@@ -39,12 +41,14 @@ const EventManagement = () => {
       Authorization: token ? `Bearer ${token}` : "",
     }
 
+
     if (includeContentType) {
       headers["Content-Type"] = "application/json"
     }
 
     return headers
   }
+
 
   // Fetch events from API
   useEffect(() => {
@@ -73,6 +77,7 @@ const EventManagement = () => {
 
     fetchEvents()
   }, [])
+
 
   // Fetch faculties from API
   useEffect(() => {
@@ -335,7 +340,7 @@ const EventManagement = () => {
 
     // Set image preview if available
     if (event.image) {
-      setImagePreview(`http://127.0.0.1:4400/uploads/${event.image}`)
+      setImagePreview(`http://localhost:4400/public/img/event/${event.image}`)
     } else {
       setImagePreview(null)
     }

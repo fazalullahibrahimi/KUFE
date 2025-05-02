@@ -72,15 +72,12 @@ router.get("/",getAllResearch)
 // Protected routes
 router.use(authMiddleware)
 
-// Get all research (admin only)
-
-
 // Status filters (admin and faculty)
-router.get("/status/:status", authorize([roles.ADMIN, roles.FACULTY]), getResearchByStatus)
+router.get("/status/:status", authorize([roles.ADMIN, roles.TEACHER]), getResearchByStatus)
 
 // Student and department filters (admin and faculty)
-router.get("/student/:student_id", authorize([roles.ADMIN, roles.FACULTY]), getResearchByStudent)
-router.get("/department/:department_id", authorize([roles.ADMIN, roles.FACULTY]), getResearchByDepartment)
+router.get("/student/:student_id", authorize([roles.ADMIN, roles.TEACHER]), getResearchByStudent)
+router.get("/department/:department_id", authorize([roles.ADMIN, roles.TEACHER]), getResearchByDepartment)
 
 // Create research (students with submit_research permission)
 router.post("/", upload.single("file"), requireRoles([roles.ADMIN,roles.STUDENT]), createResearch)

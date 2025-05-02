@@ -55,7 +55,7 @@ const userValidationSchema = Joi.object({
     "string.min": `"password" should have a minimum length of {#limit}`,
     "any.required": `"password" is a required field`,
   }),
-  role: Joi.string().valid("admin", "faculty", "student","committeeMember").default("student"),
+  role: Joi.string().valid("admin", "teacher", "student","committeeMember").default("student"),
   image: Joi.string().allow(null).optional().messages({
     "string.base": `"image" should be a type of 'text'`,
   }),

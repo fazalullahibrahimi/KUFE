@@ -26,13 +26,13 @@ router.get("/latest", getLatestEvents);
 router.use(authMiddleware)
 
 // Admin and faculty can create/update/delete events
-router.post("/", authorize(roles.ADMIN, roles.FACULTY),
+router.post("/", authorize(roles.ADMIN, roles.TEACHER),
 uploadEventPhoto,
 resizeEventPhoto,
 createEvent
 );
 
-router.patch("/:id", authorize(roles.ADMIN, roles.FACULTY),
+router.patch("/:id", authorize(roles.ADMIN, roles.TEACHER),
 uploadEventPhoto,
 resizeEventPhoto,
 updateEvent
