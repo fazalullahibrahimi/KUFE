@@ -13,6 +13,7 @@ import DepartmentManagement from "../components/DataManagement/DepartmentManagem
 import AnnouncementManagement from "../components/DataManagement/AnnouncementManagement";
 import DashboardHome from "../components/DashboardHome";
 import FacultyDirectoryManagement from "../components/DataManagement/FacultyDirectoryManagement";
+import CommitteeMemberManagement from "../components/DataManagement/CommitteeMemberManagement";
 
 const Dashboardv1 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -46,6 +47,8 @@ const Dashboardv1 = () => {
         return <AnnouncementManagement />;
       case "facultyDirectory":
         return <FacultyDirectoryManagement />;
+      case "committe":
+        return <CommitteeMemberManagement />;
       default:
         return <DashboardHome />;
     }
