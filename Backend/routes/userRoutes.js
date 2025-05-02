@@ -18,7 +18,7 @@ router.post("/resetpassword/:token", userController.resetPassword);
 router.post("/verify-email-otp", userController.verifyEmailWithOTP)
 router.get("/verify-email/:token", userController.verifyEmail)
 router.post("/resend-verification-otp", userController.resendVerificationOTP)
-
+router.get('/justNameOfComiteeMembers', userController.getAllCommitteeMembers);
 // Protected routes (require authentication)
 router.use(authMiddleware) // Corrected middleware name
 
@@ -47,3 +47,6 @@ router
 
 module.exports = router
 
+
+
+// http://localhost:4400/api/v1/user/justNameOfComiteeMembers this route for to give just name of user wtich is role is commitee Members

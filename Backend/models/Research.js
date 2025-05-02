@@ -88,11 +88,11 @@ const researchSchema = new mongoose.Schema(
     },
     abstract: {
       type: String,
-      required: [true, "Abstract is required"],
+      required: false,
     },
     publication_date: {
       type: Date,
-      required: [true, "Publication date is required"],
+      required: false,
     },
     file_path: {
       type: String,
@@ -100,11 +100,11 @@ const researchSchema = new mongoose.Schema(
     },
     pages: {
       type: Number,
-      required: [true, "Number of pages is required"],
+      required: false,
     },
     category: {
       type: String,
-      required: [true, "Category is required"],
+      required: false,
     },
     status: {
       type: String,
@@ -153,11 +153,11 @@ const researchSchema = new mongoose.Schema(
     reviewer_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "CommitteeMember", // Use the actual CommitteeMember model
-      default: null,
+      required: false,
     },
     review_date: {
       type: Date,
-      default: null,
+      required: false,
     },
   },
   { timestamps: true }

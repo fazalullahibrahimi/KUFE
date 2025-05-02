@@ -13,7 +13,7 @@ const {
   searchResearch,
 } = require("../controllers/researchController")
 const { authMiddleware } = require("../middleware/authMiddleware")
-const { authorize, checkPermission } = require("../middleware/roleCheck")
+const { authorize, checkPermission,requireRoles } = require("../middleware/roleCheck")
 const roles = require("../config/roles")
 
 // Configure multer for file uploads
@@ -83,13 +83,13 @@ router.get("/student/:student_id", authorize([roles.ADMIN, roles.FACULTY]), getR
 router.get("/department/:department_id", authorize([roles.ADMIN, roles.FACULTY]), getResearchByDepartment)
 
 // Create research (students with submit_research permission)
-router.post("/", upload.single("file"), checkPermission("submit_research"), createResearch)
+router.post("/", upload.single("file"), requireRoles([roles.COMMITTEE]), createResearch)
 
 // Review research (faculty with manage_research permission)
-router.patch("/:id/review", checkPermission("manage_research"), reviewResearch)
+router.patch( "/:id/review",requireRoles([roles.COMMITTEE]),reviewResearch)
 
 // Update research (admin or original author)
-router.put("/:id", upload.single("file"), updateResearch)
+router.patch("/:id", upload.single("file"), updateResearch)
 
 // Delete research (admin only)
 router.delete("/:id", authorize(roles.ADMIN), deleteResearch)

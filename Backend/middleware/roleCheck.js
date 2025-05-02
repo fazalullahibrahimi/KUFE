@@ -42,3 +42,20 @@ exports.checkPermission = (permission) => {
   }
 }
 
+// middleware/roleCheck.js
+
+exports.requireRoles = (rolesList) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json(apiResponse.error("User not authenticated", 401))
+    }
+
+    if (!rolesList.includes(req.user.role)) {
+      return res
+        .status(403)
+        .json(apiResponse.error(`Only ${rolesList.join(" or ")} can perform this action`, 403))
+    }
+
+    next()
+  }
+}
