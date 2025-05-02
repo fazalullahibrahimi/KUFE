@@ -83,7 +83,7 @@ router.get("/student/:student_id", authorize([roles.ADMIN, roles.FACULTY]), getR
 router.get("/department/:department_id", authorize([roles.ADMIN, roles.FACULTY]), getResearchByDepartment)
 
 // Create research (students with submit_research permission)
-router.post("/", upload.single("file"), requireRoles([roles.COMMITTEE]), createResearch)
+router.post("/", upload.single("file"), requireRoles([roles.ADMIN,roles.STUDENT]), createResearch)
 
 // Review research (faculty with manage_research permission)
 router.patch( "/:id/review",requireRoles([roles.COMMITTEE]),reviewResearch)
