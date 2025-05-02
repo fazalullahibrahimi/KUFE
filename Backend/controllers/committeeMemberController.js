@@ -53,8 +53,8 @@ const updateCommitteeMember = async (req, res) => {
       return res.status(400).json({ message: 'Department not found' });
     }
 
-    const updatedMember = await CommitteeMember.findOneAndUpdate(
-      { userId: req.params.userId },
+    const updatedMember = await CommitteeMember.findByIdAndUpdate(
+      req.params.id, // use _id instead of userId
       {
         department,
         academicRank,
@@ -63,7 +63,9 @@ const updateCommitteeMember = async (req, res) => {
         phoneNumber,
       },
       { new: true }
-    ).populate('department', 'name').populate('userId', 'fullName email');
+    )
+    .populate('department', 'name')
+    .populate('userId', 'fullName email');
 
     if (!updatedMember) {
       return res.status(404).json({ message: 'Committee member not found' });
@@ -76,7 +78,30 @@ const updateCommitteeMember = async (req, res) => {
   }
 };
 
+
 // Get all committee members
+
+
+// Get a committee member by userId
+const getCommitteeMemberById = async (req, res) => {
+  try {
+    const member = await CommitteeMember.findById(req.params.id)
+      .populate('department', 'name')
+      .populate('userId', 'fullName email');
+
+    if (!member) {
+      return res.status(404).json({ message: 'Committee member not found' });
+    }
+
+    res.status(200).json(member);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+
 const getAllCommitteeMembers = async (req, res) => {
   try {
     const committeeMembers = await CommitteeMember.find()
@@ -95,28 +120,10 @@ const getAllCommitteeMembers = async (req, res) => {
   }
 };
 
-// Get a committee member by userId
-const getCommitteeMemberById = async (req, res) => {
-  try {
-    const member = await CommitteeMember.findOne({ userId: req.params.userId })
-      .populate('department', 'name')
-      .populate('userId', 'fullName email');
-
-    if (!member) {
-      return res.status(404).json({ message: 'Committee member not found' });
-    }
-
-    res.status(200).json(member);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
 // Delete a committee member
 const deleteCommitteeMember = async (req, res) => {
   try {
-    const deletedMember = await CommitteeMember.findOneAndDelete({ userId: req.params.userId });
+    const deletedMember = await CommitteeMember.findByIdAndDelete(req.params.id);
 
     if (!deletedMember) {
       return res.status(404).json({ message: 'Committee member not found' });
@@ -128,6 +135,7 @@ const deleteCommitteeMember = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 module.exports = {
   createCommitteeMember,
