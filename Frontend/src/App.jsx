@@ -24,6 +24,7 @@ import StudentResearchSubmission from "./pages/StudentResearchSubmission.jsx";
 // import SecondPage from "./components/DataManagement/StudentMarksView.jsx";
 import StudentMarksView from "./components/DataManagement/StudentMarksView.jsx";
 import TeacherMarksManagement from "./components/DataManagement/TeacherMarksManagement.jsx";
+import CommitteeMemberManagement from "./components/DataManagement/CommitteeMemberManagement.jsx";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
         <Route path='/studenSubmit' element={<StudentResearchSubmission />} />
         <Route path='/studentmarks' element={<StudentMarksView />} />
         <Route path='/teachermarks' element={<TeacherMarksManagement />} />
+        <Route path='/committe' element={<CommitteeMemberManagement />} />
       </Routes>
     </Router>
   );
