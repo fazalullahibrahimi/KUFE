@@ -149,7 +149,7 @@ const Programs = () => {
         >
           Our Academic Programs
         </h2>
-
+ 
         <div className='w-24 h-1 bg-[#F4B400] mx-auto mb-8 rounded-full'></div>
 
         {loading ? (

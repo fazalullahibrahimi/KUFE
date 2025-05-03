@@ -1,14 +1,14 @@
 module.exports = {
   ADMIN: "admin",
-  FACULTY: "faculty",
+  TEACHER: "teacher",
   STUDENT: "student",
-  COMMITTEE: "committeeMember", // ✅ Add this
+  COMMITTEE: "committeeMember", // ✅ Still included
 
   // Role-based permissions
   permissions: {
     admin: ["manage_users", "manage_faculty", "manage_departments", "manage_courses", "manage_all"],
-    faculty: ["manage_courses", "manage_research", "manage_resources", "view_students"],
+    teacher: ["manage_courses", "manage_research", "manage_resources", "view_students"],
     student: ["view_courses", "enroll_courses", "view_resources", "submit_research"],
-    committeeMember: ["review_research"], // ✅ Add permission for reviewing
+    committeeMember: ["review_research"], // ✅ Permission for committee members
   },
-}
+};
