@@ -204,16 +204,15 @@ const updateNews = asyncHandler(async (req, res) => {
 // @route   DELETE /api/news/:id
 // @access  Private/Admin
 const deleteNews = asyncHandler(async (req, res) => {
-  const news = await News.findById(req.params.id)
+  const news = await News.findByIdAndDelete(req.params.id)
 
   if (!news) {
     return res.status(404).json(apiResponse.error(`News not found with id of ${req.params.id}`, 404))
   }
 
-  await news.remove()
-
   res.status(200).json(apiResponse.success("News deleted successfully", {}))
 })
+
 
 
 const resizeNewsPhoto = asyncHandler(async (req, res, next) => {

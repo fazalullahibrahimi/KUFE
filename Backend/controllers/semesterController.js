@@ -3,8 +3,8 @@ const Semester = require('../models/semester');
 // Create a new semester
 const createSemester = async (req, res) => {
   try {
-    const { id, name } = req.body;
-    const semester = new Semester({ id, name });
+    const { name } = req.body;
+    const semester = new Semester({ name });
     await semester.save();
     res.status(201).json({ message: 'Semester created successfully!', semester });
   } catch (error) {
@@ -61,10 +61,10 @@ const deleteSemester = async (req, res) => {
   }
 };
 
-module.exports={
-    createSemester,
-    getSemesters,
-    getSemesterById,
-    updateSemester,
-    deleteSemester
-}
+module.exports = {
+  createSemester,
+  getSemesters,
+  getSemesterById,
+  updateSemester,
+  deleteSemester
+};

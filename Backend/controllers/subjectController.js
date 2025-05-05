@@ -1,11 +1,10 @@
-
 const Subject = require('../models/subject');
 
 // Create a new subject
 const createSubject = async (req, res) => {
   try {
-    const { id, name, code, semester_id, credit_hours } = req.body;
-    const subject = new Subject({ id, name, code, semester_id, credit_hours });
+    const { name, code, semester_id, credit_hours } = req.body;
+    const subject = new Subject({ name, code, semester_id, credit_hours });
     await subject.save();
     res.status(201).json({ message: 'Subject created successfully!', subject });
   } catch (error) {
@@ -62,10 +61,10 @@ const deleteSubject = async (req, res) => {
   }
 };
 
-module.exports={
-    createSubject,
-    getSubjects,
-    getSubjectById,
-    updateSubject,
-    deleteSubject
-}
+module.exports = {
+  createSubject,
+  getSubjects,
+  getSubjectById,
+  updateSubject,
+  deleteSubject
+};

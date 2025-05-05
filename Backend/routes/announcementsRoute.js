@@ -27,7 +27,7 @@ router.route("/").get(getAnnouncements)
 router.route("/").post(authMiddleware, authorizeAdminOrFaculty, createAnnouncement)
 
 // Update announcement - Admin or Faculty can update
-router.route("/:id").put(authMiddleware, authorizeAdminOrFaculty, updateAnnouncement)
+router.route("/:id").patch(authMiddleware, authorizeAdminOrFaculty, updateAnnouncement)
 
 // Delete announcement - Only Admin can delete
 router.route("/:id").delete(authMiddleware, authorizeAdmin, deleteAnnouncement);

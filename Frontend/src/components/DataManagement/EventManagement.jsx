@@ -412,7 +412,7 @@ const EventManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Total Events</p>
-            <p className="text-lg font-semibold text-gray-800">Scheduled Events</p>
+            <p className="text-lg font-semibold text-gray-800">{events.length}</p>
           </div>
         </div>
 
@@ -424,7 +424,7 @@ const EventManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Upcoming Events</p>
-            <p className="text-lg font-semibold text-gray-800">Future Schedule</p>
+            <p className="text-lg font-semibold text-gray-800"> {events.filter((event) => new Date(event.date) > new Date()).length}</p>
           </div>
         </div>
 
@@ -434,7 +434,7 @@ const EventManagement = () => {
           </div>
           <div>
             <p className="text-gray-500 text-sm">Event Types</p>
-            <p className="text-lg font-semibold text-gray-800">Categories</p>
+            <p className="text-lg font-semibold text-gray-800">{new Set(events.map((event) => event.type)).size}</p>
           </div>
         </div>
       </div>
