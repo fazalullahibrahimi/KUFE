@@ -103,7 +103,7 @@ const enTranslations = {
     Courses: "Courses",
     About: "About",
     Contact: "Contact",
-    "Announcements Events": "Announcements & Events",
+    Announcements_Events: "Announcements & Events",
     student_portal: "Student Portal",
     ku_logo_alt: "Kandahar University Logo",
     kandahar_university: "Kandahar University",

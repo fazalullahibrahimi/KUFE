@@ -1,105 +1,146 @@
 import React from "react";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import enTranslations from "../translations/en";
-import drTranslations from "../translations/dr";
-import psTranslations from "../translations/ps";
 
-// Define available languages
-const languages = {
+// Define translations
+const translations = {
   en: {
-    name: "English",
-    flag: "🇺🇸",
-    dir: "ltr",
-    translations: enTranslations,
+    // English translations
+    Home: "Home",
+    Academics: "Academics",
+    Research: "Research",
+    Courses: "Courses",
+    About: "About",
+    Contact: "Contact",
+    "Announcements Events": "Announcements & Events",
+    student_portal: "Student Portal",
+    kandahar_university: "Kandahar University",
+    faculty_of_economics: "Faculty of Economics",
+    ku_logo_alt: "Kandahar University Logo",
+    // Add more translations as needed
   },
   dr: {
-    name: "دری",
-    flag: "🇦🇫",
-    dir: "rtl",
-    translations: drTranslations,
+    // Dari translations
+    Home: "خانه",
+    Academics: "تحصیلات",
+    Research: "تحقیقات",
+    Courses: "دروس",
+    About: "درباره ما",
+    Contact: "تماس با ما",
+    "Announcements Events": "اعلانات و رویدادها",
+    student_portal: "پورتال محصلین",
+    kandahar_university: "پوهنتون کندهار",
+    faculty_of_economics: "پوهنځی اقتصاد",
+    ku_logo_alt: "لوگوی پوهنتون کندهار",
+    // Add more translations as needed
   },
   ps: {
-    name: "پښتو",
-    flag: "🇦🇫",
-    dir: "rtl",
-    translations: psTranslations,
+    // Pashto translations
+    Home: "کور",
+    Academics: "زده کړې",
+    Research: "څیړنې",
+    Courses: "کورسونه",
+    About: "زموږ په اړه",
+    Contact: "اړیکه",
+    "Announcements Events": "اعلانات او پیښې",
+    student_portal: "د زده کوونکو پورټال",
+    kandahar_university: "د کندهار پوهنتون",
+    faculty_of_economics: "د اقتصاد پوهنځی",
+    ku_logo_alt: "د کندهار پوهنتون لوګو",
+    // Add more translations as needed
   },
 };
 
+// Define language metadata
+const languageMetadata = {
+  en: {
+    name: "English",
+    dir: "ltr",
+  },
+  dr: {
+    name: "دری",
+    dir: "rtl",
+  },
+  ps: {
+    name: "پښتو",
+    dir: "rtl",
+  },
+};
+
+// Create the language context
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  // Get initial language from localStorage or default to English
-  const [currentLanguage, setCurrentLanguage] = useState("en");
+  // Initialize with browser language or default to English
+  const [language, setLanguage] = useState("en");
   const [isRTL, setIsRTL] = useState(false);
 
+  // Load saved language preference on initial render
   useEffect(() => {
     const savedLanguage = localStorage.getItem("language") || "en";
-    setCurrentLanguage(savedLanguage);
-    setIsRTL(languages[savedLanguage].dir === "rtl");
+    changeLanguage(savedLanguage);
 
-    // Set document direction
-    document.documentElement.dir = languages[savedLanguage].dir;
-    document.documentElement.lang = savedLanguage;
-
-    // Add RTL class to body if needed
-    if (languages[savedLanguage].dir === "rtl") {
-      document.body.classList.add("rtl");
-    } else {
-      document.body.classList.remove("rtl");
-    }
+    // Debug
+    console.log("Initial language:", savedLanguage);
   }, []);
 
   // Function to change language
-  const changeLanguage = (lang) => {
-    if (languages[lang]) {
-      setCurrentLanguage(lang);
-      setIsRTL(languages[lang].dir === "rtl");
-      localStorage.setItem("language", lang);
+  const changeLanguage = (langCode) => {
+    console.log("LanguageContext: Changing language to:", langCode);
 
-      // Update document direction
-      document.documentElement.dir = languages[lang].dir;
-      document.documentElement.lang = lang;
+    if (translations[langCode]) {
+      setLanguage(langCode);
+      setIsRTL(languageMetadata[langCode].dir === "rtl");
+      localStorage.setItem("language", langCode);
 
-      // Update RTL class on body
-      if (languages[lang].dir === "rtl") {
+      // Update document direction and language
+      document.documentElement.dir = languageMetadata[langCode].dir;
+      document.documentElement.lang = langCode;
+
+      // Add or remove RTL class on body
+      if (languageMetadata[langCode].dir === "rtl") {
         document.body.classList.add("rtl");
       } else {
         document.body.classList.remove("rtl");
       }
+
+      // Debug
+      console.log("Language changed to:", langCode);
+      console.log("Is RTL:", languageMetadata[langCode].dir === "rtl");
+    } else {
+      console.error("Invalid language code:", langCode);
     }
   };
 
-  // Translation function
+  // Translation function - FIXED to prevent the split() error
   const t = (key) => {
-    const keys = key.split(".");
-    let value = languages[currentLanguage].translations;
+    // Safety check - if key is undefined or null, return empty string
+    if (!key) return "";
 
-    for (const k of keys) {
-      if (value && value[k]) {
-        value = value[k];
-      } else {
-        // Fallback to English if translation not found
-        let fallback = languages.en.translations;
-        for (const fk of keys) {
-          if (fallback && fallback[fk]) {
-            fallback = fallback[fk];
-          } else {
-            return key; // Return the key if no translation found
-          }
-        }
-        return fallback;
-      }
+    // Check if translations exist for current language
+    if (!translations[language]) {
+      console.error("Invalid language:", language);
+      return key || "";
     }
 
-    return value;
+    // Check if it's a nested key with dot notation (safely)
+    if (key && typeof key === "string" && key.includes(".")) {
+      const [section, nestedKey] = key.split(".");
+      return translations[language][section]?.[nestedKey] || key;
+    }
+
+    // Check if key exists directly in the translations
+    if (translations[language][key]) {
+      return translations[language][key];
+    }
+
+    // Return the key itself if no translation found
+    return key;
   };
 
   const value = {
-    currentLanguage,
-    languages,
-    changeLanguage,
+    language,
+    setLanguage: changeLanguage,
     t,
     isRTL,
   };
