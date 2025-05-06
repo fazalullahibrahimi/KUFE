@@ -115,6 +115,7 @@ const TeacherMarksManagement = () => {
 
         if (data.subjects && Array.isArray(data.subjects)) {
           setSubjects(data.subjects)
+          console.log("Fetched subjects:", data.subjects)
         } else {
           console.error("Unexpected API response structure:", data)
           setSubjects([])
@@ -145,7 +146,7 @@ const TeacherMarksManagement = () => {
           setSemesters(data.semesters)
           // Set the first semester as default if available
           if (data.semesters.length > 0) {
-            setSelectedSemester(data.semesters[0]._id)
+            // Don't auto-select a semester
             setMarksFormData((prev) => ({ ...prev, semester_id: data.semesters[0]._id }))
             setSubjectFormData((prev) => ({ ...prev, semester_id: data.semesters[0]._id }))
           }
@@ -164,32 +165,85 @@ const TeacherMarksManagement = () => {
     fetchSemesters()
   }, [])
 
-  // Extract marks from students data
+  // Extract marks from students data and enrich with semester information
   useEffect(() => {
-    if (students.length > 0) {
+    if (students.length > 0 && semesters.length > 0 && subjects.length > 0) {
       const allMarks = []
       students.forEach((student) => {
         if (student.marks && Array.isArray(student.marks)) {
           student.marks.forEach((mark) => {
+            // Find the subject for this mark to get its semester
+            const subject = subjects.find((sub) => sub._id === mark.subject_id)
+
+            // Get semester ID either from the subject or directly from the mark
+            let semesterId = typeof mark.semester_id === "object" ? mark.semester_id._id : mark.semester_id
+            let semesterName = "Unknown Semester"
+
+            // If we found the subject, use its semester information
+            if (subject && subject.semester_id) {
+              // Handle both string and object semester_id formats in subjects
+              const subjectSemesterId =
+                typeof subject.semester_id === "object" ? subject.semester_id._id : subject.semester_id
+
+              semesterId = subjectSemesterId
+
+              // Get the semester name from the subject's semester
+              const semester = semesters.find((sem) => sem._id === subjectSemesterId)
+              if (semester) {
+                semesterName = semester.name
+              } else if (typeof subject.semester_id === "object" && subject.semester_id.name) {
+                semesterName = subject.semester_id.name
+              }
+            } else {
+              // Fallback to using mark's semester_id
+              const semester = semesters.find((sem) => sem._id === semesterId)
+              if (semester) {
+                semesterName = semester.name
+              }
+            }
+
+            // Enrich mark with student and semester information
             allMarks.push({
               ...mark,
               student_id: student._id,
               student_name: student.name,
+              // Normalize semester_id to ensure consistent format
+              semester_id: semesterId,
+              // Add semester name for display
+              semester_name: semesterName,
             })
           })
         }
       })
+
+      console.log("Extracted marks:", allMarks.length, "Sample mark:", allMarks.length > 0 ? allMarks[0] : null)
       setStudentMarks(allMarks)
     }
-  }, [students])
+  }, [students, semesters, subjects])
 
   // Filter marks based on selected semester, subject, and search term
   useEffect(() => {
     let result = [...studentMarks]
 
+    console.log("Filtering marks with:", {
+      selectedSemester,
+      totalMarks: studentMarks.length,
+      sampleMark: studentMarks.length > 0 ? studentMarks[0] : null,
+    })
+
     // Filter by semester
     if (selectedSemester) {
-      result = result.filter((mark) => mark.semester_id === selectedSemester)
+      console.log("Filtering by semester:", selectedSemester)
+      result = result.filter((mark) => {
+        // Handle different semester_id formats
+        const markSemesterId = typeof mark.semester_id === "object" ? mark.semester_id._id : mark.semester_id
+
+        console.log(
+          `Mark semester_id: ${markSemesterId}, Selected: ${selectedSemester}, Match: ${markSemesterId === selectedSemester}`,
+        )
+        return markSemesterId === selectedSemester
+      })
+      console.log("After semester filter, marks count:", result.length)
     }
 
     // Filter by subject
@@ -210,17 +264,14 @@ const TeacherMarksManagement = () => {
         const subject = subjects.find((s) => s._id === mark.subject_id)
         return (
           student?.name?.toLowerCase().includes(term) ||
-          false ||
           student?.student_id_number?.toLowerCase().includes(term) ||
-          false ||
           subject?.name?.toLowerCase().includes(term) ||
-          false ||
-          subject?.code?.toLowerCase().includes(term) ||
-          false
+          subject?.code?.toLowerCase().includes(term)
         )
       })
     }
 
+    console.log("Final filtered marks count:", result.length)
     setFilteredMarks(result)
   }, [studentMarks, selectedSemester, selectedSubject, selectedStudent, searchTerm, students, subjects])
 
@@ -246,16 +297,29 @@ const TeacherMarksManagement = () => {
   }
 
   const handleSemesterChange = (e) => {
-    setSelectedSemester(e.target.value)
-    setSelectedSubject("") // Reset subject when semester changes
-    setMarksFormData({
-      ...marksFormData,
-      semester_id: e.target.value,
+    const semesterId = e.target.value
+    console.log("Semester changed to:", semesterId)
+
+    setSelectedSemester(semesterId)
+    setSelectedSubject("") // Reset subject selection when semester changes
+
+    // Update form data with the new semester
+    setMarksFormData((prev) => ({
+      ...prev,
+      semester_id: semesterId,
       subject_id: "",
-    })
-    setSubjectFormData({
-      ...subjectFormData,
-      semester_id: e.target.value,
+    }))
+
+    setSubjectFormData((prev) => ({
+      ...prev,
+      semester_id: semesterId,
+    }))
+
+    // Log the current state for debugging
+    console.log("Current semester state:", {
+      selectedSemester: semesterId,
+      marksFormData: semesterId,
+      subjectFormData: semesterId,
     })
   }
 
@@ -279,17 +343,14 @@ const TeacherMarksManagement = () => {
 
     const total = midtermValue + finalValue + assignmentValue
 
+    // Modified grade calculation to match server's expected enum values
+    // Assuming the server accepts: A, B, C, D, F (without + or -)
     let grade = "F"
-    if (total >= 95) grade = "A+"
-    else if (total >= 90) grade = "A"
-    else if (total >= 85) grade = "A-"
-    else if (total >= 80) grade = "B+"
-    else if (total >= 75) grade = "B"
-    else if (total >= 70) grade = "B-"
-    else if (total >= 65) grade = "C+"
-    else if (total >= 60) grade = "C"
-    else if (total >= 55) grade = "C-"
-    else if (total >= 50) grade = "D"
+    if (total >= 90) grade = "A"
+    else if (total >= 80) grade = "B"
+    else if (total >= 70) grade = "C"
+    else if (total >= 60) grade = "D"
+    else grade = "F"
 
     return { total, grade }
   }
@@ -297,6 +358,31 @@ const TeacherMarksManagement = () => {
   // CRUD operations for marks
   const handleAddMarks = async () => {
     try {
+      // Validate required fields
+      if (!marksFormData.student_id) {
+        alert("Please select a student")
+        return
+      }
+
+      if (!marksFormData.subject_id) {
+        alert("Please select a subject")
+        return
+      }
+
+      // Get the semester_id from the selected subject if not provided
+      let semester_id = marksFormData.semester_id
+      if (!semester_id) {
+        const selectedSubjectObj = subjects.find((s) => s._id === marksFormData.subject_id)
+        if (selectedSubjectObj && selectedSubjectObj.semester_id) {
+          semester_id = selectedSubjectObj.semester_id._id
+        } else if (semesters.length > 0) {
+          semester_id = semesters[0]._id
+        } else {
+          alert("Please select a semester")
+          return
+        }
+      }
+
       const { total, grade } = calculateTotalAndGrade(
         marksFormData.midterm,
         marksFormData.final,
@@ -305,14 +391,16 @@ const TeacherMarksManagement = () => {
 
       const markData = {
         subject_id: marksFormData.subject_id,
-        semester_id: marksFormData.semester_id,
-        midterm: marksFormData.midterm,
-        final: marksFormData.final,
-        assignment: marksFormData.assignment,
+        semester_id: semester_id,
+        midterm: Number(marksFormData.midterm) || 0,
+        final: Number(marksFormData.final) || 0,
+        assignment: Number(marksFormData.assignment) || 0,
         total,
         grade,
         remarks: marksFormData.remarks || "No remarks",
       }
+
+      console.log("Sending mark data:", markData)
 
       const response = await fetch(`http://localhost:4400/api/v1/students/${marksFormData.student_id}/marks`, {
         method: "POST",
@@ -321,6 +409,7 @@ const TeacherMarksManagement = () => {
       })
 
       const data = await response.json()
+      console.log("Add marks response:", data)
 
       if (data.status === "success") {
         // Refresh students data to get updated marks
@@ -338,7 +427,7 @@ const TeacherMarksManagement = () => {
         alert("Marks added successfully!")
       } else {
         console.error("Error adding marks:", data)
-        alert("Failed to add marks. Please try again.")
+        alert(`Failed to add marks: ${data.message || "Please try again."}`)
       }
     } catch (error) {
       console.error("Error adding marks:", error)
@@ -347,10 +436,13 @@ const TeacherMarksManagement = () => {
   }
 
   const resetMarksForm = () => {
+    // Make sure we have a valid semester_id
+    const defaultSemesterId = semesters.length > 0 ? semesters[0]._id : ""
+
     setMarksFormData({
       student_id: "",
       subject_id: "",
-      semester_id: selectedSemester,
+      semester_id: defaultSemesterId,
       midterm: "",
       final: "",
       assignment: "",
@@ -378,12 +470,11 @@ const TeacherMarksManagement = () => {
           const updatedSubjects = [...subjects]
 
           // Add the new subject with the correct semester_id structure
-          // This is the key fix - ensuring semester_id is an object with _id and name properties
           const newSubject = {
             ...data.subject,
             semester_id: {
               _id: data.subject.semester_id,
-              name: getSemesterById(data.subject.semester_id).name,
+              name: getSemesterById(data.subject.semester_id)?.name || "Unknown Semester",
             },
           }
 
@@ -413,7 +504,7 @@ const TeacherMarksManagement = () => {
                 ...subject,
                 semester_id: {
                   _id: subject.semester_id,
-                  name: getSemesterById(subject.semester_id).name,
+                  name: getSemesterById(subject.semester_id)?.name || "Unknown Semester",
                 },
               }
             })
@@ -516,7 +607,7 @@ const TeacherMarksManagement = () => {
     setSubjectFormData({
       name: "",
       code: "",
-      semester_id: selectedSemester,
+      semester_id: selectedSemester || (semesters.length > 0 ? semesters[0]._id : ""),
       credit_hours: 3,
     })
     setEditingSubject(null)
@@ -580,9 +671,9 @@ const TeacherMarksManagement = () => {
         const markData = {
           subject_id: rowData.subject_id,
           semester_id: subject.semester_id._id,
-          midterm: Number(rowData.midterm),
-          final: Number(rowData.final),
-          assignment: Number(rowData.assignment),
+          midterm: Number(rowData.midterm) || 0,
+          final: Number(rowData.final) || 0,
+          assignment: Number(rowData.assignment) || 0,
           total,
           grade,
           remarks: rowData.remarks || "Imported from CSV",
@@ -679,13 +770,20 @@ const TeacherMarksManagement = () => {
   }
 
   const getSemesterById = (id) => {
+    if (!id) return { name: "Unknown Semester" }
     return semesters.find((semester) => semester._id === id) || { name: "Unknown Semester" }
   }
 
+  const getSemesterNameById = (id) => {
+    if (!id) return "Unknown Semester"
+    const semester = semesters.find((semester) => semester._id === id)
+    return semester ? semester.name : "Unknown Semester"
+  }
+
   const getGradeColor = (grade) => {
-    if (grade === "A+" || grade === "A" || grade === "A-") return "text-green-600"
-    if (grade === "B+" || grade === "B" || grade === "B-") return "text-blue-600"
-    if (grade === "C+" || grade === "C" || grade === "C-") return "text-yellow-600"
+    if (grade === "A") return "text-green-600"
+    if (grade === "B") return "text-blue-600"
+    if (grade === "C") return "text-yellow-600"
     if (grade === "D") return "text-orange-600"
     return "text-red-600"
   }
@@ -701,6 +799,9 @@ const TeacherMarksManagement = () => {
       </div>
     )
   }
+
+  // Get the selected semester name for display
+  const selectedSemesterName = selectedSemester ? getSemesterNameById(selectedSemester) : ""
 
   return (
     <div className="space-y-6">
@@ -736,7 +837,13 @@ const TeacherMarksManagement = () => {
               >
                 <option value="">{t("marks.all_subjects")}</option>
                 {subjects
-                  .filter((subject) => !selectedSemester || subject.semester_id._id === selectedSemester)
+                  .filter((subject) => {
+                    if (!selectedSemester) return true
+                    // Handle both string and object semester_id formats
+                    const subjectSemesterId =
+                      typeof subject.semester_id === "object" ? subject.semester_id._id : subject.semester_id
+                    return subjectSemesterId === selectedSemester
+                  })
                   .map((subject) => (
                     <option key={subject._id} value={subject._id}>
                       {subject.code} - {subject.name}
@@ -831,32 +938,30 @@ const TeacherMarksManagement = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {subjects
-                  .filter((subject) => !selectedSemester || subject.semester_id._id === selectedSemester)
-                  .map((subject) => (
-                    <tr key={subject._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{subject.code}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.semester_id.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.credit_hours}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="flex space-x-2">
-                          <button
-                            className="text-blue-600 hover:text-blue-800"
-                            onClick={() => openEditSubjectModal(subject)}
-                          >
-                            <Edit size={18} />
-                          </button>
-                          <button
-                            className="text-red-600 hover:text-red-800"
-                            onClick={() => handleDeleteSubject(subject._id)}
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                {subjects.map((subject) => (
+                  <tr key={subject._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{subject.code}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.semester_id.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.credit_hours}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div className="flex space-x-2">
+                        <button
+                          className="text-blue-600 hover:text-blue-800"
+                          onClick={() => openEditSubjectModal(subject)}
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button
+                          className="text-red-600 hover:text-red-800"
+                          onClick={() => handleDeleteSubject(subject._id)}
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -864,7 +969,10 @@ const TeacherMarksManagement = () => {
 
         {/* Marks Table */}
         <div className="border-t border-gray-200 pt-6">
-          <h3 className="text-lg font-medium text-gray-800 mb-4">{t("marks.student_marks")}</h3>
+          <h3 className="text-lg font-medium text-gray-800 mb-4">
+            {t("marks.student_marks")}
+            {selectedSemesterName && <span className="ml-2 text-[#004B87]">- {selectedSemesterName}</span>}
+          </h3>
           <div className="overflow-x-auto">
             {filteredMarks.length === 0 ? (
               <div className="p-8 text-center">
@@ -892,6 +1000,9 @@ const TeacherMarksManagement = () => {
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t("marks.subject")}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t("marks.semester")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t("marks.midterm")}
@@ -928,9 +1039,10 @@ const TeacherMarksManagement = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{getSubjectById(mark.subject_id).name}</div>
-                          <div className="text-sm text-gray-500">{getSubjectById(mark.subject_id).code}</div>
+                          <div className="text-sm text-gray-900">{subject.name}</div>
+                          <div className="text-sm text-gray-500">{subject.code}</div>
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{mark.semester_name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{mark.midterm}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{mark.final}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{mark.assignment}</td>

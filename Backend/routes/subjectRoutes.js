@@ -20,7 +20,7 @@ router.use(authMiddleware);
 
 // Protected routes (admin only)
 router.post('/', authorize(roles.ADMIN), createSubject);
-router.put('/:id', authorize(roles.ADMIN), updateSubject);
+router.patch('/:id', authorize(roles.ADMIN), updateSubject);
 router.delete('/:id', authorize(roles.ADMIN), deleteSubject);
 
 module.exports = router;

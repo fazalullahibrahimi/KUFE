@@ -33,7 +33,6 @@ const upload = multer({
 });
 
 // Middleware to handle single image file upload with name 'image'
-
 const uploasStudentPhoto = upload.single("image");
 // @desc    Get all students
 // @route   GET /api/students
