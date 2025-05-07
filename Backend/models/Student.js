@@ -13,6 +13,11 @@ const markSchema = new mongoose.Schema(
       ref: "Semester",
       required: [true, "Semester ID is required for marks"],
     },
+    teacher_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Teacher",
+      required: [true, "Teacher ID is required for marks"],
+    },
     midterm: {
       type: Number,
       min: 0,
@@ -48,8 +53,9 @@ const markSchema = new mongoose.Schema(
       trim: true,
     },
   },
-  { _id: false } // prevent sub-id for each mark entry
+  { _id: false }
 );
+
 
 // Student schema
 const studentSchema = new mongoose.Schema(

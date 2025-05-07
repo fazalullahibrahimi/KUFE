@@ -3,8 +3,13 @@ const Subject = require('../models/subject');
 // Create a new subject
 const createSubject = async (req, res) => {
   try {
-    const { name, code, semester_id, credit_hours } = req.body;
-    const subject = new Subject({ name, code, semester_id, credit_hours });
+    const { name, code, semester_id, credit_hours, teacher_id } = req.body;
+
+    if (!teacher_id) {
+      return res.status(400).json({ error: 'Teacher ID is required' });
+    }
+
+    const subject = new Subject({ name, code, semester_id, credit_hours, teacher_id });
     await subject.save();
     res.status(201).json({ message: 'Subject created successfully!', subject });
   } catch (error) {
@@ -15,17 +20,30 @@ const createSubject = async (req, res) => {
 // Get all subjects
 const getSubjects = async (req, res) => {
   try {
-    const subjects = await Subject.find().populate('semester_id');
+    const subjects = await Subject.find()
+      .populate('semester_id')
+      .populate({
+        path: 'teacher_id',
+        select: '_id name'  // select only the teacher's _id and name
+      });
+
     res.status(200).json({ subjects });
   } catch (error) {
     res.status(500).json({ error: 'Error fetching subjects', details: error.message });
   }
 };
 
+
 // Get a specific subject by ID
 const getSubjectById = async (req, res) => {
   try {
-    const subject = await Subject.findById(req.params.id).populate('semester_id');
+    const subject = await Subject.findById(req.params.id)
+    .populate('semester_id')
+    .populate({
+      path: 'teacher_id',
+      select: '_id name'  // select only the teacher's _id and name
+    });
+
     if (!subject) {
       return res.status(404).json({ error: 'Subject not found' });
     }

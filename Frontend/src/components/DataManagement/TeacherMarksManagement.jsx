@@ -12,11 +12,13 @@ const TeacherMarksManagement = () => {
   const [semesters, setSemesters] = useState([])
   const [subjects, setSubjects] = useState([])
   const [students, setStudents] = useState([])
+  const [teachers, setTeachers] = useState([])
   const [studentMarks, setStudentMarks] = useState([])
   const [isLoading, setIsLoading] = useState({
     semesters: true,
     subjects: true,
     students: true,
+    teachers: true,
     marks: true,
   })
 
@@ -41,6 +43,8 @@ const TeacherMarksManagement = () => {
     student_id: "",
     subject_id: "",
     semester_id: "",
+    teacher_id: "", // Add teacher_id field
+    teacher_name: "", // Add teacher_name field for display
     midterm: "",
     final: "",
     assignment: "",
@@ -53,6 +57,7 @@ const TeacherMarksManagement = () => {
     code: "",
     semester_id: "",
     credit_hours: 3,
+    teacher_id: "", // Added teacher_id field
   })
 
   // Get auth token from local storage
@@ -73,6 +78,34 @@ const TeacherMarksManagement = () => {
 
     return headers
   }
+
+  // Fetch teachers from API
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        setIsLoading((prev) => ({ ...prev, teachers: true }))
+        const response = await fetch("http://127.0.0.1:4400/api/v1/teachers/", {
+          headers: createHeaders(),
+        })
+        const data = await response.json()
+        console.log("Teachers API Response:", data)
+
+        if (data.status === "success" && data.data && data.data.teachers) {
+          setTeachers(data.data.teachers)
+        } else {
+          console.error("Unexpected API response structure for teachers:", data)
+          setTeachers([])
+        }
+      } catch (error) {
+        console.error("Error fetching teachers:", error)
+        setTeachers([])
+      } finally {
+        setIsLoading((prev) => ({ ...prev, teachers: false }))
+      }
+    }
+
+    fetchTeachers()
+  }, [])
 
   // Fetch students from API
   useEffect(() => {
@@ -114,8 +147,33 @@ const TeacherMarksManagement = () => {
         console.log("Subjects API Response:", data)
 
         if (data.subjects && Array.isArray(data.subjects)) {
-          setSubjects(data.subjects)
-          console.log("Fetched subjects:", data.subjects)
+          // Enrich subjects with teacher names
+          const enrichedSubjects = data.subjects.map((subject) => {
+            // Format semester_id if needed
+            const formattedSubject = {
+              ...subject,
+              semester_id:
+                typeof subject.semester_id === "object"
+                  ? subject.semester_id
+                  : {
+                      _id: subject.semester_id,
+                      name: getSemesterById(subject.semester_id)?.name || "Unknown Semester",
+                    },
+            }
+
+            // Add teacher name if teacher_id exists
+            if (subject.teacher_id) {
+              const teacher = teachers.find((t) => t._id === subject.teacher_id)
+              if (teacher) {
+                formattedSubject.teacher_name = teacher.name
+              }
+            }
+
+            return formattedSubject
+          })
+
+          setSubjects(enrichedSubjects)
+          console.log("Enriched subjects:", enrichedSubjects)
         } else {
           console.error("Unexpected API response structure:", data)
           setSubjects([])
@@ -129,7 +187,7 @@ const TeacherMarksManagement = () => {
     }
 
     fetchSubjects()
-  }, [])
+  }, [teachers]) // Add teachers as dependency to ensure subjects are enriched after teachers are loaded
 
   // Fetch semesters from API
   useEffect(() => {
@@ -165,22 +223,24 @@ const TeacherMarksManagement = () => {
     fetchSemesters()
   }, [])
 
-  // Extract marks from students data and enrich with semester information
+  // Extract marks from students data and enrich with semester and teacher information
   useEffect(() => {
     if (students.length > 0 && semesters.length > 0 && subjects.length > 0) {
       const allMarks = []
       students.forEach((student) => {
         if (student.marks && Array.isArray(student.marks)) {
           student.marks.forEach((mark) => {
-            // Find the subject for this mark to get its semester
+            // Find the subject for this mark to get its semester and teacher
             const subject = subjects.find((sub) => sub._id === mark.subject_id)
 
             // Get semester ID either from the subject or directly from the mark
             let semesterId = typeof mark.semester_id === "object" ? mark.semester_id._id : mark.semester_id
             let semesterName = "Unknown Semester"
+            let teacherId = null
+            let teacherName = "Unknown Teacher"
 
             // If we found the subject, use its semester information
-            if (subject && subject.semester_id) {
+            if (subject) {
               // Handle both string and object semester_id formats in subjects
               const subjectSemesterId =
                 typeof subject.semester_id === "object" ? subject.semester_id._id : subject.semester_id
@@ -194,6 +254,15 @@ const TeacherMarksManagement = () => {
               } else if (typeof subject.semester_id === "object" && subject.semester_id.name) {
                 semesterName = subject.semester_id.name
               }
+
+              // Get teacher information if available
+              if (subject.teacher_id) {
+                teacherId = subject.teacher_id
+                const teacher = teachers.find((t) => t._id === teacherId)
+                if (teacher) {
+                  teacherName = teacher.name
+                }
+              }
             } else {
               // Fallback to using mark's semester_id
               const semester = semesters.find((sem) => sem._id === semesterId)
@@ -202,7 +271,7 @@ const TeacherMarksManagement = () => {
               }
             }
 
-            // Enrich mark with student and semester information
+            // Enrich mark with student, semester, and teacher information
             allMarks.push({
               ...mark,
               student_id: student._id,
@@ -211,6 +280,9 @@ const TeacherMarksManagement = () => {
               semester_id: semesterId,
               // Add semester name for display
               semester_name: semesterName,
+              // Add teacher information
+              teacher_id: teacherId,
+              teacher_name: teacherName,
             })
           })
         }
@@ -219,7 +291,7 @@ const TeacherMarksManagement = () => {
       console.log("Extracted marks:", allMarks.length, "Sample mark:", allMarks.length > 0 ? allMarks[0] : null)
       setStudentMarks(allMarks)
     }
-  }, [students, semesters, subjects])
+  }, [students, semesters, subjects, teachers])
 
   // Filter marks based on selected semester, subject, and search term
   useEffect(() => {
@@ -275,9 +347,57 @@ const TeacherMarksManagement = () => {
     setFilteredMarks(result)
   }, [studentMarks, selectedSemester, selectedSubject, selectedStudent, searchTerm, students, subjects])
 
-  // Form handling functions
+  // Update the handleMarksInputChange function to properly set teacher_id and teacher_name when a subject is selected
   const handleMarksInputChange = (e) => {
     const { name, value } = e.target
+
+    // If subject is changing, update teacher_id, teacher_name, and semester_id based on the selected subject
+    if (name === "subject_id" && value) {
+      const selectedSubject = subjects.find((s) => s._id === value)
+      if (selectedSubject) {
+        // Get semester_id from the subject
+        const subjectSemesterId =
+          typeof selectedSubject.semester_id === "object"
+            ? selectedSubject.semester_id._id
+            : selectedSubject.semester_id
+
+        // Handle teacher_id which can be an object with _id and name properties
+        let teacherId = ""
+        let teacherName = "Not Assigned"
+
+        if (selectedSubject.teacher_id) {
+          if (typeof selectedSubject.teacher_id === "object") {
+            // If teacher_id is an object with _id and name
+            teacherId = selectedSubject.teacher_id._id
+            teacherName = selectedSubject.teacher_id.name
+          } else {
+            // If teacher_id is just an ID string
+            teacherId = selectedSubject.teacher_id
+            const teacher = teachers.find((t) => t._id === teacherId)
+            if (teacher) {
+              teacherName = teacher.name
+            }
+          }
+        }
+
+        console.log("Setting teacher info from subject:", {
+          subject: selectedSubject.name,
+          teacher_id: teacherId,
+          teacher_name: teacherName,
+          semester_id: subjectSemesterId,
+        })
+
+        setMarksFormData({
+          ...marksFormData,
+          [name]: value,
+          semester_id: subjectSemesterId,
+          teacher_id: teacherId,
+          teacher_name: teacherName,
+        })
+        return
+      }
+    }
+
     setMarksFormData({
       ...marksFormData,
       [name]: name === "midterm" || name === "final" || name === "assignment" ? Number(value) : value,
@@ -308,6 +428,8 @@ const TeacherMarksManagement = () => {
       ...prev,
       semester_id: semesterId,
       subject_id: "",
+      teacher_id: "", // Reset teacher_id when semester changes
+      teacher_name: "", // Reset teacher_name when semester changes
     }))
 
     setSubjectFormData((prev) => ({
@@ -355,7 +477,7 @@ const TeacherMarksManagement = () => {
     return { total, grade }
   }
 
-  // CRUD operations for marks
+  // Update the handleAddMarks function to ensure teacher_id is included
   const handleAddMarks = async () => {
     try {
       // Validate required fields
@@ -369,16 +491,41 @@ const TeacherMarksManagement = () => {
         return
       }
 
-      // Get the semester_id from the selected subject if not provided
+      // Get the semester_id and teacher_id from the selected subject if not provided
       let semester_id = marksFormData.semester_id
-      if (!semester_id) {
+      let teacher_id = marksFormData.teacher_id
+
+      if (!semester_id || !teacher_id) {
         const selectedSubjectObj = subjects.find((s) => s._id === marksFormData.subject_id)
-        if (selectedSubjectObj && selectedSubjectObj.semester_id) {
-          semester_id = selectedSubjectObj.semester_id._id
-        } else if (semesters.length > 0) {
+        if (selectedSubjectObj) {
+          // Get semester_id if not provided
+          if (!semester_id && selectedSubjectObj.semester_id) {
+            semester_id =
+              typeof selectedSubjectObj.semester_id === "object"
+                ? selectedSubjectObj.semester_id._id
+                : selectedSubjectObj.semester_id
+          }
+
+          // Get teacher_id if not provided
+          if (!teacher_id && selectedSubjectObj.teacher_id) {
+            teacher_id =
+              typeof selectedSubjectObj.teacher_id === "object"
+                ? selectedSubjectObj.teacher_id._id
+                : selectedSubjectObj.teacher_id
+          }
+        }
+
+        if (!semester_id && semesters.length > 0) {
           semester_id = semesters[0]._id
-        } else {
+        }
+
+        if (!semester_id) {
           alert("Please select a semester")
+          return
+        }
+
+        if (!teacher_id) {
+          alert("The selected subject has no assigned teacher. Please assign a teacher to the subject first.")
           return
         }
       }
@@ -392,6 +539,7 @@ const TeacherMarksManagement = () => {
       const markData = {
         subject_id: marksFormData.subject_id,
         semester_id: semester_id,
+        teacher_id: teacher_id, // Include teacher_id in the mark data
         midterm: Number(marksFormData.midterm) || 0,
         final: Number(marksFormData.final) || 0,
         assignment: Number(marksFormData.assignment) || 0,
@@ -443,6 +591,8 @@ const TeacherMarksManagement = () => {
       student_id: "",
       subject_id: "",
       semester_id: defaultSemesterId,
+      teacher_id: "", // Reset teacher_id
+      teacher_name: "", // Reset teacher_name
       midterm: "",
       final: "",
       assignment: "",
@@ -464,58 +614,19 @@ const TeacherMarksManagement = () => {
 
       // Check for success message instead of status
       if (data.message === "Subject created successfully!" || data.subject) {
-        // If the API returned the new subject, add it to our subjects array
-        if (data.subject) {
-          // Create a copy of the current subjects array
-          const updatedSubjects = [...subjects]
+        // Refresh the subjects list to get the updated data with proper structure
+        const refreshResponse = await fetch("http://127.0.0.1:4400/api/v1/subjects/", {
+          headers: createHeaders(),
+        })
+        const refreshData = await refreshResponse.json()
 
-          // Add the new subject with the correct semester_id structure
-          const newSubject = {
-            ...data.subject,
-            semester_id: {
-              _id: data.subject.semester_id,
-              name: getSemesterById(data.subject.semester_id)?.name || "Unknown Semester",
-            },
-          }
-
-          updatedSubjects.push(newSubject)
-          setSubjects(updatedSubjects)
-
-          setIsAddSubjectModalOpen(false)
-          resetSubjectForm()
-          alert("Subject added successfully!")
-        } else {
-          // If the API didn't return the subject, refresh the subjects list
-          const refreshResponse = await fetch("http://127.0.0.1:4400/api/v1/subjects/", {
-            headers: createHeaders(),
-          })
-          const refreshData = await refreshResponse.json()
-
-          if (refreshData.subjects) {
-            // Make sure each subject has the correct semester_id structure
-            const formattedSubjects = refreshData.subjects.map((subject) => {
-              // If semester_id is already an object with _id and name, keep it as is
-              if (subject.semester_id && typeof subject.semester_id === "object" && subject.semester_id._id) {
-                return subject
-              }
-
-              // Otherwise, format it correctly
-              return {
-                ...subject,
-                semester_id: {
-                  _id: subject.semester_id,
-                  name: getSemesterById(subject.semester_id)?.name || "Unknown Semester",
-                },
-              }
-            })
-
-            setSubjects(formattedSubjects)
-          }
-
-          setIsAddSubjectModalOpen(false)
-          resetSubjectForm()
-          alert("Subject added successfully!")
+        if (refreshData.subjects) {
+          setSubjects(refreshData.subjects)
         }
+
+        setIsAddSubjectModalOpen(false)
+        resetSubjectForm()
+        alert("Subject added successfully!")
       } else {
         console.error("Error adding subject:", data)
         alert("Failed to add subject. Please try again.")
@@ -539,7 +650,7 @@ const TeacherMarksManagement = () => {
 
       // Check for success message instead of status
       if ((data.message && data.message.includes("success")) || data.subject) {
-        // Refresh the subjects data
+        // Refresh the subjects list to get the updated data with proper structure
         const refreshResponse = await fetch("http://127.0.0.1:4400/api/v1/subjects/", {
           headers: createHeaders(),
         })
@@ -582,15 +693,9 @@ const TeacherMarksManagement = () => {
 
       // Check for success message instead of status
       if ((data.message && data.message.includes("success")) || data.status === "success") {
-        // Refresh the subjects data
-        const refreshResponse = await fetch("http://127.0.0.1:4400/api/v1/subjects/", {
-          headers: createHeaders(),
-        })
-        const refreshData = await refreshResponse.json()
-
-        if (refreshData.subjects) {
-          setSubjects(refreshData.subjects)
-        }
+        // Remove the subject from our subjects array
+        const updatedSubjects = subjects.filter((subject) => subject._id !== subjectId)
+        setSubjects(updatedSubjects)
 
         alert("Subject deleted successfully!")
       } else {
@@ -609,22 +714,32 @@ const TeacherMarksManagement = () => {
       code: "",
       semester_id: selectedSemester || (semesters.length > 0 ? semesters[0]._id : ""),
       credit_hours: 3,
+      teacher_id: "", // Reset teacher_id
     })
     setEditingSubject(null)
   }
 
   const openEditSubjectModal = (subject) => {
     setEditingSubject(subject)
+
+    // Handle teacher_id which can be an object
+    let teacherId = ""
+    if (subject.teacher_id) {
+      teacherId = typeof subject.teacher_id === "object" ? subject.teacher_id._id : subject.teacher_id
+    }
+
     setSubjectFormData({
       name: subject.name,
       code: subject.code,
       semester_id: subject.semester_id._id,
       credit_hours: subject.credit_hours,
+      teacher_id: teacherId,
     })
+
     setIsEditSubjectModalOpen(true)
   }
 
-  // Import marks from CSV
+  // Update the handleImportCSV function to ensure teacher_id is included
   const handleImportCSV = () => {
     if (!csvData.trim()) {
       alert(t("marks.please_enter_csv"))
@@ -665,12 +780,19 @@ const TeacherMarksManagement = () => {
           continue
         }
 
+        // Check if subject has a teacher assigned
+        if (!subject.teacher_id) {
+          console.warn(`${t("marks.skipping_row")} ${i}: Subject has no assigned teacher`)
+          continue
+        }
+
         // Calculate total and grade
         const { total, grade } = calculateTotalAndGrade(rowData.midterm, rowData.final, rowData.assignment)
 
         const markData = {
           subject_id: rowData.subject_id,
-          semester_id: subject.semester_id._id,
+          semester_id: typeof subject.semester_id === "object" ? subject.semester_id._id : subject.semester_id,
+          teacher_id: subject.teacher_id, // Ensure teacher_id is included
           midterm: Number(rowData.midterm) || 0,
           final: Number(rowData.final) || 0,
           assignment: Number(rowData.assignment) || 0,
@@ -678,6 +800,8 @@ const TeacherMarksManagement = () => {
           grade,
           remarks: rowData.remarks || "Imported from CSV",
         }
+
+        console.log(`Row ${i} mark data:`, markData)
 
         // Add to import promises
         importPromises.push(
@@ -769,6 +893,18 @@ const TeacherMarksManagement = () => {
     return students.find((student) => student._id === id) || { name: "Unknown Student", student_id_number: "N/A" }
   }
 
+  const getTeacherById = (id) => {
+    if (!id) return { name: "Unknown Teacher" }
+
+    // If id is already an object with name property
+    if (typeof id === "object" && id.name) {
+      return { name: id.name }
+    }
+
+    // Otherwise, look up the teacher by ID
+    return teachers.find((teacher) => teacher._id === id) || { name: "Unknown Teacher" }
+  }
+
   const getSemesterById = (id) => {
     if (!id) return { name: "Unknown Semester" }
     return semesters.find((semester) => semester._id === id) || { name: "Unknown Semester" }
@@ -789,7 +925,7 @@ const TeacherMarksManagement = () => {
   }
 
   // Loading state
-  if (isLoading.semesters || isLoading.subjects || isLoading.students) {
+  if (isLoading.semesters || isLoading.subjects || isLoading.students || isLoading.teachers) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
@@ -930,6 +1066,9 @@ const TeacherMarksManagement = () => {
                     {t("subjects.semester")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t("subjects.teacher")}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     {t("subjects.credit_hours")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -938,30 +1077,46 @@ const TeacherMarksManagement = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {subjects.map((subject) => (
-                  <tr key={subject._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{subject.code}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.semester_id.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.credit_hours}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex space-x-2">
-                        <button
-                          className="text-blue-600 hover:text-blue-800"
-                          onClick={() => openEditSubjectModal(subject)}
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          className="text-red-600 hover:text-red-800"
-                          onClick={() => handleDeleteSubject(subject._id)}
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {subjects.map((subject) => {
+                  let teacherName = "Not Assigned"
+
+                  if (subject.teacher_id) {
+                    if (typeof subject.teacher_id === "object" && subject.teacher_id.name) {
+                      teacherName = subject.teacher_id.name
+                    } else {
+                      const teacher = teachers.find((t) => t._id === subject.teacher_id)
+                      if (teacher) {
+                        teacherName = teacher.name
+                      }
+                    }
+                  }
+
+                  return (
+                    <tr key={subject._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{subject.code}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.semester_id.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{teacherName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{subject.credit_hours}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div className="flex space-x-2">
+                          <button
+                            className="text-blue-600 hover:text-blue-800"
+                            onClick={() => openEditSubjectModal(subject)}
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            className="text-red-600 hover:text-red-800"
+                            onClick={() => handleDeleteSubject(subject._id)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -1002,6 +1157,9 @@ const TeacherMarksManagement = () => {
                       {t("marks.subject")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t("marks.teacher")}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t("marks.semester")}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1025,6 +1183,19 @@ const TeacherMarksManagement = () => {
                   {filteredMarks.map((mark, index) => {
                     const student = getStudentById(mark.student_id)
                     const subject = getSubjectById(mark.subject_id)
+
+                    let teacherName = "Not Assigned"
+                    if (subject.teacher_id) {
+                      if (typeof subject.teacher_id === "object" && subject.teacher_id.name) {
+                        teacherName = subject.teacher_id.name
+                      } else {
+                        const teacher = teachers.find((t) => t._id === subject.teacher_id)
+                        if (teacher) {
+                          teacherName = teacher.name
+                        }
+                      }
+                    }
+
                     return (
                       <tr key={index} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -1042,6 +1213,7 @@ const TeacherMarksManagement = () => {
                           <div className="text-sm text-gray-900">{subject.name}</div>
                           <div className="text-sm text-gray-500">{subject.code}</div>
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{teacherName}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{mark.semester_name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{mark.midterm}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{mark.final}</td>
@@ -1185,6 +1357,15 @@ const TeacherMarksManagement = () => {
                   }))}
                 required
               />
+              {/* Add teacher field that shows the teacher name when a subject is selected */}
+              <FormField
+                label={t("marks.teacher")}
+                name="teacher_name"
+                value={marksFormData.teacher_name}
+                readOnly={true}
+                placeholder="Teacher will be shown when subject is selected"
+                className="bg-gray-50"
+              />
               <FormField
                 label={t("marks.midterm_marks_max_20")}
                 name="midterm"
@@ -1320,6 +1501,20 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
+                label={t("subjects.teacher")}
+                name="teacher_id"
+                type="select"
+                value={subjectFormData.teacher_id}
+                onChange={handleSubjectInputChange}
+                options={[
+                  { value: "", label: "Select Teacher" },
+                  ...teachers.map((teacher) => ({
+                    value: teacher._id,
+                    label: teacher.name,
+                  })),
+                ]}
+              />
+              <FormField
                 label={t("subjects.credit_hours")}
                 name="credit_hours"
                 type="number"
@@ -1392,6 +1587,20 @@ const TeacherMarksManagement = () => {
                   label: semester.name,
                 }))}
                 required
+              />
+              <FormField
+                label={t("subjects.teacher")}
+                name="teacher_id"
+                type="select"
+                value={subjectFormData.teacher_id}
+                onChange={handleSubjectInputChange}
+                options={[
+                  { value: "", label: "Select Teacher" },
+                  ...teachers.map((teacher) => ({
+                    value: teacher._id,
+                    label: teacher.name,
+                  })),
+                ]}
               />
               <FormField
                 label={t("subjects.credit_hours")}

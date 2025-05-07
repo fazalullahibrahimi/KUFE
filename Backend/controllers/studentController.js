@@ -272,9 +272,9 @@ const getStudentCount = async (req, res) => {
 
 
 const createMarks = asyncHandler(async (req, res) => {
-  const { subject_id, semester_id, midterm, final, assignment, grade, remarks } = req.body;
+  const { subject_id, semester_id, teacher_id, midterm, final, assignment, grade, remarks } = req.body;
 
-  const studentId = req.params.id; // Extract student ID from route param
+  const studentId = req.params.id;
   const student = await Student.findById(studentId);
 
   if (!student) {
@@ -286,6 +286,7 @@ const createMarks = asyncHandler(async (req, res) => {
   const newMark = {
     subject_id,
     semester_id,
+    teacher_id, // 🆕 include teacher_id
     midterm,
     final,
     assignment,
@@ -299,6 +300,7 @@ const createMarks = asyncHandler(async (req, res) => {
 
   res.status(201).json(apiResponse.success("Marks added successfully", { marks: student.marks }));
 });
+
 
 
 
@@ -317,6 +319,7 @@ const updateMarks = asyncHandler(async (req, res) => {
 
   mark.subject_id = req.body.subject_id || mark.subject_id;
   mark.semester_id = req.body.semester_id || mark.semester_id;
+  mark.teacher_id = req.body.teacher_id || mark.teacher_id; // 🆕 update teacher
   mark.midterm = req.body.midterm ?? mark.midterm;
   mark.final = req.body.final ?? mark.final;
   mark.assignment = req.body.assignment ?? mark.assignment;
@@ -334,10 +337,12 @@ const updateMarks = asyncHandler(async (req, res) => {
 
 
 
+
 const getMarksById = asyncHandler(async (req, res) => {
   const student = await Student.findById(req.params.studentId)
     .populate("marks.subject_id", "name")
-    .populate("marks.semester_id", "name");
+    .populate("marks.semester_id", "name")
+    .populate("marks.teacher_id", "name"); // 🆕 populate teacher
 
   if (!student) {
     return res.status(404).json(apiResponse.error("Student not found", 404));

@@ -57,49 +57,7 @@ function AboutPage() {
         // In production, uncomment the fetch calls and use actual API endpoints
 
         // Simulating API responses with placeholder data
-        setTimeout(() => {
-          // Sample departments data
-          const departmentsData = {
-            status: "success",
-            data: {
-              departments: [
-                {
-                  _id: "1",
-                  name: "Economics",
-                  description:
-                    "The Department of Economics offers programs focusing on economic theory, policy analysis, and development economics.",
-                  icon: <BookOpen className='h-8 w-8' />,
-                },
-                {
-                  _id: "2",
-                  name: "Business Administration",
-                  description:
-                    "The Department of Business Administration provides education in management, marketing, and entrepreneurship.",
-                  icon: <Users className='h-8 w-8' />,
-                },
-                {
-                  _id: "3",
-                  name: "Finance and Banking",
-                  description:
-                    "The Department of Finance and Banking focuses on financial management, banking operations, and investment analysis.",
-                  icon: <Award className='h-8 w-8' />,
-                },
-                {
-                  _id: "4",
-                  name: "Statistics",
-                  description:
-                    "The Department of Statistics offers programs in statistical analysis, data science, and research methodology.",
-                  icon: <Calendar className='h-8 w-8' />,
-                },
-              ],
-            },
-          };
-
-          // Update state with fetched data
-          setDepartments(departmentsData.data.departments);
-          setLoading(false);
-        }, 1000);
-
+   
         //  Uncomment for actual API calls
         // Fetch departments data
         const departmentsResponse = await fetch(
@@ -331,7 +289,7 @@ function AboutPage() {
                 <div className='space-y-4'>
                   <div className='flex justify-between items-center border-b border-white/20 pb-3'>
                     <span className='text-white/80'>{t("Established")}</span>
-                    <span className='text-white font-semibold'>2002</span>
+                    <span className='text-white font-semibold'>2010</span>
                   </div>
                   <div className='flex justify-between items-center border-b border-white/20 pb-3'>
                     <span className='text-white/80'>{t("Departments")}</span>
@@ -339,7 +297,7 @@ function AboutPage() {
                   </div>
                   <div className='flex justify-between items-center border-b border-white/20 pb-3'>
                     <span className='text-white/80'>{t("Programs")}</span>
-                    <span className='text-white font-semibold'>8</span>
+                    <span className='text-white font-semibold'>{academicProgramCount}</span>
                   </div>
                   <div className='flex justify-between items-center'>
                     <span className='text-white/80'>{t("Location")}</span>
@@ -411,22 +369,22 @@ function AboutPage() {
             {[
               {
                 label: t("Students"),
-                value: animatedCounts.students,
+                value: studentCount,
                 icon: <Users className='h-6 w-6 text-[#F7B500]' />,
               },
               {
                 label: t("Faculty"),
-                value: animatedCounts.faculty,
+                value: facultyMemberCount,
                 icon: <BookOpen className='h-6 w-6 text-[#F7B500]' />,
               },
               {
                 label: t("Programs"),
-                value: animatedCounts.programs,
+                value: academicProgramCount,
                 icon: <Award className='h-6 w-6 text-[#F7B500]' />,
               },
               {
                 label: t("Research Papers"),
-                value: animatedCounts.research,
+                value: researchPaperCount,
                 icon: <Calendar className='h-6 w-6 text-[#F7B500]' />,
               },
             ].map((stat, index) => (
