@@ -1,7 +1,21 @@
 import React from "react";
-import { useState, useEffect } from "react";
-import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
 
+import { useState, useEffect, useRef } from "react";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Send,
+  ChevronRight,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+
+// UI Components
 import { Button } from "../components/ui/Button";
 import { Card, CardContent } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
@@ -14,10 +28,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/Select";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+
+// Animation helper hook
+const useElementOnScreen = (options) => {
+  const containerRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries;
+      setIsVisible(entry.isIntersecting);
+    }, options);
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, [containerRef, options]);
+
+  return [containerRef, isVisible];
+};
 
 function ContactPage() {
+  const { t, language, isRTL } = useLanguage();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -29,8 +67,14 @@ function ContactPage() {
   const [departments, setDepartments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  console.log("Departments Data:", departments);
 
+  // Animation refs
+  const [heroRef, heroVisible] = useElementOnScreen({ threshold: 0.1 });
+  const [formRef, formVisible] = useElementOnScreen({ threshold: 0.1 });
+  const [infoRef, infoVisible] = useElementOnScreen({ threshold: 0.1 });
+  const [mapRef, mapVisible] = useElementOnScreen({ threshold: 0.1 });
+
+  // Fetch departments
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
@@ -44,11 +88,9 @@ function ContactPage() {
         }
 
         const data = await response.json();
-        console.log("API Response:", data);
 
         if (data.status === "success" && data.data && data.data.departments) {
           setDepartments(data.data.departments);
-          console.log("Departments set:", data.data.departments);
         } else {
           throw new Error("Invalid data format");
         }
@@ -63,6 +105,7 @@ function ContactPage() {
     fetchDepartments();
   }, []);
 
+  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -71,6 +114,7 @@ function ContactPage() {
     });
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -90,8 +134,6 @@ function ContactPage() {
 
       // Form submitted successfully
       setFormSubmitted(true);
-
-      // Reset form after 3 seconds
     } catch (err) {
       console.error("Error submitting form:", err);
       setError(err.message);
@@ -100,6 +142,7 @@ function ContactPage() {
     }
   };
 
+  // Reset form after successful submission
   useEffect(() => {
     if (formSubmitted) {
       const timer = setTimeout(() => {
@@ -113,30 +156,79 @@ function ContactPage() {
         });
       }, 3000);
 
-      return () => clearTimeout(timer); // Cleanup timer on component unmount or state change
+      return () => clearTimeout(timer);
     }
   }, [formSubmitted]);
 
   return (
-    <div className='min-h-screen bg-[#E8ECEF]'>
+    <div className='min-h-screen bg-gradient-to-b from-[#E8ECEF] to-white'>
       <Navbar />
-      {/* Header */}
-      <div className='pt-12 relative bg-[#1D3D6F] text-white'>
-        <div className='container mx-auto px-4 py-10 md:py-16'>
-          <div className='flex justify-between items-center'>
-            <div className='max-w-2xl'>
-              <h1 className='text-3xl md:text-5xl font-bold tracking-tight mb-2 text-white'>
-                Contact Us
-              </h1>
-              <p className='mt-2 text-white text-lg md:text-xl opacity-90'>
-                Get in touch with the Faculty of Economics
-              </p>
+
+      {/* Hero Section with Enhanced Design */}
+      <div
+        ref={heroRef}
+        className={`pt-16 relative bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white overflow-hidden
+          ${heroVisible ? "opacity-100 animate-fade-in-down" : "opacity-0"}`}
+        style={{
+          animationDelay: "0.2s",
+          transition: "opacity 0.5s ease-in-out",
+        }}
+      >
+        {/* Decorative Elements */}
+        <div className='absolute top-0 left-0 w-full h-full overflow-hidden'>
+          <div className='absolute top-10 left-10 w-32 h-32 bg-[#F7B500]/10 rounded-full blur-3xl'></div>
+          <div className='absolute bottom-10 right-10 w-64 h-64 bg-[#1D3D6F]/20 rounded-full blur-3xl'></div>
+          <div className='absolute top-1/2 left-1/4 w-40 h-40 bg-white/5 rounded-full blur-xl'></div>
+
+          {/* Background Pattern */}
+          <div className='absolute inset-0 opacity-5'>
+            <div
+              className='absolute inset-0'
+              style={{
+                backgroundImage:
+                  "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+                backgroundSize: "24px 24px",
+              }}
+            ></div>
+          </div>
+        </div>
+
+        <div className='container mx-auto px-4 py-16 md:py-24 relative z-10'>
+          <div className='max-w-3xl'>
+            <div className='inline-flex items-center px-3 py-1 rounded-full bg-[#F7B500]/20 text-[#F7B500] text-sm font-medium mb-6'>
+              <span className='mr-2'>•</span>
+              <span>Faculty of Economics</span>
+            </div>
+            <h1 className='text-4xl md:text-6xl font-bold tracking-tight mb-4 text-white'>
+              Get in Touch
+            </h1>
+            <p className='mt-4 text-white/80 text-lg md:text-xl max-w-2xl leading-relaxed'>
+              We're here to answer your questions about the Faculty of Economics
+              at Kandahar University. Reach out to us for information about
+              programs, admissions, or general inquiries.
+            </p>
+
+            <div className='mt-8 flex flex-wrap gap-4'>
+              <a
+                href='#contact-form'
+                className='inline-flex items-center px-6 py-3 bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-[#F7B500]/30 transform hover:-translate-y-1'
+              >
+                Send a Message
+                <ChevronRight className='ml-2 h-4 w-4' />
+              </a>
+              <a
+                href='#map'
+                className='inline-flex items-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg transition-all duration-300 backdrop-blur-sm'
+              >
+                View on Map
+                <MapPin className='ml-2 h-4 w-4' />
+              </a>
             </div>
           </div>
         </div>
 
         {/* Decorative wave */}
-        <div className='absolute bottom-0 left-0 right-0 h-12 overflow-hidden'>
+        <div className='absolute bottom-0 left-0 right-0 h-16 overflow-hidden'>
           <svg
             viewBox='0 0 1200 120'
             preserveAspectRatio='none'
@@ -147,58 +239,68 @@ function ContactPage() {
         </div>
       </div>
 
-      {/* Main content */}
+      {/* Main content with enhanced styling */}
       <div className='container mx-auto px-4 py-16'>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-10'>
-          {/* Contact form */}
-          <div className='lg:col-span-2'>
-            <Card className='overflow-hidden border-0 shadow-xl rounded-2xl'>
+          {/* Contact form with glass morphism */}
+          <div
+            id='contact-form'
+            ref={formRef}
+            className={`lg:col-span-2 transition-all duration-700 transform 
+              ${
+                formVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-10 opacity-0"
+              }`}
+            style={{ transitionDelay: "0.3s" }}
+          >
+            <Card className='overflow-hidden border-0 shadow-xl rounded-2xl bg-white/80 backdrop-blur-lg'>
               <CardContent className='p-0 z-50'>
-                <div className='bg-white p-8 md:p-10'>
-                  <h2 className='text-2xl font-bold mb-8 text-[#1D3D6F] border-b pb-4 border-[#E8ECEF]'>
+                <div className='p-8 md:p-10 relative'>
+                  {/* Decorative elements */}
+                  <div className='absolute top-0 right-0 w-40 h-40 bg-[#1D3D6F]/5 rounded-full blur-3xl -z-10'></div>
+                  <div className='absolute bottom-0 left-0 w-60 h-60 bg-[#F7B500]/5 rounded-full blur-3xl -z-10'></div>
+
+                  <h2 className='text-2xl font-bold mb-8 text-[#1D3D6F] border-b pb-4 border-[#E8ECEF] flex items-center'>
+                    <Send className='mr-3 h-5 w-5 text-[#F7B500]' />
                     Send us a message
                   </h2>
+
                   {error && (
-                    <div className='mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg'>
-                      <p className='font-medium'>Error: {error}</p>
-                      <p className='text-sm mt-1'>
-                        Please try again or contact support if the issue
-                        persists.
-                      </p>
+                    <div className='mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg animate-fade-in flex items-start'>
+                      <AlertCircle className='h-5 w-5 mr-3 mt-0.5 flex-shrink-0' />
+                      <div>
+                        <p className='font-medium'>Error: {error}</p>
+                        <p className='text-sm mt-1'>
+                          Please try again or contact support if the issue
+                          persists.
+                        </p>
+                      </div>
                     </div>
                   )}
 
                   {formSubmitted ? (
-                    <div className='bg-[#E8ECEF] border border-[#1D3D6F]/20 rounded-xl p-8 text-center'>
-                      <div className='inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#F7B500] text-[#1D3D6F] mb-4'>
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          className='h-8 w-8'
-                          fill='none'
-                          viewBox='0 0 24 24'
-                          stroke='currentColor'
-                        >
-                          <path
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            strokeWidth={2}
-                            d='M5 13l4 4L19 7'
-                          />
-                        </svg>
+                    <div className='bg-[#E8ECEF]/50 backdrop-blur-sm border border-[#1D3D6F]/20 rounded-xl p-8 text-center animate-fade-in'>
+                      <div className='inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#F7B500] text-[#1D3D6F] mb-4 shadow-lg'>
+                        <CheckCircle className='h-8 w-8' />
                       </div>
                       <h3 className='text-xl font-medium text-[#1D3D6F] mb-2'>
                         Thank you! Your message has been sent successfully.
                       </h3>
+                      <p className='text-[#1D3D6F]/70'>
+                        We'll get back to you as soon as possible.
+                      </p>
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className='space-y-8'>
                       <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                        <div className='space-y-3'>
+                        <div className='space-y-3 group'>
                           <Label
                             htmlFor='name'
-                            className='text-[#1D3D6F] font-medium'
+                            className='text-[#1D3D6F] font-medium flex items-center'
                           >
-                            Full Name
+                            Full Name{" "}
+                            <span className='text-red-500 ml-1'>*</span>
                           </Label>
                           <Input
                             id='name'
@@ -206,15 +308,17 @@ function ContactPage() {
                             value={formData.name}
                             onChange={handleInputChange}
                             required
-                            className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20'
+                            className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20 transition-all duration-300 group-hover:border-[#1D3D6F]/50'
+                            placeholder='Enter your full name'
                           />
                         </div>
-                        <div className='space-y-3'>
+                        <div className='space-y-3 group'>
                           <Label
                             htmlFor='email'
-                            className='text-[#1D3D6F] font-medium'
+                            className='text-[#1D3D6F] font-medium flex items-center'
                           >
-                            Email Address
+                            Email Address{" "}
+                            <span className='text-red-500 ml-1'>*</span>
                           </Label>
                           <Input
                             id='email'
@@ -223,18 +327,19 @@ function ContactPage() {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20'
+                            className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20 transition-all duration-300 group-hover:border-[#1D3D6F]/50'
+                            placeholder='Enter your email address'
                           />
                         </div>
                       </div>
 
                       <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                        <div className='space-y-3'>
+                        <div className='space-y-3 group'>
                           <Label
                             htmlFor='subject'
-                            className='text-[#1D3D6F] font-medium'
+                            className='text-[#1D3D6F] font-medium flex items-center'
                           >
-                            Subject
+                            Subject <span className='text-red-500 ml-1'>*</span>
                           </Label>
                           <Input
                             id='subject'
@@ -242,10 +347,11 @@ function ContactPage() {
                             value={formData.subject}
                             onChange={handleInputChange}
                             required
-                            className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20'
+                            className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20 transition-all duration-300 group-hover:border-[#1D3D6F]/50'
+                            placeholder='Enter message subject'
                           />
                         </div>
-                        <div className='space-y-3'>
+                        <div className='space-y-3 group'>
                           <Label
                             htmlFor='department'
                             className='text-[#1D3D6F] font-medium'
@@ -259,10 +365,10 @@ function ContactPage() {
                               setFormData({ ...formData, department: value })
                             }
                           >
-                            <SelectTrigger className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20'>
+                            <SelectTrigger className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20 transition-all duration-300 group-hover:border-[#1D3D6F]/50'>
                               <SelectValue placeholder='Select Department' />
                             </SelectTrigger>
-                            <SelectContent className='bg-white border-[#E8ECEF] z-50'>
+                            <SelectContent className='bg-white/95 backdrop-blur-md border-[#E8ECEF] z-50 rounded-lg shadow-xl'>
                               {isLoading ? (
                                 <SelectItem value='' disabled>
                                   Loading departments...
@@ -276,7 +382,7 @@ function ContactPage() {
                                   <SelectItem
                                     key={index}
                                     value={department}
-                                    className='hover:bg-[#E8ECEF] rounded-md'
+                                    className='hover:bg-[#E8ECEF] rounded-md transition-colors duration-200'
                                   >
                                     {department}
                                   </SelectItem>
@@ -291,12 +397,13 @@ function ContactPage() {
                         </div>
                       </div>
 
-                      <div className='space-y-3'>
+                      <div className='space-y-3 group'>
                         <Label
                           htmlFor='message'
-                          className='text-[#1D3D6F] font-medium'
+                          className='text-[#1D3D6F] font-medium flex items-center'
                         >
-                          Your Message
+                          Your Message{" "}
+                          <span className='text-red-500 ml-1'>*</span>
                         </Label>
                         <Textarea
                           id='message'
@@ -304,7 +411,8 @@ function ContactPage() {
                           value={formData.message}
                           onChange={handleInputChange}
                           required
-                          className='min-h-[180px] border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20'
+                          className='min-h-[180px] border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20 transition-all duration-300 group-hover:border-[#1D3D6F]/50'
+                          placeholder='Write your message here...'
                         />
                       </div>
 
@@ -312,7 +420,7 @@ function ContactPage() {
                         <Button
                           type='submit'
                           disabled={isLoading}
-                          className='w-full md:w-auto bg-[#1D3D6F] hover:bg-[#2C4F85] text-white font-medium py-2.5 px-6 rounded-lg shadow-lg hover:shadow-[#1D3D6F]/30 transition-all duration-200'
+                          className='w-full md:w-auto bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] hover:from-[#2C4F85] hover:to-[#1D3D6F] text-white font-medium py-3 px-8 rounded-lg shadow-lg hover:shadow-[#1D3D6F]/30 transition-all duration-300 transform hover:-translate-y-1'
                         >
                           {isLoading ? (
                             <>
@@ -353,159 +461,256 @@ function ContactPage() {
             </Card>
           </div>
 
-          {/* Contact information */}
-          <div>
-            <CardContent className='p-0'>
-              <div className='bg-[#1D3D6F] text-white p-8 md:p-10 rounded-lg border border-slate-200  shadow-sm '>
-                <h2 className='text-2xl font-bold mb-8 border-b border-[#2C4F85] pb-4'>
-                  Contact Information
-                </h2>
+          {/* Contact information with enhanced styling */}
+          <div
+            ref={infoRef}
+            className={`transition-all duration-700 transform 
+              ${
+                infoVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-10 opacity-0"
+              }`}
+            style={{ transitionDelay: "0.5s" }}
+          >
+            <Card className='overflow-hidden border-0 shadow-xl rounded-2xl h-full'>
+              <CardContent className='p-0 h-full'>
+                <div className='bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] text-white p-8 md:p-10 rounded-2xl h-full relative overflow-hidden'>
+                  {/* Decorative elements */}
+                  <div className='absolute top-0 right-0 w-40 h-40 bg-[#F7B500]/10 rounded-full blur-3xl'></div>
+                  <div className='absolute bottom-0 left-0 w-60 h-60 bg-white/5 rounded-full blur-3xl'></div>
 
-                <div className='space-y-8'>
-                  <div className='flex items-start'>
-                    <div className='flex-shrink-0 mt-1 bg-[#2C4F85] p-2 rounded-lg'>
-                      <MapPin className='h-5 w-5 text-[#F7B500]' />
+                  <h2 className='text-2xl font-bold mb-8 border-b border-[#2C4F85]/50 pb-4 flex items-center'>
+                    <Mail className='mr-3 h-5 w-5 text-[#F7B500]' />
+                    Contact Information
+                  </h2>
+
+                  <div className='space-y-8 relative z-10'>
+                    <div className='flex items-start group'>
+                      <div className='flex-shrink-0 mt-1 bg-[#2C4F85] p-3 rounded-lg shadow-lg group-hover:bg-[#F7B500] group-hover:text-[#1D3D6F] transition-all duration-300'>
+                        <MapPin className='h-5 w-5 text-[#F7B500] group-hover:text-[#1D3D6F]' />
+                      </div>
+                      <div className='ml-4'>
+                        <h3 className='text-[#F7B500] font-medium mb-1'>
+                          Our Location
+                        </h3>
+                        <p className='text-white/90'>
+                          Kandahar University, Faculty of Economics, Kandahar,
+                          Afghanistan
+                        </p>
+                      </div>
                     </div>
-                    <div className='ml-4'>
-                      <p className='text-white'>
-                        Kandahar University, Faculty of Economics, Kandahar,
-                        Afghanistan
-                      </p>
+
+                    <div className='flex items-start group'>
+                      <div className='flex-shrink-0 mt-1 bg-[#2C4F85] p-3 rounded-lg shadow-lg group-hover:bg-[#F7B500] group-hover:text-[#1D3D6F] transition-all duration-300'>
+                        <Phone className='h-5 w-5 text-[#F7B500] group-hover:text-[#1D3D6F]' />
+                      </div>
+                      <div className='ml-4'>
+                        <h3 className='text-[#F7B500] font-medium mb-1'>
+                          Phone Number
+                        </h3>
+                        <p className='text-white/90'>+93 70 000 0000</p>
+                        <p className='text-white/70 text-sm mt-1'>
+                          Monday to Thursday, 8am to 4pm
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className='flex items-start group'>
+                      <div className='flex-shrink-0 mt-1 bg-[#2C4F85] p-3 rounded-lg shadow-lg group-hover:bg-[#F7B500] group-hover:text-[#1D3D6F] transition-all duration-300'>
+                        <Mail className='h-5 w-5 text-[#F7B500] group-hover:text-[#1D3D6F]' />
+                      </div>
+                      <div className='ml-4'>
+                        <h3 className='text-[#F7B500] font-medium mb-1'>
+                          Email Address
+                        </h3>
+                        <p className='text-white/90'>info@kufe.edu.af</p>
+                        <p className='text-white/70 text-sm mt-1'>
+                          We'll respond as soon as possible
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className='flex items-center'>
-                    <div className='flex-shrink-0 bg-[#2C4F85] p-2 rounded-lg'>
-                      <Phone className='h-5 w-5 text-[#F7B500]' />
-                    </div>
-                    <div className='ml-4'>
-                      <p className='text-white'>+93 70 000 0000</p>
+                  <div className='mt-10 relative z-10'>
+                    <h3 className='text-xl font-semibold mb-6 text-white flex items-center'>
+                      <Clock className='mr-3 h-5 w-5 text-[#F7B500]' />
+                      Office Hours
+                    </h3>
+                    <div className='space-y-4 text-white'>
+                      <div className='flex items-center bg-[#2C4F85]/50 backdrop-blur-sm p-4 rounded-lg hover:bg-[#2C4F85]/70 transition-colors duration-300 group'>
+                        <div className='p-2 bg-[#F7B500]/20 rounded-lg mr-3'>
+                          <Clock className='h-5 w-5 text-[#F7B500]' />
+                        </div>
+                        <span>Monday - Thursday: 8:00 AM - 4:00 PM</span>
+                      </div>
+                      <div className='flex items-center bg-[#2C4F85]/50 backdrop-blur-sm p-4 rounded-lg hover:bg-[#2C4F85]/70 transition-colors duration-300 group'>
+                        <div className='p-2 bg-[#F7B500]/20 rounded-lg mr-3'>
+                          <Clock className='h-5 w-5 text-[#F7B500]' />
+                        </div>
+                        <span>Friday: Closed</span>
+                      </div>
+                      <div className='flex items-center bg-[#2C4F85]/50 backdrop-blur-sm p-4 rounded-lg hover:bg-[#2C4F85]/70 transition-colors duration-300 group'>
+                        <div className='p-2 bg-[#F7B500]/20 rounded-lg mr-3'>
+                          <Clock className='h-5 w-5 text-[#F7B500]' />
+                        </div>
+                        <span>Saturday - Sunday: 8:00 AM - 12:00 PM</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className='flex items-center'>
-                    <div className='flex-shrink-0 bg-[#2C4F85] p-2 rounded-lg'>
-                      <Mail className='h-5 w-5 text-[#F7B500]' />
-                    </div>
-                    <div className='ml-4'>
-                      <p className='text-white'>info@kufe.edu.af</p>
+                  <div className='mt-10 relative z-10'>
+                    <h3 className='text-xl font-semibold mb-6 text-white'>
+                      Follow Us
+                    </h3>
+                    <div className='flex space-x-4'>
+                      <a
+                        href='#'
+                        className='bg-[#2C4F85]/70 hover:bg-[#F7B500] h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-[#F7B500]/30 transform hover:-translate-y-1'
+                        aria-label='Facebook'
+                      >
+                        <svg
+                          className='h-5 w-5 text-white'
+                          fill='currentColor'
+                          viewBox='0 0 24 24'
+                          aria-hidden='true'
+                        >
+                          <path
+                            fillRule='evenodd'
+                            d='M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z'
+                            clipRule='evenodd'
+                          />
+                        </svg>
+                      </a>
+                      <a
+                        href='#'
+                        className='bg-[#2C4F85]/70 hover:bg-[#F7B500] h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-[#F7B500]/30 transform hover:-translate-y-1'
+                        aria-label='Twitter'
+                      >
+                        <svg
+                          className='h-5 w-5 text-white'
+                          fill='currentColor'
+                          viewBox='0 0 24 24'
+                          aria-hidden='true'
+                        >
+                          <path d='M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84' />
+                        </svg>
+                      </a>
+                      <a
+                        href='#'
+                        className='bg-[#2C4F85]/70 hover:bg-[#F7B500] h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-[#F7B500]/30 transform hover:-translate-y-1'
+                        aria-label='Instagram'
+                      >
+                        <svg
+                          className='h-5 w-5 text-white'
+                          fill='currentColor'
+                          viewBox='0 0 24 24'
+                          aria-hidden='true'
+                        >
+                          <path
+                            fillRule='evenodd'
+                            d='M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z'
+                            clipRule='evenodd'
+                          />
+                        </svg>
+                      </a>
+                      <a
+                        href='#'
+                        className='bg-[#2C4F85]/70 hover:bg-[#F7B500] h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-[#F7B500]/30 transform hover:-translate-y-1'
+                        aria-label='LinkedIn'
+                      >
+                        <svg
+                          className='h-5 w-5 text-white'
+                          fill='currentColor'
+                          viewBox='0 0 24 24'
+                          aria-hidden='true'
+                        >
+                          <path
+                            fillRule='evenodd'
+                            d='M19.7 3H4.3C3.582 3 3 3.582 3 4.3v15.4c0 .718.582 1.3 1.3 1.3h15.4c.718 0 1.3-.582 1.3-1.3V4.3c0-.718-.582-1.3-1.3-1.3zM8.339 18.338H5.667v-8.59h2.672v8.59zM7.004 8.574a1.548 1.548 0 11-.002-3.096 1.548 1.548 0 01.002 3.096zm11.335 9.764H15.67v-4.177c0-.996-.017-2.278-1.387-2.278-1.389 0-1.601 1.086-1.601 2.206v4.249h-2.667v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.779 3.203 4.092v4.711z'
+                          />
+                        </svg>
+                      </a>
                     </div>
                   </div>
                 </div>
-
-                <div className='mt-10'>
-                  <h3 className='text-xl font-semibold mb-6 text-white'>
-                    Office Hours
-                  </h3>
-                  <div className='space-y-4 text-white'>
-                    <div className='flex items-center bg-[#2C4F85] p-3 rounded-lg'>
-                      <Clock className='h-5 w-5 text-[#F7B500] mr-3' />
-                      <span>Monday - Thursday: 8:00 AM - 4:00 PM</span>
-                    </div>
-                    <div className='flex items-center bg-[#2C4F85] p-3 rounded-lg'>
-                      <Clock className='h-5 w-5 text-[#F7B500] mr-3' />
-                      <span>Friday: Closed</span>
-                    </div>
-                    <div className='flex items-center bg-[#2C4F85] p-3 rounded-lg'>
-                      <Clock className='h-5 w-5 text-[#F7B500] mr-3' />
-                      <span>Saturday - Sunday: 8:00 AM - 12:00 PM</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className='mt-10'>
-                  <h3 className='text-xl font-semibold mb-6 text-white'>
-                    Follow Us
-                  </h3>
-                  <div className='flex space-x-4'>
-                    <a
-                      href='#'
-                      className='bg-[#2C4F85] hover:bg-[#F7B500] h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-[#F7B500]/30 transform hover:-translate-y-1'
-                    >
-                      <svg
-                        className='h-5 w-5 text-white'
-                        fill='currentColor'
-                        viewBox='0 0 24 24'
-                        aria-hidden='true'
-                      >
-                        <path
-                          fillRule='evenodd'
-                          d='M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z'
-                          clipRule='evenodd'
-                        />
-                      </svg>
-                    </a>
-                    <a
-                      href='#'
-                      className='bg-[#2C4F85] hover:bg-[#F7B500] h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-[#F7B500]/30 transform hover:-translate-y-1'
-                    >
-                      <svg
-                        className='h-5 w-5 text-white'
-                        fill='currentColor'
-                        viewBox='0 0 24 24'
-                        aria-hidden='true'
-                      >
-                        <path d='M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84' />
-                      </svg>
-                    </a>
-                    <a
-                      href='#'
-                      className='bg-[#2C4F85] hover:bg-[#F7B500] h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-[#F7B500]/30 transform hover:-translate-y-1'
-                    >
-                      <svg
-                        className='h-5 w-5 text-white'
-                        fill='currentColor'
-                        viewBox='0 0 24 24'
-                        aria-hidden='true'
-                      >
-                        <path
-                          fillRule='evenodd'
-                          d='M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153 1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z'
-                          clipRule='evenodd'
-                        />
-                      </svg>
-                    </a>
-                    <a
-                      href='#'
-                      className='bg-[#2C4F85] hover:bg-[#F7B500] h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-[#F7B500]/30 transform hover:-translate-y-1'
-                    >
-                      <svg
-                        className='h-5 w-5 text-white'
-                        fill='currentColor'
-                        viewBox='0 0 24 24'
-                        aria-hidden='true'
-                      >
-                        <path
-                          fillRule='evenodd'
-                          d='M19.7 3H4.3C3.582 3 3 3.582 3 4.3v15.4c0 .718.582 1.3 1.3 1.3h15.4c.718 0 1.3-.582 1.3-1.3V4.3c0-.718-.582-1.3-1.3-1.3zM8.339 18.338H5.667v-8.59h2.672v8.59zM7.004 8.574a1.548 1.548 0 11-.002-3.096 1.548 1.548 0 01.002 3.096zm11.335 9.764H15.67v-4.177c0-.996-.017-2.278-1.387-2.278-1.389 0-1.601 1.086-1.601 2.206v4.249h-2.667v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.779 3.203 4.092v4.711z'
-                        />
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
-      <div className='mt-12 flex justify-center items-center  w-[100%] px-4 md:px-8'>
-        <Card className='border-0 w-[80%] shadow-2xl rounded-3xl overflow-hidden'>
+
+      {/* Google Maps Section with Enhanced Styling */}
+      <div
+        id='map'
+        ref={mapRef}
+        className={`mt-12 container mx-auto px-4 md:px-8 mb-16 transition-all duration-700 transform 
+          ${
+            mapVisible
+              ? "translate-y-0 opacity-100"
+              : "translate-y-10 opacity-0"
+          }`}
+        style={{ transitionDelay: "0.7s" }}
+      >
+        <div className='text-center mb-10'>
+          <h2 className='text-3xl font-bold text-[#1D3D6F] mb-4'>
+            Find Us on the Map
+          </h2>
+          <div className='w-20 h-1 bg-[#F7B500] mx-auto rounded-full'></div>
+          <p className='mt-4 text-[#1D3D6F]/70 max-w-2xl mx-auto'>
+            Visit the Faculty of Economics at Kandahar University. We're located
+            in the heart of Kandahar city.
+          </p>
+        </div>
+
+        <Card className='border-0 shadow-2xl rounded-3xl overflow-hidden transform hover:scale-[1.01] transition-all duration-500'>
           <CardContent className='p-0'>
             <div className='relative w-full h-0 pb-[56.25%]'>
-              {" "}
               {/* 16:9 Aspect Ratio */}
               <iframe
                 src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3390.0517185453!2d65.7008!3d31.6133!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzHCsDM2JzQ3LjkiTiA2NcKwNDInMDIuOSJF!5e0!3m2!1sen!2sus!4v1619099477556!5m2!1sen!2sus'
                 className='absolute inset-0 w-full h-full border-0 rounded-3xl'
                 allowFullScreen=''
                 loading='lazy'
+                title='Kandahar University Map'
               ></iframe>
             </div>
           </CardContent>
         </Card>
       </div>
+
       {/* Footer */}
       <Footer />
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes fadeInDown {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        .animate-fade-in-down {
+          animation: fadeInDown 0.7s ease-out forwards;
+        }
+
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 }
