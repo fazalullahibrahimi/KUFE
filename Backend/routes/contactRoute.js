@@ -9,7 +9,7 @@ const {
 
 router.post('/', createContact);
 router.get('/', getContact);
-router.put('/:id', updateContact);
+router.patch('/:id', updateContact);
 router.delete('/:id', deleteContact);
 
 module.exports = router;
