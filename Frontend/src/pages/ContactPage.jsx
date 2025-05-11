@@ -43,7 +43,7 @@ function ContactPage() {
     name: "",
     email: "",
     subject: "",
-    department_id: "", // Changed from 'department' to 'department_id' to match backend expectation
+    department_id: "", // This is the field expected by the backend
     message: "",
   })
   const [formSubmitted, setFormSubmitted] = useState(false)
@@ -123,12 +123,14 @@ function ContactPage() {
   }
 
   // Handle department selection
-  const handleDepartmentChange = (value) => {
+  const handleDepartmentChange = (e) => {
+    const departmentId = e.target.value
+
     // Find the selected department to store its name
-    const selectedDept = departments.find((dept) => dept._id === value)
+    const selectedDept = departments.find((dept) => dept._id === departmentId)
     if (selectedDept) {
       setSelectedDepartmentName(selectedDept.name)
-      console.log(`Selected department: ${selectedDept.name} with ID: ${value}`)
+      console.log(`Selected department: ${selectedDept.name} with ID: ${departmentId}`)
     } else {
       setSelectedDepartmentName("")
     }
@@ -136,7 +138,7 @@ function ContactPage() {
     // Update form data with department_id
     setFormData({
       ...formData,
-      department_id: value,
+      department_id: departmentId,
     })
   }
 
@@ -186,10 +188,10 @@ function ContactPage() {
 
     setIsLoading(true)
 
-    // Create a submission object that includes both ID and name for clarity in logs
+    // Create a submission object that includes both ID and name for the backend
     const submissionData = {
       ...formData,
-      department_name: selectedDepartmentName, // Add department name for reference
+      department_name: selectedDepartmentName, // Add department name for the backend
     }
 
     // Log form data to verify department ID is included
@@ -201,7 +203,7 @@ function ContactPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData), // Send only the original formData to match backend expectations
+        body: JSON.stringify(submissionData), // Send the enhanced data to the backend
       })
 
       const responseData = await response.json().catch(() => null)
@@ -418,16 +420,17 @@ function ContactPage() {
                           />
                         </div>
                         <div className="space-y-3 group">
-                          <Label htmlFor="department" className="text-[#1D3D6F] font-medium">
+                          <Label htmlFor="department_id" className="text-[#1D3D6F] font-medium">
                             Department
                           </Label>
 
-                          {/* FIXED SELECT COMPONENT */}
+                          {/* Department Select Component */}
                           <div className="relative">
                             <select
-                              id="department"
+                              id="department_id"
+                              name="department_id"
                               value={formData.department_id}
-                              onChange={(e) => handleDepartmentChange(e.target.value)}
+                              onChange={handleDepartmentChange}
                               className="w-full px-3 py-2 border border-[#E8ECEF] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]/20 focus:border-[#1D3D6F] transition-all duration-300 bg-white"
                             >
                               <option value="">Select Department</option>
