@@ -495,7 +495,7 @@ const StudentResearchSubmission = () => {
       console.log("Submitting research with payload:", payload)
   
       const token = getToken()
-      const response = await fetch(`${API_BASE_URL}/research/`, {
+      const response = await fetch(`${API_BASE_URL}/research/uploadResearch`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
