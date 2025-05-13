@@ -1,7 +1,12 @@
 const Student = require("../models/Student");
 const Department = require("../models/Department");
+const Subject = require("../models/subject");
+const Semester = require("../models/semester");
 const apiResponse = require("../utils/apiResponse");
 const asyncHandler = require("../middleware/asyncHandler");
+
+const Email = require("../utils/email");
+
 
 const multer = require("multer");
 const sharp = require("sharp");
@@ -271,6 +276,37 @@ const getStudentCount = async (req, res) => {
 
 
 
+// const createMarks = asyncHandler(async (req, res) => {
+//   const { subject_id, semester_id, teacher_id, midterm, final, assignment, grade, remarks } = req.body;
+
+//   const studentId = req.params.id;
+//   const student = await Student.findById(studentId);
+
+//   if (!student) {
+//     return res.status(404).json(apiResponse.error("Student not found", 404));
+//   }
+
+//   const total = (midterm || 0) + (final || 0) + (assignment || 0);
+
+//   const newMark = {
+//     subject_id,
+//     semester_id,
+//     teacher_id, // 🆕 include teacher_id
+//     midterm,
+//     final,
+//     assignment,
+//     total,
+//     grade,
+//     remarks,
+//   };
+
+//   student.marks.push(newMark);
+//   await student.save();
+
+//   res.status(201).json(apiResponse.success("Marks added successfully", { marks: student.marks }));
+// });
+
+
 const createMarks = asyncHandler(async (req, res) => {
   const { subject_id, semester_id, teacher_id, midterm, final, assignment, grade, remarks } = req.body;
 
@@ -286,7 +322,7 @@ const createMarks = asyncHandler(async (req, res) => {
   const newMark = {
     subject_id,
     semester_id,
-    teacher_id, // 🆕 include teacher_id
+    teacher_id,
     midterm,
     final,
     assignment,
@@ -297,6 +333,49 @@ const createMarks = asyncHandler(async (req, res) => {
 
   student.marks.push(newMark);
   await student.save();
+
+  // 🔍 Fetch subject and semester names
+  const subject = await Subject.findById(subject_id);
+  const semester = await Semester.findById(semester_id);
+
+  // 📧 Send email to student
+  try {
+    const email = new Email(student, ""); // No link needed
+    const content = `
+      <div style="font-family: Arial, sans-serif;">
+        <h2 style="color: #2c3e50;">Marks Notification</h2>
+        <p>Dear ${student.name || "Student"},</p>
+        <p>Your marks for the subject <strong>${subject?.name || "Unknown Subject"}</strong> 
+        in <strong>${semester?.name || "Unknown Semester"}</strong> have been recorded successfully.</p>
+
+        <table style="border-collapse: collapse; width: 100%; margin-top: 10px;">
+          <tr style="background-color: #f2f2f2;">
+            <th style="padding: 8px; border: 1px solid #ddd;">Midterm</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">Final</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">Assignment</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">Total</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">Grade</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">Remarks</th>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">${midterm}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${final}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${assignment}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${total}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${grade}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${remarks || "None"}</td>
+          </tr>
+        </table>
+
+        <p style="margin-top: 20px;">If you have any questions, please contact your teacher or department office.</p>
+        <p>Best regards,<br>Kandahar University Faculty of Economic</p>
+      </div>
+    `;
+
+    await email.send("marksAdded", "Your Marks Have Been Added", content);
+  } catch (err) {
+    console.error("Failed to send marks email:", err.message);
+  }
 
   res.status(201).json(apiResponse.success("Marks added successfully", { marks: student.marks }));
 });
