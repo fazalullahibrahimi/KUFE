@@ -1,13 +1,15 @@
 import React from "react";
-
 import { useEffect, useState } from "react";
 import ImageBackGround from "../../public/Hero_BackGroundImage.jpg";
 import { useLanguage } from "../context/LanguageContext";
 import { FaGraduationCap, FaChalkboardTeacher, FaBook } from "react-icons/fa";
 
 const Hero = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
+
+  // Set direction based on language
+  const direction = ["ps", "dr"].includes(language) ? "rtl" : "ltr";
 
   // Handle scroll effect for animated elements
   useEffect(() => {
@@ -23,6 +25,25 @@ const Hero = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Define stats data
+  const statsData = [
+    {
+      icon: <FaGraduationCap className='text-[#F4B400] text-2xl' />,
+      title: "graduates",
+      value: "5,000+",
+    },
+    {
+      icon: <FaChalkboardTeacher className='text-[#F4B400] text-2xl' />,
+      title: "Faculty members",
+      value: "50+",
+    },
+    {
+      icon: <FaBook className='text-[#F4B400] text-2xl' />,
+      title: "programs",
+      value: "12",
+    },
+  ];
+
   return (
     <section
       className='relative w-full min-h-[600px] md:min-h-[700px] bg-cover bg-center flex items-center justify-center overflow-hidden'
@@ -30,6 +51,7 @@ const Hero = () => {
         backgroundImage: `linear-gradient(rgba(0, 75, 135, 0.85), rgba(0, 0, 0, 0.7)), url(${ImageBackGround})`,
         backgroundRepeat: "no-repeat",
       }}
+      dir={direction}
     >
       {/* Decorative elements */}
       <div className='absolute top-0 left-0 w-full h-full overflow-hidden'>
@@ -41,7 +63,11 @@ const Hero = () => {
       <div className='container mx-auto px-6 py-12 relative z-10'>
         <div className='flex flex-col md:flex-row items-center justify-between'>
           {/* Text content */}
-          <div className='text-white max-w-2xl mb-10 md:mb-0 text-center md:text-left'>
+          <div
+            className={`text-white max-w-2xl mb-10 md:mb-0 text-center md:text-${
+              direction === "rtl" ? "right" : "left"
+            }`}
+          >
             <div className='mb-4 inline-block'>
               <span className='bg-[#F4B400] text-[#004B87] text-sm font-bold py-1 px-3 rounded-full'>
                 {t("Kandahar university")}
@@ -53,13 +79,14 @@ const Hero = () => {
             </h1>
 
             <p className='text-lg md:text-xl opacity-90 mb-8 font-roboto max-w-xl'>
-              {t(
-                "Empowering future leaders with knowledge, skills, and values to drive economic growth and sustainable development."
-              ) ||
-                "Empowering future leaders with knowledge, skills, and values to drive economic growth and sustainable development."}
+              {t("message")}
             </p>
 
-            <div className='flex flex-wrap gap-4 justify-center md:justify-start'>
+            <div
+              className={`flex flex-wrap gap-4 justify-center md:justify-${
+                direction === "rtl" ? "start" : "start"
+              }`}
+            >
               <button className='bg-[#F4B400] hover:bg-[#e5a800] text-[#004B87] font-bold py-3 px-6 rounded-md transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-roboto'>
                 {t("explore programs")}
               </button>
@@ -71,31 +98,17 @@ const Hero = () => {
 
           {/* Stats cards */}
           <div className='grid grid-cols-1 gap-4 w-full md:w-auto md:max-w-sm'>
-            {[
-              {
-                icon: <FaGraduationCap className='text-[#F4B400] text-2xl' />,
-                title: t("graduates") || "Graduates",
-                value: "5,000+",
-              },
-              {
-                icon: (
-                  <FaChalkboardTeacher className='text-[#F4B400] text-2xl' />
-                ),
-                title: t("Faculty members") || "Faculty Members",
-                value: "50+",
-              },
-              {
-                icon: <FaBook className='text-[#F4B400] text-2xl' />,
-                title: t("programs") || "Programs",
-                value: "12",
-              },
-            ].map((stat, index) => (
+            {statsData.map((stat, index) => (
               <div
                 key={index}
                 className='bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-4 border border-white border-opacity-20 transform transition-all duration-300 hover:scale-105 hover:bg-opacity-15'
               >
                 <div className='flex items-center'>
-                  <div className='p-3 rounded-full bg-[#004B87] bg-opacity-30 mr-4'>
+                  <div
+                    className={`p-3 rounded-full bg-[#004B87] bg-opacity-30 ${
+                      direction === "rtl" ? "ml-4" : "mr-4"
+                    }`}
+                  >
                     {stat.icon}
                   </div>
                   <div>
@@ -103,7 +116,7 @@ const Hero = () => {
                       {stat.value}
                     </h3>
                     <p className='text-gray-800 text-sm opacity-80'>
-                      {stat.title}
+                      {t(stat.title)}
                     </p>
                   </div>
                 </div>
@@ -119,9 +132,7 @@ const Hero = () => {
           }`}
         >
           <div className='flex flex-col items-center'>
-            <span className='text-white text-sm mb-2'>
-              {t("Scroll Down") || "Scroll Down"}
-            </span>
+            <span className='text-white text-sm mb-2'>{t("Scroll Down")}</span>
             <div className='w-6 h-10 border-2 border-white rounded-full flex justify-center'>
               <div className='w-1 h-3 bg-white rounded-full animate-bounce mt-2'></div>
             </div>
