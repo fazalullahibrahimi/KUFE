@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useLanguage } from "../context/LanguageContext";
 import {
   FaCalendarAlt,
   FaMapMarkerAlt,
@@ -22,7 +24,8 @@ const Events = () => {
   const [error, setError] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
   const [showAllEvents, setShowAllEvents] = useState(false);
-
+  const { t, direction, language } = useLanguage();
+  console.log(direction);
   // Event type icons mapping
   const eventTypeIcons = {
     academic: FaGraduationCap,
@@ -146,7 +149,7 @@ const Events = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [language]);
 
   const handleRetry = () => {
     setError(null);
@@ -184,7 +187,10 @@ const Events = () => {
   const eventTypes = ["all", ...new Set(events.map((event) => event.type))];
 
   return (
-    <section className='relative py-16 bg-gradient-to-b from-[#F9F9F9] to-[#E8ECEF]'>
+    <section
+      dir={direction}
+      className='relative py-16 bg-gradient-to-b from-[#F9F9F9] to-[#E8ECEF]'
+    >
       {/* Decorative top border */}
       <div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#004B87] via-[#F4B400] to-[#004B87]'></div>
 
@@ -195,15 +201,16 @@ const Events = () => {
             className='text-3xl md:text-4xl font-bold text-[#004B87] inline-block relative'
             style={{ fontFamily: "'Poppins', sans-serif" }}
           >
-            Latest News & Events
+            {t("Latest News & Events")}
             <span className='block h-1 w-24 bg-[#F4B400] mx-auto mt-2 rounded-full'></span>
           </h2>
           <p
             className='text-[#333333] mt-4 max-w-2xl mx-auto'
             style={{ fontFamily: "'Roboto', sans-serif" }}
           >
-            Stay updated with the latest happenings, announcements, and events
-            at the Faculty of Economics.
+            {t(
+              "Stay updated with the latest happenings, announcements, and events at the Faculty of Economics."
+            )}
           </p>
         </div>
 
@@ -213,7 +220,7 @@ const Events = () => {
             <div className='flex items-center bg-white rounded-full px-3 py-1 shadow-sm mr-2'>
               <FaFilter className='text-[#004B87] mr-2' />
               <span className='text-sm text-[#004B87] font-medium'>
-                Filter:
+                {t("Filter")}
               </span>
             </div>
             {eventTypes.map((type) => (
@@ -227,7 +234,7 @@ const Events = () => {
                 }`}
               >
                 {type === "all"
-                  ? "All Events"
+                  ? t("All Events")
                   : type.charAt(0).toUpperCase() + type.slice(1)}
               </button>
             ))}
@@ -242,7 +249,7 @@ const Events = () => {
               className='text-[#004B87] font-medium'
               style={{ fontFamily: "'Roboto', sans-serif" }}
             >
-              Loading events...
+              <p>{t("Loading events...")}</p>
             </p>
           </div>
         )}
@@ -253,22 +260,24 @@ const Events = () => {
             <div className='bg-red-50 border border-red-200 rounded-lg p-6 max-w-md text-center'>
               <FaExclamationTriangle className='text-3xl text-red-500 mx-auto mb-4' />
               <h3
-                className='text-xl font-semibold text-red-700 mb-2'
+                className={`text-xl font-semibold ${
+                  direction === "rtl" ? "text-right" : "text-left"
+                } text-red-700 mb-2`}
                 style={{ fontFamily: "'Poppins', sans-serif" }}
               >
-                Unable to Load Events
+                {t("Unable to Load Events")}
               </h3>
               <p
                 className='text-red-600 mb-4'
                 style={{ fontFamily: "'Roboto', sans-serif" }}
               >
-                {error}
+                {t("Failed to load events. Please try again later.")}
               </p>
               <button
                 onClick={handleRetry}
                 className='inline-flex items-center px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003366] transition-colors'
               >
-                <FaSync className='mr-2' /> Retry
+                <FaSync className='mr-2' /> {t("Retry")}
               </button>
             </div>
           </div>
@@ -284,14 +293,15 @@ const Events = () => {
               className='text-xl font-semibold text-[#004B87] mb-2'
               style={{ fontFamily: "'Poppins', sans-serif" }}
             >
-              No Events Scheduled
+              {t("No Events Scheduled")}
             </h3>
             <p
               className='text-[#333333] text-center max-w-md'
               style={{ fontFamily: "'Roboto', sans-serif" }}
             >
-              There are no upcoming events at this time. Please check back soon
-              for new announcements and events.
+              {t(
+                "There are no upcoming events at this time. Please check back soon for new announcements and events."
+              )}
             </p>
           </div>
         )}
@@ -368,7 +378,8 @@ const Events = () => {
 
                       {/* Read more button */}
                       <button className='mt-2 inline-flex items-center text-[#F4B400] font-medium hover:text-[#004B87] transition-colors'>
-                        Read more <FaArrowRight className='ml-1 text-xs' />
+                        {t("Read more")}{" "}
+                        <FaArrowRight className='ml-1 text-xs' />
                       </button>
                     </div>
 
@@ -387,7 +398,7 @@ const Events = () => {
                   onClick={() => setShowAllEvents(!showAllEvents)}
                   className='inline-flex items-center px-6 py-3 bg-[#004B87] text-white rounded-md hover:bg-[#003366] transition-colors'
                 >
-                  {showAllEvents ? "Show Less Events" : "View All Events"}
+                  {showAllEvents ? t("Show Less Events") : t("View All Events")}
                   <FaArrowRight
                     className={`ml-2 transition-transform duration-300 ${
                       showAllEvents ? "rotate-180" : ""

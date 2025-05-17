@@ -66,3 +66,91 @@
     text-align: right;
   }
   
+  /* Additional RTL improvements */
+  
+  /* Flip flexbox row direction */
+  .rtl .flex-row {
+    flex-direction: row-reverse;
+  }
+  
+  .rtl .flex-row-reverse {
+    flex-direction: row;
+  }
+  
+  /* Flip float directions */
+  .rtl .float-left {
+    float: right;
+  }
+  
+  .rtl .float-right {
+    float: left;
+  }
+  
+  /* Flip text alignment */
+  .rtl .text-right {
+    text-align: left;
+  }
+  
+  /* Flip padding and margin logical properties */
+  .rtl .pl-1 {
+    padding-left: 0;
+    padding-right: 0.25rem;
+  }
+  
+  .rtl .pr-1 {
+    padding-right: 0;
+    padding-left: 0.25rem;
+  }
+  
+  /* Flip icon directions by mirroring */
+  .rtl .icon-flip-horizontal {
+    transform: scaleX(-1);
+  }
+  
+  /* Example: flip arrow icons */
+  .rtl .arrow-icon {
+    transform: scaleX(-1);
+  }
+  
+  /* Flip left and right positioning */
+  .rtl .left-0 {
+    left: auto;
+    right: 0;
+  }
+  
+  .rtl .right-0 {
+    right: auto;
+    left: 0;
+  }
+  
+  /* Flip margin inline start and end if used */
+  .rtl .ml-auto {
+    margin-left: 0;
+    margin-right: auto;
+  }
+  
+  .rtl .mr-auto {
+    margin-right: 0;
+    margin-left: auto;
+  }
+  
+  /* Flip text indent */
+  .rtl .text-indent-left {
+    text-indent: 0;
+    text-indent: -1em;
+  }
+  
+  /* Flip border radius for rounded corners */
+  .rtl .rounded-l-lg {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+  }
+  
+  .rtl .rounded-r-lg {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+  }

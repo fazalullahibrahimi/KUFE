@@ -1,55 +1,56 @@
 import React from "react";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import translations from "../translations/Translation";
 
 // Define translations
-const translations = {
-  en: {
-    // English translations
-    Home: "Home",
-    Academics: "Academics",
-    Research: "Research",
-    Courses: "Courses",
-    About: "About",
-    Contact: "Contact",
-    "Announcements Events": "Announcements & Events",
-    student_portal: "Student Portal",
-    kandahar_university: "Kandahar University",
-    faculty_of_economics: "Faculty of Economics",
-    ku_logo_alt: "Kandahar University Logo",
-    // Add more translations as needed
-  },
-  dr: {
-    // Dari translations
-    Home: "خانه",
-    Academics: "تحصیلات",
-    Research: "تحقیقات",
-    Courses: "دروس",
-    About: "درباره ما",
-    Contact: "تماس با ما",
-    "Announcements Events": "اعلانات و رویدادها",
-    student_portal: "پورتال محصلین",
-    kandahar_university: "پوهنتون کندهار",
-    faculty_of_economics: "پوهنځی اقتصاد",
-    ku_logo_alt: "لوگوی پوهنتون کندهار",
-    // Add more translations as needed
-  },
-  ps: {
-    // Pashto translations
-    Home: "کور",
-    Academics: "زده کړې",
-    Research: "څیړنې",
-    Courses: "کورسونه",
-    About: "زموږ په اړه",
-    Contact: "اړیکه",
-    "Announcements Events": "اعلانات او پیښې",
-    student_portal: "د زده کوونکو پورټال",
-    kandahar_university: "د کندهار پوهنتون",
-    faculty_of_economics: "د اقتصاد پوهنځی",
-    ku_logo_alt: "د کندهار پوهنتون لوګو",
-    // Add more translations as needed
-  },
-};
+// const translations = {
+//   en: {
+//     // English translations
+//     Home: "Home",
+//     Academics: "Academics",
+//     Research: "Research",
+//     Courses: "Courses",
+//     About: "About",
+//     Contact: "Contact",
+//     "Announcements Events": "Announcements & Events",
+//     student_portal: "Student Portal",
+//     kandahar_university: "Kandahar University",
+//     faculty_of_economics: "Faculty of Economics",
+//     ku_logo_alt: "Kandahar University Logo",
+//     // Add more translations as needed
+//   },
+//   dr: {
+//     // Dari translations
+//     Home: "خانه",
+//     Academics: "تحصیلات",
+//     Research: "تحقیقات",
+//     Courses: "دروس",
+//     About: "درباره ما",
+//     Contact: "تماس با ما",
+//     "Announcements Events": "اعلانات و رویدادها",
+//     student_portal: "پورتال محصلین",
+//     kandahar_university: "پوهنتون کندهار",
+//     faculty_of_economics: "پوهنځی اقتصاد",
+//     ku_logo_alt: "لوگوی پوهنتون کندهار",
+//     // Add more translations as needed
+//   },
+//   ps: {
+//     // Pashto translations
+//     Home: "کور",
+//     Academics: "زده کړې",
+//     Research: "څیړنې",
+//     Courses: "کورسونه",
+//     About: "زموږ په اړه",
+//     Contact: "اړیکه",
+//     "Announcements Events": "اعلانات او پیښې",
+//     student_portal: "د زده کوونکو پورټال",
+//     kandahar_university: "د کندهار پوهنتون",
+//     faculty_of_economics: "د اقتصاد پوهنځی",
+//     ku_logo_alt: "د کندهار پوهنتون لوګو",
+//     // Add more translations as needed
+//   },
+// };
 
 // Define language metadata
 const languageMetadata = {
@@ -143,6 +144,7 @@ export const LanguageProvider = ({ children }) => {
     setLanguage: changeLanguage,
     t,
     isRTL,
+    direction: languageMetadata[language].dir,
   };
 
   return (
