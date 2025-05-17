@@ -14,9 +14,11 @@ const contactMessageSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  department: {
-    type: String,
-  },
+  department_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+      required: true,
+    },
   message: {
     type: String,
     required: true,

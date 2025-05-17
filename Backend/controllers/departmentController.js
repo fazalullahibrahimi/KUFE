@@ -336,6 +336,7 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
     const Research = require("../models/Research");
     const Course = require("../models/Course");
     const Enrollment = require("../models/Enrollment");
+    const Teacher = require("../models/Teacher"); // ✅ Import teacher model
 
     let CourseOffering;
     try {
@@ -346,6 +347,7 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
 
     // Get basic counts
     const studentCount = await Student.countDocuments();
+    const teacherCount = await Teacher.countDocuments(); // ✅ Count teachers
     const researchCount = await Research.countDocuments();
     const courseCount = await Course.countDocuments();
     const enrollmentCount = await Enrollment.countDocuments();
@@ -418,6 +420,7 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
 
     const statistics = [
       { number: `${studentCount}+`, label: "Students Enrolled" },
+      { number: `${teacherCount}+`, label: "Faculty Members" }, // ✅ Add teacher stat
       { number: successRate, label: "Course Success Rate" },
       { number: `${researchCount}+`, label: "Research Papers" }
     ];
@@ -442,6 +445,7 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
     );
   }
 });
+
 
 
 
