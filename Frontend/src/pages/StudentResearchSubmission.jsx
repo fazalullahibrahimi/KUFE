@@ -551,6 +551,7 @@ const StudentResearchSubmission = () => {
         keywords: keywordsArray,
         status: "pending",
         submission_date: new Date().toISOString(),
+      }
 
       console.log("Submitting research with payload:", payload);
 
