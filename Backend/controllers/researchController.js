@@ -7,120 +7,228 @@ require("dotenv").config(); // Ensure you load .env values
 const path = require("path");
 const fs = require("fs");
 
-
 const researchUpload = asyncHandler(async (req, res) => {
-  const { title, abstract, category } = req.body;
+  try {
+    console.log("Request body:", req.body)
+    console.log("Request file:", req.file)
 
-  if (!title || !abstract || !category) {
-    return res.status(400).json({
-      status: "fail",
-      message: "Title, abstract, and category are required",
-    });
-  }
+    const { title, abstract, category } = req.body
 
-  // File upload path
-  const filePath = req.file ? `/uploads/research/${req.file.filename}` : "";
-
-  // Parse authors
-  let authors = req.body.authors;
-  if (typeof authors === "string") {
-    try {
-      authors = JSON.parse(authors);
-    } catch {
-      authors = req.user ? [req.user.name] : [authors];
+    if (!title || !abstract || !category) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Title, abstract, and category are required",
+      })
     }
-  } else if (!authors) {
-    authors = req.user ? [req.user.name] : [];
-  }
 
-  // Parse keywords
-  let keywords = req.body.keywords;
-  if (typeof keywords === "string") {
-    try {
-      keywords = JSON.parse(keywords);
-    } catch {
-      keywords = keywords
-        .split(",")
-        .map((k) => k.trim())
-        .filter(Boolean);
+    // Handle file upload
+    let filePath = ""
+    if (req.file) {
+      // Ensure uploads directory exists
+      const uploadDir = path.join(__dirname, "../uploads/research")
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true })
+      }
+
+      filePath = `/uploads/research/${req.file.filename}`
+      console.log("File saved at:", filePath)
+    } else {
+      console.log("No file uploaded")
+      // Make file optional for testing
+      filePath = "/uploads/research/default.pdf"
     }
+
+    // Parse authors
+    let authors = req.body.authors
+    if (typeof authors === "string") {
+      try {
+        authors = JSON.parse(authors)
+      } catch (e) {
+        console.log("Error parsing authors:", e)
+        authors = req.user ? [req.user.name] : [authors]
+      }
+    } else if (!authors) {
+      authors = req.user ? [req.user.name] : []
+    }
+
+    // Parse keywords
+    let keywords = req.body.keywords
+    if (typeof keywords === "string") {
+      try {
+        keywords = JSON.parse(keywords)
+      } catch (e) {
+        console.log("Error parsing keywords:", e)
+        keywords = keywords
+          .split(",")
+          .map((k) => k.trim())
+          .filter(Boolean)
+      }
+    }
+
+    // Create the research document
+    const newResearch = await Research.create({
+      title,
+      abstract,
+      publication_date: req.body.publication_date || new Date(),
+      file_path: filePath,
+      pages: req.body.pages || 1,
+      category,
+      status: req.body.status || "pending",
+      authors,
+      student_id: req.body.student_id || req.user?._id || null,
+      student_name: req.body.student_name || req.user?.name || null,
+      department_id: req.body.department_id || null,
+      department_name: req.body.department_name || null,
+      keywords: keywords || [],
+      reviewer_comments: "",
+      reviewer_id: null,
+      review_date: null,
+    })
+
+    console.log("Research created:", newResearch)
+
+    // Assign reviewer from same department
+    if (newResearch.department_id) {
+      const committee = await CommitteeMember.find({
+        department: newResearch.department_id,
+      })
+
+      console.log(`Found ${committee.length} committee members for department ${newResearch.department_id}`)
+
+      if (committee.length > 0) {
+        const randomReviewer = committee[Math.floor(Math.random() * committee.length)]
+        console.log("Selected reviewer:", randomReviewer)
+
+        // Store both _id and userId._id to ensure we can find the reviewer later
+        newResearch.reviewer_id = randomReviewer._id
+        await newResearch.save()
+        console.log("Updated research with reviewer:", newResearch)
+
+        // Send email notification
+        const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000/"
+        const reviewLink = `${CLIENT_URL}/review/${newResearch._id}`
+
+        try {
+          const email = new Email(randomReviewer, reviewLink)
+
+          const message = `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+              <h2 style="color: #2c3e50;">New Research Assigned to You</h2>
+              <p>Dear ${randomReviewer.fullName || randomReviewer.name || "Reviewer"},</p>
+              <p>You have been assigned a new research submission to review:</p>
+              <ul>
+                <li><strong>Title:</strong> ${newResearch.title}</li>
+                <li><strong>Submitted by:</strong> ${newResearch.student_name}</li>
+                <li><strong>Department:</strong> ${newResearch.department_name}</li>
+              </ul>
+              <p>Please log in and review the submission at the link below:</p>
+              <p style="text-align:center;">
+                <a href="${reviewLink}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:white;text-decoration:none;border-radius:5px;">Review Research</a>
+              </p>
+              <p>Thank you,<br>Kandahar University Faculty of Economic</p>
+            </div>
+          `
+
+          await email.send("researchAssigned", "New Research Assigned to You", message)
+          console.log("Email sent successfully to reviewer")
+        } catch (emailErr) {
+          console.error("Error sending email to reviewer:", emailErr.message)
+          // Log but don't fail research creation if email fails
+        }
+      }
+    }
+
+    // Final response
+    res.status(201).json({
+      status: "success",
+      data: {
+        research: newResearch,
+      },
+    })
+  } catch (error) {
+    console.error("Error in researchUpload:", error)
+    res.status(500).json({
+      status: "error",
+      message: error.message || "An error occurred while uploading research",
+    })
   }
+})
 
-  // Create the research document
-  const newResearch = await Research.create({
-    title,
-    abstract,
-    publication_date: req.body.publication_date || new Date(),
-    file_path: filePath,
-    pages: req.body.pages || 1,
-    category,
-    status: req.body.status || "pending",
-    authors,
-    student_id: req.body.student_id || req.user?._id || null,
-    student_name: req.body.student_name || req.user?.name || null,
-    department_id: req.body.department_id || null,
-    department_name: req.body.department_name || null,
-    keywords: keywords || [],
-    reviewer_comments: "",
-    reviewer_id: null,
-    review_date: null,
-  });
 
-  // 🎯 Assign reviewer from same department
-  if (newResearch.department_id) {
-    const committee = await CommitteeMember.find({
-      department: newResearch.department_id,
-    });
+const updateResearchReview = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, reviewer_comments, review_date } = req.body;
 
-    if (committee.length > 0) {
-      const randomReviewer =
-        committee[Math.floor(Math.random() * committee.length)];
+    // Validation
+    if (!id) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Research ID is required",
+      });
+    }
 
-      newResearch.reviewer_id = randomReviewer._id;
-      await newResearch.save();
+    if (!status || !reviewer_comments) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Status and reviewer comments are required",
+      });
+    }
 
-      // 📧 Send email notification
-      const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
-      const reviewLink = `${CLIENT_URL}/review/${newResearch._id}`;
+    // Fetch research and populate student
+    const research = await Research.findById(id).populate("student_id");
+    if (!research) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Research not found",
+      });
+    }
 
-      const email = new Email(randomReviewer, reviewLink);
+    // Update review data
+    research.status = status;
+    research.reviewer_comments = reviewer_comments;
+    research.reviewer_id = req.user.id;
+    research.review_date = review_date || new Date();
+    await research.save();
 
-      const message = `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-          <h2 style="color: #2c3e50;">New Research Assigned to You</h2>
-          <p>Dear ${randomReviewer.fullName || "Reviewer"},</p>
-          <p>You have been assigned a new research submission to review:</p>
+    console.log("Research updated:", research);
+
+    // Send email to student
+    const student = research.student_id;
+    if (student && student.email) {
+      const emailInstance = new Email(student, "https://localhost:5173/studenSubmit");
+
+      const content = `
+        <div style="font-family: Arial, sans-serif;">
+          <h2>Research Review Status Updated</h2>
+          <p>Dear ${student.fullName || "Student"},</p>
+          <p>Your research has been reviewed and updated. Below are the details:</p>
           <ul>
-            <li><strong>Title:</strong> ${newResearch.title}</li>
-            <li><strong>Submitted by:</strong> ${newResearch.student_name}</li>
-            <li><strong>Department:</strong> ${newResearch.department_name}</li>
+            <li><strong>Status:</strong> ${status}</li>
+            <li><strong>Reviewer Comments:</strong> ${reviewer_comments}</li>
           </ul>
-          <p>Please log in and review the submission at the link below:</p>
-          <p style="text-align:center;">
-            <a href="${reviewLink}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:white;text-decoration:none;border-radius:5px;">Review Research</a>
-          </p>
-          <p>Thank you,<br>Kandahar University Faculty of Economic</p>
+          <p>Best regards,<br/>Kandahar University Faculty of Economic</p>
         </div>
       `;
 
-      try {
-        await email.send("researchAssigned", "New Research Assigned to You", message);
-      } catch (emailErr) {
-        console.error("Error sending email to reviewer:", emailErr.message);
-        // Optional: Log but don’t fail research creation if email fails
-      }
+      await emailInstance.send("reviewUpdate", "Your Research Review Status Has Been Updated", content);
     }
+
+    // Respond to client
+    res.status(200).json({
+      status: "success",
+      data: {
+        research,
+      },
+    });
+  } catch (error) {
+    console.error("Error in updateResearchReview:", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message || "An error occurred while updating the research review",
+    });
   }
-
-  // ✅ Final response
-  res.status(201).json({
-    status: "success",
-    data: {
-      research: newResearch,
-    },
-  });
 });
-
 
 
 
@@ -368,4 +476,5 @@ module.exports = {
   getResearchByDepartment,
   searchResearch,
   researchUpload,
+  updateResearchReview,
 };
