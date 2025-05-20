@@ -1401,17 +1401,16 @@ const StudentResearchSubmission = () => {
                 <h3 className="text-lg font-medium text-gray-800">Review Decision</h3>
                 <div className="flex items-center">
                   <a
-                    href="#"
+                    href={`http://localhost:4000${currentSubmission.file_path}`} // Make sure this is correct
                     className="text-[#004B87] hover:underline text-sm flex items-center"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      // In a real app, this would download the file
-                      alert(`Downloading: ${currentSubmission.file_path || "research paper"}`)
-                    }}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <Download size={16} className="mr-1" />
                     Download Paper
                   </a>
+
                 </div>
               </div>
 
