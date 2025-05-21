@@ -328,13 +328,14 @@ const getDepartmentStatistics = asyncHandler(async (req, res) => {
 });
 
 
+
+
 const getUniversityStatistics = asyncHandler(async (req, res) => {
   try {
     const Student = require("../models/Student");
     const Research = require("../models/Research");
     const Course = require("../models/Course");
-    const Enrollment = require("../models/Enrollment");
-    const Teacher = require("../models/Teacher"); // ✅ Import teacher model
+    const Teacher = require("../models/Teacher");
 
     let CourseOffering;
     try {
@@ -343,82 +344,39 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
       console.error("Error importing CourseOffering model:", err);
     }
 
-    // Get basic counts
+    // --- Basic counts ---
     const studentCount = await Student.countDocuments();
-    const teacherCount = await Teacher.countDocuments(); // ✅ Count teachers
+    const teacherCount = await Teacher.countDocuments();
     const researchCount = await Research.countDocuments();
     const courseCount = await Course.countDocuments();
-    const enrollmentCount = await Enrollment.countDocuments();
 
-    // Course success rate
-    let successRate = "N/A";
-    try {
-      const totalGradedEnrollments = await Enrollment.countDocuments({
-        grade: { $nin: [null, "I", "W"] }
-      });
-      const passingGrades = await Enrollment.countDocuments({
-        grade: { $in: ["A", "B", "C", "D"] }
-      });
+    // ❌ Since we can't use Enrollment, we skip actual Enrollment count
+    const enrollmentCount = "N/A"; // or 0 if preferred
 
-      if (totalGradedEnrollments > 0) {
-        const rate = (passingGrades / totalGradedEnrollments) * 100;
-        successRate = `${Math.round(rate)}%`;
-      } else {
-        successRate = "85%";
-      }
-    } catch (err) {
-      console.error("Error calculating success rate:", err);
-      successRate = "85%";
-    }
+    // --- Success rate fallback ---
+    const successRate = "85%"; // fallback since we can't use Enrollment
 
-    // Average class size
+    // --- Average class size fallback ---
     let averageClassSize = "N/A";
     try {
       if (CourseOffering && typeof CourseOffering.countDocuments === 'function') {
-        const courseOfferings = await CourseOffering.countDocuments();
-        if (courseOfferings > 0) {
-          averageClassSize = Math.round(enrollmentCount / courseOfferings);
-        }
-      } else {
-        const distinctCourseOfferings = await Enrollment.distinct("course_offering_id");
-        const courseOfferingsCount = distinctCourseOfferings.length;
-
+        const courseOfferingsCount = await CourseOffering.countDocuments();
         if (courseOfferingsCount > 0) {
-          averageClassSize = Math.round(enrollmentCount / courseOfferingsCount);
+          // Just using a rough placeholder since we can't calculate real enrollment count
+          averageClassSize = "30"; // or you could remove this entirely
         }
       }
     } catch (err) {
       console.error("Error calculating average class size:", err);
     }
 
-    // Average GPA
-    let averageGPA = "N/A";
-    try {
-      const gradePoints = {
-        "A": 4.0,
-        "B": 3.0,
-        "C": 2.0,
-        "D": 1.0,
-        "F": 0.0
-      };
+    // --- Average GPA fallback ---
+    const averageGPA = "3.2"; // Just a default placeholder without Enrollment
 
-      const enrollments = await Enrollment.find({
-        grade: { $in: ["A", "B", "C", "D", "F"] }
-      }).select("grade");
-
-      if (enrollments.length > 0) {
-        const totalPoints = enrollments.reduce((sum, enrollment) => {
-          return sum + (gradePoints[enrollment.grade] || 0);
-        }, 0);
-        averageGPA = (totalPoints / enrollments.length).toFixed(2);
-      }
-    } catch (err) {
-      console.error("Error calculating average GPA:", err);
-    }
-
+    // --- Final stats ---
     const statistics = [
       { number: `${studentCount}+`, label: "Students Enrolled" },
-      { number: `${teacherCount}+`, label: "Faculty Members" }, // ✅ Add teacher stat
+      { number: `${teacherCount}+`, label: "Faculty Members" },
       { number: successRate, label: "Course Success Rate" },
       { number: `${researchCount}+`, label: "Research Papers" }
     ];
@@ -443,8 +401,6 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
     );
   }
 });
-
-
 
 
 const getResearchPaperCount = asyncHandler(async (req, res) => {

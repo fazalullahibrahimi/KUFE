@@ -6,9 +6,11 @@ const roles = require("../config/roles");
 const router = express.Router();
 
 // Public routes
+router.get("/top-teachers", teacherController.getTopTeachers);
 router.get("/count",teacherController.getTeacherCount);
 router.get("/", teacherController.getTeachers);
 router.get("/:id", teacherController.getTeacher);
+
 
 
 // Apply authentication for protected routes
