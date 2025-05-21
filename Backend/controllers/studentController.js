@@ -456,7 +456,39 @@ const deleteMarks = asyncHandler(async (req, res) => {
   res.status(200).json(apiResponse.success("Mark deleted successfully", { marks: student.marks }));
 });
 
+const getTopStudents = asyncHandler(async (req, res) => {
+  const topStudents = await Student.aggregate([
+    { $unwind: "$marks" },
+    {
+      $match: {
+        "marks.total": { $gte: 90 }
+      }
+    },
+    {
+      $group: {
+        _id: "$_id",
+        name: { $first: "$name" },
+        student_id_number: { $first: "$student_id_number" },
+        email: { $first: "$email" },
+        phone: { $first: "$phone" },
+        profile_image: { $first: "$profile_image" },
+        totalHighMarks: { $sum: "$marks.total" }
+      }
+    },
+    { $sort: { totalHighMarks: -1 } },
+    { $limit: 3 }
+  ]);
 
+  if (!topStudents || topStudents.length === 0) {
+    return res
+      .status(404)
+      .json(apiResponse.error("No top students found with marks ≥ 90", 404));
+  }
+
+  res
+    .status(200)
+    .json(apiResponse.success("Top students retrieved successfully", topStudents));
+});
 
 module.exports = {
   getStudents,
@@ -471,5 +503,6 @@ module.exports = {
   deleteMarks,
   uploasStudentPhoto,
   resizeStudentPhoto,
+  getTopStudents,
 };
 

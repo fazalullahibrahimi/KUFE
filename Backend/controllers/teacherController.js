@@ -193,6 +193,18 @@ const getTeacherCount = asyncHandler(async (req, res) => {
     );
   }
 });
+const getTopTeachers = asyncHandler(async (req, res) => {
+  const topTeachers = await Teacher.find({ featured: true, status: "active" })
+    .sort({ "profile.publications.length": -1 }) // fallback sort
+    .lean(); // use lean to optimize read
+
+  // Sort manually by number of publications since MongoDB can't sort nested array lengths directly
+  const sortedTeachers = topTeachers
+    .sort((a, b) => (b.profile?.publications?.length || 0) - (a.profile?.publications?.length || 0))
+    .slice(0, 3); // get top 3
+
+  res.status(200).json(apiResponse.success("Top 3 teachers retrieved", sortedTeachers));
+});
 
 module.exports = {
   getTeachers,
@@ -203,5 +215,6 @@ module.exports = {
   deleteTeacher,
   uploadTeacherPhoto,
   resizeTeacherPhoto,
+  getTopTeachers,
 
 };

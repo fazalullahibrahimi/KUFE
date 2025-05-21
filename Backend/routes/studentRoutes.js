@@ -11,7 +11,8 @@ const {
   deleteMarks,
   uploasStudentPhoto,
   resizeStudentPhoto,
-  getStudentCount
+  getStudentCount,
+  getTopStudents,
 } = require("../controllers/studentController");
 
 const { authMiddleware, authorize } = require("../middleware/authMiddleware");
@@ -20,6 +21,7 @@ const roles = require("../config/roles");
 const router = express.Router();
 
 // Public routes
+router.get("/top-students", getTopStudents);
 router.get("/onestudent", getStudent);
 router.get("/studentcount", getStudentCount);
 router.get("/", getStudents);

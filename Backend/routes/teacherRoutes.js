@@ -7,6 +7,7 @@ const router = express.Router();
 
 // Public routes
 router.get("/count",teacherController.getTeacherCount);
+router.get("/top-teachers",teacherController.getTopTeachers);
 router.get("/", teacherController.getTeachers);
 router.get("/:id", teacherController.getTeacher);
 
