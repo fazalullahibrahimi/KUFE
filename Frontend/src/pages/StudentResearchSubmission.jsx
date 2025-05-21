@@ -522,7 +522,7 @@ const StudentResearchSubmission = () => {
       .filter((item) => item !== "");
     setFormData({
       ...formData,
-      keywords,
+      keywords: keywords,
     });
   };
 
@@ -551,13 +551,12 @@ const StudentResearchSubmission = () => {
         keywords: keywordsArray,
         status: "pending",
         submission_date: new Date().toISOString(),
+      };
 
       console.log("Submitting research with payload:", payload);
 
       const token = getToken();
       const response = await fetch(`${API_BASE_URL}/research/`, {
-
-
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1795,3 +1794,4 @@ const StudentResearchSubmission = () => {
 };
 
 export default StudentResearchSubmission;
+// There is no specific error highlighted in the provided code. The component seems to be properly closed and exported. If you have a specific error in mind, please provide more details about the error you're encountering.
