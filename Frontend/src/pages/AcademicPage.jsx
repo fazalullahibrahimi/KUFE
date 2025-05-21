@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useLanguage } from "../contexts/LanguageContext";
 
 // Custom hook for intersection observer (for animations)
 const useElementOnScreen = (options) => {
@@ -111,6 +112,7 @@ const ProgramCard = ({ program, index }) => {
     threshold: 0.1,
     rootMargin: "0px 0px -50px 0px",
   });
+  const { t, direction } = useLanguage();
 
   return (
     <div
@@ -146,8 +148,14 @@ const ProgramCard = ({ program, index }) => {
             href='#'
             className='inline-flex items-center font-semibold text-[#1D3D6F] hover:text-[#F7B500] transition-colors group-hover:gap-2'
           >
-            <span>Learn more</span>
-            <ChevronRight className='h-4 w-4 ml-1 transition-transform group-hover:translate-x-1' />
+            <span>{t("Learn_More_Link")}</span>
+            <ChevronRight
+              className={`h-4 w-4 ${
+                direction === "rtl" ? "mr-1" : "ml-1"
+              } transition-transform group-hover:${
+                direction === "rtl" ? "translate-x-[-0.25rem]" : "translate-x-1"
+              }`}
+            />
           </a>
         </div>
       </div>
@@ -162,6 +170,7 @@ const StatCard = ({ stat, index }) => {
     duration: 2000,
     delay: index * 200,
   });
+  const { direction } = useLanguage();
 
   return (
     <div
@@ -186,6 +195,7 @@ const EventCard = ({ event, index }) => {
     threshold: 0.1,
     rootMargin: "0px 0px -50px 0px",
   });
+  const { t, direction } = useLanguage();
 
   return (
     <div
@@ -235,8 +245,14 @@ const EventCard = ({ event, index }) => {
           href='#'
           className='inline-flex items-center font-semibold text-[#1D3D6F] hover:text-[#F7B500] transition-colors'
         >
-          <span>Read more</span>
-          <ChevronRight className='h-4 w-4 ml-1 transition-transform group-hover:translate-x-1' />
+          <span>{t("Read_More_Link")}</span>
+          <ChevronRight
+            className={`h-4 w-4 ${
+              direction === "rtl" ? "mr-1" : "ml-1"
+            } transition-transform group-hover:${
+              direction === "rtl" ? "translate-x-[-0.25rem]" : "translate-x-1"
+            }`}
+          />
         </a>
       </div>
     </div>
@@ -276,6 +292,7 @@ const AcademicPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
+  const { t, language, direction } = useLanguage();
 
   // Refs for scroll animations
   const heroRef = useRef(null);
@@ -438,7 +455,7 @@ const AcademicPage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [language]);
 
   // Filter programs based on active filter
   const filteredPrograms =
@@ -460,7 +477,7 @@ const AcademicPage = () => {
   }, []);
 
   return (
-    <div className='min-h-screen bg-[#F9F9F9]'>
+    <div dir={direction} className='min-h-screen bg-[#F9F9F9]'>
       <Navbar />
 
       {/* Hero Section */}
@@ -480,11 +497,19 @@ const AcademicPage = () => {
         <div className='container mx-auto px-4 pt-6'>
           <div className='flex items-center text-sm text-white/70'>
             <a href='/' className='hover:text-white flex items-center'>
-              <Home className='h-3.5 w-3.5 mr-1' />
-              <span>Home</span>
+              <Home
+                className={`h-3.5 w-3.5 ${
+                  direction === "rtl" ? "ml-1" : "mr-1"
+                }`}
+              />
+              <span>{t("Home")}</span>
             </a>
-            <ChevronRight className='h-3.5 w-3.5 mx-2' />
-            <span className='text-white'>Academic Programs</span>
+            <ChevronRight
+              className={`h-3.5 w-3.5 mx-2 ${
+                direction === "rtl" ? "rotate-180" : ""
+              }`}
+            />
+            <span className='text-white'>{t("Academic_Programs_Title")}</span>
           </div>
         </div>
 
@@ -492,12 +517,13 @@ const AcademicPage = () => {
           <div className='flex flex-col md:flex-row justify-between items-center'>
             <div className='max-w-2xl mb-10 md:mb-0'>
               <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 text-white'>
-                Academic <span className='text-[#F7B500]'>Programs</span>
+                {t("Academic_Programs_Title").split(" ")[0]}{" "}
+                <span className='text-[#F7B500]'>
+                  {t("Academic_Programs_Title").split(" ")[1]}
+                </span>
               </h1>
               <p className='mt-4 text-white/90 text-lg md:text-xl leading-relaxed'>
-                Explore our comprehensive undergraduate and graduate programs at
-                the Faculty of Economics, designed to prepare you for leadership
-                in a global economy.
+                {t("Academic_Programs_Description")}
               </p>
 
               <div className='mt-8 flex flex-wrap gap-4'>
@@ -505,13 +531,13 @@ const AcademicPage = () => {
                   href='#programs'
                   className='px-6 py-3 bg-[#F7B500] text-[#1D3D6F] font-bold rounded-lg hover:bg-[#F7B500]/90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                 >
-                  Explore Programs
+                  {t("Explore_Programs_Button")}
                 </a>
                 <a
                   href='#'
                   className='px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/20 transition border border-white/20'
                 >
-                  Download Brochure
+                  {t("Download_Brochure")}
                 </a>
               </div>
             </div>
@@ -520,40 +546,60 @@ const AcademicPage = () => {
               <div className='absolute inset-0 bg-gradient-to-r from-[#004B87] to-[#1D3D6F] rounded-2xl transform rotate-3 scale-95 opacity-20 blur-xl'></div>
               <div className='relative bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20'>
                 <h3 className='text-xl font-bold mb-4 flex items-center'>
-                  <Search className='h-5 w-5 mr-2' />
-                  Find Your Program
+                  <Search
+                    className={`h-5 w-5 ${
+                      direction === "rtl" ? "ml-2" : "mr-2"
+                    }`}
+                  />
+                  {t("Find_Your_Program")}
                 </h3>
                 <div className='space-y-4'>
                   <div>
                     <label className='block text-sm font-medium mb-1 text-white/80'>
-                      Program Level
+                      {t("Program_Level")}
                     </label>
                     <div className='relative'>
                       <select className='w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 appearance-none text-black'>
-                        <option value=''>All Levels</option>
-                        <option value='undergraduate'>Undergraduate</option>
-                        <option value='graduate'>Graduate</option>
+                        <option value=''>{t("All_Levels")}</option>
+                        <option value='undergraduate'>
+                          {t("Undergraduate_Level")}
+                        </option>
+                        <option value='graduate'>{t("Graduate_Level")}</option>
                       </select>
-                      <ChevronDown className='absolute right-3 top-3 h-4 w-4 pointer-events-none' />
+                      <ChevronDown
+                        className={`absolute ${
+                          direction === "rtl" ? "left-3" : "right-3"
+                        } top-3 h-4 w-4 pointer-events-none`}
+                      />
                     </div>
                   </div>
                   <div>
                     <label className='block text-sm font-medium mb-1 text-white/80'>
-                      Field of Study
+                      {t("Field_of_Study")}
                     </label>
                     <div className='relative'>
                       <select className='w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 appearance-none text-black'>
-                        <option value=''>All Fields</option>
-                        <option value='economics'>Economics</option>
-                        <option value='finance'>Finance</option>
-                        <option value='management'>Management</option>
-                        <option value='accounting'>Accounting</option>
+                        <option value=''>{t("All_Fields")}</option>
+                        <option value='economics'>
+                          {t("Economics_Field")}
+                        </option>
+                        <option value='finance'>{t("Finance_Field")}</option>
+                        <option value='management'>
+                          {t("Management_Field")}
+                        </option>
+                        <option value='accounting'>
+                          {t("Accounting_Field")}
+                        </option>
                       </select>
-                      <ChevronDown className='absolute right-3 top-3 h-4 w-4 pointer-events-none' />
+                      <ChevronDown
+                        className={`absolute ${
+                          direction === "rtl" ? "left-3" : "right-3"
+                        } top-3 h-4 w-4 pointer-events-none`}
+                      />
                     </div>
                   </div>
                   <button className='w-full bg-[#F7B500] text-[#1D3D6F] font-bold py-2.5 rounded-lg hover:bg-[#F7B500]/90 transition'>
-                    Search Programs
+                    {t("Search_Programs_Button")}
                   </button>
                 </div>
               </div>
@@ -610,17 +656,15 @@ const AcademicPage = () => {
             <div className='inline-flex items-center justify-center mb-4'>
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
               <span className='mx-2 text-[#F7B500] font-semibold'>
-                DISCOVER
+                {t("DISCOVER_LABEL")}
               </span>
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
             </div>
             <h2 className='text-3xl md:text-4xl font-bold mb-6 text-[#1D3D6F]'>
-              Our Academic Programs
+              {t("Our_Academic_Programs_Title")}
             </h2>
             <p className='text-gray-600 text-lg'>
-              Explore our diverse range of programs designed to provide you with
-              the knowledge and skills needed for success in today's competitive
-              global economy.
+              {t("Academic_Programs_Section_Description")}
             </p>
 
             {/* Program filters */}
@@ -633,7 +677,7 @@ const AcademicPage = () => {
                     : "text-gray-600 hover:text-[#1D3D6F]"
                 }`}
               >
-                All Programs
+                {t("All_Programs_Filter")}
               </button>
               <button
                 onClick={() => setActiveFilter("undergraduate")}
@@ -643,7 +687,7 @@ const AcademicPage = () => {
                     : "text-gray-600 hover:text-[#1D3D6F]"
                 }`}
               >
-                Undergraduate
+                {t("Undergraduate_Level")}
               </button>
               <button
                 onClick={() => setActiveFilter("graduate")}
@@ -653,7 +697,7 @@ const AcademicPage = () => {
                     : "text-gray-600 hover:text-[#1D3D6F]"
                 }`}
               >
-                Graduate
+                {t("Graduate_Level")}
               </button>
             </div>
           </div>
@@ -680,17 +724,16 @@ const AcademicPage = () => {
                     <Search className='h-10 w-10' />
                   </div>
                   <h3 className='text-xl font-medium text-[#1D3D6F] mb-2'>
-                    No programs found
+                    {t("No_Programs_Found_Title")}
                   </h3>
                   <p className='text-gray-500 max-w-md mx-auto'>
-                    We couldn't find any programs matching your criteria. Please
-                    try a different filter or check back later.
+                    {t("No_Programs_Found_Description")}
                   </p>
                   <button
                     onClick={() => setActiveFilter("all")}
                     className='mt-6 px-6 py-2 bg-[#1D3D6F] text-white rounded-lg hover:bg-[#004B87] transition'
                   >
-                    View All Programs
+                    {t("View_All_Programs_Button")}
                   </button>
                 </div>
               )}
@@ -716,16 +759,15 @@ const AcademicPage = () => {
             <div className='inline-flex items-center justify-center mb-4'>
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
               <span className='mx-2 text-[#F7B500] font-semibold'>
-                BY THE NUMBERS
+                {t("BY_THE_NUMBERS_LABEL")}
               </span>
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
             </div>
             <h2 className='text-3xl md:text-4xl font-bold mb-6 text-white'>
-              University Statistics
+              {t("University_Statistics_Title")}
             </h2>
             <p className='text-white/80 text-lg'>
-              Our commitment to excellence is reflected in our numbers. Discover
-              the impact of our academic programs and community.
+              {t("University_Statistics_Description")}
             </p>
           </div>
 
@@ -755,16 +797,15 @@ const AcademicPage = () => {
             <div className='inline-flex items-center justify-center mb-4'>
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
               <span className='mx-2 text-[#F7B500] font-semibold'>
-                STAY UPDATED
+                {t("STAY_UPDATED_LABEL")}
               </span>
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
             </div>
             <h2 className='text-3xl md:text-4xl font-bold mb-6 text-[#1D3D6F]'>
-              Latest News & Events
+              {t("Latest_News_Events_Title")}
             </h2>
             <p className='text-gray-600 text-lg'>
-              Stay informed about the latest happenings, events, and
-              announcements from our faculty and university.
+              {t("Latest_News_Events_Description")}
             </p>
           </div>
 
@@ -786,10 +827,10 @@ const AcademicPage = () => {
                     <Calendar className='h-10 w-10' />
                   </div>
                   <h3 className='text-xl font-medium text-[#1D3D6F] mb-2'>
-                    No events found
+                    {t("No_Events_Found_Title")}
                   </h3>
                   <p className='text-gray-500 max-w-md mx-auto'>
-                    Check back later for upcoming events and news.
+                    {t("No_Events_Found_Description")}
                   </p>
                 </div>
               )}
@@ -801,8 +842,12 @@ const AcademicPage = () => {
               href='#'
               className='inline-flex items-center px-6 py-3 bg-white border border-gray-200 rounded-lg text-[#1D3D6F] font-medium hover:bg-gray-50 transition shadow-sm'
             >
-              View All News & Events
-              <ArrowRight className='ml-2 h-4 w-4' />
+              {t("View_All_News_Events_Button")}
+              <ArrowRight
+                className={`${direction === "rtl" ? "mr-2" : "ml-2"} h-4 w-4 ${
+                  direction === "rtl" ? "rotate-180" : ""
+                }`}
+              />
             </a>
           </div>
         </div>
@@ -820,28 +865,33 @@ const AcademicPage = () => {
               <div className='flex flex-col md:flex-row md:items-center justify-between gap-10'>
                 <div className='max-w-2xl'>
                   <h2 className='text-3xl md:text-4xl font-bold mb-4 text-white'>
-                    Ready to Begin Your{" "}
-                    <span className='text-[#F7B500]'>Academic Journey</span>?
+                    {t("Academic_Journey_Title")}
                   </h2>
                   <p className='text-white/90 text-lg leading-relaxed mb-8'>
-                    Take the next step in your academic career. Apply now to
-                    join our programs at the Faculty of Economics and be part of
-                    a community dedicated to excellence and innovation.
+                    {t("Academic_Journey_Description")}
                   </p>
                   <div className='flex flex-wrap gap-4'>
                     <a
                       href='#'
                       className='px-8 py-4 bg-[#F7B500] text-[#1D3D6F] font-bold rounded-lg hover:bg-[#F7B500]/90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center'
                     >
-                      Apply Now
-                      <ArrowRight className='ml-2 h-5 w-5' />
+                      {t("Apply_Now_Button")}
+                      <ArrowRight
+                        className={`${
+                          direction === "rtl" ? "mr-2" : "ml-2"
+                        } h-5 w-5 ${direction === "rtl" ? "rotate-180" : ""}`}
+                      />
                     </a>
                     <a
                       href='#'
                       className='px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/20 transition border border-white/20 flex items-center'
                     >
-                      Request Information
-                      <ExternalLink className='ml-2 h-4 w-4' />
+                      {t("Request_Information_Button")}
+                      <ExternalLink
+                        className={`${
+                          direction === "rtl" ? "mr-2" : "ml-2"
+                        } h-4 w-4`}
+                      />
                     </a>
                   </div>
                 </div>

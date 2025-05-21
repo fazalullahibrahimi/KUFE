@@ -25,6 +25,7 @@ import {
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import axios from "axios";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
@@ -43,6 +44,7 @@ export default function CoursesPage() {
   const [viewMode, setViewMode] = useState("grid");
   const [sortOption, setSortOption] = useState("title");
   const [animatedElements, setAnimatedElements] = useState([]);
+  const { t, language, direction } = useLanguage();
 
   const observerRef = useRef(null);
 
@@ -105,7 +107,7 @@ export default function CoursesPage() {
     };
 
     fetchCourses();
-  }, []);
+  }, [language]);
 
   // Handle search and filtering
   useEffect(() => {
@@ -152,14 +154,16 @@ export default function CoursesPage() {
     // Apply sorting
     results = [...results].sort((a, b) => {
       if (sortOption === "title") {
-        return a.name.localeCompare(b.name);
+        return (a.name || "").localeCompare(b.name || "");
       } else if (sortOption === "code") {
-        return a.code.localeCompare(b.code);
+        return (a.code || "").localeCompare(b.code || "");
       } else if (sortOption === "credits") {
-        return b.credits - a.credits;
+        return (b.credits || 0) - (a.credits || 0);
       } else if (sortOption === "semester") {
         const semesterOrder = { Fall: 1, Spring: 2, Summer: 3 };
-        return semesterOrder[a.semester] - semesterOrder[b.semester];
+        return (
+          (semesterOrder[a.semester] || 0) - (semesterOrder[b.semester] || 0)
+        );
       }
       return 0;
     });
@@ -194,7 +198,7 @@ export default function CoursesPage() {
   };
 
   return (
-    <div className='min-h-screen bg-[#F5F7FA]'>
+    <div dir={direction} className='min-h-screen bg-[#F5F7FA]'>
       <Navbar />
 
       {/* Hero Section */}
@@ -208,27 +212,32 @@ export default function CoursesPage() {
             <div className='max-w-2xl mb-8 md:mb-0'>
               <div className='flex items-center mb-3'>
                 <span className='text-[#F7B500] text-sm font-semibold'>
-                  KUFE
+                  {t("Home_Courses")}
                 </span>
-                <ChevronRight className='h-4 w-4 mx-1 text-gray-300' />
-                <span className='text-white text-sm'>Course Catalog</span>
+                <ChevronRight
+                  className={`h-4 w-4 mx-1 text-gray-300 ${
+                    direction === "rtl" ? "rotate-180" : ""
+                  }`}
+                />
+                <span className='text-white text-sm'>
+                  {t("Course_Catalog")}
+                </span>
               </div>
 
               <h1 className='text-3xl md:text-5xl font-bold tracking-tight mb-4 text-white'>
-                Discover Your Academic Path
+                {t("Discover_Academic_Path")}
               </h1>
 
               <p className='text-white text-lg md:text-xl opacity-90 mb-6'>
-                Explore our comprehensive catalog of courses designed to prepare
-                you for success in economics and business
+                {t("Course_Catalog_Description")}
               </p>
 
               <div className='flex flex-wrap gap-4'>
                 <button className='bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-bold py-3 px-6 rounded-lg transition shadow-md'>
-                  Browse Courses
+                  {t("Browse_Courses")}
                 </button>
                 <button className='bg-transparent hover:bg-white/10 text-white border border-white font-medium py-3 px-6 rounded-lg transition'>
-                  View Programs
+                  {t("View_Programs")}
                 </button>
               </div>
             </div>
@@ -236,17 +245,21 @@ export default function CoursesPage() {
             <div className='w-full md:w-auto'>
               <div className='bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-xl'>
                 <h3 className='text-xl font-semibold mb-4 text-white'>
-                  Quick Course Finder
+                  {t("Quick_Course_Finder")}
                 </h3>
                 <div className='relative mb-4'>
                   <Search
-                    className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'
+                    className={`absolute ${
+                      direction === "rtl" ? "right-3" : "left-3"
+                    } top-1/2 transform -translate-y-1/2 text-gray-400`}
                     size={20}
                   />
                   <input
                     type='text'
-                    placeholder='Search by course name or code...'
-                    className='w-full pl-10 pr-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F7B500] text-white placeholder-white/60'
+                    placeholder={t("Search_Course_Placeholder")}
+                    className={`w-full ${
+                      direction === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"
+                    } py-3 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F7B500] text-white placeholder-white/60`}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -260,16 +273,16 @@ export default function CoursesPage() {
                     }
                   >
                     <option value='all' className='text-gray-800'>
-                      All Departments
+                      {t("All_Departments_Courses")}
                     </option>
                     <option value='Economics' className='text-gray-800'>
-                      Economics
+                      {t("Economics_Field")}
                     </option>
                     <option value='Finance' className='text-gray-800'>
-                      Finance
+                      {t("Finance_Field")}
                     </option>
                     <option value='Management' className='text-gray-800'>
-                      Management
+                      {t("Management_Field")}
                     </option>
                   </select>
                   <select
@@ -280,18 +293,18 @@ export default function CoursesPage() {
                     }
                   >
                     <option value='all' className='text-gray-800'>
-                      All Levels
+                      {t("All_Levels_Courses")}
                     </option>
                     <option value='Undergraduate' className='text-gray-800'>
-                      Undergraduate
+                      {t("Undergraduate_Courses")}
                     </option>
                     <option value='Graduate' className='text-gray-800'>
-                      Graduate
+                      {t("Graduate_Courses")}
                     </option>
                   </select>
                 </div>
                 <button className='w-full bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-bold py-3 rounded-lg transition shadow-md'>
-                  Find Courses
+                  {t("Find_Courses")}
                 </button>
               </div>
             </div>
@@ -313,7 +326,12 @@ export default function CoursesPage() {
       {/* Main Content */}
       <div className='container mx-auto px-4 py-8'>
         {selectedCourse ? (
-          <CourseDetail course={selectedCourse} onBackClick={handleBackClick} />
+          <CourseDetail
+            course={selectedCourse}
+            onBackClick={handleBackClick}
+            t={t}
+            direction={direction}
+          />
         ) : (
           <>
             {/* Course Stats */}
@@ -324,22 +342,22 @@ export default function CoursesPage() {
               {[
                 {
                   icon: <BookOpen className='h-6 w-6 text-[#F7B500]' />,
-                  label: "Total Courses",
+                  label: t("Total_Courses"),
                   value: courses.length,
                 },
                 {
                   icon: <GraduationCap className='h-6 w-6 text-[#F7B500]' />,
-                  label: "Departments",
+                  label: t("Departments"),
                   value: "4",
                 },
                 {
                   icon: <Users className='h-6 w-6 text-[#F7B500]' />,
-                  label: "Faculty Members",
+                  label: t("Faculty_Members"),
                   value: "32",
                 },
                 {
                   icon: <Calendar className='h-6 w-6 text-[#F7B500]' />,
-                  label: "Semesters",
+                  label: t("Semesters"),
                   value: "3",
                 },
               ].map((stat, index) => (
@@ -383,10 +401,10 @@ export default function CoursesPage() {
                       onClick={() => setActiveTab(tab)}
                     >
                       {tab === "all"
-                        ? "All Courses"
+                        ? t("All_Courses")
                         : tab === "featured"
-                        ? "Featured"
-                        : "Popular"}
+                        ? t("Featured")
+                        : t("Popular")}
                     </button>
                   ))}
                 </div>
@@ -394,13 +412,17 @@ export default function CoursesPage() {
                 <div className='flex items-center gap-3 w-full md:w-auto'>
                   <div className='relative flex-grow md:flex-grow-0 md:w-48'>
                     <Search
-                      className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'
+                      className={`absolute ${
+                        direction === "rtl" ? "right-3" : "left-3"
+                      } top-1/2 transform -translate-y-1/2 text-gray-400`}
                       size={18}
                     />
                     <input
                       type='text'
-                      placeholder='Search courses...'
-                      className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]'
+                      placeholder={t("Search_Courses")}
+                      className={`w-full ${
+                        direction === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"
+                      } py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]`}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -415,7 +437,7 @@ export default function CoursesPage() {
                     onClick={() => setShowFilters(!showFilters)}
                   >
                     <Filter size={18} />
-                    <span className='hidden md:inline'>Filters</span>
+                    <span className='hidden md:inline'>{t("Filters")}</span>
                     <ChevronDown
                       size={16}
                       className={`transition-transform ${
@@ -462,24 +484,21 @@ export default function CoursesPage() {
               {/* Results Stats */}
               <div className='flex flex-col md:flex-row justify-between items-start md:items-center mt-4 pt-4 border-t border-gray-200'>
                 <p className='text-gray-600 mb-3 md:mb-0'>
-                  Showing{" "}
-                  <span className='font-semibold text-[#1D3D6F]'>
-                    {filteredCourses.length}
-                  </span>{" "}
-                  of <span className='font-semibold'>{courses.length}</span>{" "}
-                  courses
+                  {t("Showing_Courses")
+                    .replace("{count}", filteredCourses.length)
+                    .replace("{total}", courses.length)}
                 </p>
                 <div className='flex items-center gap-2'>
-                  <span className='text-sm text-gray-600'>Sort by:</span>
+                  <span className='text-sm text-gray-600'>{t("Sort_By")}:</span>
                   <select
                     className='border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]'
                     value={sortOption}
                     onChange={(e) => setSortOption(e.target.value)}
                   >
-                    <option value='title'>Title (A-Z)</option>
-                    <option value='code'>Course Code</option>
-                    <option value='credits'>Credits (High to Low)</option>
-                    <option value='semester'>Semester</option>
+                    <option value='title'>{t("Sort_By_Title")}</option>
+                    <option value='code'>{t("Sort_By_Code")}</option>
+                    <option value='credits'>{t("Sort_By_Credits")}</option>
+                    <option value='semester'>{t("Sort_By_Semester")}</option>
                   </select>
                 </div>
               </div>
@@ -503,7 +522,7 @@ export default function CoursesPage() {
                     </svg>
                   </div>
                   <div className='ml-3'>
-                    <p className='text-sm font-medium'>Error</p>
+                    <p className='text-sm font-medium'>{t("Error")}</p>
                     <p className='text-sm'>{error}</p>
                   </div>
                 </div>
@@ -514,7 +533,9 @@ export default function CoursesPage() {
             {isLoading ? (
               <div className='flex flex-col items-center justify-center h-64'>
                 <Loader2 className='h-12 w-12 animate-spin text-[#1D3D6F] mb-4' />
-                <p className='text-[#1D3D6F] font-medium'>Loading courses...</p>
+                <p className='text-[#1D3D6F] font-medium'>
+                  {t("Loading_Courses")}
+                </p>
               </div>
             ) : filteredCourses.length > 0 ? (
               <div id='course-list' className='animate-on-scroll'>
@@ -550,17 +571,16 @@ export default function CoursesPage() {
                   <Search className='h-10 w-10' />
                 </div>
                 <h3 className='text-2xl font-semibold mb-3 text-[#1D3D6F]'>
-                  No courses found
+                  {t("No_Courses_Found")}
                 </h3>
                 <p className='text-gray-500 mb-8 max-w-md mx-auto'>
-                  We couldn't find any courses matching your current filters.
-                  Try adjusting your search criteria.
+                  {t("No_Courses_Description")}
                 </p>
                 <button
                   onClick={resetFilters}
                   className='bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-medium py-3 px-8 rounded-lg transition shadow-md'
                 >
-                  Reset filters
+                  {t("Reset_Filters_Courses")}
                 </button>
               </div>
             )}
@@ -578,11 +598,10 @@ export default function CoursesPage() {
             className='animate-on-scroll container mx-auto px-4 py-12 mt-8'
           >
             <h2 className='text-2xl md:text-3xl font-bold text-[#1D3D6F] mb-2'>
-              Featured Academic Programs
+              {t("Featured_Academic_Programs")}
             </h2>
             <p className='text-gray-600 mb-8'>
-              Discover our specialized programs designed to prepare you for
-              success
+              {t("Featured_Programs_Description")}
             </p>
 
             <div
@@ -594,25 +613,22 @@ export default function CoursesPage() {
             >
               {[
                 {
-                  title: "Bachelor of Economics",
-                  description:
-                    "A comprehensive program covering micro and macroeconomics, econometrics, and development economics.",
+                  title: t("Bachelor_Economics"),
+                  description: t("Bachelor_Economics_Description"),
                   icon: <Book className='h-8 w-8 text-[#F7B500]' />,
                   duration: "4 years",
                   credits: "140 credits",
                 },
                 {
-                  title: "Master of Finance",
-                  description:
-                    "Advanced studies in financial management, investment analysis, and international finance.",
+                  title: t("Master_Finance"),
+                  description: t("Master_Finance_Description"),
                   icon: <Users className='h-8 w-8 text-[#F7B500]' />,
                   duration: "2 years",
                   credits: "60 credits",
                 },
                 {
-                  title: "Business Administration",
-                  description:
-                    "Learn essential business skills including management, marketing, and entrepreneurship.",
+                  title: t("Business_Administration"),
+                  description: t("Business_Administration_Description"),
                   icon: <Calendar className='h-8 w-8 text-[#F7B500]' />,
                   duration: "4 years",
                   credits: "130 credits",
@@ -634,20 +650,32 @@ export default function CoursesPage() {
                     <p className='text-gray-600 mb-4'>{program.description}</p>
                     <div className='flex justify-between items-center text-sm text-gray-500 mb-4'>
                       <div className='flex items-center'>
-                        <Clock className='h-4 w-4 mr-1 text-[#1D3D6F]' />
-                        {program.duration}
+                        <Clock
+                          className={`h-4 w-4 ${
+                            direction === "rtl" ? "ml-1" : "mr-1"
+                          } text-[#1D3D6F]`}
+                        />
+                        {t("Duration")}: {program.duration}
                       </div>
                       <div className='flex items-center'>
-                        <FileText className='h-4 w-4 mr-1 text-[#1D3D6F]' />
-                        {program.credits}
+                        <FileText
+                          className={`h-4 w-4 ${
+                            direction === "rtl" ? "ml-1" : "mr-1"
+                          } text-[#1D3D6F]`}
+                        />
+                        {t("Credits")}: {program.credits}
                       </div>
                     </div>
                     <a
                       href='#'
                       className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition group-hover:translate-x-1 duration-300'
                     >
-                      Learn more{" "}
-                      <ChevronRight className='h-4 w-4 ml-1 transition-transform group-hover:translate-x-1' />
+                      {t("Learn_More")}{" "}
+                      <ChevronRight
+                        className={`h-4 w-4 ${
+                          direction === "rtl" ? "mr-1 rotate-180" : "ml-1"
+                        } transition-transform group-hover:translate-x-1`}
+                      />
                     </a>
                   </div>
                 </div>
@@ -676,21 +704,23 @@ export default function CoursesPage() {
             <div className='p-8 md:p-10 flex flex-col md:flex-row items-center justify-between relative z-10'>
               <div className='mb-8 md:mb-0 md:mr-6 md:max-w-xl'>
                 <h2 className='text-2xl md:text-3xl font-bold text-white mb-4'>
-                  Ready to Register for Courses?
+                  {t("Ready_Register")}
                 </h2>
                 <p className='text-white/90 mb-6'>
-                  Enrollment for the upcoming semester is now open. Secure your
-                  spot in our courses and take the next step in your academic
-                  journey.
+                  {t("Registration_Description")}
                 </p>
                 <div className='space-y-3'>
                   {[
-                    "Open registration period",
-                    "Flexible course schedules",
-                    "Expert faculty members",
+                    t("Open_Registration"),
+                    t("Flexible_Schedules"),
+                    t("Expert_Faculty"),
                   ].map((item, i) => (
                     <div key={i} className='flex items-center'>
-                      <CheckCircle2 className='h-5 w-5 text-[#F7B500] mr-2' />
+                      <CheckCircle2
+                        className={`h-5 w-5 text-[#F7B500] ${
+                          direction === "rtl" ? "ml-2" : "mr-2"
+                        }`}
+                      />
                       <span className='text-white'>{item}</span>
                     </div>
                   ))}
@@ -699,37 +729,37 @@ export default function CoursesPage() {
 
               <div className='bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 md:min-w-[320px]'>
                 <h3 className='text-xl font-semibold mb-4 text-white'>
-                  Quick Registration
+                  {t("Quick_Registration")}
                 </h3>
                 <div className='space-y-4'>
                   <div>
                     <label className='block text-white/90 text-sm mb-1'>
-                      Student ID
+                      {t("Student_ID")}
                     </label>
                     <input
                       type='text'
                       className='w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F7B500] text-white'
-                      placeholder='Enter your student ID'
+                      placeholder={t("Student_ID_Placeholder")}
                     />
                   </div>
                   <div>
                     <label className='block text-white/90 text-sm mb-1'>
-                      Semester
+                      {t("Semester")}
                     </label>
                     <select className='w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F7B500] text-white'>
                       <option value='fall' className='text-gray-800'>
-                        Fall 2023
+                        {t("Fall")} 2023
                       </option>
                       <option value='spring' className='text-gray-800'>
-                        Spring 2024
+                        {t("Spring")} 2024
                       </option>
                       <option value='summer' className='text-gray-800'>
-                        Summer 2024
+                        {t("Summer")} 2024
                       </option>
                     </select>
                   </div>
                   <button className='w-full bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-bold py-3 rounded-lg transition shadow-md'>
-                    Start Registration
+                    {t("Start_Registration")}
                   </button>
                 </div>
               </div>
@@ -745,51 +775,52 @@ export default function CoursesPage() {
 
 // Course Filter Component
 function CourseFilter({ activeFilters, onFilterChange }) {
+  const { t, direction } = useLanguage();
   return (
     <div className='pt-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-4'>
       <div>
         <label className='block text-sm font-medium text-[#1D3D6F] mb-1'>
-          Department
+          {t("Department")}
         </label>
         <select
           className='w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]'
           value={activeFilters.department}
           onChange={(e) => onFilterChange("department", e.target.value)}
         >
-          <option value='all'>All Departments</option>
-          <option value='Economics'>Economics</option>
-          <option value='Finance'>Finance</option>
-          <option value='Management'>Management</option>
-          <option value='Statistics'>Statistics</option>
+          <option value='all'>{t("All_Departments_Courses")}</option>
+          <option value='Economics'>{t("Economics_Field")}</option>
+          <option value='Finance'>{t("Finance_Field")}</option>
+          <option value='Management'>{t("Management_Field")}</option>
+          <option value='Statistics'>{t("Accounting_Field")}</option>
         </select>
       </div>
       <div>
         <label className='block text-sm font-medium text-[#1D3D6F] mb-1'>
-          Semester
+          {t("Semester")}
         </label>
         <select
           className='w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]'
           value={activeFilters.semester}
           onChange={(e) => onFilterChange("semester", e.target.value)}
         >
-          <option value='all'>All Semesters</option>
-          <option value='Fall'>Fall</option>
-          <option value='Spring'>Spring</option>
-          <option value='Summer'>Summer</option>
+          <option value='all'>{t("All_Semesters")}</option>
+          <option value='Fall'>{t("Fall")}</option>
+          <option value='Spring'>{t("Spring")}</option>
+          <option value='Summer'>{t("Summer")}</option>
         </select>
       </div>
       <div>
         <label className='block text-sm font-medium text-[#1D3D6F] mb-1'>
-          Level
+          {t("Level")}
         </label>
         <select
           className='w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]'
           value={activeFilters.level}
           onChange={(e) => onFilterChange("level", e.target.value)}
         >
-          <option value='all'>All Levels</option>
-          <option value='Undergraduate'>Undergraduate</option>
-          <option value='Graduate'>Graduate</option>
+          <option value='all'>{t("All_Levels_Courses")}</option>
+          <option value='Undergraduate'>{t("Undergraduate_Courses")}</option>
+          <option value='Graduate'>{t("Graduate_Courses")}</option>
         </select>
       </div>
     </div>
@@ -798,6 +829,7 @@ function CourseFilter({ activeFilters, onFilterChange }) {
 
 // Course Card Component
 function CourseCard({ course, onClick, index, isVisible }) {
+  const { t, direction } = useLanguage();
   return (
     <div
       className={`bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-500 transform ${
@@ -809,9 +841,9 @@ function CourseCard({ course, onClick, index, isVisible }) {
       <div className='h-48 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] relative'>
         <img
           src={
-            `http://localhost:4400/public/img/courses/${
-              course.image || "/placeholder.svg"
-            }` || "/placeholder.svg?height=200&width=300"
+            course.image
+              ? `http://localhost:4400/public/img/courses/${course.image}`
+              : "/placeholder.svg?height=200&width=300"
           }
           alt={course.name}
           className='w-full h-full object-cover mix-blend-overlay'
@@ -836,15 +868,23 @@ function CourseCard({ course, onClick, index, isVisible }) {
       <div className='p-5'>
         <div className='flex justify-between items-center mb-3'>
           <span className='text-sm text-gray-500 flex items-center'>
-            <Calendar className='h-4 w-4 mr-1 text-[#1D3D6F]' />
-            {course.semester} Semester
+            <Calendar
+              className={`h-4 w-4 ${
+                direction === "rtl" ? "ml-1" : "mr-1"
+              } text-[#1D3D6F]`}
+            />
+            {t(course.semester)} {t("Semester_Label")}
           </span>
           <span className='text-sm font-medium bg-[#1D3D6F]/10 text-[#1D3D6F] px-2 py-1 rounded-full'>
-            {course.credits} Credits
+            {course.credits} {t("Credits_Label")}
           </span>
         </div>
         <p className='text-[#1D3D6F] font-medium mb-2 flex items-center'>
-          <User className='h-4 w-4 mr-1 text-[#1D3D6F]' />
+          <User
+            className={`h-4 w-4 ${
+              direction === "rtl" ? "ml-1" : "mr-1"
+            } text-[#1D3D6F]`}
+          />
           {course.instructor}
         </p>
         <p className='text-gray-600 text-sm line-clamp-2 mb-4 h-10'>
@@ -852,10 +892,15 @@ function CourseCard({ course, onClick, index, isVisible }) {
         </p>
         <div className='flex justify-between items-center'>
           <span className='text-xs bg-[#E8ECEF] text-[#1D3D6F] px-2 py-1 rounded-full'>
-            {course.level}
+            {t(course.level + "_Courses")}
           </span>
           <button className='text-[#1D3D6F] text-sm font-medium hover:text-[#F7B500] transition-colors flex items-center'>
-            View Details <ChevronRight className='h-4 w-4 ml-1' />
+            {t("View_Details")}{" "}
+            <ChevronRight
+              className={`h-4 w-4 ${
+                direction === "rtl" ? "mr-1 rotate-180" : "ml-1"
+              }`}
+            />
           </button>
         </div>
       </div>
@@ -865,6 +910,7 @@ function CourseCard({ course, onClick, index, isVisible }) {
 
 // Course List Item Component
 function CourseListItem({ course, onClick, index, isVisible }) {
+  const { t, direction } = useLanguage();
   return (
     <div
       className={`bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-500 transform ${
@@ -877,9 +923,9 @@ function CourseListItem({ course, onClick, index, isVisible }) {
         <div className='w-full md:w-64 h-40 md:h-auto bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] relative'>
           <img
             src={
-              `http://localhost:4400/public/img/courses/${
-                course.image || "/placeholder.svg"
-              }` || "/placeholder.svg?height=200&width=300"
+              course.image
+                ? `http://localhost:4400/public/img/courses/${course.image}`
+                : "/placeholder.svg?height=200&width=300"
             }
             alt={course.name}
             className='w-full h-full object-cover mix-blend-overlay'
@@ -914,27 +960,44 @@ function CourseListItem({ course, onClick, index, isVisible }) {
             </div>
             <div className='flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start gap-2 md:gap-4 mt-2 md:mt-0 md:ml-4'>
               <span className='text-sm font-medium bg-[#1D3D6F]/10 text-[#1D3D6F] px-3 py-1 rounded-full'>
-                {course.credits} Credits
+                {course.credits} {t("Credits_Label")}
               </span>
               <span className='text-sm text-gray-500 flex items-center'>
-                <Calendar className='h-4 w-4 mr-1 text-[#1D3D6F]' />
-                {course.semester}
+                <Calendar
+                  className={`h-4 w-4 ${
+                    direction === "rtl" ? "ml-1" : "mr-1"
+                  } text-[#1D3D6F]`}
+                />
+                {t(course.semester)}
               </span>
               <span className='text-xs bg-[#E8ECEF] text-[#1D3D6F] px-2 py-1 rounded-full'>
-                {course.level}
+                {t(course.level + "_Courses")}
               </span>
             </div>
           </div>
           <div className='flex justify-between items-center mt-3 pt-3 border-t border-gray-100'>
             <div className='flex items-center text-sm text-gray-500'>
-              <MapPin className='h-4 w-4 mr-1 text-[#1D3D6F]' />
-              {course.location || "Main Campus"}
+              <MapPin
+                className={`h-4 w-4 ${
+                  direction === "rtl" ? "ml-1" : "mr-1"
+                } text-[#1D3D6F]`}
+              />
+              {course.location || t("Location")}
               <span className='mx-2'>•</span>
-              <Clock className='h-4 w-4 mr-1 text-[#1D3D6F]' />
+              <Clock
+                className={`h-4 w-4 ${
+                  direction === "rtl" ? "ml-1" : "mr-1"
+                } text-[#1D3D6F]`}
+              />
               {course.schedule || "MWF 10:00-11:30"}
             </div>
             <button className='text-[#1D3D6F] text-sm font-medium hover:text-[#F7B500] transition-colors flex items-center'>
-              View Details <ChevronRight className='h-4 w-4 ml-1' />
+              {t("View_Details")}{" "}
+              <ChevronRight
+                className={`h-4 w-4 ${
+                  direction === "rtl" ? "mr-1 rotate-180" : "ml-1"
+                }`}
+              />
             </button>
           </div>
         </div>
@@ -944,7 +1007,7 @@ function CourseListItem({ course, onClick, index, isVisible }) {
 }
 
 // Course Detail Component
-function CourseDetail({ course, onBackClick }) {
+function CourseDetail({ course, onBackClick, t, direction }) {
   return (
     <div className='bg-white rounded-xl shadow-lg overflow-hidden animate-fadeIn'>
       <div className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white p-6'>
@@ -952,7 +1015,12 @@ function CourseDetail({ course, onBackClick }) {
           onClick={onBackClick}
           className='mb-4 flex items-center text-white hover:text-[#F7B500] transition-colors'
         >
-          <ArrowLeft className='mr-2 h-4 w-4' /> Back to Courses
+          <ArrowLeft
+            className={`${direction === "rtl" ? "ml-2" : "mr-2"} h-4 w-4 ${
+              direction === "rtl" ? "rotate-180" : ""
+            }`}
+          />{" "}
+          {t("Back_To_Courses")}
         </button>
         <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
           <div>
@@ -989,7 +1057,7 @@ function CourseDetail({ course, onBackClick }) {
                   <BookOpen className='h-5 w-5 text-white' />
                 </div>
                 <h2 className='text-xl font-semibold text-[#1D3D6F]'>
-                  Course Overview
+                  {t("Course_Overview")}
                 </h2>
               </div>
               <p className='text-gray-700 leading-relaxed'>
@@ -998,8 +1066,12 @@ function CourseDetail({ course, onBackClick }) {
             </div>
 
             <h2 className='text-xl font-semibold mb-4 text-[#1D3D6F] flex items-center'>
-              <Star className='h-5 w-5 mr-2 text-[#F7B500]' />
-              Learning Outcomes
+              <Star
+                className={`h-5 w-5 ${
+                  direction === "rtl" ? "ml-2" : "mr-2"
+                } text-[#F7B500]`}
+              />
+              {t("Learning_Outcomes")}
             </h2>
             <div className='bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-8'>
               <ul className='space-y-3'>
@@ -1021,14 +1093,18 @@ function CourseDetail({ course, onBackClick }) {
             </div>
 
             <h2 className='text-xl font-semibold mb-4 text-[#1D3D6F]'>
-              Prerequisites
+              {t("Prerequisites")}
             </h2>
             {course.prerequisites && course.prerequisites.length > 0 ? (
               <div className='bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-8'>
                 <ul className='divide-y divide-gray-100'>
                   {course.prerequisites.map((prereq, index) => (
                     <li key={index} className='py-3 flex items-center'>
-                      <div className='bg-[#1D3D6F]/10 p-2 rounded-lg mr-3'>
+                      <div
+                        className={`bg-[#1D3D6F]/10 p-2 rounded-lg ${
+                          direction === "rtl" ? "ml-3" : "mr-3"
+                        }`}
+                      >
                         <BookOpen className='h-4 w-4 text-[#1D3D6F]' />
                       </div>
                       <span className='text-gray-700'>{prereq}</span>
@@ -1038,12 +1114,12 @@ function CourseDetail({ course, onBackClick }) {
               </div>
             ) : (
               <div className='bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-8 text-center'>
-                <p className='text-gray-500'>No prerequisites required.</p>
+                <p className='text-gray-500'>{t("No_Prerequisites")}</p>
               </div>
             )}
 
             <h2 className='text-xl font-semibold mb-4 text-[#1D3D6F]'>
-              Course Materials
+              {t("Course_Materials")}
             </h2>
             <div className='bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-8'>
               <ul className='divide-y divide-gray-100'>
@@ -1087,7 +1163,12 @@ function CourseDetail({ course, onBackClick }) {
                           {material.size}
                         </span>
                         <button className='bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] px-3 py-1 rounded-lg text-sm font-medium transition-colors flex items-center'>
-                          <Download className='h-4 w-4 mr-1' /> Download
+                          <Download
+                            className={`h-4 w-4 ${
+                              direction === "rtl" ? "ml-1" : "mr-1"
+                            }`}
+                          />{" "}
+                          {t("Download_Templates")}
                         </button>
                       </div>
                     </div>
@@ -1100,41 +1181,59 @@ function CourseDetail({ course, onBackClick }) {
           <div>
             <div className='bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden sticky top-4'>
               <div className='bg-[#1D3D6F] text-white p-4'>
-                <h2 className='text-lg font-semibold'>Course Information</h2>
+                <h2 className='text-lg font-semibold'>
+                  {t("Course_Information")}
+                </h2>
               </div>
               <div className='p-5'>
                 <ul className='space-y-4'>
                   <li className='flex justify-between items-center pb-3 border-b border-gray-100'>
                     <span className='text-gray-600 flex items-center'>
-                      <BookOpen className='h-4 w-4 mr-2 text-[#1D3D6F]' />
-                      Department:
+                      <BookOpen
+                        className={`h-4 w-4 ${
+                          direction === "rtl" ? "ml-2" : "mr-2"
+                        } text-[#1D3D6F]`}
+                      />
+                      {t("Department_Label")}:
                     </span>
                     <span className='font-medium text-[#1D3D6F]'>
-                      {course.department_id?.name || "Department"}
+                      {course.department_id?.name || t("Department")}
                     </span>
                   </li>
                   <li className='flex justify-between items-center pb-3 border-b border-gray-100'>
                     <span className='text-gray-600 flex items-center'>
-                      <Calendar className='h-4 w-4 mr-2 text-[#1D3D6F]' />
-                      Semester:
+                      <Calendar
+                        className={`h-4 w-4 ${
+                          direction === "rtl" ? "ml-2" : "mr-2"
+                        } text-[#1D3D6F]`}
+                      />
+                      {t("Semester_Label")}:
                     </span>
                     <span className='font-medium text-[#1D3D6F]'>
-                      {course.semester}
+                      {t(course.semester)}
                     </span>
                   </li>
                   <li className='flex justify-between items-center pb-3 border-b border-gray-100'>
                     <span className='text-gray-600 flex items-center'>
-                      <GraduationCap className='h-4 w-4 mr-2 text-[#1D3D6F]' />
-                      Level:
+                      <GraduationCap
+                        className={`h-4 w-4 ${
+                          direction === "rtl" ? "ml-2" : "mr-2"
+                        } text-[#1D3D6F]`}
+                      />
+                      {t("Level_Label")}:
                     </span>
                     <span className='font-medium text-[#1D3D6F]'>
-                      {course.level}
+                      {t(course.level + "_Courses")}
                     </span>
                   </li>
                   <li className='flex justify-between items-center pb-3 border-b border-gray-100'>
                     <span className='text-gray-600 flex items-center'>
-                      <Book className='h-4 w-4 mr-2 text-[#1D3D6F]' />
-                      Credits:
+                      <Book
+                        className={`h-4 w-4 ${
+                          direction === "rtl" ? "ml-2" : "mr-2"
+                        } text-[#1D3D6F]`}
+                      />
+                      {t("Credits_Label")}:
                     </span>
                     <span className='font-medium text-[#1D3D6F]'>
                       {course.credits}
@@ -1144,36 +1243,58 @@ function CourseDetail({ course, onBackClick }) {
 
                 <div className='mt-6'>
                   <h3 className='text-lg font-semibold mb-4 text-[#1D3D6F]'>
-                    Schedule
+                    {t("Schedule")}
                   </h3>
                   <div className='space-y-3 bg-[#F5F7FA] p-4 rounded-lg'>
                     <div className='flex items-center'>
-                      <Calendar className='h-5 w-5 mr-2 text-[#1D3D6F]' />
+                      <Calendar
+                        className={`h-5 w-5 ${
+                          direction === "rtl" ? "ml-2" : "mr-2"
+                        } text-[#1D3D6F]`}
+                      />
                       <span className='text-gray-700'>
                         {course.schedule || "MWF 10:00-11:30"}
                       </span>
                     </div>
                     <div className='flex items-center'>
-                      <MapPin className='h-5 w-5 mr-2 text-[#1D3D6F]' />
+                      <MapPin
+                        className={`h-5 w-5 ${
+                          direction === "rtl" ? "ml-2" : "mr-2"
+                        } text-[#1D3D6F]`}
+                      />
                       <span className='text-gray-700'>
-                        {course.location || "Main Campus, Room 305"}
+                        {course.location || t("Location")}
                       </span>
                     </div>
                     <div className='flex items-center'>
-                      <Clock className='h-5 w-5 mr-2 text-[#1D3D6F]' />
-                      <span className='text-gray-700'>Duration: 16 weeks</span>
+                      <Clock
+                        className={`h-5 w-5 ${
+                          direction === "rtl" ? "ml-2" : "mr-2"
+                        } text-[#1D3D6F]`}
+                      />
+                      <span className='text-gray-700'>
+                        {t("Duration_Weeks").replace("{weeks}", "16")}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <div className='mt-6 space-y-3'>
                   <button className='w-full bg-[#F7B500] text-[#1D3D6F] py-3 rounded-lg font-medium hover:bg-[#F7B500]/90 transition-colors flex items-center justify-center'>
-                    <Calendar className='h-5 w-5 mr-2' />
-                    Register for Course
+                    <Calendar
+                      className={`h-5 w-5 ${
+                        direction === "rtl" ? "ml-2" : "mr-2"
+                      }`}
+                    />
+                    {t("Register_Course")}
                   </button>
                   <button className='w-full bg-white border border-[#1D3D6F] text-[#1D3D6F] py-3 rounded-lg font-medium hover:bg-[#1D3D6F]/5 transition-colors flex items-center justify-center'>
-                    <FileText className='h-5 w-5 mr-2' />
-                    Download Syllabus
+                    <FileText
+                      className={`h-5 w-5 ${
+                        direction === "rtl" ? "ml-2" : "mr-2"
+                      }`}
+                    />
+                    {t("Download_Syllabus")}
                   </button>
                 </div>
               </div>
