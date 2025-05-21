@@ -11,6 +11,7 @@ const {
   getResearchByStudent,
   getResearchByDepartment,
   searchResearch,
+  researchUpload,
 } = require("../controllers/researchController")
 const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize, checkPermission,requireRoles } = require("../middleware/roleCheck")
@@ -80,8 +81,8 @@ router.get("/student/:student_id", authorize([roles.ADMIN, roles.TEACHER]), getR
 router.get("/department/:department_id", authorize([roles.ADMIN, roles.TEACHER]), getResearchByDepartment)
 
 // Create research (students with submit_research permission)
-router.post("/", upload.single("file"), requireRoles([roles.ADMIN,roles.STUDENT]), createResearch)
-
+router.post("/",requireRoles([roles.ADMIN]), createResearch)
+router.post("/uploadResearch" ,upload.single("file"),requireRoles([roles.STUDENT]),researchUpload);
 // Review research (faculty with manage_research permission)
 router.patch( "/:id/review",requireRoles([roles.COMMITTEE]),reviewResearch)
 

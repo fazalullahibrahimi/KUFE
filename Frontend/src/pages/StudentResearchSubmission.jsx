@@ -551,12 +551,13 @@ const StudentResearchSubmission = () => {
         keywords: keywordsArray,
         status: "pending",
         submission_date: new Date().toISOString(),
-      };
 
       console.log("Submitting research with payload:", payload);
 
       const token = getToken();
       const response = await fetch(`${API_BASE_URL}/research/`, {
+
+
         method: "POST",
         headers: {
           "Content-Type": "application/json",
