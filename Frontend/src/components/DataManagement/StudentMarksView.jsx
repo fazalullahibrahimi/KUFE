@@ -340,29 +340,57 @@ const StudentMarksView = () => {
 
         {studentFound ? (
           <div className='space-y-6'>
-            <div className='bg-blue-50 p-6 rounded-lg'>
-              <div className='flex flex-col md:flex-row justify-between'>
-                <div>
-                  <h3 className='text-xl font-bold text-gray-800 mb-1'>
-                    {studentFound.name}
-                  </h3>
-                  <p className='text-gray-600'>
-                    {t("marks.student_id")}: {studentFound.id}
-                  </p>
-                  <p className='text-gray-600'>
-                    {t("marks.department")}: {studentFound.department_name}
-                  </p>
-                  <p className='text-gray-600'>
-                    {t("marks.enrollment_year")}: {studentFound.enrollment_year}
-                  </p>
+            <div className='bg-gradient-to-r from-blue-50 to-blue-100 p-8 rounded-lg shadow-md'>
+              <div className='flex flex-col md:flex-row justify-between items-center'>
+                <div className='flex items-center'>
+                  <div className='w-16 h-16 bg-[#004B87] rounded-full flex items-center justify-center text-white text-2xl font-bold mr-6'>
+                    {studentFound.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className='text-2xl font-bold text-gray-800 mb-2'>
+                      {studentFound.name}
+                    </h3>
+                    <div className='flex flex-wrap gap-4'>
+                      <div className='flex items-center'>
+                        <div className='w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center mr-2'>
+                          <span className='text-blue-700 text-xs font-bold'>
+                            ID
+                          </span>
+                        </div>
+                        <p className='text-gray-700 font-medium'>
+                          {studentFound.id}
+                        </p>
+                      </div>
+                      <div className='flex items-center'>
+                        <div className='w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center mr-2'>
+                          <span className='text-purple-700 text-xs font-bold'>
+                            DEP
+                          </span>
+                        </div>
+                        <p className='text-gray-700 font-medium'>
+                          {studentFound.department_name}
+                        </p>
+                      </div>
+                      <div className='flex items-center'>
+                        <div className='w-8 h-8 bg-green-200 rounded-full flex items-center justify-center mr-2'>
+                          <span className='text-green-700 text-xs font-bold'>
+                            YR
+                          </span>
+                        </div>
+                        <p className='text-gray-700 font-medium'>
+                          {studentFound.enrollment_year}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className='mt-4 md:mt-0'>
-                  <div className='bg-white p-4 rounded-md shadow-sm'>
+                <div className='mt-6 md:mt-0'>
+                  <div className='bg-white p-6 rounded-lg shadow-md border-t-4 border-[#004B87]'>
                     <div className='text-center'>
-                      <p className='text-sm text-gray-500 mb-1'>
+                      <p className='text-sm text-gray-500 mb-2 uppercase tracking-wider font-medium'>
                         {t("marks.cumulative_gpa")}
                       </p>
-                      <p className='text-3xl font-bold text-[#004B87]'>
+                      <p className='text-4xl font-bold bg-gradient-to-r from-[#004B87] to-[#0063B1] bg-clip-text text-transparent'>
                         {calculateCGPA(studentFound.id)}
                       </p>
                     </div>
@@ -377,47 +405,88 @@ const StudentMarksView = () => {
               </h3>
 
               {/* Semester Tabs */}
-              <div className='mb-6 border-b border-gray-200'>
-                <div className='flex overflow-x-auto'>
+              <div className='mb-8'>
+                <h4 className='text-md font-medium text-gray-700 mb-4 flex items-center'>
+                  <Calendar className='mr-2 text-[#004B87]' size={18} />
+                  {t("marks.select_semester")}
+                </h4>
+                <div className='grid grid-cols-2 sm:grid-cols-4 gap-3'>
                   {semesters.map((semester) => {
                     const semesterResults = studentResults.filter(
                       (result) => result.semester_id === semester.id
                     );
                     const hasResults = semesterResults.length > 0;
+
+                    const semesterGPA = hasResults
+                      ? calculateSemesterGPA(studentFound.id, semester.id)
+                      : null;
+
+                    let gpaBgColor = "bg-yellow-100";
+                    let gpaTextColor = "text-yellow-800";
+
+                    if (semesterGPA) {
+                      if (Number.parseFloat(semesterGPA) >= 3.0) {
+                        gpaBgColor = "bg-green-100";
+                        gpaTextColor = "text-green-800";
+                      } else if (Number.parseFloat(semesterGPA) >= 2.0) {
+                        gpaBgColor = "bg-blue-100";
+                        gpaTextColor = "text-blue-800";
+                      }
+                    }
+
                     return (
                       <button
                         key={semester.id}
-                        className={`px-4 py-2 text-sm font-medium ${
+                        className={`relative rounded-lg transition-all duration-200 ${
+                          !hasResults
+                            ? "opacity-60 cursor-not-allowed"
+                            : "hover:shadow-md"
+                        } ${
                           selectedSemester === semester.id
-                            ? "border-b-2 border-[#004B87] text-[#004B87]"
-                            : "text-gray-500 hover:text-gray-700"
-                        } ${!hasResults ? "opacity-50" : ""}`}
-                        onClick={() => setSelectedSemester(semester.id)}
+                            ? "ring-2 ring-[#004B87] ring-offset-2"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          hasResults && setSelectedSemester(semester.id)
+                        }
                         disabled={!hasResults}
                       >
-                        {semester.name}
-                        {hasResults && (
-                          <span
-                            className={`ml-2 px-1.5 py-0.5 text-xs rounded-full ${
-                              Number.parseFloat(
-                                calculateSemesterGPA(
-                                  studentFound.id,
-                                  semester.id
-                                )
-                              ) >= 3.0
-                                ? "bg-green-100 text-green-800"
-                                : Number.parseFloat(
-                                    calculateSemesterGPA(
-                                      studentFound.id,
-                                      semester.id
-                                    )
-                                  ) >= 2.0
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {calculateSemesterGPA(studentFound.id, semester.id)}
-                          </span>
+                        <div
+                          className={`p-3 h-full ${
+                            selectedSemester === semester.id
+                              ? "bg-gradient-to-r from-[#004B87] to-[#0063B1] text-white"
+                              : hasResults
+                              ? "bg-white border border-gray-200"
+                              : "bg-gray-50 border border-gray-200 text-gray-500"
+                          }`}
+                        >
+                          <div className='text-center'>
+                            <div className='font-medium mb-1'>
+                              {semester.name}
+                            </div>
+
+                            {hasResults && (
+                              <div
+                                className={`text-xs font-semibold ${
+                                  selectedSemester === semester.id
+                                    ? "bg-white bg-opacity-20 text-white"
+                                    : `${gpaBgColor} ${gpaTextColor}`
+                                } px-2 py-1 rounded-full inline-block`}
+                              >
+                                GPA: {semesterGPA}
+                              </div>
+                            )}
+
+                            {!hasResults && (
+                              <div className='text-xs text-gray-500'>
+                                {t("marks.no_results")}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {selectedSemester === semester.id && (
+                          <div className='absolute bottom-0 left-0 w-full h-1 bg-[#004B87]'></div>
                         )}
                       </button>
                     );
@@ -482,30 +551,27 @@ const StudentMarksView = () => {
                       </div>
                     </div>
 
-                    <div className='overflow-x-auto'>
+                    <div className='overflow-x-auto rounded-lg shadow'>
                       <table className='min-w-full divide-y divide-gray-200'>
-                        <thead className='bg-gray-50'>
+                        <thead className='bg-gradient-to-r from-[#004B87] to-[#0063B1]'>
                           <tr>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                            <th className='px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider'>
                               {t("marks.subject")}
                             </th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                            <th className='px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider'>
                               {t("marks.credit_hours")}
                             </th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                            <th className='px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider'>
                               {t("marks.midterm")}
                             </th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                            <th className='px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider'>
                               {t("marks.final")}
                             </th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                            <th className='px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider'>
                               {t("marks.assignment")}
                             </th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                            <th className='px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider'>
                               {t("marks.total")}
-                            </th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                              {t("marks.grade")}
                             </th>
                           </tr>
                         </thead>
@@ -515,44 +581,55 @@ const StudentMarksView = () => {
                               (result) =>
                                 result.semester_id === selectedSemester
                             )
-                            .map((result) => {
+                            .map((result, index) => {
                               const subject = getSubjectById(result.subject_id);
                               return (
                                 <tr
                                   key={result.id}
-                                  className='hover:bg-gray-50'
+                                  className={`hover:bg-blue-50 transition-colors ${
+                                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                                  }`}
                                 >
-                                  <td className='px-6 py-4 whitespace-nowrap'>
+                                  <td className='px-6 py-5 whitespace-nowrap'>
                                     <div className='text-sm font-medium text-gray-900'>
                                       {subject.name}
                                     </div>
-                                    <div className='text-sm text-gray-500'>
+                                    <div className='text-xs text-gray-500 mt-1'>
                                       {subject.code}
                                     </div>
                                   </td>
-                                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                    {subject.credit_hours}
+                                  <td className='px-6 py-5 whitespace-nowrap'>
+                                    <div className='text-sm font-medium text-center bg-blue-50 rounded-full w-8 h-8 flex items-center justify-center mx-auto'>
+                                      {subject.credit_hours}
+                                    </div>
                                   </td>
-                                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                    {result.midterm_marks}
+                                  <td className='px-6 py-5 whitespace-nowrap'>
+                                    <div className='text-sm text-center font-medium'>
+                                      <span className='bg-blue-50 text-blue-800 px-3 py-1 rounded-lg'>
+                                        {result.midterm_marks}
+                                      </span>
+                                    </div>
                                   </td>
-                                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                    {result.final_marks}
+                                  <td className='px-6 py-5 whitespace-nowrap'>
+                                    <div className='text-sm text-center font-medium'>
+                                      <span className='bg-purple-50 text-purple-800 px-3 py-1 rounded-lg'>
+                                        {result.final_marks}
+                                      </span>
+                                    </div>
                                   </td>
-                                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                    {result.assignment_marks}
+                                  <td className='px-6 py-5 whitespace-nowrap'>
+                                    <div className='text-sm text-center font-medium'>
+                                      <span className='bg-green-50 text-green-800 px-3 py-1 rounded-lg'>
+                                        {result.assignment_marks}
+                                      </span>
+                                    </div>
                                   </td>
-                                  <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
-                                    {result.total_marks}
-                                  </td>
-                                  <td className='px-6 py-4 whitespace-nowrap'>
-                                    <span
-                                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getGradeColor(
-                                        result.grade
-                                      )} bg-opacity-10`}
-                                    >
-                                      {result.grade}
-                                    </span>
+                                  <td className='px-6 py-5 whitespace-nowrap'>
+                                    <div className='text-sm font-bold text-center'>
+                                      <span className='bg-gray-100 text-gray-800 px-4 py-2 rounded-lg'>
+                                        {result.total_marks}
+                                      </span>
+                                    </div>
                                   </td>
                                 </tr>
                               );
