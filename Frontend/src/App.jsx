@@ -21,6 +21,7 @@ import VerificationSuccess from "./pages/VerificationSuccess.jsx";
 import ResendVerification from "./pages/ResendVerification.jsx";
 import FacultyDirectory from "./pages/FacultyDirectory.jsx";
 import StudentResearchSubmission from "./pages/StudentResearchSubmission.jsx";
+import StudentResearchSubmitForm from "./pages/StudentResearchSubmitForm.jsx";
 // import SecondPage from "./components/DataManagement/StudentMarksView.jsx";
 import StudentMarksView from "./components/DataManagement/StudentMarksView.jsx";
 import TeacherMarksManagement from "./components/DataManagement/TeacherMarksManagement.jsx";
@@ -50,7 +51,14 @@ function App() {
         <Route path='/verify-email' element={<VerifyEmail />} />
         <Route path='/verification-success' element={<VerificationSuccess />} />
         <Route path='/resend-verification' element={<ResendVerification />} />
-        <Route path='/studenSubmit' element={<StudentResearchSubmission />} />
+        <Route
+          path='/studentSubmissin'
+          element={<StudentResearchSubmission />}
+        />
+        <Route
+          path='/submit-research'
+          element={<StudentResearchSubmitForm />}
+        />
         <Route path='/studentmarks' element={<StudentMarksView />} />
         <Route path='/teachermarks' element={<TeacherMarksManagement />} />
         <Route path='/committe' element={<CommitteeMemberManagement />} />

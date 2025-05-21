@@ -298,6 +298,24 @@ export default function ResearchPage() {
       ));
   };
 
+  // Check if user is logged in and is a student
+  const isLoggedIn = localStorage.getItem("token");
+  const currentUser = (() => {
+    try {
+      const userString = localStorage.getItem("user");
+      return userString ? JSON.parse(userString) : null;
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      return null;
+    }
+  })();
+
+  const isStudent = currentUser && currentUser.role === "student";
+
+  const navigateToSubmitResearch = () => {
+    window.location.href = "/submit-research";
+  };
+
   return (
     <div
       dir={direction}
@@ -343,9 +361,23 @@ export default function ResearchPage() {
                 <h1 className='text-4xl md:text-5xl font-bold tracking-tight mb-4 text-white'>
                   {t("Research_Library_Title")}
                 </h1>
-                <p className='text-white/90 text-lg md:text-xl max-w-xl leading-relaxed'>
+                <p className='text-white/90 text-lg md:text-xl max-w-xl leading-relaxed mb-4'>
                   {t("Research_Library_Description")}
                 </p>
+
+                {isLoggedIn && isStudent && (
+                  <button
+                    onClick={navigateToSubmitResearch}
+                    className='inline-flex items-center px-5 py-2 bg-[#F7B500] text-[#1D3D6F] font-bold rounded-full hover:bg-[#e5a700] transition-colors'
+                  >
+                    {t("Submit Your Research")}{" "}
+                    <ArrowUpRight
+                      className={`h-4 w-4 ${
+                        direction === "rtl" ? "mr-2" : "ml-2"
+                      }`}
+                    />
+                  </button>
+                )}
               </div>
 
               <div className='bg-white/10 backdrop-blur-sm p-5 rounded-lg border border-white/20 w-full md:w-auto'>
@@ -794,14 +826,31 @@ export default function ResearchPage() {
                 <p className='text-gray-600 max-w-xl mb-6'>
                   {t("Submit_Research_Description")}
                 </p>
-                <button className='bg-[#1D3D6F] hover:bg-[#2C4F85] text-white font-bold py-3 px-6 rounded-lg transition shadow-md inline-flex items-center'>
-                  {t("Submit_Paper")}{" "}
-                  <ArrowUpRight
-                    className={`h-4 w-4 ${
-                      direction === "rtl" ? "mr-2" : "ml-2"
-                    }`}
-                  />
-                </button>
+                {isLoggedIn && isStudent ? (
+                  <button
+                    onClick={navigateToSubmitResearch}
+                    className='bg-[#1D3D6F] hover:bg-[#2C4F85] text-white font-bold py-3 px-6 rounded-lg transition shadow-md inline-flex items-center'
+                  >
+                    {t("Submit Your Research")}{" "}
+                    <ArrowUpRight
+                      className={`h-4 w-4 ${
+                        direction === "rtl" ? "mr-2" : "ml-2"
+                      }`}
+                    />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => (window.location.href = "/login")}
+                    className='bg-[#1D3D6F] hover:bg-[#2C4F85] text-white font-bold py-3 px-6 rounded-lg transition shadow-md inline-flex items-center'
+                  >
+                    {t("Login to Submit")}{" "}
+                    <ArrowUpRight
+                      className={`h-4 w-4 ${
+                        direction === "rtl" ? "mr-2" : "ml-2"
+                      }`}
+                    />
+                  </button>
+                )}
               </div>
 
               <div className='md:w-1/3 bg-[#E8ECEF] rounded-xl p-6 border border-gray-200'>

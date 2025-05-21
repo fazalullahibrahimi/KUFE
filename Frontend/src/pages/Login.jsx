@@ -74,6 +74,7 @@ function Login() {
       if (response.data.success) {
         setLoginSuccess(true);
         localStorage.setItem("token", response.data.user.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
 
         const userRole = response.data.user.role;
         const redirectPath = userRole === "admin" ? "/dashboardv1" : "/";
