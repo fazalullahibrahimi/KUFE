@@ -275,37 +275,39 @@ const getStudentCount = async (req, res) => {
 
 
 
+const getTopStudents = asyncHandler(async (req, res) => {
+  const topStudents = await Student.aggregate([
+    { $unwind: "$marks" },
+    {
+      $match: {
+        "marks.total": { $gte: 90 }
+      }
+    },
+    {
+      $group: {
+        _id: "$_id",
+        name: { $first: "$name" },
+        student_id_number: { $first: "$student_id_number" },
+        email: { $first: "$email" },
+        phone: { $first: "$phone" },
+        profile_image: { $first: "$profile_image" },
+        totalHighMarks: { $sum: "$marks.total" }
+      }
+    },
+    { $sort: { totalHighMarks: -1 } },
+    { $limit: 3 }
+  ]);
 
-// const createMarks = asyncHandler(async (req, res) => {
-//   const { subject_id, semester_id, teacher_id, midterm, final, assignment, grade, remarks } = req.body;
+  if (!topStudents || topStudents.length === 0) {
+    return res
+      .status(404)
+      .json(apiResponse.error("No top students found with marks ≥ 90", 404));
+  }
 
-//   const studentId = req.params.id;
-//   const student = await Student.findById(studentId);
-
-//   if (!student) {
-//     return res.status(404).json(apiResponse.error("Student not found", 404));
-//   }
-
-//   const total = (midterm || 0) + (final || 0) + (assignment || 0);
-
-//   const newMark = {
-//     subject_id,
-//     semester_id,
-//     teacher_id, // 🆕 include teacher_id
-//     midterm,
-//     final,
-//     assignment,
-//     total,
-//     grade,
-//     remarks,
-//   };
-
-//   student.marks.push(newMark);
-//   await student.save();
-
-//   res.status(201).json(apiResponse.success("Marks added successfully", { marks: student.marks }));
-// });
-
+  res
+    .status(200)
+    .json(apiResponse.success("Top students retrieved successfully", topStudents));
+});
 
 const createMarks = asyncHandler(async (req, res) => {
   const { subject_id, semester_id, teacher_id, midterm, final, assignment, grade, remarks } = req.body;
@@ -471,5 +473,6 @@ module.exports = {
   deleteMarks,
   uploasStudentPhoto,
   resizeStudentPhoto,
+ getTopStudents,
 };
 

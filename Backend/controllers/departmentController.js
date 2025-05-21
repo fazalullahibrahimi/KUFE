@@ -3,11 +3,9 @@ const Department = require("../models/Department")
 const apiResponse = require("../utils/apiResponse")
 const asyncHandler = require("../middleware/asyncHandler.js");
 const validateMongodbId = require("../utils/validateMongoDBId.js");
-const Enrollment = require("../models/Enrollment");
 const Student = require("../models/Student");
 const Research = require("../models/Research");
 const Course = require("../models/Course");
-const CourseOffering = require("../models/CourseOffering");
 
 // @desc    Get all departments
 // @route   GET /api/departments
