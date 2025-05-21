@@ -2,6 +2,7 @@ import React from "react";
 
 import { createContext, useContext, useState, useEffect } from "react";
 import translations from "../translations/Translation";
+import psTranslations from "../translations/ps";
 
 // Define translations
 // const translations = {
@@ -113,7 +114,7 @@ export const LanguageProvider = ({ children }) => {
     }
   };
 
-  // Translation function - FIXED to prevent the split() error
+  // Translation function - Enhanced to handle both translation sources
   const t = (key) => {
     // Safety check - if key is undefined or null, return empty string
     if (!key) return "";
@@ -124,15 +125,44 @@ export const LanguageProvider = ({ children }) => {
       return key || "";
     }
 
-    // Check if it's a nested key with dot notation (safely)
-    if (key && typeof key === "string" && key.includes(".")) {
-      const [section, nestedKey] = key.split(".");
-      return translations[language][section]?.[nestedKey] || key;
-    }
+    // For Pashto language, check both translation sources
+    if (language === "ps") {
+      // Check if it's a nested key with dot notation (safely)
+      if (key && typeof key === "string" && key.includes(".")) {
+        const [section, nestedKey] = key.split(".");
 
-    // Check if key exists directly in the translations
-    if (translations[language][key]) {
-      return translations[language][key];
+        // First check in psTranslations
+        if (psTranslations[section]?.[nestedKey]) {
+          return psTranslations[section][nestedKey];
+        }
+
+        // Then check in main translations
+        return translations[language][section]?.[nestedKey] || key;
+      }
+
+      // Check if key exists directly in psTranslations nested objects
+      for (const section in psTranslations) {
+        if (psTranslations[section]?.[key]) {
+          return psTranslations[section][key];
+        }
+      }
+
+      // Check if key exists directly in the main translations
+      if (translations[language][key]) {
+        return translations[language][key];
+      }
+    } else {
+      // For other languages, use the standard approach
+      // Check if it's a nested key with dot notation (safely)
+      if (key && typeof key === "string" && key.includes(".")) {
+        const [section, nestedKey] = key.split(".");
+        return translations[language][section]?.[nestedKey] || key;
+      }
+
+      // Check if key exists directly in the translations
+      if (translations[language][key]) {
+        return translations[language][key];
+      }
     }
 
     // Return the key itself if no translation found

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown, Menu, X, Globe, ChevronRight } from "lucide-react";
 import Logo from "../../public/KufeLogo.jpeg";
-import { useLanguage } from "../context/LanguageContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const Navbar = () => {
   const location = useLocation();

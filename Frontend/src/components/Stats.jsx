@@ -13,11 +13,13 @@ import {
 } from "react-icons/fa";
 import useCountUp from "../hooks/useCountUp";
 import useElementOnScreen from "../hooks/useElementOnScreen";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const Stats = () => {
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t, language, direction } = useLanguage();
 
   // Custom hook for intersection observer
   const [containerRef, isVisible] = useElementOnScreen({
@@ -53,12 +55,12 @@ const Stats = () => {
       console.error("Error fetching statistics:", err);
       // Fallback to static data if API fails
       setStats([
-        { number: "2,500+", label: "Students Enrolled" },
-        { number: "85%", label: "Employment Rate" },
-        { number: "50+", label: "Faculty Members" },
-        { number: "30+", label: "Research Papers" },
+        { number: "2,500+", label: t("Students Enrolled") },
+        { number: "85%", label: t("Employment Rate") },
+        { number: "50+", label: t("Faculty Members") },
+        { number: "30+", label: t("Research Papers") },
       ]);
-      setError("Could not load live statistics. Showing estimated values.");
+      setError(t("Could not load live statistics. Showing estimated values."));
     } finally {
       setLoading(false);
     }
@@ -66,7 +68,7 @@ const Stats = () => {
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [language]);
 
   const handleRetry = () => {
     setError(null);
@@ -81,7 +83,7 @@ const Stats = () => {
           <div className='flex flex-col justify-center items-center py-12'>
             <FaSpinner className='animate-spin text-4xl text-[#F4B400] mb-4' />
             <h2 className='text-2xl font-poppins font-semibold'>
-              Loading Statistics...
+              {t("Loading Statistics...")}
             </h2>
           </div>
         </div>
@@ -90,14 +92,18 @@ const Stats = () => {
   }
 
   return (
-    <section className='relative bg-gradient-to-b from-[#004B87] to-[#003366] text-white py-16 overflow-hidden'>
+    <section
+      dir={direction}
+      className='relative bg-gradient-to-b from-[#004B87] to-[#003366] text-white py-16 overflow-hidden'
+    >
       {/* Decorative elements */}
       <div className='absolute top-0 left-0 w-64 h-64 bg-[#F4B400] rounded-full opacity-10 -translate-x-1/2 -translate-y-1/2'></div>
       <div className='absolute bottom-0 right-0 w-96 h-96 bg-[#F4B400] rounded-full opacity-10 translate-x-1/3 translate-y-1/3'></div>
 
       <div className='container mx-auto px-4 relative z-10'>
         <h2 className='text-3xl md:text-4xl font-poppins font-bold text-center mb-12 text-white'>
-          University <span className='text-[#F4B400]'>Statistics</span>
+          {t("University")}{" "}
+          <span className='text-[#F4B400]'>{t("Statistics")}</span>
         </h2>
 
         <div
@@ -142,14 +148,17 @@ const Stats = () => {
         {error && (
           <div className='mt-8 text-center'>
             <div className='inline-flex items-center bg-[#F4B400] bg-opacity-20 text-[#F4B400] px-4 py-2 rounded-lg'>
-              <FaExclamationTriangle className='mr-2' />
+              <FaExclamationTriangle
+                className={direction === "rtl" ? "ml-2" : "mr-2"}
+              />
               <p>{error}</p>
             </div>
             <button
               onClick={handleRetry}
               className='flex items-center mx-auto mt-4 bg-[#F4B400] text-[#004B87] px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors font-medium'
             >
-              <FaSync className='mr-2' /> Retry
+              <FaSync className={direction === "rtl" ? "ml-2" : "mr-2"} />{" "}
+              {t("Retry Stats")}
             </button>
           </div>
         )}

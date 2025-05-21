@@ -7,6 +7,7 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import axios from "axios";
+import { useLanguage } from "../contexts/LanguageContext";
 
 // Icons array as components for styling consistency
 const icons = [
@@ -19,6 +20,7 @@ const Programs = () => {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t, language, direction } = useLanguage();
 
   useEffect(() => {
     const fetchPrograms = async () => {
@@ -39,7 +41,7 @@ const Programs = () => {
         }
 
         if (response.data.data.programs.length === 0) {
-          setError("No academic programs are currently available.");
+          setError(t("No academic programs are currently available."));
           setPrograms([]);
           setLoading(false);
           return;
@@ -86,14 +88,14 @@ const Programs = () => {
     };
 
     fetchPrograms();
-  }, []);
+  }, [language, t]);
 
   // Loading state
   const renderLoading = () => (
     <div className='flex flex-col items-center justify-center py-12'>
       <FaSpinner className='animate-spin text-4xl text-[#004B87] mb-4' />
       <p className="text-[#333333] font-['Roboto']">
-        Loading academic programs...
+        {t("Loading academic programs...")}
       </p>
     </div>
   );
@@ -103,7 +105,7 @@ const Programs = () => {
     <div className='flex flex-col items-center justify-center py-12 px-4'>
       <FaExclamationTriangle className='text-4xl text-[#F4B400] mb-4' />
       <h3 className="text-xl font-semibold text-red-600 mb-2 font-['Poppins']">
-        Unable to Load Programs
+        {t("Unable to Load Programs")}
       </h3>
       <p className="text-[#333333] text-center max-w-md font-['Roboto']">
         {error}
@@ -113,7 +115,7 @@ const Programs = () => {
         aria-label='Reload Page'
         className="mt-4 px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#F4B400] hover:text-[#333333] transition-colors font-['Roboto']"
       >
-        Reload Page
+        {t("Reload Page")}
       </button>
     </div>
   );
@@ -123,17 +125,19 @@ const Programs = () => {
     <div className='flex flex-col items-center justify-center py-12 px-4'>
       <div className='text-4xl text-gray-400 mb-4'>📚</div>
       <h3 className="text-xl font-semibold text-[#333333] mb-2 font-['Poppins']">
-        No Programs Available
+        {t("No Programs Available")}
       </h3>
       <p className="text-[#333333] text-center max-w-md font-['Roboto']">
-        There are currently no academic programs listed. Please check back
-        later.
+        {t(
+          "There are currently no academic programs listed. Please check back later."
+        )}
       </p>
     </div>
   );
 
   return (
     <section
+      dir={direction}
       className='py-16 relative overflow-hidden text-center'
       style={{ fontFamily: "'Roboto', sans-serif" }}
     >
@@ -147,9 +151,9 @@ const Programs = () => {
           aria-level='2'
           style={{ fontFamily: "'Poppins', sans-serif" }}
         >
-          Our Academic Programs
+          {t("Our Academic Programs")}
         </h2>
- 
+
         <div className='w-24 h-1 bg-[#F4B400] mx-auto mb-8 rounded-full'></div>
 
         {loading ? (
@@ -207,7 +211,7 @@ const Programs = () => {
                       className='px-4 py-2 bg-[#F4B400] text-[#333333] rounded-md hover:bg-[#e5a800] transition-colors font-medium'
                       style={{ fontFamily: "'Roboto', sans-serif" }}
                     >
-                      Learn More
+                      {t("Learn More")}
                     </button>
                   </div>
 

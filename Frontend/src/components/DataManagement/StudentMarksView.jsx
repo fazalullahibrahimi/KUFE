@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { User, Calendar } from "lucide-react";
-import { useLanguage } from "../../context/LanguageContext";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const StudentMarksView = () => {
   const { t, isRTL } = useLanguage();

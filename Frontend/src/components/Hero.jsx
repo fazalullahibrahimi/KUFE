@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import ImageBackGround from "../../public/Hero_BackGroundImage.jpg";
-import { useLanguage } from "../context/LanguageContext";
+import { useLanguage } from "../contexts/LanguageContext";
 import { FaGraduationCap, FaChalkboardTeacher, FaBook } from "react-icons/fa";
 
 const Hero = () => {

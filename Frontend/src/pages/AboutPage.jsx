@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { useLanguage } from "../context/LanguageContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 function AboutPage() {
   const { t, language } = useLanguage();
@@ -57,7 +57,7 @@ function AboutPage() {
         // In production, uncomment the fetch calls and use actual API endpoints
 
         // Simulating API responses with placeholder data
-   
+
         //  Uncomment for actual API calls
         // Fetch departments data
         const departmentsResponse = await fetch(
@@ -297,7 +297,9 @@ function AboutPage() {
                   </div>
                   <div className='flex justify-between items-center border-b border-white/20 pb-3'>
                     <span className='text-white/80'>{t("Programs")}</span>
-                    <span className='text-white font-semibold'>{academicProgramCount}</span>
+                    <span className='text-white font-semibold'>
+                      {academicProgramCount}
+                    </span>
                   </div>
                   <div className='flex justify-between items-center'>
                     <span className='text-white/80'>{t("Location")}</span>

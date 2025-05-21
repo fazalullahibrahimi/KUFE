@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function ResearchPage() {
   const [researchPapers, setResearchPapers] = useState([]);
@@ -32,6 +33,7 @@ export default function ResearchPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [visibleSections, setVisibleSections] = useState({});
+  const { t, language, direction } = useLanguage();
   const sectionRefs = {
     hero: useRef(null),
     papers: useRef(null),
@@ -107,7 +109,7 @@ export default function ResearchPage() {
     };
 
     fetchResearchPapers();
-  }, []);
+  }, [language]);
 
   // Intersection Observer for animations
   useEffect(() => {
@@ -201,7 +203,10 @@ export default function ResearchPage() {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
-      return new Date(dateString).toLocaleDateString("en-US", {
+      // Use appropriate locale based on current language
+      const locale =
+        language === "en" ? "en-US" : language === "ps" ? "ps-AF" : "fa-AF";
+      return new Date(dateString).toLocaleDateString(locale, {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -294,7 +299,10 @@ export default function ResearchPage() {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-b from-[#E8ECEF] to-white'>
+    <div
+      dir={direction}
+      className='min-h-screen bg-gradient-to-b from-[#E8ECEF] to-white'
+    >
       <Navbar />
 
       {/* Header with Parallax Effect */}
@@ -320,39 +328,46 @@ export default function ResearchPage() {
             {/* Breadcrumb */}
             <div className='flex items-center text-sm mb-6 text-white/70'>
               <a href='/' className='hover:text-white transition'>
-                Home
+                {t("Home")}
               </a>
-              <ChevronRight className='h-3 w-3 mx-2' />
-              <span className='text-white'>Research Library</span>
+              <ChevronRight
+                className={`h-3 w-3 mx-2 ${
+                  direction === "rtl" ? "rotate-180" : ""
+                }`}
+              />
+              <span className='text-white'>{t("Research_Library_Title")}</span>
             </div>
 
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center'>
               <div className='max-w-2xl mb-8 md:mb-0'>
                 <h1 className='text-4xl md:text-5xl font-bold tracking-tight mb-4 text-white'>
-                  Research Library
+                  {t("Research_Library_Title")}
                 </h1>
                 <p className='text-white/90 text-lg md:text-xl max-w-xl leading-relaxed'>
-                  Explore groundbreaking research from KUFE faculty and students
-                  that contributes to economic development and policy-making.
+                  {t("Research_Library_Description")}
                 </p>
               </div>
 
               <div className='bg-white/10 backdrop-blur-sm p-5 rounded-lg border border-white/20 w-full md:w-auto'>
                 <div className='text-white mb-3 font-medium'>
-                  Research Statistics
+                  {t("Research_Statistics")}
                 </div>
                 <div className='grid grid-cols-2 gap-4'>
                   <div className='text-center'>
                     <div className='text-3xl font-bold text-[#F7B500]'>
                       {researchPapers.length}
                     </div>
-                    <div className='text-sm text-white/80'>Publications</div>
+                    <div className='text-sm text-white/80'>
+                      {t("Publications")}
+                    </div>
                   </div>
                   <div className='text-center'>
                     <div className='text-3xl font-bold text-[#F7B500]'>
                       {categories.length - 1}
                     </div>
-                    <div className='text-sm text-white/80'>Categories</div>
+                    <div className='text-sm text-white/80'>
+                      {t("Categories")}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -387,13 +402,17 @@ export default function ResearchPage() {
               }`}
             >
               <Search
-                className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400'
+                className={`absolute ${
+                  direction === "rtl" ? "right-4" : "left-4"
+                } top-1/2 transform -translate-y-1/2 text-gray-400`}
                 size={20}
               />
               <input
                 type='text'
-                placeholder='Search by title, author, or keyword...'
-                className='w-full py-4 pl-12 pr-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1D3D6F] focus:border-[#1D3D6F] focus:outline-none shadow-sm'
+                placeholder={t("Search_Placeholder")}
+                className={`w-full py-4 ${
+                  direction === "rtl" ? "pr-12 pl-4" : "pl-12 pr-4"
+                } rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#1D3D6F] focus:border-[#1D3D6F] focus:outline-none shadow-sm`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
@@ -413,7 +432,11 @@ export default function ResearchPage() {
                     </option>
                   ))}
                 </select>
-                <div className='absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none'>
+                <div
+                  className={`absolute ${
+                    direction === "rtl" ? "left-4" : "right-4"
+                  } top-1/2 transform -translate-y-1/2 pointer-events-none`}
+                >
                   <ChevronDown className='h-5 w-5 text-gray-400' />
                 </div>
               </div>
@@ -430,7 +453,7 @@ export default function ResearchPage() {
               </div>
               <div className='ml-3'>
                 <h3 className='text-lg font-medium text-red-800'>
-                  Error Loading Research Papers
+                  {t("Error_Loading_Research")}
                 </h3>
                 <div className='mt-2 text-red-700'>
                   <p>{error}</p>
@@ -440,7 +463,12 @@ export default function ResearchPage() {
                     onClick={retryFetch}
                     className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
                   >
-                    <RefreshCw className='h-4 w-4 mr-2' /> Retry
+                    <RefreshCw
+                      className={`h-4 w-4 ${
+                        direction === "rtl" ? "ml-2" : "mr-2"
+                      }`}
+                    />{" "}
+                    {t("Retry_Button")}
                   </button>
                 </div>
               </div>
@@ -463,33 +491,39 @@ export default function ResearchPage() {
             <div className='flex flex-wrap -mb-px'>
               <button
                 onClick={() => setActiveTab("all")}
-                className={`mr-8 py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`${
+                  direction === "rtl" ? "ml-8" : "mr-8"
+                } py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === "all"
                     ? "border-[#1D3D6F] text-[#1D3D6F]"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
-                All Papers
+                {t("All_Papers")}
               </button>
               <button
                 onClick={() => setActiveTab("featured")}
-                className={`mr-8 py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`${
+                  direction === "rtl" ? "ml-8" : "mr-8"
+                } py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === "featured"
                     ? "border-[#1D3D6F] text-[#1D3D6F]"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
-                Featured Research
+                {t("Featured_Research")}
               </button>
               <button
                 onClick={() => setActiveTab("recent")}
-                className={`mr-8 py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`${
+                  direction === "rtl" ? "ml-8" : "mr-8"
+                } py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === "recent"
                     ? "border-[#1D3D6F] text-[#1D3D6F]"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
-                Recent Publications
+                {t("Recent_Publications")}
               </button>
             </div>
           </div>
@@ -497,19 +531,21 @@ export default function ResearchPage() {
           {/* Research Papers Count & Sort */}
           <div className='mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
             <p className='text-[#1D3D6F] font-medium'>
-              Showing {sortedPapers.length} of {researchPapers.length} papers
+              {t("Showing_Papers")
+                .replace("{count}", sortedPapers.length)
+                .replace("{total}", researchPapers.length)}
             </p>
             <div className='flex items-center gap-3'>
-              <span className='text-sm text-[#1D3D6F]'>Sort by:</span>
+              <span className='text-sm text-[#1D3D6F]'>{t("Sort_By")}</span>
               <select
                 className='border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D3D6F] bg-white shadow-sm'
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <option value='date'>Publication Date</option>
-                <option value='title'>Title (A-Z)</option>
-                <option value='author'>Author</option>
-                <option value='citations'>Citations</option>
+                <option value='date'>{t("Publication_Date")}</option>
+                <option value='title'>{t("Title_AZ")}</option>
+                <option value='author'>{t("Author")}</option>
+                <option value='citations'>{t("Citations")}</option>
               </select>
             </div>
           </div>
@@ -602,13 +638,25 @@ export default function ResearchPage() {
                         <div className='flex flex-wrap justify-between items-center gap-4 pt-3 border-t border-gray-100'>
                           <div className='flex items-center gap-4'>
                             <div className='flex items-center text-sm text-gray-500'>
-                              <BookOpen className='h-4 w-4 mr-1 text-[#1D3D6F]' />
-                              <span>{paper.pages || "N/A"} pages</span>
+                              <BookOpen
+                                className={`h-4 w-4 ${
+                                  direction === "rtl" ? "ml-1" : "mr-1"
+                                } text-[#1D3D6F]`}
+                              />
+                              <span>
+                                {paper.pages || "N/A"} {t("Pages")}
+                              </span>
                             </div>
                             {paper.citationCount !== undefined && (
                               <div className='flex items-center text-sm text-gray-500'>
-                                <BookMarked className='h-4 w-4 mr-1 text-[#1D3D6F]' />
-                                <span>{paper.citationCount} citations</span>
+                                <BookMarked
+                                  className={`h-4 w-4 ${
+                                    direction === "rtl" ? "ml-1" : "mr-1"
+                                  } text-[#1D3D6F]`}
+                                />
+                                <span>
+                                  {paper.citationCount} {t("Citations_Count")}
+                                </span>
                               </div>
                             )}
                           </div>
@@ -619,7 +667,7 @@ export default function ResearchPage() {
                             rel='noopener noreferrer'
                             className='inline-flex items-center gap-2 bg-[#1D3D6F] hover:bg-[#2C4F85] text-white font-medium py-2 px-4 rounded-lg transition-colors shadow-sm group-hover:shadow-md'
                           >
-                            <FileText className='h-4 w-4' /> View PDF
+                            <FileText className='h-4 w-4' /> {t("View_PDF")}
                           </a>
                         </div>
                       </div>
@@ -632,11 +680,10 @@ export default function ResearchPage() {
                     <BookOpen className='h-8 w-8' />
                   </div>
                   <h3 className='text-xl font-medium text-[#1D3D6F] mb-2'>
-                    No research papers found
+                    {t("No_Research_Found_Title")}
                   </h3>
                   <p className='text-gray-500 mb-6 max-w-md mx-auto'>
-                    We couldn't find any research papers matching your criteria.
-                    Try adjusting your search or filter settings.
+                    {t("No_Research_Found_Description")}
                   </p>
                   <button
                     onClick={() => {
@@ -646,7 +693,7 @@ export default function ResearchPage() {
                     }}
                     className='bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-medium py-2 px-6 rounded-lg transition shadow-sm'
                   >
-                    Reset filters
+                    {t("Reset_Filters")}
                   </button>
                 </div>
               )}
@@ -666,8 +713,12 @@ export default function ResearchPage() {
             }`}
           >
             <h2 className='text-2xl font-bold text-[#1D3D6F] mb-6 flex items-center'>
-              <Award className='h-6 w-6 mr-2 text-[#F7B500]' />
-              Featured Research
+              <Award
+                className={`h-6 w-6 ${
+                  direction === "rtl" ? "ml-2" : "mr-2"
+                } text-[#F7B500]`}
+              />
+              {t("Featured_Research")}
             </h2>
 
             <div className='bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] rounded-xl shadow-lg overflow-hidden'>
@@ -713,7 +764,12 @@ export default function ResearchPage() {
                           href={paper.filePath || paper.fileUrl || "#"}
                           className='text-[#F7B500] group-hover:text-white font-medium text-sm flex items-center transition-colors'
                         >
-                          View Paper <ArrowUpRight className='h-4 w-4 ml-1' />
+                          {t("View_Paper")}{" "}
+                          <ArrowUpRight
+                            className={`h-4 w-4 ${
+                              direction === "rtl" ? "mr-1" : "ml-1"
+                            }`}
+                          />
                         </a>
                       </div>
                     </div>
@@ -733,46 +789,64 @@ export default function ResearchPage() {
                   <FileText className='h-6 w-6' />
                 </div>
                 <h2 className='text-2xl font-bold mb-3 text-[#1D3D6F]'>
-                  Submit Your Research
+                  {t("Submit_Research_Title")}
                 </h2>
                 <p className='text-gray-600 max-w-xl mb-6'>
-                  Are you a faculty member or student with research to share?
-                  Submit your paper for review and publication in our research
-                  library. Your work could contribute to the academic community
-                  and advance knowledge in your field.
+                  {t("Submit_Research_Description")}
                 </p>
                 <button className='bg-[#1D3D6F] hover:bg-[#2C4F85] text-white font-bold py-3 px-6 rounded-lg transition shadow-md inline-flex items-center'>
-                  Submit Paper <ArrowUpRight className='h-4 w-4 ml-2' />
+                  {t("Submit_Paper")}{" "}
+                  <ArrowUpRight
+                    className={`h-4 w-4 ${
+                      direction === "rtl" ? "mr-2" : "ml-2"
+                    }`}
+                  />
                 </button>
               </div>
 
               <div className='md:w-1/3 bg-[#E8ECEF] rounded-xl p-6 border border-gray-200'>
                 <h3 className='font-medium text-[#1D3D6F] mb-4'>
-                  Submission Requirements
+                  {t("Submission_Requirements")}
                 </h3>
                 <ul className='space-y-3'>
                   <li className='flex items-start'>
-                    <CheckCircle2 className='h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5' />
+                    <CheckCircle2
+                      className={`h-5 w-5 text-green-500 ${
+                        direction === "rtl" ? "ml-2" : "mr-2"
+                      } flex-shrink-0 mt-0.5`}
+                    />
                     <span className='text-sm text-gray-600'>
-                      Complete research paper in PDF format
+                      {t("Requirement_PDF")}
                     </span>
                   </li>
                   <li className='flex items-start'>
-                    <CheckCircle2 className='h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5' />
+                    <CheckCircle2
+                      className={`h-5 w-5 text-green-500 ${
+                        direction === "rtl" ? "ml-2" : "mr-2"
+                      } flex-shrink-0 mt-0.5`}
+                    />
                     <span className='text-sm text-gray-600'>
-                      Abstract of 250-300 words
+                      {t("Requirement_Abstract")}
                     </span>
                   </li>
                   <li className='flex items-start'>
-                    <CheckCircle2 className='h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5' />
+                    <CheckCircle2
+                      className={`h-5 w-5 text-green-500 ${
+                        direction === "rtl" ? "ml-2" : "mr-2"
+                      } flex-shrink-0 mt-0.5`}
+                    />
                     <span className='text-sm text-gray-600'>
-                      Keywords (3-5) relevant to your research
+                      {t("Requirement_Keywords")}
                     </span>
                   </li>
                   <li className='flex items-start'>
-                    <CheckCircle2 className='h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5' />
+                    <CheckCircle2
+                      className={`h-5 w-5 text-green-500 ${
+                        direction === "rtl" ? "ml-2" : "mr-2"
+                      } flex-shrink-0 mt-0.5`}
+                    />
                     <span className='text-sm text-gray-600'>
-                      Author information and affiliations
+                      {t("Requirement_Author")}
                     </span>
                   </li>
                 </ul>
@@ -792,8 +866,12 @@ export default function ResearchPage() {
           }`}
         >
           <h2 className='text-2xl font-bold text-[#1D3D6F] mb-6 flex items-center'>
-            <GraduationCap className='h-6 w-6 mr-2 text-[#F7B500]' />
-            Research Resources
+            <GraduationCap
+              className={`h-6 w-6 ${
+                direction === "rtl" ? "ml-2" : "mr-2"
+              } text-[#F7B500]`}
+            />
+            {t("Research_Resources_Title")}
           </h2>
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
@@ -802,18 +880,21 @@ export default function ResearchPage() {
                 <BookOpen className='h-6 w-6' />
               </div>
               <h3 className='text-lg font-semibold mb-3 text-[#1D3D6F] group-hover:text-[#2C4F85] transition-colors'>
-                Research Guidelines
+                {t("Research_Guidelines_Title")}
               </h3>
               <p className='text-gray-600 mb-4'>
-                Access our comprehensive guidelines for conducting and
-                publishing research at KUFE. Learn about methodologies, ethical
-                considerations, and formatting requirements.
+                {t("Research_Guidelines_Description")}
               </p>
               <a
                 href='#'
                 className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors'
               >
-                View Guidelines <ChevronRight className='h-4 w-4 ml-1' />
+                {t("View_Guidelines")}{" "}
+                <ChevronRight
+                  className={`h-4 w-4 ${
+                    direction === "rtl" ? "mr-1" : "ml-1"
+                  } ${direction === "rtl" ? "rotate-180" : ""}`}
+                />
               </a>
             </div>
 
@@ -822,18 +903,21 @@ export default function ResearchPage() {
                 <Download className='h-6 w-6' />
               </div>
               <h3 className='text-lg font-semibold mb-3 text-[#1D3D6F] group-hover:text-[#2C4F85] transition-colors'>
-                Research Templates
+                {t("Research_Templates_Title")}
               </h3>
               <p className='text-gray-600 mb-4'>
-                Download templates for research proposals, papers, and
-                presentations. Our standardized formats will help you create
-                professional academic documents.
+                {t("Research_Templates_Description")}
               </p>
               <a
                 href='#'
                 className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors'
               >
-                Download Templates <ChevronRight className='h-4 w-4 ml-1' />
+                {t("Download_Templates")}{" "}
+                <ChevronRight
+                  className={`h-4 w-4 ${
+                    direction === "rtl" ? "mr-1" : "ml-1"
+                  } ${direction === "rtl" ? "rotate-180" : ""}`}
+                />
               </a>
             </div>
 
@@ -842,18 +926,21 @@ export default function ResearchPage() {
                 <Clock className='h-6 w-6' />
               </div>
               <h3 className='text-lg font-semibold mb-3 text-[#1D3D6F] group-hover:text-[#2C4F85] transition-colors'>
-                Research Funding
+                {t("Research_Funding_Title")}
               </h3>
               <p className='text-gray-600 mb-4'>
-                Learn about available funding opportunities for research
-                projects at KUFE. Discover grants, scholarships, and other
-                financial resources to support your work.
+                {t("Research_Funding_Description")}
               </p>
               <a
                 href='#'
                 className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors'
               >
-                Explore Funding <ChevronRight className='h-4 w-4 ml-1' />
+                {t("Explore_Funding")}{" "}
+                <ChevronRight
+                  className={`h-4 w-4 ${
+                    direction === "rtl" ? "mr-1" : "ml-1"
+                  } ${direction === "rtl" ? "rotate-180" : ""}`}
+                />
               </a>
             </div>
           </div>

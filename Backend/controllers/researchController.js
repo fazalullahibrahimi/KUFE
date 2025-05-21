@@ -6,52 +6,10 @@ const Email = require("../utils/email"); // ✅ import your Email class
 require("dotenv").config(); // Ensure you load .env values
 const path = require("path");
 const fs = require("fs");
-const multer = require("multer");
 
 
-
-
-
-// ----------- Multer Storage Config -----------
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, "../public/uploads/research");
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const ext = path.extname(file.originalname);
-    cb(null, `file-${uniqueSuffix}${ext}`);
-  },
-});
-
-const multerFilter = (req, file, cb) => {
-  // Accept all file types — customize if needed
-  cb(null, true);
-};
-
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
-});
-
-const uploadFile = upload.single("file");
-
-const processUploadedFile = (req, res, next) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
-  }
-
-  req.filePath = `/uploads/research/${req.file.filename}`;
-  next();
-};
-
-// ----------- Main Upload Handler -----------
 const researchUpload = asyncHandler(async (req, res) => {
-  const { title, abstract, category, publication_date, pages, status } = req.body;
+  const { title, abstract, category } = req.body;
 
   if (!title || !abstract || !category) {
     return res.status(400).json({
@@ -60,7 +18,8 @@ const researchUpload = asyncHandler(async (req, res) => {
     });
   }
 
-  let filePath = req.filePath || "/uploads/research/default.pdf";
+  // File upload path
+  const filePath = req.file ? `/uploads/research/${req.file.filename}` : "";
 
   // Parse authors
   let authors = req.body.authors;
@@ -68,10 +27,10 @@ const researchUpload = asyncHandler(async (req, res) => {
     try {
       authors = JSON.parse(authors);
     } catch {
-      authors = authors.split(",").map((a) => a.trim());
+      authors = req.user ? [req.user.name] : [authors];
     }
   } else if (!authors) {
-    authors = req.user?.name ? [req.user.name] : [];
+    authors = req.user ? [req.user.name] : [];
   }
 
   // Parse keywords
@@ -80,18 +39,22 @@ const researchUpload = asyncHandler(async (req, res) => {
     try {
       keywords = JSON.parse(keywords);
     } catch {
-      keywords = keywords.split(",").map((k) => k.trim()).filter(Boolean);
+      keywords = keywords
+        .split(",")
+        .map((k) => k.trim())
+        .filter(Boolean);
     }
   }
 
+  // Create the research document
   const newResearch = await Research.create({
     title,
     abstract,
-    publication_date: publication_date ? new Date(publication_date) : new Date(),
+    publication_date: req.body.publication_date || new Date(),
     file_path: filePath,
-    pages: parseInt(pages) || 1,
+    pages: req.body.pages || 1,
     category,
-    status: status || "pending",
+    status: req.body.status || "pending",
     authors,
     student_id: req.body.student_id || req.user?._id || null,
     student_name: req.body.student_name || req.user?.name || null,
@@ -103,126 +66,61 @@ const researchUpload = asyncHandler(async (req, res) => {
     review_date: null,
   });
 
-  // Assign reviewer
+  // 🎯 Assign reviewer from same department
   if (newResearch.department_id) {
     const committee = await CommitteeMember.find({
       department: newResearch.department_id,
     });
 
     if (committee.length > 0) {
-      const randomReviewer = committee[Math.floor(Math.random() * committee.length)];
+      const randomReviewer =
+        committee[Math.floor(Math.random() * committee.length)];
+
       newResearch.reviewer_id = randomReviewer._id;
       await newResearch.save();
 
+      // 📧 Send email notification
       const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
       const reviewLink = `${CLIENT_URL}/review/${newResearch._id}`;
 
+      const email = new Email(randomReviewer, reviewLink);
+
+      const message = `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+          <h2 style="color: #2c3e50;">New Research Assigned to You</h2>
+          <p>Dear ${randomReviewer.fullName || "Reviewer"},</p>
+          <p>You have been assigned a new research submission to review:</p>
+          <ul>
+            <li><strong>Title:</strong> ${newResearch.title}</li>
+            <li><strong>Submitted by:</strong> ${newResearch.student_name}</li>
+            <li><strong>Department:</strong> ${newResearch.department_name}</li>
+          </ul>
+          <p>Please log in and review the submission at the link below:</p>
+          <p style="text-align:center;">
+            <a href="${reviewLink}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:white;text-decoration:none;border-radius:5px;">Review Research</a>
+          </p>
+          <p>Thank you,<br>Kandahar University Faculty of Economic</p>
+        </div>
+      `;
+
       try {
-        const email = new Email(randomReviewer, reviewLink);
-        const message = `
-          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-            <h2 style="color: #2c3e50;">New Research Assigned to You</h2>
-            <p>Dear ${randomReviewer.fullName || randomReviewer.name || "Reviewer"},</p>
-            <p>You have been assigned a new research submission to review:</p>
-            <ul>
-              <li><strong>Title:</strong> ${newResearch.title}</li>
-              <li><strong>Submitted by:</strong> ${newResearch.student_name}</li>
-              <li><strong>Department:</strong> ${newResearch.department_name}</li>
-            </ul>
-            <p style="text-align:center;">
-              <a href="${reviewLink}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:white;text-decoration:none;border-radius:5px;">Review Research</a>
-            </p>
-            <p>Thank you,<br>Kandahar University Faculty of Economic</p>
-          </div>
-        `;
         await email.send("researchAssigned", "New Research Assigned to You", message);
       } catch (emailErr) {
         console.error("Error sending email to reviewer:", emailErr.message);
+        // Optional: Log but don’t fail research creation if email fails
       }
     }
   }
 
+  // ✅ Final response
   res.status(201).json({
     status: "success",
-    data: { research: newResearch },
+    data: {
+      research: newResearch,
+    },
   });
 });
 
-
-const updateResearchReview = asyncHandler(async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status, reviewer_comments, review_date } = req.body;
-
-    // Validation
-    if (!id) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Research ID is required",
-      });
-    }
-
-    if (!status || !reviewer_comments) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Status and reviewer comments are required",
-      });
-    }
-
-    // Fetch research and populate student
-    const research = await Research.findById(id).populate("student_id");
-    if (!research) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Research not found",
-      });
-    }
-
-    // Update review data
-    research.status = status;
-    research.reviewer_comments = reviewer_comments;
-    research.reviewer_id = req.user.id;
-    research.review_date = review_date || new Date();
-    await research.save();
-
-    console.log("Research updated:", research);
-
-    // Send email to student
-    const student = research.student_id;
-    if (student && student.email) {
-      const emailInstance = new Email(student, "https://localhost:5173/studenSubmit");
-
-      const content = `
-        <div style="font-family: Arial, sans-serif;">
-          <h2>Research Review Status Updated</h2>
-          <p>Dear ${student.fullName || "Student"},</p>
-          <p>Your research has been reviewed and updated. Below are the details:</p>
-          <ul>
-            <li><strong>Status:</strong> ${status}</li>
-            <li><strong>Reviewer Comments:</strong> ${reviewer_comments}</li>
-          </ul>
-          <p>Best regards,<br/>Kandahar University Faculty of Economic</p>
-        </div>
-      `;
-
-      await emailInstance.send("reviewUpdate", "Your Research Review Status Has Been Updated", content);
-    }
-
-    // Respond to client
-    res.status(200).json({
-      status: "success",
-      data: {
-        research,
-      },
-    });
-  } catch (error) {
-    console.error("Error in updateResearchReview:", error);
-    res.status(500).json({
-      status: "error",
-      message: error.message || "An error occurred while updating the research review",
-    });
-  }
-});
 
 
 
@@ -470,7 +368,4 @@ module.exports = {
   getResearchByDepartment,
   searchResearch,
   researchUpload,
-  updateResearchReview,
-  uploadFile,
-  processUploadedFile
 };
