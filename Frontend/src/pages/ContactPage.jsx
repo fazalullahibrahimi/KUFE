@@ -143,22 +143,15 @@ function ContactPage() {
 
   // Handle department selection
   const handleDepartmentChange = (e) => {
-    const departmentId = e.target.value
+    const departmentId = e.target.value;
 
     // Find the selected department to store its name
-<<<<<<< HEAD
-    const selectedDept = departments.find((dept) => dept._id === value);
+    const selectedDept = departments.find((dept) => dept._id === departmentId);
     if (selectedDept) {
       setSelectedDepartmentName(selectedDept.name);
       console.log(
-        `Selected department: ${selectedDept.name} with ID: ${value}`
+        `Selected department: ${selectedDept.name} with ID: ${departmentId}`
       );
-=======
-    const selectedDept = departments.find((dept) => dept._id === departmentId)
-    if (selectedDept) {
-      setSelectedDepartmentName(selectedDept.name)
-      console.log(`Selected department: ${selectedDept.name} with ID: ${departmentId}`)
->>>>>>> 4836eccb2ca1d6eae45045a2edcc63f02f03df00
     } else {
       setSelectedDepartmentName("");
     }
@@ -166,15 +159,9 @@ function ContactPage() {
     // Update form data with department_id
     setFormData({
       ...formData,
-<<<<<<< HEAD
-      department_id: value,
+      department_id: departmentId,
     });
   };
-=======
-      department_id: departmentId,
-    })
-  }
->>>>>>> 4836eccb2ca1d6eae45045a2edcc63f02f03df00
 
   // Form validation
   const validateForm = () => {
@@ -225,13 +212,8 @@ function ContactPage() {
     // Create a submission object that includes both ID and name for the backend
     const submissionData = {
       ...formData,
-<<<<<<< HEAD
       department_name: selectedDepartmentName, // Add department name for reference
     };
-=======
-      department_name: selectedDepartmentName, // Add department name for the backend
-    }
->>>>>>> 4836eccb2ca1d6eae45045a2edcc63f02f03df00
 
     // Log form data to verify department ID is included
     console.log("Submitting form data:", submissionData);
@@ -242,13 +224,8 @@ function ContactPage() {
         headers: {
           "Content-Type": "application/json",
         },
-<<<<<<< HEAD
-        body: JSON.stringify(formData), // Send only the original formData to match backend expectations
-      });
-=======
         body: JSON.stringify(submissionData), // Send the enhanced data to the backend
-      })
->>>>>>> 4836eccb2ca1d6eae45045a2edcc63f02f03df00
+      });
 
       const responseData = await response.json().catch(() => null);
       console.log("Server response:", responseData);
@@ -376,7 +353,7 @@ function ContactPage() {
           <div
             id='contact-form'
             ref={formRef}
-            className={`lg:col-span-2 transition-all duration-700 transform 
+            className={`lg:col-span-2 transition-all duration-700 transform
               ${
                 formVisible
                   ? "translate-y-0 opacity-100"
@@ -489,39 +466,23 @@ function ContactPage() {
                             placeholder='Enter message subject'
                           />
                         </div>
-<<<<<<< HEAD
+
                         <div className='space-y-3 group'>
                           <Label
-                            htmlFor='department'
+                            htmlFor='department_id'
                             className='text-[#1D3D6F] font-medium'
                           >
                             Department
                           </Label>
 
-                          {/* FIXED SELECT COMPONENT */}
+                          {/* Department Select Component */}
                           <div className='relative'>
                             <select
-                              id='department'
-                              value={formData.department_id}
-                              onChange={(e) =>
-                                handleDepartmentChange(e.target.value)
-                              }
-                              className='w-full px-3 py-2 border border-[#E8ECEF] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]/20 focus:border-[#1D3D6F] transition-all duration-300 bg-white'
-=======
-                        <div className="space-y-3 group">
-                          <Label htmlFor="department_id" className="text-[#1D3D6F] font-medium">
-                            Department
-                          </Label>
-
-                          {/* Department Select Component */}
-                          <div className="relative">
-                            <select
-                              id="department_id"
-                              name="department_id"
+                              id='department_id'
+                              name='department_id'
                               value={formData.department_id}
                               onChange={handleDepartmentChange}
-                              className="w-full px-3 py-2 border border-[#E8ECEF] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]/20 focus:border-[#1D3D6F] transition-all duration-300 bg-white"
->>>>>>> 4836eccb2ca1d6eae45045a2edcc63f02f03df00
+                              className='w-full px-3 py-2 border border-[#E8ECEF] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]/20 focus:border-[#1D3D6F] transition-all duration-300 bg-white'
                             >
                               <option value=''>Select Department</option>
                               {departments.map((dept) => (
@@ -623,7 +584,7 @@ function ContactPage() {
           {/* Contact information with enhanced styling */}
           <div
             ref={infoRef}
-            className={`transition-all duration-700 transform 
+            className={`transition-all duration-700 transform
               ${
                 infoVisible
                   ? "translate-y-0 opacity-100"
@@ -802,7 +763,7 @@ function ContactPage() {
       <div
         id='map'
         ref={mapRef}
-        className={`mt-12 container mx-auto px-4 md:px-8 mb-16 transition-all duration-700 transform 
+        className={`mt-12 container mx-auto px-4 md:px-8 mb-16 transition-all duration-700 transform
           ${
             mapVisible
               ? "translate-y-0 opacity-100"
