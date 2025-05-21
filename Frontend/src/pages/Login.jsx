@@ -62,7 +62,9 @@ function Login() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:4400/api/v1/user/login",
+        `${
+          import.meta.env.VITE_API_URL || "http://127.0.0.1:4400/api/v1"
+        }/user/login`,
         {
           email: formData.email,
           password: formData.password,
