@@ -15,7 +15,8 @@ const {
   getTopStudents,
 } = require("../controllers/studentController");
 
-const { authMiddleware, authorize } = require("../middleware/authMiddleware");
+const { authMiddleware } = require("../middleware/authMiddleware");
+const { authorize, checkPermission,requireRoles } = require("../middleware/roleCheck")
 const roles = require("../config/roles");
 
 const router = express.Router();
@@ -49,9 +50,9 @@ router.patch(
 router.delete("/:id", authorize(roles.ADMIN), deleteStudent);
 
 // Student Marks routes (admin only)
-router.post("/:id/marks", authorize(roles.ADMIN), createMarks);
-router.patch("/:id/marks", authorize(roles.ADMIN), updateMarks);
-router.get("/:id/marks", authorize(roles.ADMIN), getMarksById);
-router.delete("/:id/marks", authorize(roles.ADMIN), deleteMarks);
+router.post("/:id/marks", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), createMarks);
+router.patch("/:id/marks", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), updateMarks);
+router.get("/:id/marks", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), getMarksById);
+router.delete("/:id/marks", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), deleteMarks);
 
 module.exports = router;

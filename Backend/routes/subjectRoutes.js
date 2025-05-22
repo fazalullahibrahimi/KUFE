@@ -8,7 +8,8 @@ const {
   deleteSubject
 } = require('../controllers/subjectController');
 
-const { authMiddleware, authorize } = require('../middleware/authMiddleware');
+const { authMiddleware} = require('../middleware/authMiddleware');
+const { authorize, checkPermission,requireRoles } = require("../middleware/roleCheck")
 const roles = require('../config/roles');
 
 // Public routes
@@ -19,8 +20,8 @@ router.get('/:id', getSubjectById);
 router.use(authMiddleware);
 
 // Protected routes (admin only)
-router.post('/', authorize(roles.ADMIN), createSubject);
-router.patch('/:id', authorize(roles.ADMIN), updateSubject);
-router.delete('/:id', authorize(roles.ADMIN), deleteSubject);
+router.post('/', requireRoles([roles.ADMIN,roles.TEACHER]), createSubject);
+router.patch('/:id', requireRoles([roles.ADMIN,roles.TEACHER]), updateSubject);
+router.delete('/:id', requireRoles([roles.ADMIN,roles.TEACHER]), deleteSubject);
 
 module.exports = router;
