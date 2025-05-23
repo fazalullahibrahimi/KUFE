@@ -4,6 +4,7 @@ import Hero from "../components/Hero";
 import Programs from "../components/Programs";
 import Stats from "../components/Stats";
 import Events from "../components/Events";
+import TopPerformers from "../components/TopPerformers";
 import Footer from "../components/Footer";
 
 const Home = () => {
@@ -13,6 +14,7 @@ const Home = () => {
       <Hero />
       <Programs />
       <Stats />
+      <TopPerformers />
       <Events />
       <Footer />
     </>

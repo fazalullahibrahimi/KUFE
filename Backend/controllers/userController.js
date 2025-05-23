@@ -1,39 +1,38 @@
+const User = require("../models/User");
+const asyncHandler = require("../middleware/asyncHandler.js");
+const validateMongoDBId = require("../utils/validateMongoDBId.js");
+const generateToken = require("../utils/generateToken.js");
+const Email = require("../utils/email.js");
+const getAll = require("./handleFactory.js");
 
-const User = require("../models/User")
-const asyncHandler = require("../middleware/asyncHandler.js")
-const validateMongoDBId = require("../utils/validateMongoDBId.js")
-const generateToken = require("../utils/generateToken.js")
-const Email = require("../utils/email.js")
-const getAll = require("./handleFactory.js")
-
-const multer = require("multer")
-const sharp = require("sharp")
-const path = require("path")
-const fs = require("fs")
-const crypto = require("crypto")
-const Joi = require("joi")
+const multer = require("multer");
+const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs");
+const crypto = require("crypto");
+const Joi = require("joi");
 
 // Multer and image processing setup remains the same
 // Configure Multer Storage in memory
-const multerStorage = multer.memoryStorage()
+const multerStorage = multer.memoryStorage();
 
 // Filter to ensure only images are uploaded
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image")) {
-    cb(null, true)
+    cb(null, true);
   } else {
-    cb("Not an image! Please upload only images.", false)
+    cb("Not an image! Please upload only images.", false);
   }
-}
+};
 
 // Multer upload configuration
 const upload = multer({
   storage: multerStorage,
   fileFilter: multerFilter,
-})
+});
 
 // Middleware to handle single image file upload with name 'image'
-const uploadUserPhoto = upload.single("image")
+const uploadUserPhoto = upload.single("image");
 
 // Define the validation schema
 const userValidationSchema = Joi.object({
@@ -55,11 +54,13 @@ const userValidationSchema = Joi.object({
     "string.min": `"password" should have a minimum length of {#limit}`,
     "any.required": `"password" is a required field`,
   }),
-  role: Joi.string().valid("admin", "teacher", "student","committeeMember").default("student"),
+  role: Joi.string()
+    .valid("admin", "teacher", "student", "committeeMember")
+    .default("student"),
   image: Joi.string().allow(null).optional().messages({
     "string.base": `"image" should be a type of 'text'`,
   }),
-}).default({ image: "default-user.jpg" }) // Set default image
+}).default({ image: "default-user.jpg" }); // Set default image
 
 // Define the validation schema for contact
 const contactValidationSchema = Joi.object({
@@ -81,28 +82,28 @@ const contactValidationSchema = Joi.object({
     "string.empty": `"message" cannot be an empty field`,
     "any.required": `"message" is a required field`,
   }),
-})
+});
 
 // Register User
 const registerUser = asyncHandler(async (req, res) => {
-  const { error } = userValidationSchema.validate(req.body)
+  const { error } = userValidationSchema.validate(req.body);
 
   if (error) {
     return res.status(400).send({
       success: false,
       message: error.details[0].message,
-    })
+    });
   }
 
-  const { fullName, email, password, role } = req.body
+  const { fullName, email, password, role } = req.body;
 
-  const userExists = await User.findOne({ email })
+  const userExists = await User.findOne({ email });
 
   if (userExists) {
     return res.status(409).send({
       success: false,
       message: "User already exists",
-    })
+    });
   }
 
   const newUser = new User({
@@ -112,34 +113,37 @@ const registerUser = asyncHandler(async (req, res) => {
     role,
     image: req.file ? req.file.filename : "default-user.jpg",
     isVerified: false, // Set as unverified by default
-  })
+  });
 
   try {
-    await newUser.save()
+    await newUser.save();
 
     // Generate verification token and OTP
-    const verificationToken = newUser.createEmailVerificationToken()
-    await newUser.save({ validateBeforeSave: false })
+    const verificationToken = newUser.createEmailVerificationToken();
+    await newUser.save({ validateBeforeSave: false });
 
     // Generate OTP (6-digit number)
-    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Store OTP hash in the database
-    const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex")
-    newUser.verifyEmailToken = hashedOtp
-    newUser.verifyEmailTokenExpires = Date.now() + 10 * 60 * 1000 // 10 minutes
-    await newUser.save({ validateBeforeSave: false })
+    const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+    newUser.verifyEmailToken = hashedOtp;
+    newUser.verifyEmailTokenExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await newUser.save({ validateBeforeSave: false });
 
     // Create verification URL (for link-based verification alternative)
-    const verificationURL = `${req.protocol}://${req.get("host")}/api/users/verify-email/${verificationToken}`
+    const verificationURL = `${req.protocol}://${req.get(
+      "host"
+    )}/api/users/verify-email/${verificationToken}`;
 
     // Send verification email with OTP
     try {
-      await new Email(newUser, verificationURL).sendVerificationOTP(otp)
+      await new Email(newUser, verificationURL).sendVerificationOTP(otp);
 
       res.status(201).json({
         success: true,
-        message: "User registered successfully! Please check your email for verification OTP.",
+        message:
+          "User registered successfully! Please check your email for verification OTP.",
         user: {
           _id: newUser._id,
           fullName: newUser.fullName,
@@ -148,26 +152,26 @@ const registerUser = asyncHandler(async (req, res) => {
           image: newUser.image,
           isVerified: newUser.isVerified,
         },
-      })
+      });
     } catch (error) {
       // If email sending fails, reset verification tokens
-      newUser.verifyEmailToken = undefined
-      newUser.verifyEmailTokenExpires = undefined
-      await newUser.save({ validateBeforeSave: false })
+      newUser.verifyEmailToken = undefined;
+      newUser.verifyEmailTokenExpires = undefined;
+      await newUser.save({ validateBeforeSave: false });
 
       return res.status(500).send({
         success: false,
         message: "Error sending verification email. Please try again later.",
-      })
+      });
     }
   } catch (error) {
     res.status(400).send({
       success: false,
       message: "Error saving user",
       error: error.message,
-    })
+    });
   }
-})
+});
 
 const loginValidationSchema = Joi.object({
   email: Joi.string()
@@ -189,29 +193,29 @@ const loginValidationSchema = Joi.object({
       "string.min": `"password" should have a minimum length of {#limit}`,
       "any.required": `"password" is a required field`,
     }),
-})
+});
 
 // Login user - Updated to check for email verification
 const loginUser = asyncHandler(async (req, res) => {
   // Validate the request body
-  const { error } = loginValidationSchema.validate(req.body)
+  const { error } = loginValidationSchema.validate(req.body);
 
   if (error) {
     return res.status(400).send({
       success: false,
       message: error.details[0].message,
-    })
+    });
   }
 
-  const { email, password } = req.body
+  const { email, password } = req.body;
 
-  const existingUser = await User.findOne({ email }).select("+password")
+  const existingUser = await User.findOne({ email }).select("+password");
 
   if (!existingUser) {
     return res.status(401).send({
       success: false,
       message: "Email or password is incorrect!",
-    })
+    });
   }
 
   // Check if user's email is verified
@@ -221,12 +225,36 @@ const loginUser = asyncHandler(async (req, res) => {
       message: "Please verify your email before logging in.",
       needsVerification: true,
       userId: existingUser._id,
-    })
+    });
   }
 
   // Check password
   if (await existingUser.correctPassword(password, existingUser.password)) {
-    const token = generateToken(existingUser._id)
+    const token = generateToken(existingUser._id);
+
+    // If user is a committee member, get their committee member ID
+    let committeeId = null;
+    let departmentId = null;
+
+    if (existingUser.role === "committeeMember") {
+      try {
+        // Import CommitteeMember model
+        const CommitteeMember = require("../models/CommitteeMember");
+
+        // Find committee member record
+        const committeeMember = await CommitteeMember.findOne({
+          userId: existingUser._id,
+        });
+
+        if (committeeMember) {
+          committeeId = committeeMember._id;
+          departmentId = committeeMember.department;
+        }
+      } catch (error) {
+        console.error("Error fetching committee member details:", error);
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: "Logged in successfully",
@@ -236,15 +264,17 @@ const loginUser = asyncHandler(async (req, res) => {
         email: existingUser.email,
         role: existingUser.role,
         token,
+        committeeId: committeeId,
+        department_id: departmentId,
       },
-    })
+    });
   } else {
     return res.status(401).send({
       success: false,
       message: "Email or password is incorrect!",
-    })
+    });
   }
-})
+});
 
 // Verify email with OTP
 const verifyEmailWithOTP = asyncHandler(async (req, res) => {
@@ -306,7 +336,10 @@ const verifyEmail = asyncHandler(async (req, res) => {
   const emailToken = req.params.token;
 
   // 2. Hash the token
-  const hashedToken = crypto.createHash("sha256").update(emailToken).digest("hex");
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(emailToken)
+    .digest("hex");
 
   // 3. Find user with the token
   const user = await User.findOne({
@@ -345,102 +378,106 @@ const verifyEmail = asyncHandler(async (req, res) => {
 
 // Resend verification OTP
 const resendVerificationOTP = asyncHandler(async (req, res) => {
-  const { email } = req.body
+  const { email } = req.body;
 
   if (!email) {
     return res.status(400).send({
       success: false,
       message: "Please provide your email",
-    })
+    });
   }
 
   // Find user
-  const user = await User.findOne({ email })
+  const user = await User.findOne({ email });
 
   if (!user) {
     return res.status(404).send({
       success: false,
       message: "User not found",
-    })
+    });
   }
 
   if (user.isVerified) {
     return res.status(400).send({
       success: false,
       message: "Email already verified",
-    })
+    });
   }
 
   // Generate new verification token
-  const verificationToken = user.createEmailVerificationToken()
-  await user.save({ validateBeforeSave: false })
+  const verificationToken = user.createEmailVerificationToken();
+  await user.save({ validateBeforeSave: false });
 
   // Generate OTP (6-digit number)
-  const otp = Math.floor(100000 + Math.random() * 900000).toString()
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
   // Store OTP hash
-  const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex")
-  user.verifyEmailToken = hashedOtp
-  user.verifyEmailTokenExpires = Date.now() + 10 * 60 * 1000 // 10 minutes
-  await user.save({ validateBeforeSave: false })
+  const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+  user.verifyEmailToken = hashedOtp;
+  user.verifyEmailTokenExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  await user.save({ validateBeforeSave: false });
 
   // Create verification URL (for link-based verification alternative)
-  const verificationURL = `${req.protocol}://${req.get("host")}/api/v1/user/verify-email/${verificationToken}`
+  const verificationURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/user/verify-email/${verificationToken}`;
 
   try {
-    await new Email(user, verificationURL).sendVerificationOTP(otp)
+    await new Email(user, verificationURL).sendVerificationOTP(otp);
 
     res.status(200).json({
       success: true,
       message: "Verification OTP sent successfully!",
-    })
+    });
   } catch (error) {
-    user.verifyEmailToken = undefined
-    user.verifyEmailTokenExpires = undefined
-    await user.save({ validateBeforeSave: false })
+    user.verifyEmailToken = undefined;
+    user.verifyEmailTokenExpires = undefined;
+    await user.save({ validateBeforeSave: false });
 
     return res.status(500).send({
       success: false,
       message: "Error sending verification email. Please try again later.",
-    })
+    });
   }
-})
+});
 
 const resizeUserPhoto = asyncHandler(async (req, res, next) => {
-  if (!req.file) return next()
+  if (!req.file) return next();
 
-  const dir = path.join(__dirname, ".././public/img/users")
+  const dir = path.join(__dirname, ".././public/img/users");
   if (!fs.existsSync(dir)) {
     try {
-      fs.mkdirSync(dir, { recursive: true })
+      fs.mkdirSync(dir, { recursive: true });
     } catch (error) {
-      console.error("Error creating image directory:", error)
+      console.error("Error creating image directory:", error);
       return res.status(500).send({
         success: false,
         message: "Failed to create image directory",
-      })
+      });
     }
   }
 
-  const filename = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.jpeg`
-  req.file.filename = filename
+  const filename = `user-${Date.now()}-${Math.random()
+    .toString(36)
+    .substr(2, 9)}.jpeg`;
+  req.file.filename = filename;
 
   try {
     await sharp(req.file.buffer)
       .resize(500, 500)
       .toFormat("jpeg")
       .jpeg({ quality: 90 })
-      .toFile(path.join(dir, filename))
+      .toFile(path.join(dir, filename));
   } catch (error) {
-    console.error("Error processing image:", error)
+    console.error("Error processing image:", error);
     return res.status(500).send({
       success: false,
       message: "Error processing image",
-    })
+    });
   }
 
-  next()
-})
+  next();
+});
 
 const updateUserPhoto = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndUpdate(
@@ -451,35 +488,35 @@ const updateUserPhoto = asyncHandler(async (req, res) => {
     {
       new: true,
       runValidators: true,
-    },
-  ).select("-password")
+    }
+  ).select("-password");
 
   res.status(200).json({
     status: "success",
     data: {
       user,
     },
-  })
-})
+  });
+});
 
 // Other functions remain the same
 const logoutCurrentUser = asyncHandler(async (req, res) => {
   res.cookie("jwt", "", {
     httpOnly: true,
     expires: new Date(0),
-  })
+  });
 
   res.status(200).json({
     success: true,
     message: "Logged out successfully",
-  })
-})
+  });
+});
 
 const getCurrentUserProfile = asyncHandler(async (req, res, next) => {
-  const { _id } = req.user
-  validateMongoDBId(_id)
+  const { _id } = req.user;
+  validateMongoDBId(_id);
 
-  const user = await User.findById({ _id })
+  const user = await User.findById({ _id });
   if (user) {
     res.status(200).json({
       status: "success",
@@ -490,14 +527,14 @@ const getCurrentUserProfile = asyncHandler(async (req, res, next) => {
         image: user.image,
         role: user.role,
       },
-    })
+    });
   } else {
     return res.status(404).json({
       success: false,
       message: "User not found.",
-    })
+    });
   }
-})
+});
 
 // Update User By Id (only admin can)
 const updateUserValidationSchema = Joi.object({
@@ -524,46 +561,46 @@ const updateUserValidationSchema = Joi.object({
       "string.base": `"role" should be a type of 'text'`,
       "any.only": `"role" must be one of [user, admin, guide]`,
     }),
-})
+});
 
 const updateUserById = asyncHandler(async (req, res) => {
-  const { id } = req.params
-  validateMongoDBId(id)
+  const { id } = req.params;
+  validateMongoDBId(id);
 
   // Validate the request body
-  const { error } = updateUserValidationSchema.validate(req.body)
+  const { error } = updateUserValidationSchema.validate(req.body);
 
   if (error) {
     return res.status(400).send({
       success: false,
       message: error.details[0].message, // Return the first validation error message
-    })
+    });
   }
 
-  const { fullName, email, role } = req.body
+  const { fullName, email, role } = req.body;
 
-  const user = await User.findById(id)
+  const user = await User.findById(id);
 
   if (user) {
-    user.fullName = fullName || user.fullName
-    user.email = email || user.email
-    user.role = role || user.role
+    user.fullName = fullName || user.fullName;
+    user.email = email || user.email;
+    user.role = role || user.role;
 
-    const updatedUser = await user.save()
+    const updatedUser = await user.save();
     res.status(200).json({
       success: true,
       _id: updatedUser._id,
       fullName: updatedUser.fullName,
       email: updatedUser.email,
       role: updatedUser.role,
-    })
+    });
   } else {
     return res.status(404).json({
       success: false,
       message: "User not found!",
-    })
+    });
   }
-})
+});
 
 // Update current user profile
 const updateProfileValidationSchema = Joi.object({
@@ -582,31 +619,31 @@ const updateProfileValidationSchema = Joi.object({
       "string.base": `"email" should be a type of 'text'`,
       "string.email": `"email" must be a valid email`,
     }),
-})
+});
 
 const updateCurrentUserProfile = asyncHandler(async (req, res) => {
-  const { _id } = req.user
-  validateMongoDBId(_id)
+  const { _id } = req.user;
+  validateMongoDBId(_id);
 
   // Validate the request body
-  const { error } = updateProfileValidationSchema.validate(req.body)
+  const { error } = updateProfileValidationSchema.validate(req.body);
 
   if (error) {
     return res.status(400).send({
       success: false,
       message: error.details[0].message, // Return the first validation error message
-    })
+    });
   }
 
-  const { fullName, email } = req.body
+  const { fullName, email } = req.body;
 
-  const user = await User.findById(_id)
+  const user = await User.findById(_id);
 
   if (user) {
-    user.fullName = fullName || user.fullName
-    user.email = email || user.email
+    user.fullName = fullName || user.fullName;
+    user.email = email || user.email;
 
-    const updatedUser = await user.save()
+    const updatedUser = await user.save();
 
     res.json({
       success: true,
@@ -614,154 +651,157 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
       fullName: updatedUser.fullName,
       email: updatedUser.email,
       role: updatedUser.role,
-    })
+    });
   } else {
     return res.status(404).json({
       success: false,
       message: "User not found",
-    })
+    });
   }
-})
+});
 
-const getAllUsers = getAll(User)
+const getAllUsers = getAll(User);
 
 const findUserByID = asyncHandler(async (req, res, next) => {
-  const { id } = req.params
-  validateMongoDBId(id)
+  const { id } = req.params;
+  validateMongoDBId(id);
 
-  const user = await User.findById({ _id: id })
+  const user = await User.findById({ _id: id });
 
   if (user) {
-    res.status(200).json(user)
+    res.status(200).json(user);
   } else {
     return res.status(404).json({
       success: false,
       message: "User not found",
-    })
+    });
   }
-})
+});
 
 const deleteUserByID = asyncHandler(async (req, res, next) => {
-  const { id } = req.params
-  validateMongoDBId(id)
+  const { id } = req.params;
+  validateMongoDBId(id);
 
-  const user = await User.findById({ _id: id })
+  const user = await User.findById({ _id: id });
   if (user) {
     if (user.isAdmin) {
       return res.status(400).json({
         success: false,
         message: "Cannot delete user as admin!",
-      })
+      });
     }
 
-    await User.deleteOne({ _id: user._id })
-    res.status(204).json({ message: "User removed successfully" })
+    await User.deleteOne({ _id: user._id });
+    res.status(204).json({ message: "User removed successfully" });
   } else {
     return res.status(404).json({
       success: false,
       message: "User not found!",
-    })
+    });
   }
-})
+});
 
 const updatePassword = asyncHandler(async (req, res, next) => {
-  const { _id } = req.user // User's ID from authentication middleware
-  validateMongoDBId(_id)
+  const { _id } = req.user; // User's ID from authentication middleware
+  validateMongoDBId(_id);
 
-  const { currentPassword, newPassword } = req.body
+  const { currentPassword, newPassword } = req.body;
 
   if (!currentPassword || !newPassword) {
     return res.status(400).send({
       success: false,
       message: "Current and new password are required",
-    })
+    });
   }
 
   // 1) Get user from the database
-  const user = await User.findById(_id)
+  const user = await User.findById(_id);
 
   if (!user) {
     return res.status(404).send({
       success: false,
       message: "User not found",
-    })
+    });
   }
 
   // 2) Validate current password
-  const isMatch = await user.isPasswordValid(currentPassword) // Compare with hashed password
+  const isMatch = await user.isPasswordValid(currentPassword); // Compare with hashed password
   if (!isMatch) {
     return res.status(401).send({
       success: false,
       message: "Your current password is incorrect",
-    })
+    });
   }
 
   // 3) Update to new password
-  user.password = newPassword // This should trigger hashing in Mongoose middleware
-  await user.save()
+  user.password = newPassword; // This should trigger hashing in Mongoose middleware
+  await user.save();
 
   // 4) Respond with success message
   res.status(200).json({
     status: "success",
     message: "Your password was updated successfully",
-  })
-})
+  });
+});
 
 const forgotPassword = asyncHandler(async (req, res, next) => {
   // 1) Get user based on POSTed email
 
-  const user = await User.findOne({ email: req.body.email })
+  const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return res.status(404).send({
       success: false,
       message: "There is no user with this email address.",
-    })
+    });
   }
 
   // 2) Generate the random reset token
-  const resetToken = user.createPasswordResetToken()
-  await user.save({ validateBeforeSave: false })
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
 
   // 3) Send it to user's email
   try {
     // Use frontend URL for the reset link
-    const resetURL = `http://localhost:5173/resetPassword/${resetToken}`
+    const resetURL = `http://localhost:5173/resetPassword/${resetToken}`;
 
     // Send the reset URL to the user
-    await new Email(user, resetURL).sendPasswordReset()
+    await new Email(user, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: "success",
       message: "Token sent to email go to email and click of sending link!",
-    })
+    });
   } catch (err) {
-    user.passwordResetToken = undefined
-    user.passwordResetExpires = undefined
-    await user.save({ validateBeforeSave: false })
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
 
-    console.error(err)
+    console.error(err);
     return res.status(500).send({
       success: false,
       message: "There was an error sending the email. Try again later!",
-    })
+    });
   }
-})
+});
 
 const resetPassword = asyncHandler(async (req, res, next) => {
   // 1) Get user based on the token
-  const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex")
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
-  })
+  });
 
   // 2) If token is invalid or expired
   if (!user) {
     return res.status(400).send({
       success: false,
       message: "Token is invalid or has expired!",
-    })
+    });
   }
 
   // 3) Check if passwords match
@@ -769,31 +809,31 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     return res.status(400).send({
       success: false,
       message: "Passwords do not match!",
-    })
+    });
   }
 
   // 4) Set new password
-  user.password = req.body.password
-  user.passwordResetToken = undefined
-  user.passwordResetExpires = undefined
-  await user.save()
+  user.password = req.body.password;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
 
   // 5) Send success response
   res.status(200).json({
     status: "success",
     message: "Your password was reset successfully",
-  })
-})
-
-
+  });
+});
 
 const getAllCommitteeMembers = async (req, res) => {
   try {
-    const committeeMembers = await User.find({ role: 'committeeMember' }).select('fullName');
+    const committeeMembers = await User.find({
+      role: "committeeMember",
+    }).select("fullName");
     res.status(200).json(committeeMembers);
   } catch (error) {
-    console.error('Error fetching committee members:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching committee members:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 module.exports = {
@@ -817,4 +857,4 @@ module.exports = {
   verifyEmailWithOTP,
   verifyEmail,
   resendVerificationOTP,
-}
+};

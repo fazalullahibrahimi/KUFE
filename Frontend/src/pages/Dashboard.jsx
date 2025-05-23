@@ -386,6 +386,98 @@ const Dashboard = () => {
 
         {/* Main Dashboard Content */}
         <div className='flex-1 overflow-y-auto p-6'>
+          {activeTab === "research" && (
+            <div className='space-y-6'>
+              <div className='flex justify-between items-center'>
+                <h2 className='text-xl font-semibold text-gray-800'>
+                  Research Management
+                </h2>
+                <a
+                  href='/admin-research'
+                  className='flex items-center px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
+                >
+                  <FileText size={18} className='mr-2' />
+                  View All Research Submissions
+                </a>
+              </div>
+
+              {/* Research Stats Cards */}
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                <div className='bg-white rounded-lg shadow p-6 flex items-center'>
+                  <div className='w-12 h-12 rounded-full bg-[#004B87] bg-opacity-10 flex items-center justify-center mr-4'>
+                    <FileText size={24} className='text-[#004B87]' />
+                  </div>
+                  <div>
+                    <p className='text-gray-500 text-sm'>Total Submissions</p>
+                    <p className='text-2xl font-bold text-gray-800'>24</p>
+                  </div>
+                </div>
+
+                <div className='bg-white rounded-lg shadow p-6 flex items-center'>
+                  <div className='w-12 h-12 rounded-full bg-green-500 bg-opacity-10 flex items-center justify-center mr-4'>
+                    <Check size={24} className='text-green-500' />
+                  </div>
+                  <div>
+                    <p className='text-gray-500 text-sm'>Accepted</p>
+                    <p className='text-2xl font-bold text-gray-800'>12</p>
+                  </div>
+                </div>
+
+                <div className='bg-white rounded-lg shadow p-6 flex items-center'>
+                  <div className='w-12 h-12 rounded-full bg-yellow-500 bg-opacity-10 flex items-center justify-center mr-4'>
+                    <AlertTriangle size={24} className='text-yellow-500' />
+                  </div>
+                  <div>
+                    <p className='text-gray-500 text-sm'>Pending Review</p>
+                    <p className='text-2xl font-bold text-gray-800'>8</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Links */}
+              <div className='bg-white rounded-lg shadow p-6'>
+                <h3 className='text-lg font-medium text-gray-800 mb-4'>
+                  Research Management
+                </h3>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <a
+                    href='/admin-research'
+                    className='flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50'
+                  >
+                    <div className='w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3'>
+                      <FileText size={20} />
+                    </div>
+                    <div>
+                      <p className='font-medium text-gray-800'>
+                        View All Submissions
+                      </p>
+                      <p className='text-sm text-gray-500'>
+                        Access all research submissions
+                      </p>
+                    </div>
+                  </a>
+
+                  <a
+                    href='/committee-research'
+                    className='flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50'
+                  >
+                    <div className='w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3'>
+                      <MessageSquare size={20} />
+                    </div>
+                    <div>
+                      <p className='font-medium text-gray-800'>
+                        Committee View
+                      </p>
+                      <p className='text-sm text-gray-500'>
+                        Department-specific submissions
+                      </p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === "courses" && (
             <div className='space-y-6'>
               <div className='flex justify-between items-center'>

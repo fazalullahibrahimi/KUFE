@@ -288,6 +288,16 @@ const translations = {
     "Faculty members": "Faculty Members",
     programs: "Programs",
     "Scroll Down": "Scroll Down",
+
+    // TopPerformers.jsx
+    "Top Students": "Top Students",
+    "Top Teachers": "Top Teachers",
+    "Student ID": "Student ID",
+    "Top Score": "Top Score",
+    "No top students data available": "No top students data available",
+    "No top teachers data available": "No top teachers data available",
+    Loading: "Loading",
+    "Error Loading Data": "Error Loading Data",
   },
   dr: {
     // Dari translations
@@ -365,6 +375,16 @@ const translations = {
     "Faculty members": "اعضای هیئت علمی",
     programs: "برنامه‌ها",
     "Scroll Down": "اسکرول به پایین",
+
+    // TopPerformers.jsx
+    "Top Students": "دانشجویان برتر",
+    "Top Teachers": "استادان برتر",
+    "Student ID": "شماره دانشجویی",
+    "Top Score": "نمره برتر",
+    "No top students data available": "اطلاعات دانشجویان برتر در دسترس نیست",
+    "No top teachers data available": "اطلاعات استادان برتر در دسترس نیست",
+    Loading: "در حال بارگذاری",
+    "Error Loading Data": "خطا در بارگذاری اطلاعات",
 
     // AcademicPage.jsx
     Academic_Programs_Title: "برنامه‌های تحصیلی",
@@ -634,6 +654,16 @@ const translations = {
     "Faculty members": "د پوهنځي غړي",
     programs: "پروګرامونه",
     "Scroll Down": "ښکته سکرول کړئ",
+
+    // TopPerformers.jsx
+    "Top Students": "غوره زده کوونکي",
+    "Top Teachers": "غوره استادان",
+    "Student ID": "د زده کوونکي پېژندنه",
+    "Top Score": "لوړه نمره",
+    "No top students data available": "د غوره زده کوونکو معلومات شتون نلري",
+    "No top teachers data available": "د غوره استادانو معلومات شتون نلري",
+    Loading: "په بار کولو کې",
+    "Error Loading Data": "د معلوماتو په بار کولو کې تېروتنه",
 
     // AcademicPage.jsx
     Academic_Programs_Title: "اکاډمیک پروګرامونه",

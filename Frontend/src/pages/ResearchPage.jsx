@@ -366,17 +366,32 @@ export default function ResearchPage() {
                 </p>
 
                 {isLoggedIn && isStudent && (
-                  <button
-                    onClick={navigateToSubmitResearch}
-                    className='inline-flex items-center px-5 py-2 bg-[#F7B500] text-[#1D3D6F] font-bold rounded-full hover:bg-[#e5a700] transition-colors'
-                  >
-                    {t("Submit Your Research")}{" "}
-                    <ArrowUpRight
-                      className={`h-4 w-4 ${
-                        direction === "rtl" ? "mr-2" : "ml-2"
-                      }`}
-                    />
-                  </button>
+                  <div className='flex space-x-4'>
+                    <button
+                      onClick={navigateToSubmitResearch}
+                      className='inline-flex items-center px-5 py-2 bg-[#F7B500] text-[#1D3D6F] font-bold rounded-full hover:bg-[#e5a700] transition-colors'
+                    >
+                      {t("Submit Your Research")}{" "}
+                      <ArrowUpRight
+                        className={`h-4 w-4 ${
+                          direction === "rtl" ? "mr-2" : "ml-2"
+                        }`}
+                      />
+                    </button>
+                    <button
+                      onClick={() =>
+                        (window.location.href = "/studentSubmissin")
+                      }
+                      className='inline-flex items-center px-5 py-2 bg-white text-[#1D3D6F] font-bold rounded-full hover:bg-gray-100 transition-colors border border-[#1D3D6F]'
+                    >
+                      {t("View My Submissions")}{" "}
+                      <FileText
+                        className={`h-4 w-4 ${
+                          direction === "rtl" ? "mr-2" : "ml-2"
+                        }`}
+                      />
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -827,17 +842,32 @@ export default function ResearchPage() {
                   {t("Submit_Research_Description")}
                 </p>
                 {isLoggedIn && isStudent ? (
-                  <button
-                    onClick={navigateToSubmitResearch}
-                    className='bg-[#1D3D6F] hover:bg-[#2C4F85] text-white font-bold py-3 px-6 rounded-lg transition shadow-md inline-flex items-center'
-                  >
-                    {t("Submit Your Research")}{" "}
-                    <ArrowUpRight
-                      className={`h-4 w-4 ${
-                        direction === "rtl" ? "mr-2" : "ml-2"
-                      }`}
-                    />
-                  </button>
+                  <div className='flex flex-wrap gap-4'>
+                    <button
+                      onClick={navigateToSubmitResearch}
+                      className='bg-[#1D3D6F] hover:bg-[#2C4F85] text-white font-bold py-3 px-6 rounded-lg transition shadow-md inline-flex items-center'
+                    >
+                      {t("Submit Your Research")}{" "}
+                      <ArrowUpRight
+                        className={`h-4 w-4 ${
+                          direction === "rtl" ? "mr-2" : "ml-2"
+                        }`}
+                      />
+                    </button>
+                    <button
+                      onClick={() =>
+                        (window.location.href = "/studentSubmissin")
+                      }
+                      className='bg-white hover:bg-gray-100 text-[#1D3D6F] font-bold py-3 px-6 rounded-lg transition shadow-md inline-flex items-center border border-[#1D3D6F]'
+                    >
+                      {t("View My Submissions")}{" "}
+                      <FileText
+                        className={`h-4 w-4 ${
+                          direction === "rtl" ? "mr-2" : "ml-2"
+                        }`}
+                      />
+                    </button>
+                  </div>
                 ) : (
                   <button
                     onClick={() => (window.location.href = "/login")}

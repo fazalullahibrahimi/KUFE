@@ -1,5 +1,4 @@
 import React from "react";
-
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown, Menu, X, Globe, ChevronRight } from "lucide-react";
@@ -147,11 +146,6 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Student Portal Button */}
-          <button className='bg-[#F7B500] text-[#1D3D6F] px-4 py-2 rounded-md hover:bg-[#d9a200] transition-colors font-medium'>
-            {t("student_portal")}
-          </button>
-
           {/* Mobile Menu Button */}
           <button
             className='md:hidden flex items-center justify-center text-white'
@@ -215,15 +209,6 @@ const Navbar = () => {
                 )}
               </button>
             ))}
-          </div>
-
-          <div className='px-6 py-4'>
-            <button
-              className='w-full bg-[#F7B500] text-[#1D3D6F] py-3 rounded-md hover:bg-[#d9a200] transition-colors font-medium'
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {t("student_portal")}
-            </button>
           </div>
         </div>
       )}

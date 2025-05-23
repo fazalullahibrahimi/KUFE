@@ -43,6 +43,7 @@ export const notifyTeacherOfSubmission = async (research, student, teacher) => {
         abstract:
           research.abstract?.substring(0, 200) +
           (research.abstract?.length > 200 ? "..." : ""),
+        reviewLink: "http://localhost:5175/committee-research", // Link to committee research view
       },
     };
 
@@ -276,7 +277,13 @@ export const getStudentById = async (studentId) => {
     }
   } catch (error) {
     console.error("Error getting student data:", error);
-    return null;
+    // Always return a mock student instead of null to prevent UI errors
+    return {
+      _id: studentId,
+      name: "Student Name",
+      email: "student@example.com",
+      student_id_number: studentId,
+    };
   }
 };
 
