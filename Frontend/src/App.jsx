@@ -22,6 +22,8 @@ import ResendVerification from "./pages/ResendVerification.jsx";
 import FacultyDirectory from "./pages/FacultyDirectory.jsx";
 import StudentResearchSubmission from "./pages/StudentResearchSubmission.jsx";
 import StudentResearchSubmitForm from "./pages/StudentResearchSubmitForm.jsx";
+import CommitteeResearchView from "./pages/CommitteeResearchView";
+import AdminResearchView from "./pages/AdminResearchView";
 // import SecondPage from "./components/DataManagement/StudentMarksView.jsx";
 import StudentMarksView from "./components/DataManagement/StudentMarksView.jsx";
 import TeacherMarksManagement from "./components/DataManagement/TeacherMarksManagement.jsx";
@@ -62,6 +64,8 @@ function App() {
         <Route path='/studentmarks' element={<StudentMarksView />} />
         <Route path='/teachermarks' element={<TeacherMarksManagement />} />
         <Route path='/committe' element={<CommitteeMemberManagement />} />
+        <Route path='/committee-research' element={<CommitteeResearchView />} />
+        <Route path='/admin-research' element={<AdminResearchView />} />
       </Routes>
     </Router>
   );
