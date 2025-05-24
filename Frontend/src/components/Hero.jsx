@@ -1,12 +1,16 @@
 import React from "react";
 import { useEffect, useState } from "react";
+import axios from "axios";
 import ImageBackGround from "../../public/Hero_BackGroundImage.jpg";
 import { useLanguage } from "../contexts/LanguageContext";
-import { FaGraduationCap, FaChalkboardTeacher, FaBook } from "react-icons/fa";
+import { FaChalkboardTeacher, FaBook, FaSpinner, FaUserGraduate } from "react-icons/fa";
 
 const Hero = () => {
   const { t, language } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
+  const [statsData, setStatsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Set direction based on language
   const direction = ["ps", "dr"].includes(language) ? "rtl" : "ltr";
@@ -25,24 +29,69 @@ const Hero = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Define stats data
-  const statsData = [
-    {
-      icon: <FaGraduationCap className='text-[#F4B400] text-2xl' />,
-      title: "graduates",
-      value: "5,000+",
-    },
-    {
-      icon: <FaChalkboardTeacher className='text-[#F4B400] text-2xl' />,
-      title: "Faculty members",
-      value: "50+",
-    },
-    {
-      icon: <FaBook className='text-[#F4B400] text-2xl' />,
-      title: "programs",
-      value: "12",
-    },
-  ];
+  // Fetch statistics from APIs
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch data from multiple APIs (same as AboutPage)
+        const [studentResponse, facultyResponse, programResponse] = await Promise.all([
+          axios.get("http://localhost:4400/api/v1/students/studentcount"),
+          axios.get("http://localhost:4400/api/v1/teachers/count"),
+          axios.get("http://localhost:4400/api/v1/departments/programcount")
+        ]);
+
+        // Format the data for display
+        const formattedStats = [
+          {
+            icon: <FaUserGraduate className='text-[#F4B400] text-2xl' />,
+            title: "Students",
+            value: `${studentResponse.data}+`,
+          },
+          {
+            icon: <FaChalkboardTeacher className='text-[#F4B400] text-2xl' />,
+            title: "Faculty Members",
+            value: `${facultyResponse.data}+`,
+          },
+          {
+            icon: <FaBook className='text-[#F4B400] text-2xl' />,
+            title: "Programs",
+            value: programResponse.data.toString(),
+          },
+        ];
+
+        setStatsData(formattedStats);
+      } catch (err) {
+        console.error("Error fetching statistics:", err);
+        setError("Failed to load statistics");
+
+        // Fallback to static data
+        setStatsData([
+          {
+            icon: <FaUserGraduate className='text-[#F4B400] text-2xl' />,
+            title: "Students",
+            value: "5,000+",
+          },
+          {
+            icon: <FaChalkboardTeacher className='text-[#F4B400] text-2xl' />,
+            title: "Faculty Members",
+            value: "50+",
+          },
+          {
+            icon: <FaBook className='text-[#F4B400] text-2xl' />,
+            title: "Programs",
+            value: "12",
+          },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <section
@@ -82,46 +131,48 @@ const Hero = () => {
               {t("message")}
             </p>
 
-            <div
-              className={`flex flex-wrap gap-4 justify-center md:justify-${
-                direction === "rtl" ? "start" : "start"
-              }`}
-            >
-              <button className='bg-[#F4B400] hover:bg-[#e5a800] text-[#004B87] font-bold py-3 px-6 rounded-md transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-roboto'>
-                {t("explore programs")}
-              </button>
-              <button className='bg-transparent border-2 border-white hover:bg-white hover:text-[#004B87] text-white font-bold py-3 px-6 rounded-md transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 font-roboto'>
-                {t("apply now")}
-              </button>
-            </div>
+
           </div>
 
           {/* Stats cards */}
           <div className='grid grid-cols-1 gap-4 w-full md:w-auto md:max-w-sm'>
-            {statsData.map((stat, index) => (
-              <div
-                key={index}
-                className='bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-4 border border-white border-opacity-20 transform transition-all duration-300 hover:scale-105 hover:bg-opacity-15'
-              >
-                <div className='flex items-center'>
-                  <div
-                    className={`p-3 rounded-full bg-[#004B87] bg-opacity-30 ${
-                      direction === "rtl" ? "ml-4" : "mr-4"
-                    }`}
-                  >
-                    {stat.icon}
-                  </div>
-                  <div>
-                    <h3 className='text-gray-800 font-bold text-2xl'>
-                      {stat.value}
-                    </h3>
-                    <p className='text-gray-800 text-sm opacity-80'>
-                      {t(stat.title)}
-                    </p>
+            {loading ? (
+              // Loading state
+              [...Array(3)].map((_, index) => (
+                <div
+                  key={index}
+                  className='bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-4 border border-white border-opacity-20 flex items-center justify-center'
+                >
+                  <FaSpinner className='animate-spin text-[#F4B400] text-2xl' />
+                </div>
+              ))
+            ) : (
+              // Actual stats data
+              statsData.map((stat, index) => (
+                <div
+                  key={index}
+                  className='bg-white bg-opacity-10 backdrop-blur-lg rounded-lg p-4 border border-white border-opacity-20 transform transition-all duration-300 hover:scale-105 hover:bg-opacity-15'
+                >
+                  <div className='flex items-center'>
+                    <div
+                      className={`p-3 rounded-full bg-[#004B87] bg-opacity-30 ${
+                        direction === "rtl" ? "ml-4" : "mr-4"
+                      }`}
+                    >
+                      {stat.icon}
+                    </div>
+                    <div>
+                      <h3 className='text-gray-800 font-bold text-2xl'>
+                        {stat.value}
+                      </h3>
+                      <p className='text-gray-800 text-sm opacity-80'>
+                        {stat.title}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 

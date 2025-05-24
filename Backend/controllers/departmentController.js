@@ -240,7 +240,7 @@ const getDepartmentWithCourses = asyncHandler(async (req, res) => {
     .select("code name description credits");
 
   res.status(200).json(
-    apiResponse.success("Department with courses retrieved successfully", { 
+    apiResponse.success("Department with courses retrieved successfully", {
       department,
       courses,
       coursesCount: courses.length
@@ -292,7 +292,7 @@ const getFeaturedDepartments = asyncHandler(async (req, res) => {
 const getDepartmentStatistics = asyncHandler(async (req, res) => {
   // Count total departments
   const totalDepartments = await Department.countDocuments();
-  
+
   // Get departments grouped by faculty
   const departmentsByFaculty = await Department.aggregate([
     {
@@ -376,7 +376,7 @@ const getUniversityStatistics = asyncHandler(async (req, res) => {
 
     // --- Final stats ---
     const statistics = [
-      { number: `${studentCount}+`, label: "Students Enrolled" },
+      { number: `${studentCount}+`, label: "Students" },
       { number: `${teacherCount}+`, label: "Faculty Members" },
       { number: successRate, label: "Course Success Rate" },
       { number: `${researchCount}+`, label: "Research Papers" }

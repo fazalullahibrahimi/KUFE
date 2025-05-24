@@ -4,12 +4,16 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import {
   FaSpinner,
-  FaUserGraduate,
-  FaBriefcase,
   FaChalkboardTeacher,
   FaBookOpen,
   FaExclamationTriangle,
   FaSync,
+  FaUsers,
+  FaChartLine,
+  FaFlask,
+  FaAward,
+  FaGraduationCap,
+  FaMedal,
 } from "react-icons/fa";
 import useCountUp from "../hooks/useCountUp";
 import useElementOnScreen from "../hooks/useElementOnScreen";
@@ -27,13 +31,68 @@ const Stats = () => {
     triggerOnce: true,
   });
 
-  // Define icons for each stat type
-  const statIcons = [
-    FaUserGraduate,
-    FaBriefcase,
-    FaChalkboardTeacher,
-    FaBookOpen,
-  ];
+  // Function to get appropriate icon and color based on statistic label
+  const getStatIconAndColor = (label) => {
+    const lowerLabel = label.toLowerCase();
+
+    if (lowerLabel.includes('student') || lowerLabel.includes('enrolled')) {
+      return {
+        icon: FaUsers,
+        bgColor: 'bg-blue-500',
+        bgOpacity: 'bg-blue-500/20',
+        iconColor: 'text-blue-500'
+      };
+    } else if (lowerLabel.includes('faculty') || lowerLabel.includes('teacher')) {
+      return {
+        icon: FaChalkboardTeacher,
+        bgColor: 'bg-green-500',
+        bgOpacity: 'bg-green-500/20',
+        iconColor: 'text-green-500'
+      };
+    } else if (lowerLabel.includes('success') || lowerLabel.includes('rate') || lowerLabel.includes('%')) {
+      return {
+        icon: FaChartLine,
+        bgColor: 'bg-purple-500',
+        bgOpacity: 'bg-purple-500/20',
+        iconColor: 'text-purple-500'
+      };
+    } else if (lowerLabel.includes('research') || lowerLabel.includes('paper')) {
+      return {
+        icon: FaFlask,
+        bgColor: 'bg-orange-500',
+        bgOpacity: 'bg-orange-500/20',
+        iconColor: 'text-orange-500'
+      };
+    } else if (lowerLabel.includes('graduate') || lowerLabel.includes('graduation')) {
+      return {
+        icon: FaGraduationCap,
+        bgColor: 'bg-indigo-500',
+        bgOpacity: 'bg-indigo-500/20',
+        iconColor: 'text-indigo-500'
+      };
+    } else if (lowerLabel.includes('award') || lowerLabel.includes('achievement')) {
+      return {
+        icon: FaAward,
+        bgColor: 'bg-yellow-500',
+        bgOpacity: 'bg-yellow-500/20',
+        iconColor: 'text-yellow-500'
+      };
+    } else if (lowerLabel.includes('employment') || lowerLabel.includes('job')) {
+      return {
+        icon: FaMedal,
+        bgColor: 'bg-red-500',
+        bgOpacity: 'bg-red-500/20',
+        iconColor: 'text-red-500'
+      };
+    } else {
+      return {
+        icon: FaBookOpen,
+        bgColor: 'bg-[#F4B400]',
+        bgOpacity: 'bg-[#F4B400]/20',
+        iconColor: 'text-[#F4B400]'
+      };
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -55,10 +114,10 @@ const Stats = () => {
       console.error("Error fetching statistics:", err);
       // Fallback to static data if API fails
       setStats([
-        { number: "2,500+", label: t("Students Enrolled") },
-        { number: "85%", label: t("Employment Rate") },
-        { number: "50+", label: t("Faculty Members") },
-        { number: "30+", label: t("Research Papers") },
+        { number: "2,500+", label: "Students" },
+        { number: "50+", label: "Faculty Members" },
+        { number: "85%", label: "Course Success Rate" },
+        { number: "30+", label: "Research Papers" },
       ]);
       setError(t("Could not load live statistics. Showing estimated values."));
     } finally {
@@ -113,7 +172,7 @@ const Stats = () => {
           {stats.map((stat, index) => {
             // Extract the numeric part and any suffix
             const { value, formattedValue } = parseStatValue(stat.number);
-            const Icon = statIcons[index % statIcons.length];
+            const { icon: Icon, bgOpacity, iconColor } = getStatIconAndColor(stat.label);
 
             return (
               <div
@@ -125,8 +184,8 @@ const Stats = () => {
                 }}
               >
                 <div className='flex justify-center mb-4'>
-                  <div className='w-16 h-16 rounded-full bg-[#F4B400] bg-opacity-20 flex items-center justify-center'>
-                    <Icon className='text-[#F4B400] text-3xl' />
+                  <div className={`w-16 h-16 rounded-full ${bgOpacity} flex items-center justify-center`}>
+                    <Icon className={`${iconColor} text-3xl`} />
                   </div>
                 </div>
                 <h3 className='text-3xl sm:text-4xl font-poppins font-bold text-gray-800 flex justify-center items-baseline'>

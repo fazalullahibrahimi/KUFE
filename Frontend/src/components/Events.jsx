@@ -24,6 +24,8 @@ const Events = () => {
   const [error, setError] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
   const [showAllEvents, setShowAllEvents] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const { t, direction, language } = useLanguage();
   console.log(direction);
   // Event type icons mapping
@@ -186,6 +188,41 @@ const Events = () => {
   // Get unique event types for filter
   const eventTypes = ["all", ...new Set(events.map((event) => event.type))];
 
+  // Handle read more functionality
+  const handleReadMore = (event) => {
+    setSelectedEvent(event);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedEvent(null);
+  };
+
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleEscKey = (event) => {
+      if (event.key === 'Escape' && showModal) {
+        closeModal();
+      }
+    };
+
+    if (showModal) {
+      document.addEventListener('keydown', handleEscKey);
+      // Prevent body scroll when modal is open and remove any backdrop filters
+      document.body.style.overflow = 'hidden';
+      document.body.style.filter = 'none';
+      document.body.style.backdropFilter = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+      document.body.style.overflow = 'unset';
+      document.body.style.filter = '';
+      document.body.style.backdropFilter = '';
+    };
+  }, [showModal]);
+
   return (
     <section
       dir={direction}
@@ -320,7 +357,7 @@ const Events = () => {
                   }`}
                 >
                   {/* Glass card */}
-                  <div className='h-full bg-white bg-opacity-80 backdrop-blur-sm border border-white border-opacity-20 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300'>
+                  <div className={`h-full bg-white/80 border border-white/20 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 ${showModal ? '' : 'backdrop-blur-sm'}`}>
                     {/* Card header with date and type */}
                     <div className='flex justify-between items-start p-4 border-b border-gray-100'>
                       <div className='flex items-center'>
@@ -377,7 +414,10 @@ const Events = () => {
                       )}
 
                       {/* Read more button */}
-                      <button className='mt-2 inline-flex items-center text-[#F4B400] font-medium hover:text-[#004B87] transition-colors'>
+                      <button
+                        onClick={() => handleReadMore(event)}
+                        className='mt-2 inline-flex items-center text-[#F4B400] font-medium hover:text-[#004B87] transition-colors hover:underline'
+                      >
                         {t("Read more")}{" "}
                         <FaArrowRight className='ml-1 text-xs' />
                       </button>
@@ -410,6 +450,114 @@ const Events = () => {
           </>
         )}
       </div>
+
+      {/* Event Details Modal */}
+      {showModal && selectedEvent && (
+        <div
+          className='fixed inset-0 bg-black/50 backdrop-blur-none flex items-center justify-center z-[9999] p-4'
+          onClick={closeModal}
+          style={{ backdropFilter: 'none' }}
+        >
+          <div
+            className='bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200'
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className='flex justify-between items-start p-6 border-b border-gray-200'>
+              <div className='flex items-center'>
+                <div className='bg-[#004B87]/10 p-3 rounded-lg mr-4'>
+                  {getEventIcon(selectedEvent.type)}
+                </div>
+                <div>
+                  <h2
+                    className='text-2xl font-bold text-[#004B87]'
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    {selectedEvent.title}
+                  </h2>
+                  <div className='flex items-center mt-2 text-sm text-gray-600'>
+                    <FaCalendarAlt className='mr-2' />
+                    <span>{selectedEvent.date}</span>
+                    {selectedEvent.location && (
+                      <>
+                        <FaMapMarkerAlt className='ml-4 mr-2' />
+                        <span>{selectedEvent.location}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={closeModal}
+                className='text-gray-400 hover:text-gray-600 text-2xl font-bold'
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className='p-6'>
+              {selectedEvent.type && (
+                <div className='mb-4'>
+                  <span
+                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${getEventTypeColor(
+                      selectedEvent.type
+                    )}`}
+                  >
+                    {getEventIcon(selectedEvent.type)}
+                    <span>
+                      {selectedEvent.type.charAt(0).toUpperCase() +
+                        selectedEvent.type.slice(1)}
+                    </span>
+                  </span>
+                </div>
+              )}
+
+              <div
+                className='text-gray-700 leading-relaxed'
+                style={{ fontFamily: "'Roboto', sans-serif" }}
+              >
+                {selectedEvent.description}
+              </div>
+
+              {/* Additional event details could go here */}
+              <div className='mt-6 p-4 bg-gray-50 rounded-lg'>
+                <h3 className='font-semibold text-[#004B87] mb-2'>
+                  {t("Event Details")}
+                </h3>
+                <div className='space-y-2 text-sm text-gray-600'>
+                  <div className='flex items-center'>
+                    <FaCalendarAlt className='mr-2 text-[#004B87]' />
+                    <span><strong>{t("Date")}:</strong> {selectedEvent.date}</span>
+                  </div>
+                  {selectedEvent.location && (
+                    <div className='flex items-center'>
+                      <FaMapMarkerAlt className='mr-2 text-[#004B87]' />
+                      <span><strong>{t("Location")}:</strong> {selectedEvent.location}</span>
+                    </div>
+                  )}
+                  <div className='flex items-center'>
+                    <div className='mr-2 text-[#004B87]'>
+                      {getEventIcon(selectedEvent.type)}
+                    </div>
+                    <span><strong>{t("Type")}:</strong> {selectedEvent.type?.charAt(0).toUpperCase() + selectedEvent.type?.slice(1)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className='flex justify-end p-6 border-t border-gray-200'>
+              <button
+                onClick={closeModal}
+                className='px-6 py-2 bg-[#004B87] text-white rounded-lg hover:bg-[#003366] transition-colors'
+              >
+                {t("Close")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

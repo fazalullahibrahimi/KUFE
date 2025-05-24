@@ -533,77 +533,10 @@ const AcademicPage = () => {
                 >
                   {t("Explore_Programs_Button")}
                 </a>
-                <a
-                  href='#'
-                  className='px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/20 transition border border-white/20'
-                >
-                  {t("Download_Brochure")}
-                </a>
               </div>
             </div>
 
-            <div className='relative w-full max-w-md'>
-              <div className='absolute inset-0 bg-gradient-to-r from-[#004B87] to-[#1D3D6F] rounded-2xl transform rotate-3 scale-95 opacity-20 blur-xl'></div>
-              <div className='relative bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20'>
-                <h3 className='text-xl font-bold mb-4 flex items-center'>
-                  <Search
-                    className={`h-5 w-5 ${
-                      direction === "rtl" ? "ml-2" : "mr-2"
-                    }`}
-                  />
-                  {t("Find_Your_Program")}
-                </h3>
-                <div className='space-y-4'>
-                  <div>
-                    <label className='block text-sm font-medium mb-1 text-white/80'>
-                      {t("Program_Level")}
-                    </label>
-                    <div className='relative'>
-                      <select className='w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 appearance-none text-black'>
-                        <option value=''>{t("All_Levels")}</option>
-                        <option value='undergraduate'>
-                          {t("Undergraduate_Level")}
-                        </option>
-                        <option value='graduate'>{t("Graduate_Level")}</option>
-                      </select>
-                      <ChevronDown
-                        className={`absolute ${
-                          direction === "rtl" ? "left-3" : "right-3"
-                        } top-3 h-4 w-4 pointer-events-none`}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium mb-1 text-white/80'>
-                      {t("Field_of_Study")}
-                    </label>
-                    <div className='relative'>
-                      <select className='w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 appearance-none text-black'>
-                        <option value=''>{t("All_Fields")}</option>
-                        <option value='economics'>
-                          {t("Economics_Field")}
-                        </option>
-                        <option value='finance'>{t("Finance_Field")}</option>
-                        <option value='management'>
-                          {t("Management_Field")}
-                        </option>
-                        <option value='accounting'>
-                          {t("Accounting_Field")}
-                        </option>
-                      </select>
-                      <ChevronDown
-                        className={`absolute ${
-                          direction === "rtl" ? "left-3" : "right-3"
-                        } top-3 h-4 w-4 pointer-events-none`}
-                      />
-                    </div>
-                  </div>
-                  <button className='w-full bg-[#F7B500] text-[#1D3D6F] font-bold py-2.5 rounded-lg hover:bg-[#F7B500]/90 transition'>
-                    {t("Search_Programs_Button")}
-                  </button>
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
 
@@ -870,30 +803,7 @@ const AcademicPage = () => {
                   <p className='text-white/90 text-lg leading-relaxed mb-8'>
                     {t("Academic_Journey_Description")}
                   </p>
-                  <div className='flex flex-wrap gap-4'>
-                    <a
-                      href='#'
-                      className='px-8 py-4 bg-[#F7B500] text-[#1D3D6F] font-bold rounded-lg hover:bg-[#F7B500]/90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center'
-                    >
-                      {t("Apply_Now_Button")}
-                      <ArrowRight
-                        className={`${
-                          direction === "rtl" ? "mr-2" : "ml-2"
-                        } h-5 w-5 ${direction === "rtl" ? "rotate-180" : ""}`}
-                      />
-                    </a>
-                    <a
-                      href='#'
-                      className='px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/20 transition border border-white/20 flex items-center'
-                    >
-                      {t("Request_Information_Button")}
-                      <ExternalLink
-                        className={`${
-                          direction === "rtl" ? "mr-2" : "ml-2"
-                        } h-4 w-4`}
-                      />
-                    </a>
-                  </div>
+
                 </div>
 
                 <div className='hidden lg:block'>
