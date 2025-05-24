@@ -47,7 +47,7 @@ router.patch("/:id/review", requireRoles([roles.COMMITTEE]), updateResearchRevie
 // router.patch( "/:id/review",requireRoles([roles.COMMITTEE]),reviewResearch)
 
 // Update research (admin or original author)
-router.patch("/:id",processUploadedFile, updateResearch)
+router.patch("/:id",authorize(roles.ADMIN), updateResearch)
 
 // Delete research (admin only)
 router.delete("/:id", authorize(roles.ADMIN), deleteResearch)
