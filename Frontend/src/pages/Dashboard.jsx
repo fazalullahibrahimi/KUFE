@@ -249,6 +249,23 @@ const Dashboard = () => {
 
           <div
             className={`flex items-center px-4 py-3 ${
+              activeTab === "marks"
+                ? "bg-white bg-opacity-20 text-sky-700 border-l-4 border-[#F4B400]"
+                : "hover:bg-white text-sky-700 hover:bg-opacity-10"
+            } cursor-pointer`}
+            onClick={() => {
+              setActiveTab("marks");
+              window.location.href = "/teachermarks";
+            }}
+          >
+            <FileText size={20} />
+            <span className={`ml-3 ${!isSidebarOpen && "hidden"}`}>
+              Marks Management
+            </span>
+          </div>
+
+          <div
+            className={`flex items-center px-4 py-3 ${
               activeTab === "research"
                 ? "bg-white bg-opacity-20 text-sky-700 border-l-4 border-[#F4B400]"
                 : "hover:bg-white text-sky-700 hover:bg-opacity-10"
@@ -328,6 +345,7 @@ const Dashboard = () => {
               {activeTab === "faculty" && "Faculty Management"}
               {activeTab === "students" && "Student Management"}
               {activeTab === "courses" && "Course Management"}
+              {activeTab === "marks" && "Marks Management"}
               {activeTab === "research" && "Research Publications"}
               {activeTab === "announcements" && "Announcements"}
               {activeTab === "analytics" && "Analytics"}
