@@ -3,6 +3,7 @@ import React from "react";
 import { createContext, useContext, useState, useEffect } from "react";
 import translations from "../translations/Translation";
 import psTranslations from "../translations/ps";
+import { drTranslations } from "../translations/dr";
 
 // Define translations
 // const translations = {
@@ -145,6 +146,30 @@ export const LanguageProvider = ({ children }) => {
         if (psTranslations[section]?.[key]) {
           return psTranslations[section][key];
         }
+      }
+
+      // Check if key exists directly in the main translations
+      if (translations[language][key]) {
+        return translations[language][key];
+      }
+    } else if (language === "dr") {
+      // For Dari language, check both translation sources
+      // Check if it's a nested key with dot notation (safely)
+      if (key && typeof key === "string" && key.includes(".")) {
+        const [section, nestedKey] = key.split(".");
+
+        // First check in drTranslations
+        if (drTranslations.dr?.[section]?.[nestedKey]) {
+          return drTranslations.dr[section][nestedKey];
+        }
+
+        // Then check in main translations
+        return translations[language][section]?.[nestedKey] || key;
+      }
+
+      // Check if key exists directly in drTranslations
+      if (drTranslations.dr?.[key]) {
+        return drTranslations.dr[key];
       }
 
       // Check if key exists directly in the main translations
