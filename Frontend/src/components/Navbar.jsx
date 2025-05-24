@@ -1,9 +1,17 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronDown, Menu, X, Globe, ChevronRight } from "lucide-react";
-import Logo from "../../public/KufeLogo.jpeg";
+import {
+  ChevronDown,
+  Menu,
+  X,
+  Globe,
+  ChevronRight,
+  BookOpen,
+} from "lucide-react";
+import Logo from "/KufeLogo.jpeg";
 import { useLanguage } from "../contexts/LanguageContext";
+import { getCurrentUser } from "../utils/helpers";
 
 const Navbar = () => {
   const location = useLocation();
@@ -13,6 +21,11 @@ const Navbar = () => {
   const langMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
+  // Get current user to check role
+  const currentUser = getCurrentUser();
+  const isStudent = currentUser?.role === "student";
+  const isTeacher = currentUser?.role === "teacher";
+
   // Navigation items with translations
   const navItems = [
     { name: t("Home"), path: "/" },
@@ -21,7 +34,7 @@ const Navbar = () => {
     { name: t("Courses"), path: "/courses" },
     { name: t("About"), path: "/about" },
     { name: t("Contact"), path: "/contact" },
-    { name: t("Announcements Events"), path: "/anounce" },
+    { name: t("News"), path: "/anounce" },
   ];
 
   // Available languages
@@ -85,7 +98,7 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Navigation */}
-        <ul className='hidden md:flex space-x-6'>
+        <ul className='hidden md:flex space-x-5'>
           {navItems.map((item) => (
             <li
               key={item.name}
@@ -98,6 +111,40 @@ const Navbar = () => {
               <Link to={item.path}>{item.name}</Link>
             </li>
           ))}
+
+          {/* Student Marks Button - Only visible to students */}
+          {isStudent && (
+            <li>
+              <Link
+                to='/studentmarks'
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+                  location.pathname === "/studentmarks"
+                    ? "bg-[#F7B500] text-[#004B87] font-medium"
+                    : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
+                }`}
+              >
+                <BookOpen size={16} />
+                <span>My Marks</span>
+              </Link>
+            </li>
+          )}
+
+          {/* Teacher Marks Button - Only visible to teachers */}
+          {isTeacher && (
+            <li>
+              <Link
+                to='/teachermarks'
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+                  location.pathname === "/teachermarks"
+                    ? "bg-[#F7B500] text-[#004B87] font-medium"
+                    : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
+                }`}
+              >
+                <BookOpen size={16} />
+                <span>Upload Marks</span>
+              </Link>
+            </li>
+          )}
         </ul>
 
         <div className='flex items-center space-x-3'>
@@ -185,6 +232,48 @@ const Navbar = () => {
                 </Link>
               </li>
             ))}
+
+            {/* Student Marks Button - Only visible to students in mobile menu */}
+            {isStudent && (
+              <li>
+                <Link
+                  to='/studentmarks'
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex justify-between items-center px-6 py-3 hover:bg-gray-50 ${
+                    location.pathname === "/studentmarks"
+                      ? "bg-blue-50 text-[#004B87] font-medium"
+                      : "text-gray-700"
+                  }`}
+                >
+                  <div className='flex items-center gap-2'>
+                    <BookOpen size={18} />
+                    <span>My Marks</span>
+                  </div>
+                  <ChevronRight className='h-4 w-4' />
+                </Link>
+              </li>
+            )}
+
+            {/* Teacher Marks Button - Only visible to teachers in mobile menu */}
+            {isTeacher && (
+              <li>
+                <Link
+                  to='/teachermarks'
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex justify-between items-center px-6 py-3 hover:bg-gray-50 ${
+                    location.pathname === "/teachermarks"
+                      ? "bg-blue-50 text-[#004B87] font-medium"
+                      : "text-gray-700"
+                  }`}
+                >
+                  <div className='flex items-center gap-2'>
+                    <BookOpen size={18} />
+                    <span>Upload Marks</span>
+                  </div>
+                  <ChevronRight className='h-4 w-4' />
+                </Link>
+              </li>
+            )}
           </ul>
 
           <div className='px-6 py-4'>
