@@ -298,6 +298,10 @@ const translations = {
     "No top teachers data available": "No top teachers data available",
     Loading: "Loading",
     "Error Loading Data": "Error Loading Data",
+    Excellence: "Excellence",
+    "Our Distinguished Community": "Our Distinguished Community",
+    "Meet the exceptional individuals who represent the highest standards of academic achievement and teaching excellence at our university.":
+      "Meet the exceptional individuals who represent the highest standards of academic achievement and teaching excellence at our university.",
   },
   dr: {
     // Dari translations
@@ -385,6 +389,10 @@ const translations = {
     "No top teachers data available": "اطلاعات استادان برتر در دسترس نیست",
     Loading: "در حال بارگذاری",
     "Error Loading Data": "خطا در بارگذاری اطلاعات",
+    Excellence: "برتری",
+    "Our Distinguished Community": "جامعه برجسته ما",
+    "Meet the exceptional individuals who represent the highest standards of academic achievement and teaching excellence at our university.":
+      "با افراد استثنایی که نماینده بالاترین استانداردهای دستاوردهای علمی و برتری تدریس در دانشگاه ما هستند، آشنا شوید.",
 
     // AcademicPage.jsx
     Academic_Programs_Title: "برنامه‌های تحصیلی",
@@ -664,6 +672,10 @@ const translations = {
     "No top teachers data available": "د غوره استادانو معلومات شتون نلري",
     Loading: "په بار کولو کې",
     "Error Loading Data": "د معلوماتو په بار کولو کې تېروتنه",
+    Excellence: "غوره والی",
+    "Our Distinguished Community": "زموږ ځانګړې ټولنه",
+    "Meet the exceptional individuals who represent the highest standards of academic achievement and teaching excellence at our university.":
+      "د هغو استثنايي کسانو سره وپېژنئ چې زموږ په پوهنتون کې د علمي لاسته راوړنو او د تدریس غوره والي لوړ معیارونه استازیتوب کوي.",
 
     // AcademicPage.jsx
     Academic_Programs_Title: "اکاډمیک پروګرامونه",

@@ -14,9 +14,11 @@ import {
   Layers,
   User,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import FacultyDirectoryManagement from "./DataManagement/FacultyDirectoryManagement";
 // import Logo from "../../pub";
 const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
+  const navigate = useNavigate();
   // Menu items configuration
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: <Home size={20} /> },
@@ -24,6 +26,12 @@ const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
     { id: "departments", label: "Departments", icon: <Layers size={20} /> },
     { id: "students", label: "Students", icon: <GraduationCap size={20} /> },
     { id: "courses", label: "Courses", icon: <BookOpen size={20} /> },
+    {
+      id: "marks",
+      label: "Marks Management",
+      icon: <FileText size={20} />,
+      href: "/teachermarks",
+    },
     { id: "research", label: "Research", icon: <FileText size={20} /> },
     { id: "events", label: "Events", icon: <Calendar size={20} /> },
     { id: "news", label: "News", icon: <Newspaper size={20} /> },
@@ -70,7 +78,12 @@ const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
                 ? "bg-white bg-opacity-20 text-sky-900 border-l-4 border-[#F4B400]"
                 : "hover:bg-white hover:text-sky-900  text-[#fff] hover:bg-opacity-10"
             } cursor-pointer`}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => {
+              setActiveTab(item.id);
+              if (item.href) {
+                navigate(item.href);
+              }
+            }}
           >
             {item.icon}
             <span className={`ml-3 ${!isSidebarOpen && "hidden"}`}>

@@ -103,31 +103,66 @@ const TopPerformers = () => {
   }
 
   return (
-    <div className='bg-gradient-to-b from-[#E8ECEF] to-white py-16'>
-      <div className='container mx-auto px-4'>
+    <section className='relative py-24 overflow-hidden bg-gradient-to-b from-[#F8FAFC] to-white'>
+      {/* Background Pattern */}
+      <div className='absolute inset-0 z-0 opacity-5'>
+        <div className='absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#004B87]'></div>
+        <div className='absolute top-1/3 -left-24 w-80 h-80 rounded-full bg-[#F7B500]'></div>
+        <div className='absolute bottom-0 right-1/4 w-64 h-64 rounded-full bg-[#004B87]'></div>
+      </div>
+
+      <div className='container relative z-10 mx-auto px-6 max-w-7xl'>
+        {/* Section Intro */}
+        <div className='text-center mb-16 max-w-3xl mx-auto'>
+          <h2 className='inline-block px-6 py-2 mb-4 text-sm font-semibold tracking-wider text-[#004B87] uppercase bg-blue-50 rounded-full'>
+            {t("Excellence")}
+          </h2>
+          <h3 className='text-4xl font-bold text-[#1D3D6F] mb-4 leading-tight'>
+            {t("Our Distinguished Community")}
+          </h3>
+          <p className='text-gray-600 text-lg'>
+            {t(
+              "Meet the exceptional individuals who represent the highest standards of academic achievement and teaching excellence at our university."
+            )}
+          </p>
+        </div>
+
         {/* Top Students Section */}
-        <div className='mb-16'>
-          <div className='flex items-center justify-center mb-10'>
-            <GraduationCap className='text-[#004B87] mr-3' size={28} />
-            <h2 className='text-3xl font-bold text-[#1D3D6F] text-center'>
-              {t("Top Students")}
-            </h2>
+        <div className='mb-24'>
+          <div className='flex items-center justify-center mb-12'>
+            <div className='relative'>
+              <div className='absolute inset-0 flex items-center'>
+                <div className='w-full border-t border-gray-200'></div>
+              </div>
+              <div className='relative flex justify-center'>
+                <span className='px-4 bg-white flex items-center'>
+                  <GraduationCap className='text-[#004B87] mr-3' size={28} />
+                  <h2 className='text-3xl font-bold text-[#1D3D6F]'>
+                    {t("Top Students")}
+                  </h2>
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10'>
             {topStudents.length > 0 ? (
               topStudents.map((student) => (
                 <div
                   key={student._id}
-                  className='bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105 hover:shadow-xl'
+                  className='group bg-white rounded-2xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 transform hover:-translate-y-2 border border-gray-100'
                 >
-                  <div className='bg-gradient-to-r from-[#004B87] to-[#1D3D6F] h-24 relative'>
-                    <div className='absolute -bottom-12 left-1/2 transform -translate-x-1/2'>
-                      <div className='w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-white'>
+                  <div className='bg-gradient-to-r from-[#004B87] to-[#1D3D6F] h-28 relative'>
+                    {/* Decorative Elements */}
+                    <div className='absolute top-0 right-0 w-20 h-20 bg-white opacity-10 rounded-bl-full'></div>
+                    <div className='absolute bottom-0 left-0 w-16 h-16 bg-[#F7B500] opacity-10 rounded-tr-full'></div>
+
+                    <div className='absolute -bottom-14 left-1/2 transform -translate-x-1/2'>
+                      <div className='w-28 h-28 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg'>
                         <img
                           src={getImageUrl(student.profile_image, "student")}
                           alt={student.name}
-                          className='w-full h-full object-cover'
+                          className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110'
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src =
@@ -138,30 +173,40 @@ const TopPerformers = () => {
                     </div>
                   </div>
 
-                  <div className='pt-16 pb-6 px-6 text-center'>
-                    <h3 className='text-xl font-bold text-[#1D3D6F] mb-1'>
+                  <div className='pt-20 pb-8 px-8 text-center'>
+                    <h3 className='text-2xl font-bold text-[#1D3D6F] mb-2 group-hover:text-[#004B87] transition-colors'>
                       {student.name}
                     </h3>
-                    <p className='text-gray-500 mb-3'>
+                    <p className='text-gray-500 mb-4 font-medium'>
                       {t("Student ID")}: {student.student_id_number}
                     </p>
 
-                    <div className='flex justify-center mb-4'>
-                      <div className='bg-[#F7B500] text-[#1D3D6F] font-bold px-4 py-1 rounded-full text-sm flex items-center'>
-                        <Award className='mr-1' size={16} />
+                    <div className='flex justify-center mb-6'>
+                      <div className='bg-gradient-to-r from-[#F7B500] to-[#F5A700] text-[#1D3D6F] font-bold px-5 py-2 rounded-full text-sm flex items-center shadow-sm'>
+                        <Award className='mr-2' size={18} />
                         {t("Top Score")}: {student.totalHighMarks}
                       </div>
                     </div>
 
-                    <div className='flex flex-col space-y-2 text-sm'>
-                      <div className='flex items-center justify-center text-gray-600'>
+                    <div className='flex flex-col space-y-3 text-sm border-t border-gray-100 pt-5 mx-4'>
+                      <div className='flex items-center justify-center text-gray-600 hover:text-[#004B87] transition-colors'>
                         <Mail className='mr-2' size={16} />
-                        {student.email}
+                        <a
+                          href={`mailto:${student.email}`}
+                          className='hover:underline'
+                        >
+                          {student.email}
+                        </a>
                       </div>
                       {student.phone && (
-                        <div className='flex items-center justify-center text-gray-600'>
+                        <div className='flex items-center justify-center text-gray-600 hover:text-[#004B87] transition-colors'>
                           <Phone className='mr-2' size={16} />
-                          {student.phone}
+                          <a
+                            href={`tel:${student.phone}`}
+                            className='hover:underline'
+                          >
+                            {student.phone}
+                          </a>
                         </div>
                       )}
                     </div>
@@ -169,9 +214,9 @@ const TopPerformers = () => {
                 </div>
               ))
             ) : (
-              <div className='col-span-3 text-center py-10'>
-                <User className='mx-auto text-gray-300 mb-4' size={48} />
-                <p className='text-gray-500'>
+              <div className='col-span-3 text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100'>
+                <User className='mx-auto text-gray-200 mb-4' size={64} />
+                <p className='text-gray-500 font-medium'>
                   {t("No top students data available")}
                 </p>
               </div>
@@ -181,27 +226,40 @@ const TopPerformers = () => {
 
         {/* Top Teachers Section */}
         <div>
-          <div className='flex items-center justify-center mb-10'>
-            <BookOpen className='text-[#004B87] mr-3' size={28} />
-            <h2 className='text-3xl font-bold text-[#1D3D6F] text-center'>
-              {t("Top Teachers")}
-            </h2>
+          <div className='flex items-center justify-center mb-12'>
+            <div className='relative'>
+              <div className='absolute inset-0 flex items-center'>
+                <div className='w-full border-t border-gray-200'></div>
+              </div>
+              <div className='relative flex justify-center'>
+                <span className='px-4 bg-white flex items-center'>
+                  <BookOpen className='text-[#004B87] mr-3' size={28} />
+                  <h2 className='text-3xl font-bold text-[#1D3D6F]'>
+                    {t("Top Teachers")}
+                  </h2>
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10'>
             {topTeachers.length > 0 ? (
               topTeachers.map((teacher) => (
                 <div
                   key={teacher._id}
-                  className='bg-white rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105 hover:shadow-xl'
+                  className='group bg-white rounded-2xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 transform hover:-translate-y-2 border border-gray-100'
                 >
-                  <div className='bg-gradient-to-r from-[#004B87] to-[#1D3D6F] h-24 relative'>
-                    <div className='absolute -bottom-12 left-1/2 transform -translate-x-1/2'>
-                      <div className='w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-white'>
+                  <div className='bg-gradient-to-r from-[#004B87] to-[#1D3D6F] h-28 relative'>
+                    {/* Decorative Elements */}
+                    <div className='absolute top-0 right-0 w-20 h-20 bg-white opacity-10 rounded-bl-full'></div>
+                    <div className='absolute bottom-0 left-0 w-16 h-16 bg-[#F7B500] opacity-10 rounded-tr-full'></div>
+
+                    <div className='absolute -bottom-14 left-1/2 transform -translate-x-1/2'>
+                      <div className='w-28 h-28 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg'>
                         <img
                           src={getImageUrl(teacher.image, "teacher")}
                           alt={teacher.name}
-                          className='w-full h-full object-cover'
+                          className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110'
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src =
@@ -212,29 +270,41 @@ const TopPerformers = () => {
                     </div>
                   </div>
 
-                  <div className='pt-16 pb-6 px-6 text-center'>
-                    <h3 className='text-xl font-bold text-[#1D3D6F] mb-1'>
+                  <div className='pt-20 pb-8 px-8 text-center'>
+                    <h3 className='text-2xl font-bold text-[#1D3D6F] mb-2 group-hover:text-[#004B87] transition-colors'>
                       {teacher.name}
                     </h3>
-                    <p className='text-gray-500 mb-3'>{teacher.position}</p>
+                    <p className='text-gray-500 mb-4 font-medium'>
+                      {teacher.position}
+                    </p>
 
-                    <div className='flex justify-center mb-4'>
-                      <div className='bg-[#F7B500] text-[#1D3D6F] font-bold px-4 py-1 rounded-full text-sm'>
+                    <div className='flex justify-center mb-6'>
+                      <div className='bg-gradient-to-r from-[#F7B500] to-[#F5A700] text-[#1D3D6F] font-bold px-5 py-2 rounded-full text-sm shadow-sm'>
                         {teacher.department_name}
                       </div>
                     </div>
 
-                    <div className='flex flex-col space-y-2 text-sm'>
+                    <div className='flex flex-col space-y-3 text-sm border-t border-gray-100 pt-5 mx-4'>
                       {teacher.contact_info?.email && (
-                        <div className='flex items-center justify-center text-gray-600'>
+                        <div className='flex items-center justify-center text-gray-600 hover:text-[#004B87] transition-colors'>
                           <Mail className='mr-2' size={16} />
-                          {teacher.contact_info.email}
+                          <a
+                            href={`mailto:${teacher.contact_info.email}`}
+                            className='hover:underline'
+                          >
+                            {teacher.contact_info.email}
+                          </a>
                         </div>
                       )}
                       {teacher.contact_info?.phone && (
-                        <div className='flex items-center justify-center text-gray-600'>
+                        <div className='flex items-center justify-center text-gray-600 hover:text-[#004B87] transition-colors'>
                           <Phone className='mr-2' size={16} />
-                          {teacher.contact_info.phone}
+                          <a
+                            href={`tel:${teacher.contact_info.phone}`}
+                            className='hover:underline'
+                          >
+                            {teacher.contact_info.phone}
+                          </a>
                         </div>
                       )}
                     </div>
@@ -242,9 +312,9 @@ const TopPerformers = () => {
                 </div>
               ))
             ) : (
-              <div className='col-span-3 text-center py-10'>
-                <User className='mx-auto text-gray-300 mb-4' size={48} />
-                <p className='text-gray-500'>
+              <div className='col-span-3 text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100'>
+                <User className='mx-auto text-gray-200 mb-4' size={64} />
+                <p className='text-gray-500 font-medium'>
                   {t("No top teachers data available")}
                 </p>
               </div>
@@ -252,7 +322,7 @@ const TopPerformers = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
