@@ -59,25 +59,6 @@ const TopPerformers = () => {
     fetchTopPerformers();
   }, [language]); // Refetch when language changes
 
-  // Function to get image URL
-  const getImageUrl = (imagePath, type) => {
-    if (!imagePath) {
-      return type === "student"
-        ? "https://via.placeholder.com/150?text=Student"
-        : "https://via.placeholder.com/150?text=Teacher";
-    }
-
-    // Check if the path already includes the full URL
-    if (imagePath.startsWith("http")) {
-      return imagePath;
-    }
-
-    // Otherwise, construct the URL
-    return `http://localhost:4400/public/images/${
-      type === "student" ? "students" : "teachers"
-    }/${imagePath}`;
-  };
-
   if (loading) {
     return (
       <div className='container mx-auto px-4 py-12'>
@@ -160,13 +141,15 @@ const TopPerformers = () => {
                     <div className='absolute -bottom-14 left-1/2 transform -translate-x-1/2'>
                       <div className='w-28 h-28 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg'>
                         <img
-                          src={getImageUrl(student.profile_image, "student")}
+                          src={
+                            student.profile_image
+                              ? `http://localhost:4400/public/img/students/${student.profile_image}`
+                              : "https://via.placeholder.com/200x200/004B87/FFFFFF?text=Student"
+                          }
                           alt={student.name}
                           className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110'
                           onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src =
-                              "https://via.placeholder.com/150?text=Student";
+                            e.target.src = "https://via.placeholder.com/200x200/004B87/FFFFFF?text=Student";
                           }}
                         />
                       </div>
@@ -257,13 +240,15 @@ const TopPerformers = () => {
                     <div className='absolute -bottom-14 left-1/2 transform -translate-x-1/2'>
                       <div className='w-28 h-28 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg'>
                         <img
-                          src={getImageUrl(teacher.image, "teacher")}
+                          src={
+                            teacher.image
+                              ? `http://localhost:4400/public/img/teachers/${teacher.image}`
+                              : "https://via.placeholder.com/200x200/004B87/FFFFFF?text=Teacher"
+                          }
                           alt={teacher.name}
                           className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110'
                           onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src =
-                              "https://via.placeholder.com/150?text=Teacher";
+                            e.target.src = "https://via.placeholder.com/200x200/004B87/FFFFFF?text=Teacher";
                           }}
                         />
                       </div>

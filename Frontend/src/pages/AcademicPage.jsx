@@ -1,6 +1,7 @@
 import React from "react";
 
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   BookOpen,
@@ -16,9 +17,11 @@ import {
   Clock,
   ExternalLink,
   Home,
+  X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Modal from "../components/common/Modal";
 import { useLanguage } from "../contexts/LanguageContext";
 
 // Custom hook for intersection observer (for animations)
@@ -106,7 +109,7 @@ const useCountUp = ({ end, duration = 2000, delay = 0 }) => {
 };
 
 // Program card component
-const ProgramCard = ({ program, index }) => {
+const ProgramCard = ({ program, index, onReadMore }) => {
   const IconComponent = program.icon;
   const [cardRef, isVisible] = useElementOnScreen({
     threshold: 0.1,
@@ -144,9 +147,9 @@ const ProgramCard = ({ program, index }) => {
         <p className='text-gray-600 mb-6 line-clamp-3'>{program.description}</p>
 
         <div className='pt-2 border-t border-gray-100'>
-          <a
-            href='#'
-            className='inline-flex items-center font-semibold text-[#1D3D6F] hover:text-[#F7B500] transition-colors group-hover:gap-2'
+          <button
+            onClick={() => onReadMore(program)}
+            className='inline-flex items-center font-semibold text-[#1D3D6F] hover:text-[#F7B500] transition-colors group-hover:gap-2 cursor-pointer'
           >
             <span>{t("Learn_More_Link")}</span>
             <ChevronRight
@@ -156,7 +159,7 @@ const ProgramCard = ({ program, index }) => {
                 direction === "rtl" ? "translate-x-[-0.25rem]" : "translate-x-1"
               }`}
             />
-          </a>
+          </button>
         </div>
       </div>
     </div>
@@ -190,7 +193,7 @@ const StatCard = ({ stat, index }) => {
 };
 
 // Event card component
-const EventCard = ({ event, index }) => {
+const EventCard = ({ event, index, onReadMore }) => {
   const [cardRef, isVisible] = useElementOnScreen({
     threshold: 0.1,
     rootMargin: "0px 0px -50px 0px",
@@ -241,9 +244,9 @@ const EventCard = ({ event, index }) => {
           {event.title}
         </h3>
         <p className='text-gray-600 mb-4 line-clamp-3'>{event.description}</p>
-        <a
-          href='#'
-          className='inline-flex items-center font-semibold text-[#1D3D6F] hover:text-[#F7B500] transition-colors'
+        <button
+          onClick={() => onReadMore(event)}
+          className='inline-flex items-center font-semibold text-[#1D3D6F] hover:text-[#F7B500] transition-colors cursor-pointer'
         >
           <span>{t("Read_More_Link")}</span>
           <ChevronRight
@@ -253,7 +256,7 @@ const EventCard = ({ event, index }) => {
               direction === "rtl" ? "translate-x-[-0.25rem]" : "translate-x-1"
             }`}
           />
-        </a>
+        </button>
       </div>
     </div>
   );
@@ -292,7 +295,15 @@ const AcademicPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
+
+  // Modal states
+  const [showProgramModal, setShowProgramModal] = useState(false);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
   const { t, language, direction } = useLanguage();
+  const navigate = useNavigate();
 
   // Refs for scroll animations
   const heroRef = useRef(null);
@@ -300,6 +311,31 @@ const AcademicPage = () => {
 
   // Array of icons to cycle through for each program
   const icons = [BookOpen, Award, Users, Calendar, GraduationCap];
+
+  // Handler functions
+  const handleProgramReadMore = (program) => {
+    setSelectedProgram(program);
+    setShowProgramModal(true);
+  };
+
+  const handleEventReadMore = (event) => {
+    setSelectedEvent(event);
+    setShowEventModal(true);
+  };
+
+  const handleViewAllNewsEvents = () => {
+    navigate('/anounce');
+  };
+
+  const closeProgramModal = () => {
+    setShowProgramModal(false);
+    setSelectedProgram(null);
+  };
+
+  const closeEventModal = () => {
+    setShowEventModal(false);
+    setSelectedEvent(null);
+  };
 
   // Fetch programs, stats, and news/events in useEffect
   useEffect(() => {
@@ -649,7 +685,7 @@ const AcademicPage = () => {
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
               {filteredPrograms.length > 0 ? (
                 filteredPrograms.map((program, index) => (
-                  <ProgramCard key={index} program={program} index={index} />
+                  <ProgramCard key={index} program={program} index={index} onReadMore={handleProgramReadMore} />
                 ))
               ) : (
                 <div className='col-span-1 md:col-span-3 text-center py-16'>
@@ -752,7 +788,7 @@ const AcademicPage = () => {
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
               {Array.isArray(newsEvents) && newsEvents.length > 0 ? (
                 newsEvents.map((event, index) => (
-                  <EventCard key={index} event={event} index={index} />
+                  <EventCard key={index} event={event} index={index} onReadMore={handleEventReadMore} />
                 ))
               ) : (
                 <div className='col-span-1 md:col-span-3 text-center py-16 bg-white rounded-xl shadow-md'>
@@ -771,9 +807,9 @@ const AcademicPage = () => {
           )}
 
           <div className='text-center mt-12'>
-            <a
-              href='#'
-              className='inline-flex items-center px-6 py-3 bg-white border border-gray-200 rounded-lg text-[#1D3D6F] font-medium hover:bg-gray-50 transition shadow-sm'
+            <button
+              onClick={handleViewAllNewsEvents}
+              className='inline-flex items-center px-6 py-3 bg-white border border-gray-200 rounded-lg text-[#1D3D6F] font-medium hover:bg-gray-50 transition shadow-sm cursor-pointer'
             >
               {t("View_All_News_Events_Button")}
               <ArrowRight
@@ -781,7 +817,7 @@ const AcademicPage = () => {
                   direction === "rtl" ? "rotate-180" : ""
                 }`}
               />
-            </a>
+            </button>
           </div>
         </div>
       </section>
@@ -833,6 +869,118 @@ const AcademicPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Program Details Modal */}
+      <Modal
+        isOpen={showProgramModal}
+        onClose={closeProgramModal}
+        title={selectedProgram?.title || "Program Details"}
+        size="lg"
+      >
+        {selectedProgram && (
+          <div className="space-y-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-gradient-to-r from-[#004B87] to-[#1D3D6F] p-3 rounded-lg mr-4">
+                {selectedProgram.icon && <selectedProgram.icon className="h-6 w-6 text-white" />}
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-[#1D3D6F]">{selectedProgram.title}</h3>
+                <p className="text-gray-500 capitalize">{selectedProgram.type} Program</p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-medium text-gray-800 mb-3">Program Description</h4>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-gray-700 leading-relaxed">{selectedProgram.description}</p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h5 className="font-medium text-[#1D3D6F] mb-2">Program Type</h5>
+                <p className="text-gray-700 capitalize">{selectedProgram.type}</p>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h5 className="font-medium text-[#1D3D6F] mb-2">Department</h5>
+                <p className="text-gray-700">Faculty of Economics</p>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <h5 className="font-medium text-[#1D3D6F] mb-2">Additional Information</h5>
+              <p className="text-gray-700">
+                For more detailed information about admission requirements, curriculum, and career prospects,
+                please contact our admissions office or visit the program's dedicated page.
+              </p>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Event Details Modal */}
+      <Modal
+        isOpen={showEventModal}
+        onClose={closeEventModal}
+        title={selectedEvent?.title || "Event Details"}
+        size="lg"
+      >
+        {selectedEvent && (
+          <div className="space-y-6">
+            {selectedEvent.image && (
+              <div className="w-full h-48 overflow-hidden rounded-lg">
+                <img
+                  src={`http://localhost:4400/public/img/event/${selectedEvent.image}`}
+                  alt={selectedEvent.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = "/placeholder.svg?height=200&width=400";
+                  }}
+                />
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-[#1D3D6F] mb-2">{selectedEvent.title}</h3>
+                {selectedEvent.type && (
+                  <span className="inline-block bg-[#F7B500] text-[#1D3D6F] text-sm font-medium px-3 py-1 rounded-full">
+                    {selectedEvent.type}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="flex items-center text-gray-600">
+                <Clock className="h-5 w-5 mr-2 text-[#F7B500]" />
+                <span>{selectedEvent.date}</span>
+              </div>
+              {selectedEvent.location && (
+                <div className="flex items-center text-gray-600">
+                  <MapPin className="h-5 w-5 mr-2 text-[#F7B500]" />
+                  <span>{selectedEvent.location}</span>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <h4 className="text-lg font-medium text-gray-800 mb-3">Event Description</h4>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">{selectedEvent.description}</p>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h5 className="font-medium text-[#1D3D6F] mb-2">Contact Information</h5>
+              <p className="text-gray-700">
+                For more information about this event, please contact the Faculty of Economics office
+                or visit our announcements page.
+              </p>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Footer Section */}
       <Footer />

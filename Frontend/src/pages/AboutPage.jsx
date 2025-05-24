@@ -37,6 +37,10 @@ function AboutPage() {
     research: 0,
   });
 
+  // State for department modals
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [showDepartmentModal, setShowDepartmentModal] = useState(false);
+
   // Refs for sections to observe
   const heroRef = useRef(null);
   const statsRef = useRef(null);
@@ -214,6 +218,40 @@ function AboutPage() {
       }
     }, frameDuration);
   };
+
+  // Department icon mapping
+  const getDepartmentIcon = (departmentName) => {
+    const iconMap = {
+      'Economics': <BookOpen className='h-8 w-8 text-[#F7B500]' />,
+      'Business Administration': <Users className='h-8 w-8 text-[#F7B500]' />,
+      'Finance': <Award className='h-8 w-8 text-[#F7B500]' />,
+      'Statistics': <Calendar className='h-8 w-8 text-[#F7B500]' />,
+      'Management': <Users className='h-8 w-8 text-[#F7B500]' />,
+      'Accounting': <BookOpen className='h-8 w-8 text-[#F7B500]' />,
+      'Marketing': <Award className='h-8 w-8 text-[#F7B500]' />,
+      'Banking': <Calendar className='h-8 w-8 text-[#F7B500]' />,
+    };
+
+    // Find matching icon or return default
+    const matchedKey = Object.keys(iconMap).find(key =>
+      departmentName.toLowerCase().includes(key.toLowerCase())
+    );
+
+    return matchedKey ? iconMap[matchedKey] : <BookOpen className='h-8 w-8 text-[#F7B500]' />;
+  };
+
+  // Department handlers
+  const handleReadMore = (department) => {
+    setSelectedDepartment(department);
+    setShowDepartmentModal(true);
+  };
+
+  const closeDepartmentModal = () => {
+    setShowDepartmentModal(false);
+    setSelectedDepartment(null);
+  };
+
+
 
   // Determine text direction based on language
   const isRTL = language === "dr" || language === "ps";
@@ -662,13 +700,13 @@ function AboutPage() {
                 >
                   <div className='h-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85]'></div>
                   <div className='p-6'>
-                    <div className='inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#1D3D6F]/10 mb-4 group-hover:bg-[#1D3D6F]/20 transition-colors'>
-                      {dept.icon}
+                    <div className='inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#1D3D6F]/10 mb-4 hover:bg-[#1D3D6F]/20 transition-colors'>
+                      {getDepartmentIcon(dept.name)}
                     </div>
                     <h4 className='text-xl font-semibold mb-3 text-[#1D3D6F]'>
                       {t(dept.name)}
                     </h4>
-                    <p className='text-gray-600 mb-4'>{t(dept.description)}</p>
+                    <p className='text-gray-600 mb-4 line-clamp-3'>{t(dept.description)}</p>
                     <div className='flex justify-between items-center text-sm text-gray-500 mb-4'>
                       <div className='flex items-center'>
                         <Clock className='h-4 w-4 mr-1 text-[#1D3D6F]' />
@@ -679,13 +717,13 @@ function AboutPage() {
                         {t("Fall & Spring Intake")}
                       </div>
                     </div>
-                    <a
-                      href='#'
-                      className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition group-hover:translate-x-1 duration-300'
+                    <button
+                      onClick={() => handleReadMore(dept)}
+                      className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition hover:translate-x-1 duration-300 cursor-pointer'
                     >
                       {t("Learn more")}{" "}
-                      <ChevronRight className='h-4 w-4 ml-1 transition-transform group-hover:translate-x-1' />
-                    </a>
+                      <ChevronRight className='h-4 w-4 ml-1 transition-transform hover:translate-x-1' />
+                    </button>
                   </div>
                 </div>
               ))
@@ -941,6 +979,133 @@ function AboutPage() {
           </div>
         </section>
       </div>
+
+      {/* Department Modal */}
+      {showDepartmentModal && selectedDepartment && (
+        <div
+          className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50'
+          onClick={closeDepartmentModal}
+        >
+          <div
+            className='bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className='sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl z-10'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center'>
+                  <div className='inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#1D3D6F]/10 mr-4'>
+                    {getDepartmentIcon(selectedDepartment.name)}
+                  </div>
+                  <h2 className='text-2xl font-bold text-[#1D3D6F]'>
+                    {t(selectedDepartment.name)}
+                  </h2>
+                </div>
+                <button
+                  onClick={closeDepartmentModal}
+                  className='p-2 hover:bg-gray-100 rounded-full transition-colors'
+                >
+                  <svg className='w-6 h-6 text-gray-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className='p-6'>
+              <div className='mb-6'>
+                <h3 className='text-lg font-semibold text-[#1D3D6F] mb-3'>Department Overview</h3>
+                <p className='text-gray-600 leading-relaxed'>
+                  {t(selectedDepartment.description)}
+                </p>
+              </div>
+
+              <div className='grid md:grid-cols-2 gap-6 mb-6'>
+                <div className='bg-blue-50 p-4 rounded-lg'>
+                  <h4 className='font-semibold text-[#1D3D6F] mb-2 flex items-center'>
+                    <Clock className='h-5 w-5 mr-2 text-[#F7B500]' />
+                    Program Duration
+                  </h4>
+                  <p className='text-gray-600'>4-Year Bachelor's Degree Program</p>
+                </div>
+
+                <div className='bg-green-50 p-4 rounded-lg'>
+                  <h4 className='font-semibold text-[#1D3D6F] mb-2 flex items-center'>
+                    <Calendar className='h-5 w-5 mr-2 text-[#F7B500]' />
+                    Intake Periods
+                  </h4>
+                  <p className='text-gray-600'>Fall & Spring Semesters</p>
+                </div>
+
+                <div className='bg-yellow-50 p-4 rounded-lg'>
+                  <h4 className='font-semibold text-[#1D3D6F] mb-2 flex items-center'>
+                    <Users className='h-5 w-5 mr-2 text-[#F7B500]' />
+                    Faculty Members
+                  </h4>
+                  <p className='text-gray-600'>Experienced Professors & Lecturers</p>
+                </div>
+
+                <div className='bg-purple-50 p-4 rounded-lg'>
+                  <h4 className='font-semibold text-[#1D3D6F] mb-2 flex items-center'>
+                    <Award className='h-5 w-5 mr-2 text-[#F7B500]' />
+                    Degree Type
+                  </h4>
+                  <p className='text-gray-600'>Bachelor of Science (B.S.)</p>
+                </div>
+              </div>
+
+              <div className='mb-6'>
+                <h3 className='text-lg font-semibold text-[#1D3D6F] mb-3'>Career Opportunities</h3>
+                <div className='grid md:grid-cols-2 gap-3'>
+                  {[
+                    'Government Economic Analyst',
+                    'Financial Consultant',
+                    'Business Development Manager',
+                    'Research Analyst',
+                    'Banking Professional',
+                    'Investment Advisor',
+                    'Policy Researcher',
+                    'Corporate Finance Specialist'
+                  ].map((career, index) => (
+                    <div key={index} className='flex items-center p-2 bg-gray-50 rounded-lg'>
+                      <ChevronRight className='h-4 w-4 text-[#F7B500] mr-2' />
+                      <span className='text-gray-700'>{career}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className='mb-6'>
+                <h3 className='text-lg font-semibold text-[#1D3D6F] mb-3'>Key Features</h3>
+                <div className='space-y-3'>
+                  <div className='flex items-start'>
+                    <BookOpen className='h-5 w-5 text-[#F7B500] mr-3 mt-0.5' />
+                    <div>
+                      <h4 className='font-medium text-gray-800'>Comprehensive Curriculum</h4>
+                      <p className='text-gray-600 text-sm'>Modern curriculum designed to meet industry standards</p>
+                    </div>
+                  </div>
+                  <div className='flex items-start'>
+                    <Users className='h-5 w-5 text-[#F7B500] mr-3 mt-0.5' />
+                    <div>
+                      <h4 className='font-medium text-gray-800'>Expert Faculty</h4>
+                      <p className='text-gray-600 text-sm'>Learn from experienced professors and industry professionals</p>
+                    </div>
+                  </div>
+                  <div className='flex items-start'>
+                    <Award className='h-5 w-5 text-[#F7B500] mr-3 mt-0.5' />
+                    <div>
+                      <h4 className='font-medium text-gray-800'>Research Opportunities</h4>
+                      <p className='text-gray-600 text-sm'>Engage in cutting-edge research projects and publications</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <Footer />

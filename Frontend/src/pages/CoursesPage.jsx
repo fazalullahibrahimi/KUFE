@@ -22,9 +22,12 @@ import {
   ListFilter,
   User,
   Download,
+  Award,
+  X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Modal from "../components/common/Modal";
 import axios from "axios";
 import { useLanguage } from "../contexts/LanguageContext";
 
@@ -45,6 +48,12 @@ export default function CoursesPage() {
   const [viewMode, setViewMode] = useState("grid");
   const [sortOption, setSortOption] = useState("title");
   const [animatedElements, setAnimatedElements] = useState([]);
+
+  // Modal states for Featured Academic Programs
+  const [showProgramModal, setShowProgramModal] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [showContactModal, setShowContactModal] = useState(false);
+
   const { t, language, direction } = useLanguage();
 
   const observerRef = useRef(null);
@@ -198,6 +207,291 @@ export default function CoursesPage() {
     setActiveTab("all");
   };
 
+  // Handler functions for Featured Academic Programs
+  const handleProgramReadMore = (program) => {
+    setSelectedProgram(program);
+    setShowProgramModal(true);
+  };
+
+  const closeProgramModal = () => {
+    setShowProgramModal(false);
+    setSelectedProgram(null);
+  };
+
+  // Handler functions for modal buttons
+  const handleContactAdmissions = () => {
+    setShowContactModal(true);
+  };
+
+  const closeContactModal = () => {
+    setShowContactModal(false);
+  };
+
+  const copyContactInfo = () => {
+    const contactText = `Email: admissions@kufe.edu.af\nPhone: +93 (0) 30 222 0000\nProgram: ${selectedProgram?.title}`;
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(contactText).then(() => {
+        alert('Contact information copied to clipboard!');
+      }).catch(() => {
+        alert('Contact information:\n' + contactText);
+      });
+    } else {
+      alert('Contact information:\n' + contactText);
+    }
+  };
+
+  // Handler functions for hero section buttons
+  const handleBrowseCourses = () => {
+    // Scroll to the course list section
+    const courseListElement = document.getElementById('course-list');
+    if (courseListElement) {
+      courseListElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      // If no courses loaded yet, scroll to course filters
+      const courseFiltersElement = document.getElementById('course-filters');
+      if (courseFiltersElement) {
+        courseFiltersElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
+  const handleViewPrograms = () => {
+    // Scroll to the featured programs section
+    const featuredProgramsElement = document.getElementById('featured-programs');
+    if (featuredProgramsElement) {
+      featuredProgramsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      // If featured programs not visible, show them by resetting filters
+      setActiveTab('all');
+      setSearchTerm('');
+      setActiveFilters({
+        department: "all",
+        semester: "all",
+        level: "all",
+      });
+      // Then scroll after a short delay
+      setTimeout(() => {
+        const element = document.getElementById('featured-programs');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500);
+    }
+  };
+
+  // Quick Registration functionality
+  const [quickRegData, setQuickRegData] = useState({
+    studentId: '',
+    semester: 'fall'
+  });
+
+  const handleQuickRegistration = (e) => {
+    e.preventDefault();
+
+    if (!quickRegData.studentId.trim()) {
+      alert('Please enter your Student ID');
+      return;
+    }
+
+    // Create registration information modal/alert
+    const registrationInfo = `
+COURSE REGISTRATION INFORMATION
+
+Student ID: ${quickRegData.studentId}
+Selected Semester: ${quickRegData.semester === 'fall' ? 'Fall 2023' : quickRegData.semester === 'spring' ? 'Spring 2024' : 'Summer 2024'}
+
+NEXT STEPS:
+1. Visit the Student Portal at: portal.kufe.edu.af
+2. Log in with your student credentials
+3. Navigate to "Course Registration" section
+4. Select your courses for the semester
+5. Submit your registration
+
+IMPORTANT NOTES:
+• Registration deadlines must be observed
+• Prerequisites must be completed
+• Consult with your academic advisor
+• Payment of fees required before registration
+
+CONTACT SUPPORT:
+Email: registrar@kufe.edu.af
+Phone: +93 (0) 30 222 0100
+Office: Student Services Building, Room 101
+
+Would you like to open the Student Portal now?
+`;
+
+    const openPortal = confirm(registrationInfo);
+
+    if (openPortal) {
+      // Open student portal in new tab
+      window.open('https://portal.kufe.edu.af', '_blank');
+    }
+
+    // Reset form
+    setQuickRegData({
+      studentId: '',
+      semester: 'fall'
+    });
+  };
+
+  // Handler functions for course detail downloads
+  const handleDownloadSyllabus = (course) => {
+    if (!course) return;
+
+    const syllabusContent = `
+FACULTY OF ECONOMICS - KANDAHAR UNIVERSITY
+COURSE SYLLABUS
+
+Course Code: ${course.code || 'N/A'}
+Course Title: ${course.name || 'N/A'}
+Instructor: ${course.instructor || 'N/A'}
+Credits: ${course.credits || 'N/A'}
+Semester: ${course.semester || 'N/A'}
+Level: ${course.level || 'N/A'}
+Department: ${course.department_id?.name || 'Economics'}
+
+COURSE DESCRIPTION
+${course.description || 'Course description not available.'}
+
+LEARNING OBJECTIVES
+Upon successful completion of this course, students will be able to:
+• Understand key theoretical concepts in the field
+• Apply analytical methods to real-world problems
+• Develop critical thinking and problem-solving skills
+• Communicate findings effectively through written and oral presentations
+• Work collaboratively in team-based projects
+
+COURSE OUTLINE
+Week 1-2: Introduction and Fundamentals
+Week 3-4: Core Concepts and Theories
+Week 5-6: Practical Applications
+Week 7-8: Case Studies and Analysis
+Week 9-10: Advanced Topics
+Week 11-12: Research and Projects
+Week 13-14: Review and Assessment
+Week 15-16: Final Examinations
+
+ASSESSMENT METHODS
+• Midterm Examination: 30%
+• Final Examination: 40%
+• Assignments and Projects: 20%
+• Class Participation: 10%
+
+REQUIRED TEXTBOOKS
+• Primary textbook will be announced in class
+• Additional readings will be provided
+• Access to online resources and databases
+
+PREREQUISITES
+${course.prerequisites && course.prerequisites.length > 0
+  ? course.prerequisites.join(', ')
+  : 'No specific prerequisites required'}
+
+ATTENDANCE POLICY
+Regular attendance is mandatory. Students are expected to attend all classes.
+More than 3 unexcused absences may result in course failure.
+
+CONTACT INFORMATION
+Instructor: ${course.instructor || 'TBA'}
+Office Hours: To be announced
+Email: Contact through department office
+Department: Faculty of Economics
+
+Generated on: ${new Date().toLocaleDateString()}
+`;
+
+    const blob = new Blob([syllabusContent], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${course.code || 'Course'}_Syllabus.txt`;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    alert(`Syllabus for ${course.name} downloaded successfully!`);
+  };
+
+
+
+  const handleDownloadBrochure = () => {
+    if (!selectedProgram) return;
+
+    // Map program titles to brochure file names
+    const brochureFiles = {
+      "Bachelor in Economics": "/brochures/Bachelor_in_Economics_Brochure.txt",
+      "Master in Finance": "/brochures/Master_in_Finance_Brochure.txt",
+      "Business Administration": "/brochures/Business_Administration_Brochure.txt"
+    };
+
+    const brochureUrl = brochureFiles[selectedProgram.title];
+
+    if (brochureUrl) {
+      // Download the pre-created brochure file
+      const link = document.createElement('a');
+      link.href = brochureUrl;
+      link.download = `${selectedProgram.title.replace(/\s+/g, '_')}_Brochure.txt`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Show success message
+      alert(`${selectedProgram.title} brochure downloaded successfully!`);
+    } else {
+      // Fallback: create dynamic brochure if file not found
+      const brochureContent = `
+FACULTY OF ECONOMICS - KANDAHAR UNIVERSITY
+${selectedProgram.title.toUpperCase()} PROGRAM BROCHURE
+
+PROGRAM OVERVIEW
+${selectedProgram.description}
+
+PROGRAM DETAILS
+Duration: ${selectedProgram.duration}
+Total Credits: ${selectedProgram.credits}
+
+CAREER OPPORTUNITIES
+${selectedProgram.title === "Bachelor in Economics" ?
+  "• Economic Analyst\n• Financial Consultant\n• Policy Researcher\n• Banking Professional" :
+  selectedProgram.title === "Master in Finance" ?
+  "• Investment Manager\n• Financial Analyst\n• Risk Manager\n• Corporate Finance Specialist" :
+  "• Business Manager\n• Operations Director\n• Entrepreneur\n• Management Consultant"
+}
+
+ADMISSION REQUIREMENTS
+• High school diploma or equivalent
+• Entrance examination
+• English proficiency test
+• Personal statement
+
+CONTACT INFORMATION
+Faculty of Economics, Kandahar University
+Email: admissions@kufe.edu.af
+Phone: +93 (0) 30 222 0000
+
+Generated on: ${new Date().toLocaleDateString()}
+`;
+
+      const blob = new Blob([brochureContent], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${selectedProgram.title.replace(/\s+/g, '_')}_Brochure.txt`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      alert(`${selectedProgram.title} brochure downloaded successfully!`);
+    }
+  };
+
   return (
     <div dir={direction} className='min-h-screen bg-[#F5F7FA]'>
       <Navbar />
@@ -234,10 +528,16 @@ export default function CoursesPage() {
               </p>
 
               <div className='flex flex-wrap gap-4'>
-                <button className='bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-bold py-3 px-6 rounded-lg transition shadow-md'>
+                <button
+                  onClick={handleBrowseCourses}
+                  className='bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-bold py-3 px-6 rounded-lg transition shadow-md cursor-pointer'
+                >
                   {t("Browse_Courses")}
                 </button>
-                <button className='bg-transparent hover:bg-white/10 text-white border border-white font-medium py-3 px-6 rounded-lg transition'>
+                <button
+                  onClick={handleViewPrograms}
+                  className='bg-transparent hover:bg-white/10 text-white border border-white font-medium py-3 px-6 rounded-lg transition cursor-pointer'
+                >
                   {t("View_Programs")}
                 </button>
               </div>
@@ -330,6 +630,7 @@ export default function CoursesPage() {
           <CourseDetail
             course={selectedCourse}
             onBackClick={handleBackClick}
+            onDownloadSyllabus={handleDownloadSyllabus}
             t={t}
             direction={direction}
           />
@@ -667,9 +968,9 @@ export default function CoursesPage() {
                         {t("Credits")}: {program.credits}
                       </div>
                     </div>
-                    <a
-                      href='#'
-                      className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition group-hover:translate-x-1 duration-300'
+                    <button
+                      onClick={() => handleProgramReadMore(program)}
+                      className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition group-hover:translate-x-1 duration-300 cursor-pointer'
                     >
                       {t("Learn_More")}{" "}
                       <ChevronRight
@@ -677,7 +978,7 @@ export default function CoursesPage() {
                           direction === "rtl" ? "mr-1 rotate-180" : "ml-1"
                         } transition-transform group-hover:translate-x-1`}
                       />
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -732,22 +1033,29 @@ export default function CoursesPage() {
                 <h3 className='text-xl font-semibold mb-4 text-white'>
                   {t("Quick_Registration")}
                 </h3>
-                <div className='space-y-4'>
+                <form onSubmit={handleQuickRegistration} className='space-y-4'>
                   <div>
                     <label className='block text-white/90 text-sm mb-1'>
                       {t("Student_ID")}
                     </label>
                     <input
                       type='text'
-                      className='w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F7B500] text-white'
+                      value={quickRegData.studentId}
+                      onChange={(e) => setQuickRegData({...quickRegData, studentId: e.target.value})}
+                      className='w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F7B500] text-white placeholder-white/60'
                       placeholder={t("Student_ID_Placeholder")}
+                      required
                     />
                   </div>
                   <div>
                     <label className='block text-white/90 text-sm mb-1'>
                       {t("Semester")}
                     </label>
-                    <select className='w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F7B500] text-white'>
+                    <select
+                      value={quickRegData.semester}
+                      onChange={(e) => setQuickRegData({...quickRegData, semester: e.target.value})}
+                      className='w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F7B500] text-white'
+                    >
                       <option value='fall' className='text-gray-800'>
                         {t("Fall")} 2023
                       </option>
@@ -759,15 +1067,202 @@ export default function CoursesPage() {
                       </option>
                     </select>
                   </div>
-                  <button className='w-full bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-bold py-3 rounded-lg transition shadow-md'>
+                  <button
+                    type='submit'
+                    className='w-full bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-bold py-3 rounded-lg transition shadow-md cursor-pointer'
+                  >
                     {t("Start_Registration")}
                   </button>
-                </div>
+                </form>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Program Details Modal */}
+      <Modal
+        isOpen={showProgramModal}
+        onClose={closeProgramModal}
+        title={selectedProgram?.title || "Program Details"}
+        size="lg"
+      >
+        {selectedProgram && (
+          <div className="space-y-6">
+            <div className="flex items-center mb-4">
+              <div className="bg-gradient-to-r from-[#004B87] to-[#1D3D6F] p-3 rounded-lg mr-4">
+                {selectedProgram.icon}
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-[#1D3D6F]">{selectedProgram.title}</h3>
+                <p className="text-gray-500">Academic Program</p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-medium text-gray-800 mb-3">Program Description</h4>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-gray-700 leading-relaxed">{selectedProgram.description}</p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h5 className="font-medium text-[#1D3D6F] mb-2">Duration</h5>
+                <p className="text-gray-700">{selectedProgram.duration}</p>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h5 className="font-medium text-[#1D3D6F] mb-2">Total Credits</h5>
+                <p className="text-gray-700">{selectedProgram.credits}</p>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <h5 className="font-medium text-[#1D3D6F] mb-2">Career Opportunities</h5>
+              <div className="space-y-2">
+                {selectedProgram.title === "Bachelor in Economics" && (
+                  <ul className="text-gray-700 space-y-1">
+                    <li>• Economic Analyst</li>
+                    <li>• Financial Consultant</li>
+                    <li>• Policy Researcher</li>
+                    <li>• Banking Professional</li>
+                  </ul>
+                )}
+                {selectedProgram.title === "Master in Finance" && (
+                  <ul className="text-gray-700 space-y-1">
+                    <li>• Investment Manager</li>
+                    <li>• Financial Analyst</li>
+                    <li>• Risk Manager</li>
+                    <li>• Corporate Finance Specialist</li>
+                  </ul>
+                )}
+                {selectedProgram.title === "Business Administration" && (
+                  <ul className="text-gray-700 space-y-1">
+                    <li>• Business Manager</li>
+                    <li>• Operations Director</li>
+                    <li>• Entrepreneur</li>
+                    <li>• Management Consultant</li>
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-[#1D3D6F] text-white p-4 rounded-lg">
+              <h5 className="font-medium mb-2">Admission Requirements</h5>
+              <ul className="text-sm space-y-1">
+                <li>• High school diploma or equivalent</li>
+                <li>• Entrance examination</li>
+                <li>• English proficiency test</li>
+                <li>• Personal statement</li>
+              </ul>
+            </div>
+
+            <div className="bg-[#F7B500] text-[#1D3D6F] p-4 rounded-lg">
+              <h5 className="font-medium mb-2">Ready to Apply?</h5>
+              <p className="text-sm mb-3">
+                Contact our admissions office for more information about this program and application procedures.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={handleContactAdmissions}
+                  className="bg-[#1D3D6F] text-white px-3 py-1 rounded text-sm hover:bg-[#2C4F85] transition-colors cursor-pointer"
+                >
+                  Contact Admissions
+                </button>
+                <button
+                  onClick={handleDownloadBrochure}
+                  className="bg-white text-[#1D3D6F] px-3 py-1 rounded text-sm border border-[#1D3D6F] hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  Download Brochure
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Contact Admissions Modal */}
+      <Modal
+        isOpen={showContactModal}
+        onClose={closeContactModal}
+        title="Contact Admissions Office"
+        size="md"
+      >
+        <div className="space-y-6">
+          <div className="bg-[#1D3D6F] text-white p-4 rounded-lg">
+            <h3 className="text-lg font-medium mb-2">Program Inquiry</h3>
+            <p className="text-sm">{selectedProgram?.title || 'Academic Program'}</p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center p-3 bg-blue-50 rounded-lg">
+              <div className="bg-blue-100 p-2 rounded-lg mr-3">
+                📧
+              </div>
+              <div>
+                <p className="font-medium text-gray-800">Email</p>
+                <p className="text-blue-600">admissions@kufe.edu.af</p>
+              </div>
+            </div>
+
+            <div className="flex items-center p-3 bg-green-50 rounded-lg">
+              <div className="bg-green-100 p-2 rounded-lg mr-3">
+                📞
+              </div>
+              <div>
+                <p className="font-medium text-gray-800">Phone</p>
+                <p className="text-green-600">+93 (0) 30 222 0000</p>
+              </div>
+            </div>
+
+            <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
+              <div className="bg-yellow-100 p-2 rounded-lg mr-3">
+                📍
+              </div>
+              <div>
+                <p className="font-medium text-gray-800">Address</p>
+                <p className="text-gray-600">University Road, Kandahar, Afghanistan</p>
+              </div>
+            </div>
+
+            <div className="flex items-center p-3 bg-purple-50 rounded-lg">
+              <div className="bg-purple-100 p-2 rounded-lg mr-3">
+                🕒
+              </div>
+              <div>
+                <p className="font-medium text-gray-800">Office Hours</p>
+                <p className="text-gray-600">Sunday-Thursday, 8:00 AM - 4:00 PM</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="font-medium text-gray-800 mb-2">Information Available</h4>
+            <ul className="text-sm text-gray-600 space-y-1">
+              <li>• Application procedures and deadlines</li>
+              <li>• Admission requirements</li>
+              <li>• Tuition fees and financial aid options</li>
+              <li>• Course curriculum details</li>
+              <li>• Career support services</li>
+            </ul>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={copyContactInfo}
+              className="flex-1 bg-[#1D3D6F] text-white px-4 py-2 rounded-lg hover:bg-[#2C4F85] transition-colors"
+            >
+              Copy Contact Info
+            </button>
+            <button
+              onClick={() => window.open('mailto:admissions@kufe.edu.af?subject=Inquiry about ' + encodeURIComponent(selectedProgram?.title || 'Academic Program'), '_blank')}
+              className="flex-1 bg-[#F7B500] text-[#1D3D6F] px-4 py-2 rounded-lg hover:bg-[#F7B500]/90 transition-colors"
+            >
+              Send Email
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       <Footer />
     </div>
@@ -1008,7 +1503,7 @@ function CourseListItem({ course, onClick, index, isVisible }) {
 }
 
 // Course Detail Component
-function CourseDetail({ course, onBackClick, t, direction }) {
+function CourseDetail({ course, onBackClick, onDownloadSyllabus, t, direction }) {
   return (
     <div className='bg-white rounded-xl shadow-lg overflow-hidden animate-fadeIn'>
       <div className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white p-6'>
@@ -1131,18 +1626,28 @@ function CourseDetail({ course, onBackClick, t, direction }) {
                       title: "Introduction to Economics Textbook",
                       type: "book",
                       size: "PDF, 8.5 MB",
+                      description: "Primary textbook covering fundamental economic principles"
                     },
                     {
                       id: 2,
                       title: "Course Syllabus",
                       type: "doc",
                       size: "PDF, 1.2 MB",
+                      description: "Complete course outline and requirements"
                     },
                     {
                       id: 3,
-                      title: "Assignment Guidelines",
+                      title: "Lecture Notes Collection",
                       type: "doc",
-                      size: "PDF, 0.8 MB",
+                      size: "PDF, 3.4 MB",
+                      description: "Comprehensive lecture notes and examples"
+                    },
+                    {
+                      id: 4,
+                      title: "Case Studies",
+                      type: "doc",
+                      size: "PDF, 2.1 MB",
+                      description: "Real-world economic case studies for analysis"
                     },
                   ]
                 ).map((material) => (
@@ -1151,31 +1656,347 @@ function CourseDetail({ course, onBackClick, t, direction }) {
                     className='p-4 hover:bg-gray-50 transition-colors'
                   >
                     <div className='flex justify-between items-center'>
-                      <div className='flex items-center'>
-                        <div className='bg-[#1D3D6F] text-white p-2 rounded-lg mr-3 uppercase text-xs'>
+                      <div className='flex items-center flex-1'>
+                        <div className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white p-3 rounded-lg mr-4 uppercase text-xs font-bold min-w-[50px] text-center'>
                           {material.type}
                         </div>
-                        <span className='text-[#1D3D6F] font-medium'>
-                          {material.title}
-                        </span>
+                        <div className='flex-1'>
+                          <h4 className='text-[#1D3D6F] font-semibold text-lg mb-1'>
+                            {material.title}
+                          </h4>
+                          <p className='text-gray-600 text-sm mb-1'>
+                            {material.description}
+                          </p>
+                          <span className='text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full'>
+                            {material.size}
+                          </span>
+                        </div>
                       </div>
-                      <div className='flex items-center'>
-                        <span className='text-xs text-gray-500 mr-3'>
-                          {material.size}
-                        </span>
-                        <button className='bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] px-3 py-1 rounded-lg text-sm font-medium transition-colors flex items-center'>
-                          <Download
-                            className={`h-4 w-4 ${
-                              direction === "rtl" ? "ml-1" : "mr-1"
-                            }`}
-                          />{" "}
-                          {t("Download_Templates")}
-                        </button>
+                      <div className='ml-4'>
+                        <div className='bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium'>
+                          Available in Class
+                        </div>
                       </div>
                     </div>
                   </li>
                 ))}
               </ul>
+            </div>
+
+            {/* Advanced Templates Section */}
+            <div className='mt-8'>
+              <h2 className='text-xl font-semibold mb-6 text-[#1D3D6F] flex items-center'>
+                <Download className='h-6 w-6 mr-2 text-[#F7B500]' />
+                Course Templates & Resources
+              </h2>
+
+              <div className='grid md:grid-cols-3 gap-6'>
+                {/* Assignment Template */}
+                <div className='bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 group'>
+                  <div className='flex items-center mb-4'>
+                    <div className='bg-blue-500 text-white p-3 rounded-lg mr-3 group-hover:scale-110 transition-transform'>
+                      <FileText className='h-6 w-6' />
+                    </div>
+                    <div>
+                      <h3 className='font-semibold text-blue-900'>Assignment Template</h3>
+                      <p className='text-sm text-blue-700'>Professional format</p>
+                    </div>
+                  </div>
+                  <p className='text-blue-800 text-sm mb-4 leading-relaxed'>
+                    Structured template for course assignments with proper formatting guidelines,
+                    citation requirements, and submission standards.
+                  </p>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded-full'>
+                      .TXT Format
+                    </span>
+                    <button
+                      onClick={() => {
+                        const content = `ASSIGNMENT TEMPLATE - Faculty of Economics
+Student Name: ___________________
+Student ID: ___________________
+Course: ${course.name || 'Course Name'}
+Assignment Title: ___________________
+Due Date: ___________________
+
+INSTRUCTIONS:
+1. Read assignment requirements carefully
+2. Follow formatting guidelines below
+3. Include proper citations (APA format)
+4. Submit before deadline via student portal
+
+ASSIGNMENT CONTENT:
+[Write your assignment content here]
+
+ANALYSIS SECTION:
+[Provide detailed analysis with supporting evidence]
+
+CONCLUSION:
+[Summarize key findings and insights]
+
+REFERENCES:
+[List all sources in APA format]
+
+FORMATTING REQUIREMENTS:
+- Font: Times New Roman, 12pt
+- Spacing: Double-spaced
+- Margins: 1 inch all sides
+- Page numbers: Top right corner
+
+Submission Date: ___________________`;
+
+                        const blob = new Blob([content], { type: 'text/plain' });
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `${course.code || 'Course'}_Assignment_Template.txt`;
+                        link.click();
+                        window.URL.revokeObjectURL(url);
+                        alert('Assignment template downloaded successfully!');
+                      }}
+                      className='bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors flex items-center'
+                    >
+                      <Download className='h-4 w-4 mr-1' />
+                      Download
+                    </button>
+                  </div>
+                </div>
+
+                {/* Project Report Template */}
+                <div className='bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 group'>
+                  <div className='flex items-center mb-4'>
+                    <div className='bg-green-500 text-white p-3 rounded-lg mr-3 group-hover:scale-110 transition-transform'>
+                      <Book className='h-6 w-6' />
+                    </div>
+                    <div>
+                      <h3 className='font-semibold text-green-900'>Project Report Template</h3>
+                      <p className='text-sm text-green-700'>Research format</p>
+                    </div>
+                  </div>
+                  <p className='text-green-800 text-sm mb-4 leading-relaxed'>
+                    Comprehensive template for research projects including methodology,
+                    analysis sections, and professional presentation standards.
+                  </p>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-xs bg-green-200 text-green-800 px-2 py-1 rounded-full'>
+                      .TXT Format
+                    </span>
+                    <button
+                      onClick={() => {
+                        const content = `PROJECT REPORT TEMPLATE - Faculty of Economics
+PROJECT TITLE: ___________________
+STUDENT NAME: ___________________
+STUDENT ID: ___________________
+COURSE: ${course.name || 'Course Name'}
+INSTRUCTOR: ${course.instructor || 'Instructor Name'}
+DATE: ___________________
+
+EXECUTIVE SUMMARY
+[Brief overview of project objectives, methodology, and key findings]
+
+1. INTRODUCTION
+1.1 Background and Context
+[Provide background information and context for the project]
+
+1.2 Problem Statement
+[Clearly define the problem or research question]
+
+1.3 Objectives
+[List primary and secondary objectives]
+
+2. LITERATURE REVIEW
+[Review relevant academic sources and previous research]
+
+3. METHODOLOGY
+3.1 Research Design
+[Describe research approach and design]
+
+3.2 Data Collection
+[Explain data collection methods and sources]
+
+3.3 Analysis Methods
+[Detail analytical techniques used]
+
+4. ANALYSIS AND FINDINGS
+4.1 Data Analysis
+[Present analysis results with charts/tables]
+
+4.2 Key Findings
+[Highlight main discoveries and insights]
+
+5. DISCUSSION
+5.1 Interpretation of Results
+[Discuss implications of findings]
+
+5.2 Limitations
+[Acknowledge study limitations]
+
+6. CONCLUSIONS AND RECOMMENDATIONS
+[Summarize findings and provide recommendations]
+
+7. REFERENCES
+[List all sources in APA format]
+
+8. APPENDICES
+[Include supporting materials]`;
+
+                        const blob = new Blob([content], { type: 'text/plain' });
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `${course.code || 'Course'}_Project_Report_Template.txt`;
+                        link.click();
+                        window.URL.revokeObjectURL(url);
+                        alert('Project report template downloaded successfully!');
+                      }}
+                      className='bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors flex items-center'
+                    >
+                      <Download className='h-4 w-4 mr-1' />
+                      Download
+                    </button>
+                  </div>
+                </div>
+
+                {/* Presentation Template */}
+                <div className='bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 group'>
+                  <div className='flex items-center mb-4'>
+                    <div className='bg-purple-500 text-white p-3 rounded-lg mr-3 group-hover:scale-110 transition-transform'>
+                      <Users className='h-6 w-6' />
+                    </div>
+                    <div>
+                      <h3 className='font-semibold text-purple-900'>Presentation Template</h3>
+                      <p className='text-sm text-purple-700'>Slide structure</p>
+                    </div>
+                  </div>
+                  <p className='text-purple-800 text-sm mb-4 leading-relaxed'>
+                    Professional presentation structure with slide guidelines,
+                    timing recommendations, and best practices for academic presentations.
+                  </p>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded-full'>
+                      .TXT Format
+                    </span>
+                    <button
+                      onClick={() => {
+                        const content = `PRESENTATION TEMPLATE - Faculty of Economics
+COURSE: ${course.name || 'Course Name'}
+PRESENTER: ___________________
+STUDENT ID: ___________________
+DATE: ___________________
+DURATION: 15-20 minutes
+
+SLIDE STRUCTURE GUIDE
+
+SLIDE 1: TITLE SLIDE
+- Presentation Title
+- Student Name and ID
+- Course: ${course.name || 'Course Name'}
+- Date
+- University Logo
+
+SLIDE 2: AGENDA/OUTLINE
+- Overview of topics to be covered
+- Estimated timing for each section
+
+SLIDE 3: INTRODUCTION
+- Background and context
+- Problem statement or research question
+- Objectives of the presentation
+
+SLIDE 4-5: LITERATURE REVIEW/BACKGROUND
+- Key theories and concepts
+- Previous research findings
+- Theoretical framework
+
+SLIDE 6-8: METHODOLOGY (if applicable)
+- Research approach
+- Data collection methods
+- Analysis techniques
+
+SLIDE 9-12: MAIN CONTENT/ANALYSIS
+- Key findings and results
+- Data visualization (charts, graphs)
+- Supporting evidence
+- Case studies or examples
+
+SLIDE 13-14: DISCUSSION
+- Interpretation of results
+- Implications and significance
+- Limitations and challenges
+
+SLIDE 15: CONCLUSIONS
+- Summary of key findings
+- Recommendations
+- Future research directions
+
+SLIDE 16: REFERENCES
+- Key academic sources
+- APA format citations
+
+SLIDE 17: THANK YOU & QUESTIONS
+- Contact information
+- Open for questions and discussion
+
+PRESENTATION TIPS:
+✓ Keep slides simple and uncluttered
+✓ Use bullet points instead of paragraphs
+✓ Include relevant visuals and charts
+✓ Practice timing (aim for 15-20 minutes)
+✓ Prepare for Q&A session
+✓ Maintain eye contact with audience
+✓ Speak clearly and at appropriate pace
+
+TECHNICAL REQUIREMENTS:
+- Font: Arial or Calibri, minimum 24pt
+- High contrast colors
+- Consistent formatting
+- Save as PDF for compatibility`;
+
+                        const blob = new Blob([content], { type: 'text/plain' });
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `${course.code || 'Course'}_Presentation_Template.txt`;
+                        link.click();
+                        window.URL.revokeObjectURL(url);
+                        alert('Presentation template downloaded successfully!');
+                      }}
+                      className='bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors flex items-center'
+                    >
+                      <Download className='h-4 w-4 mr-1' />
+                      Download
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Resources */}
+              <div className='mt-6 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white p-6 rounded-xl'>
+                <h3 className='font-semibold text-lg mb-3 flex items-center'>
+                  <CheckCircle2 className='h-5 w-5 mr-2 text-[#F7B500]' />
+                  Template Usage Guidelines
+                </h3>
+                <div className='grid md:grid-cols-2 gap-4 text-sm'>
+                  <div>
+                    <h4 className='font-medium mb-2 text-[#F7B500]'>Before Using Templates:</h4>
+                    <ul className='space-y-1 text-gray-200'>
+                      <li>• Read course-specific requirements</li>
+                      <li>• Check assignment guidelines</li>
+                      <li>• Verify formatting standards</li>
+                      <li>• Confirm submission deadlines</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className='font-medium mb-2 text-[#F7B500]'>Academic Standards:</h4>
+                    <ul className='space-y-1 text-gray-200'>
+                      <li>• Follow APA citation format</li>
+                      <li>• Maintain academic integrity</li>
+                      <li>• Use proper grammar and spelling</li>
+                      <li>• Include original analysis</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1281,15 +2102,10 @@ function CourseDetail({ course, onBackClick, t, direction }) {
                 </div>
 
                 <div className='mt-6 space-y-3'>
-                  <button className='w-full bg-[#F7B500] text-[#1D3D6F] py-3 rounded-lg font-medium hover:bg-[#F7B500]/90 transition-colors flex items-center justify-center'>
-                    <Calendar
-                      className={`h-5 w-5 ${
-                        direction === "rtl" ? "ml-2" : "mr-2"
-                      }`}
-                    />
-                    {t("Register_Course")}
-                  </button>
-                  <button className='w-full bg-white border border-[#1D3D6F] text-[#1D3D6F] py-3 rounded-lg font-medium hover:bg-[#1D3D6F]/5 transition-colors flex items-center justify-center'>
+                  <button
+                    onClick={() => onDownloadSyllabus(course)}
+                    className='w-full bg-[#F7B500] text-[#1D3D6F] py-3 rounded-lg font-medium hover:bg-[#F7B500]/90 transition-colors flex items-center justify-center cursor-pointer'
+                  >
                     <FileText
                       className={`h-5 w-5 ${
                         direction === "rtl" ? "ml-2" : "mr-2"
@@ -1297,6 +2113,18 @@ function CourseDetail({ course, onBackClick, t, direction }) {
                     />
                     {t("Download_Syllabus")}
                   </button>
+                  <div className='bg-blue-50 p-3 rounded-lg'>
+                    <p className='text-sm text-blue-800 text-center'>
+                      <Calendar className='h-4 w-4 inline mr-1' />
+                      Course registration is handled through the Student Portal
+                    </p>
+                  </div>
+                  <div className='bg-green-50 p-3 rounded-lg'>
+                    <p className='text-sm text-green-800 text-center'>
+                      <Download className='h-4 w-4 inline mr-1' />
+                      Templates available in the Course Templates section above
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

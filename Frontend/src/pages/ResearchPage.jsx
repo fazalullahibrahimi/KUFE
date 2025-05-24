@@ -18,9 +18,13 @@ import {
   X,
   RefreshCw,
   ChevronDown,
+  DollarSign,
+  ExternalLink,
+  Info,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Modal from "../components/common/Modal";
 import { useLanguage } from "../contexts/LanguageContext";
 
 export default function ResearchPage() {
@@ -33,6 +37,11 @@ export default function ResearchPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [visibleSections, setVisibleSections] = useState({});
+
+  // Modal states
+  const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
+  const [showFundingModal, setShowFundingModal] = useState(false);
+
   const { t, language, direction } = useLanguage();
   const sectionRefs = {
     hero: useRef(null),
@@ -314,6 +323,49 @@ export default function ResearchPage() {
 
   const navigateToSubmitResearch = () => {
     window.location.href = "/submit-research";
+  };
+
+  // Handler functions for Research Resources
+  const handleViewGuidelines = () => {
+    setShowGuidelinesModal(true);
+  };
+
+  const handleDownloadTemplates = () => {
+    // Create and trigger download of research templates
+    const templates = [
+      {
+        name: "Research_Proposal_Template.txt",
+        url: "/templates/Research_Proposal_Template.txt"
+      },
+      {
+        name: "Research_Paper_Template.txt",
+        url: "/templates/Research_Paper_Template.txt"
+      },
+      {
+        name: "Presentation_Template.txt",
+        url: "/templates/Presentation_Template.txt"
+      }
+    ];
+
+    // Download each template file
+    templates.forEach((template, index) => {
+      setTimeout(() => {
+        const link = document.createElement('a');
+        link.href = template.url;
+        link.download = template.name;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }, index * 500); // Stagger downloads by 500ms
+    });
+
+    // Show success message
+    alert("Templates download started. Please check your downloads folder.");
+  };
+
+  const handleExploreFunding = () => {
+    setShowFundingModal(true);
   };
 
   return (
@@ -964,9 +1016,9 @@ export default function ResearchPage() {
               <p className='text-gray-600 mb-4'>
                 {t("Research_Guidelines_Description")}
               </p>
-              <a
-                href='#'
-                className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors'
+              <button
+                onClick={handleViewGuidelines}
+                className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors cursor-pointer'
               >
                 {t("View_Guidelines")}{" "}
                 <ChevronRight
@@ -974,7 +1026,7 @@ export default function ResearchPage() {
                     direction === "rtl" ? "mr-1" : "ml-1"
                   } ${direction === "rtl" ? "rotate-180" : ""}`}
                 />
-              </a>
+              </button>
             </div>
 
             <div className='bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 group'>
@@ -987,17 +1039,17 @@ export default function ResearchPage() {
               <p className='text-gray-600 mb-4'>
                 {t("Research_Templates_Description")}
               </p>
-              <a
-                href='#'
-                className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors'
+              <button
+                onClick={handleDownloadTemplates}
+                className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors cursor-pointer'
               >
                 {t("Download_Templates")}{" "}
-                <ChevronRight
+                <Download
                   className={`h-4 w-4 ${
                     direction === "rtl" ? "mr-1" : "ml-1"
-                  } ${direction === "rtl" ? "rotate-180" : ""}`}
+                  }`}
                 />
-              </a>
+              </button>
             </div>
 
             <div className='bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 group'>
@@ -1010,21 +1062,201 @@ export default function ResearchPage() {
               <p className='text-gray-600 mb-4'>
                 {t("Research_Funding_Description")}
               </p>
-              <a
-                href='#'
-                className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors'
+              <button
+                onClick={handleExploreFunding}
+                className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors cursor-pointer'
               >
                 {t("Explore_Funding")}{" "}
-                <ChevronRight
+                <DollarSign
                   className={`h-4 w-4 ${
                     direction === "rtl" ? "mr-1" : "ml-1"
-                  } ${direction === "rtl" ? "rotate-180" : ""}`}
+                  }`}
                 />
-              </a>
+              </button>
             </div>
           </div>
         </section>
       </div>
+
+      {/* Research Guidelines Modal */}
+      <Modal
+        isOpen={showGuidelinesModal}
+        onClose={() => setShowGuidelinesModal(false)}
+        title={t("Research_Guidelines_Title")}
+        size="lg"
+      >
+        <div className="space-y-6">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="flex items-center mb-3">
+              <Info className="h-5 w-5 text-blue-600 mr-2" />
+              <h3 className="text-lg font-medium text-blue-900">Overview</h3>
+            </div>
+            <p className="text-blue-800">
+              These guidelines provide comprehensive instructions for conducting and publishing research
+              at the Faculty of Economics, Kandahar University.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-lg font-medium text-gray-800 mb-3">Research Methodology</h4>
+            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+              <div className="flex items-start">
+                <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-gray-800">Literature Review</p>
+                  <p className="text-sm text-gray-600">Conduct comprehensive literature review using peer-reviewed sources</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-gray-800">Data Collection</p>
+                  <p className="text-sm text-gray-600">Use appropriate quantitative or qualitative research methods</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <CheckCircle2 className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-gray-800">Analysis</p>
+                  <p className="text-sm text-gray-600">Apply statistical or thematic analysis as appropriate</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-lg font-medium text-gray-800 mb-3">Ethical Considerations</h4>
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <ul className="space-y-2 text-gray-700">
+                <li>• Obtain necessary ethical approvals before data collection</li>
+                <li>• Ensure participant consent and confidentiality</li>
+                <li>• Avoid plagiarism and properly cite all sources</li>
+                <li>• Declare any conflicts of interest</li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-lg font-medium text-gray-800 mb-3">Formatting Requirements</h4>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <ul className="space-y-2 text-gray-700">
+                <li>• Use APA 7th edition citation style</li>
+                <li>• 12-point Times New Roman font, double-spaced</li>
+                <li>• Include abstract (150-250 words)</li>
+                <li>• Provide 3-5 keywords</li>
+                <li>• Submit in PDF format</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="bg-[#1D3D6F] text-white p-4 rounded-lg">
+            <h5 className="font-medium mb-2">Need Help?</h5>
+            <p className="text-sm">
+              Contact the Research Office at research@kufe.edu.af or visit Room 205,
+              Faculty of Economics building for additional support.
+            </p>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Research Funding Modal */}
+      <Modal
+        isOpen={showFundingModal}
+        onClose={() => setShowFundingModal(false)}
+        title={t("Research_Funding_Title")}
+        size="lg"
+      >
+        <div className="space-y-6">
+          <div className="bg-green-50 p-4 rounded-lg">
+            <div className="flex items-center mb-3">
+              <DollarSign className="h-5 w-5 text-green-600 mr-2" />
+              <h3 className="text-lg font-medium text-green-900">Funding Opportunities</h3>
+            </div>
+            <p className="text-green-800">
+              Explore various funding opportunities available for research projects at KUFE.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white border border-gray-200 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-800 mb-2">Internal Grants</h4>
+              <p className="text-sm text-gray-600 mb-3">
+                University-funded research grants for faculty and students
+              </p>
+              <div className="text-sm">
+                <p><strong>Amount:</strong> $500 - $5,000</p>
+                <p><strong>Duration:</strong> 6-12 months</p>
+                <p><strong>Deadline:</strong> March 31, 2024</p>
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-800 mb-2">Government Funding</h4>
+              <p className="text-sm text-gray-600 mb-3">
+                National research council grants for economic research
+              </p>
+              <div className="text-sm">
+                <p><strong>Amount:</strong> $2,000 - $15,000</p>
+                <p><strong>Duration:</strong> 12-24 months</p>
+                <p><strong>Deadline:</strong> June 15, 2024</p>
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-800 mb-2">International Grants</h4>
+              <p className="text-sm text-gray-600 mb-3">
+                World Bank and UN development research funding
+              </p>
+              <div className="text-sm">
+                <p><strong>Amount:</strong> $5,000 - $50,000</p>
+                <p><strong>Duration:</strong> 12-36 months</p>
+                <p><strong>Deadline:</strong> Rolling basis</p>
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-800 mb-2">Student Research Fund</h4>
+              <p className="text-sm text-gray-600 mb-3">
+                Special funding for undergraduate and graduate student research
+              </p>
+              <div className="text-sm">
+                <p><strong>Amount:</strong> $200 - $2,000</p>
+                <p><strong>Duration:</strong> 3-6 months</p>
+                <p><strong>Deadline:</strong> Quarterly</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-lg font-medium text-gray-800 mb-3">Application Process</h4>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <ol className="space-y-2 text-gray-700">
+                <li>1. Submit research proposal using provided template</li>
+                <li>2. Include detailed budget and timeline</li>
+                <li>3. Obtain supervisor/department approval</li>
+                <li>4. Submit application before deadline</li>
+                <li>5. Present proposal to review committee if shortlisted</li>
+              </ol>
+            </div>
+          </div>
+
+          <div className="bg-[#F7B500] text-[#1D3D6F] p-4 rounded-lg">
+            <h5 className="font-medium mb-2">Ready to Apply?</h5>
+            <p className="text-sm mb-3">
+              Download application forms and get detailed information about funding opportunities.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button className="bg-[#1D3D6F] text-white px-3 py-1 rounded text-sm hover:bg-[#2C4F85] transition-colors">
+                Download Forms
+              </button>
+              <button className="bg-white text-[#1D3D6F] px-3 py-1 rounded text-sm border border-[#1D3D6F] hover:bg-gray-50 transition-colors">
+                Contact Office
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
       <Footer />
     </div>
   );
