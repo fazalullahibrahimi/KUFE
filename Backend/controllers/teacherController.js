@@ -206,15 +206,123 @@ const getTopTeachers = asyncHandler(async (req, res) => {
   res.status(200).json(apiResponse.success("Top 3 teachers retrieved", sortedTeachers));
 });
 
+// @desc    Get teacher statistics by department
+// @route   GET /api/teachers/statistics
+// @access  Public
+const getTeacherStatistics = asyncHandler(async (req, res) => {
+  try {
+    // Teachers by department
+    const teachersByDepartment = await Teacher.aggregate([
+      {
+        $lookup: {
+          from: "departments",
+          localField: "department_id",
+          foreignField: "_id",
+          as: "department"
+        }
+      },
+      {
+        $unwind: "$department"
+      },
+      {
+        $group: {
+          _id: "$department_id",
+          departmentName: { $first: "$department.name" },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          departmentId: "$_id",
+          departmentName: 1,
+          count: 1
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+
+    // Teachers by status
+    const teachersByStatus = await Teacher.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          status: "$_id",
+          count: 1
+        }
+      }
+    ]);
+
+    // Featured teachers count
+    const featuredTeachersCount = await Teacher.countDocuments({ featured: true });
+    const totalTeachers = await Teacher.countDocuments();
+
+    res.status(200).json(
+      apiResponse.success("Teacher statistics retrieved successfully", {
+        data: {
+          teachersByDepartment,
+          teachersByStatus,
+          featuredTeachersCount,
+          totalTeachers,
+          total: totalTeachers
+        }
+      })
+    );
+  } catch (error) {
+    console.error("Error getting teacher statistics:", error);
+    res.status(500).json(
+      apiResponse.error("Failed to get teacher statistics", 500)
+    );
+  }
+});
+
+// @desc    Get teachers by department
+// @route   GET /api/teachers/by-department/:departmentId
+// @access  Public
+const getTeachersByDepartment = asyncHandler(async (req, res) => {
+  try {
+    if (!validateMongodbId(req.params.departmentId)) {
+      return res.status(400).json(apiResponse.error("Invalid department ID", 400));
+    }
+
+    const teachers = await Teacher.find({
+      department_id: req.params.departmentId,
+      status: "active"
+    })
+    .populate("department_id", "name")
+    .sort("-createdAt");
+
+    res.status(200).json(
+      apiResponse.success("Teachers by department retrieved successfully", {
+        count: teachers.length,
+        teachers
+      })
+    );
+  } catch (error) {
+    res.status(500).json(
+      apiResponse.error("Failed to get teachers by department", 500)
+    );
+  }
+});
+
 module.exports = {
   getTeachers,
   getTeacher,
- getTeacherCount,
+  getTeacherCount,
   createTeacher,
   updateTeacher,
   deleteTeacher,
   uploadTeacherPhoto,
   resizeTeacherPhoto,
   getTopTeachers,
-
+  getTeacherStatistics,
+  getTeachersByDepartment,
 };

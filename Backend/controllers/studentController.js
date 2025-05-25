@@ -234,7 +234,7 @@ const resizeStudentPhoto = asyncHandler(async (req, res, next) => {
         success:false,
         message:"Failed to create image directory"
       })
-      
+
     }
   }
 
@@ -255,7 +255,7 @@ const resizeStudentPhoto = asyncHandler(async (req, res, next) => {
       success:false,
       message:"Error processing image"
     })
-   
+
   }
 
   next();
@@ -272,6 +272,138 @@ const getStudentCount = async (req, res) => {
     res.status(500).json({ message: "Failed to get student count", error });
   }
 };
+
+// @desc    Get student count by department
+// @route   GET /api/students/count-by-department
+// @access  Public
+const getStudentCountByDepartment = asyncHandler(async (req, res) => {
+  try {
+    const departmentCounts = await Student.aggregate([
+      {
+        $lookup: {
+          from: "departments",
+          localField: "department_id",
+          foreignField: "_id",
+          as: "department"
+        }
+      },
+      {
+        $unwind: "$department"
+      },
+      {
+        $group: {
+          _id: "$department_id",
+          departmentName: { $first: "$department.name" },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          departmentId: "$_id",
+          departmentName: 1,
+          count: 1
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+
+    res.status(200).json(
+      apiResponse.success("Student count by department retrieved successfully", {
+        data: departmentCounts,
+        total: departmentCounts.reduce((sum, dept) => sum + dept.count, 0)
+      })
+    );
+  } catch (error) {
+    console.error("Error getting student count by department:", error);
+    res.status(500).json(
+      apiResponse.error("Failed to get student count by department", 500)
+    );
+  }
+});
+
+// @desc    Get student count by enrollment year
+// @route   GET /api/students/count-by-year
+// @access  Public
+const getStudentCountByYear = asyncHandler(async (req, res) => {
+  try {
+    const yearCounts = await Student.aggregate([
+      {
+        $group: {
+          _id: "$enrollment_year",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          year: "$_id",
+          count: 1
+        }
+      },
+      {
+        $sort: { year: -1 }
+      }
+    ]);
+
+    res.status(200).json(
+      apiResponse.success("Student count by year retrieved successfully", {
+        data: yearCounts,
+        total: yearCounts.reduce((sum, year) => sum + year.count, 0)
+      })
+    );
+  } catch (error) {
+    console.error("Error getting student count by year:", error);
+    res.status(500).json(
+      apiResponse.error("Failed to get student count by year", 500)
+    );
+  }
+});
+
+// @desc    Get student count by city
+// @route   GET /api/students/count-by-city
+// @access  Public
+const getStudentCountByCity = asyncHandler(async (req, res) => {
+  try {
+    const cityCounts = await Student.aggregate([
+      {
+        $match: {
+          "address.city": { $exists: true, $ne: null, $ne: "" }
+        }
+      },
+      {
+        $group: {
+          _id: "$address.city",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          city: "$_id",
+          count: 1
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+
+    res.status(200).json(
+      apiResponse.success("Student count by city retrieved successfully", {
+        data: cityCounts,
+        total: cityCounts.reduce((sum, city) => sum + city.count, 0)
+      })
+    );
+  } catch (error) {
+    console.error("Error getting student count by city:", error);
+    res.status(500).json(
+      apiResponse.error("Failed to get student count by city", 500)
+    );
+  }
+});
 
 
 
@@ -345,7 +477,7 @@ const createMarks = asyncHandler(async (req, res) => {
       <div style="font-family: Arial, sans-serif;">
         <h2 style="color: #2c3e50;">Marks Notification</h2>
         <p>Dear ${student.name || "Student"},</p>
-        <p>Your marks for the subject <strong>${subject?.name || "Unknown Subject"}</strong> 
+        <p>Your marks for the subject <strong>${subject?.name || "Unknown Subject"}</strong>
         in <strong>${semester?.name || "Unknown Semester"}</strong> have been recorded successfully.</p>
 
         <table style="border-collapse: collapse; width: 100%; margin-top: 10px;">
@@ -504,5 +636,8 @@ module.exports = {
   uploasStudentPhoto,
   resizeStudentPhoto,
   getTopStudents,
+  getStudentCountByDepartment,
+  getStudentCountByYear,
+  getStudentCountByCity,
 };
 

@@ -127,7 +127,7 @@ const createCourse = asyncHandler(async (req, res) => {
     prerequisites = [],
     materials = [],
   } = req.body;
-  
+
 
   // Parse materials if sent as JSON string
   let parsedMaterials = [];
@@ -264,7 +264,7 @@ const resizeCoursePhoto = asyncHandler(async (req, res, next) => {
         success:false,
         message:"Failed to create image directory"
       })
-      
+
     }
   }
 
@@ -285,10 +285,99 @@ const resizeCoursePhoto = asyncHandler(async (req, res, next) => {
       success:false,
       message:"Error processing image"
     })
-   
+
   }
 
   next();
+});
+
+// @desc    Get total number of courses
+// @route   GET /api/courses/count
+// @access  Public
+const getCourseCount = asyncHandler(async (req, res) => {
+  try {
+    const count = await Course.countDocuments();
+    res.status(200).json(
+      apiResponse.success("Course count retrieved successfully", {
+        count
+      })
+    );
+  } catch (error) {
+    res.status(500).json(
+      apiResponse.error("Failed to get course count", 500)
+    );
+  }
+});
+
+// @desc    Get courses by department
+// @route   GET /api/courses/by-department/:departmentId
+// @access  Public
+const getCoursesByDepartment = asyncHandler(async (req, res) => {
+  try {
+    const courses = await Course.find({ department_id: req.params.departmentId })
+      .populate("department_id", "name")
+      .sort("-createdAt");
+
+    res.status(200).json(
+      apiResponse.success("Courses by department retrieved successfully", {
+        count: courses.length,
+        courses
+      })
+    );
+  } catch (error) {
+    res.status(500).json(
+      apiResponse.error("Failed to get courses by department", 500)
+    );
+  }
+});
+
+// @desc    Get course statistics
+// @route   GET /api/courses/statistics
+// @access  Public
+const getCourseStatistics = asyncHandler(async (req, res) => {
+  try {
+    const totalCourses = await Course.countDocuments();
+
+    // Courses by level
+    const coursesByLevel = await Course.aggregate([
+      {
+        $group: {
+          _id: "$level",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          level: "$_id",
+          count: 1
+        }
+      }
+    ]);
+
+    // Average credits
+    const avgCredits = await Course.aggregate([
+      {
+        $group: {
+          _id: null,
+          averageCredits: { $avg: "$credits" },
+          totalCredits: { $sum: "$credits" }
+        }
+      }
+    ]);
+
+    res.status(200).json(
+      apiResponse.success("Course statistics retrieved successfully", {
+        totalCourses,
+        coursesByLevel,
+        creditStatistics: avgCredits[0] || { averageCredits: 0, totalCredits: 0 }
+      })
+    );
+  } catch (error) {
+    res.status(500).json(
+      apiResponse.error("Failed to get course statistics", 500)
+    );
+  }
 });
 
 module.exports = {
@@ -298,5 +387,8 @@ module.exports = {
   updateCourse,
   deleteCourse,
   uploadCoursePhoto,
-  resizeCoursePhoto
+  resizeCoursePhoto,
+  getCourseCount,
+  getCoursesByDepartment,
+  getCourseStatistics
 };

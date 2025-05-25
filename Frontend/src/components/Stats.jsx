@@ -161,7 +161,7 @@ const Stats = () => {
 
       <div className='container mx-auto px-4 relative z-10'>
         <h2 className='text-3xl md:text-4xl font-poppins font-bold text-center mb-12 text-white'>
-          {t("University")}{" "}
+          {t("Economics Faculty")}{" "}
           <span className='text-[#F4B400]'>{t("Statistics")}</span>
         </h2>
 

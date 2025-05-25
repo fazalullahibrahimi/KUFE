@@ -13,6 +13,9 @@ const {
   resizeStudentPhoto,
   getStudentCount,
   getTopStudents,
+  getStudentCountByDepartment,
+  getStudentCountByYear,
+  getStudentCountByCity,
 } = require("../controllers/studentController");
 
 const { authMiddleware } = require("../middleware/authMiddleware");
@@ -25,6 +28,9 @@ const router = express.Router();
 router.get("/top-students", getTopStudents);
 router.get("/onestudent", getStudent);
 router.get("/studentcount", getStudentCount);
+router.get("/count-by-department", getStudentCountByDepartment);
+router.get("/count-by-year", getStudentCountByYear);
+router.get("/count-by-city", getStudentCountByCity);
 router.get("/", getStudents);
 
 // Apply auth middleware for protected routes

@@ -1,6 +1,10 @@
 import React from "react"
 import { useState, useEffect } from "react"
-import { Plus, Save, MessageSquare } from "lucide-react"
+import {
+  Plus, Save, MessageSquare, Megaphone, Star, Calendar, Clock,
+  TrendingUp, Activity, Eye, Edit, Target, Award, Users, BarChart3,
+  PieChart, Settings, Bell, CheckCircle, AlertCircle, Archive
+} from "lucide-react"
 import Table from "../common/Table"
 import Modal from "../common/Modal"
 import FormField from "../common/FormField"
@@ -322,50 +326,266 @@ const AnnouncementManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-800">Announcement Management</h2>
-        <button
-          className="flex items-center px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
-          onClick={() => {
-            resetForm()
-            setIsAddModalOpen(true)
-          }}
-        >
-          <Plus size={18} className="mr-2" />
-          Add New Announcement
-        </button>
+    <div className="space-y-8">
+      {/* Enhanced Header Section */}
+      <div className="relative bg-gradient-to-br from-[#004B87] via-[#1D3D6F] to-[#2C4F85] rounded-3xl p-8 text-white overflow-hidden shadow-2xl">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#F4B400] rounded-full -translate-y-48 translate-x-48 animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#16A085] rounded-full translate-y-32 -translate-x-32 animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16 animate-ping delay-2000"></div>
+        </div>
+
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div className="mb-6 md:mb-0">
+            <div className="flex items-center mb-4">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl mr-4 border border-white/30">
+                <Megaphone className="h-8 w-8 text-[#F4B400]" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
+                  Announcement Management
+                </h1>
+                <p className="text-white/90 text-lg">Create and manage university announcements</p>
+              </div>
+            </div>
+            <div className="flex items-center text-white/70">
+              <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
+              <span className="text-sm">Communication hub • {announcements.length} announcements</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="text-right mb-3 sm:mb-0">
+              <div className="text-2xl font-bold text-[#F4B400]">{announcements.length}</div>
+              <div className="text-white/60 text-sm">Total Announcements</div>
+            </div>
+            <button
+              className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
+              onClick={() => {
+                resetForm()
+                setIsAddModalOpen(true)
+              }}
+            >
+              <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
+              <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
+                Add New Announcement
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Announcement Stats */}
+      {/* Enhanced Announcement Analytics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Announcements Card */}
+        <div className="group bg-gradient-to-br from-[#004B87] to-[#1D3D6F] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <Megaphone className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">Total Announcements</p>
+              </div>
+              <p className="text-3xl font-bold text-white">{announcements.length}</p>
+              <div className="flex items-center mt-2">
+                <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
+                <span className="text-green-300 text-xs">+15% this month</span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-[#F4B400]">{announcements.length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Featured Announcements Card */}
+        <div className="group bg-gradient-to-br from-[#F4B400] to-[#E6A200] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#004B87] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <Star className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">Featured Items</p>
+              </div>
+              <p className="text-3xl font-bold text-white">{announcements.filter((item) => item.is_featured).length}</p>
+              <div className="flex items-center mt-2">
+                <Award className="h-4 w-4 text-white/70 mr-1" />
+                <span className="text-white/70 text-xs">Priority announcements</span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-white">{announcements.filter((item) => item.is_featured).length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Published Announcements Card */}
+        <div className="group bg-gradient-to-br from-[#10B981] to-[#059669] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <CheckCircle className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">Published</p>
+              </div>
+              <p className="text-3xl font-bold text-white">{announcements.filter((item) => item.status === "published").length}</p>
+              <div className="flex items-center mt-2">
+                <Activity className="h-4 w-4 text-green-200 mr-1" />
+                <span className="text-green-200 text-xs">Live announcements</span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-white">{announcements.filter((item) => item.status === "published").length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Categories Card */}
+        <div className="group bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <BarChart3 className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">Categories</p>
+              </div>
+              <p className="text-3xl font-bold text-white">{new Set(announcements.map((item) => item.category)).size}</p>
+              <div className="flex items-center mt-2">
+                <Target className="h-4 w-4 text-purple-200 mr-1" />
+                <span className="text-purple-200 text-xs">Content types</span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-white">{new Set(announcements.map((item) => item.category)).size}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Analytics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
-          <div className="w-12 h-12 rounded-full bg-[#004B87] bg-opacity-10 flex items-center justify-center mr-4">
-            <span className="text-[#004B87] font-bold">{announcements.length}</span>
+        {/* Status Distribution */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
+                <PieChart className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">Status Distribution</h3>
+            </div>
+            <Eye className="h-5 w-5 text-gray-400" />
           </div>
-          <div>
-            <p className="text-gray-500 text-sm">Total Announcements</p>
-            <p className="text-lg font-semibold text-gray-800">{announcements.length}</p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Published</span>
+              <span className="text-lg font-bold text-[#10B981]">
+                {announcements.filter(a => a.status === "published").length}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Draft</span>
+              <span className="text-lg font-bold text-[#F59E0B]">
+                {announcements.filter(a => a.status === "draft").length}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Archived</span>
+              <span className="text-lg font-bold text-[#6B7280]">
+                {announcements.filter(a => a.status === "archived").length}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
-          <div className="w-12 h-12 rounded-full bg-[#F4B400] bg-opacity-10 flex items-center justify-center mr-4">
-            <span className="text-[#F4B400] font-bold">{announcements.filter((item) => item.is_featured).length}</span>
+        {/* Category Breakdown */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
+                <BarChart3 className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">Category Breakdown</h3>
+            </div>
+            <Users className="h-5 w-5 text-gray-400" />
           </div>
-          <div>
-            <p className="text-gray-500 text-sm">Featured Items</p>
-            <p className="text-lg font-semibold text-gray-800">{announcements.filter((item) => item.is_featured).length}</p>
+          <div className="space-y-3">
+            {[...new Set(announcements.map(a => a.category))].slice(0, 4).map((category, index) => {
+              const count = announcements.filter(a => a.category === category).length;
+              const percentage = ((count / announcements.length) * 100).toFixed(1);
+              return (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 capitalize">{category}</span>
+                  <div className="flex items-center">
+                    <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                      <div
+                        className="bg-gradient-to-r from-[#06B6D4] to-[#0891B2] h-2 rounded-full"
+                        style={{width: `${percentage}%`}}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-800">{count}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
-          <div className="w-12 h-12 rounded-full bg-green-500 bg-opacity-10 flex items-center justify-center mr-4">
-            <span className="text-green-500 font-bold">{new Set(announcements.map((item) => item.category)).size}</span>
+        {/* Timing Analytics */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
+                <Calendar className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">Timing Analytics</h3>
+            </div>
+            <Clock className="h-5 w-5 text-gray-400" />
           </div>
-          <div>
-            <p className="text-gray-500 text-sm">Categories</p>
-            <p className="text-lg font-semibold text-gray-800">{new Set(announcements.map((item) => item.category)).size}</p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Active Now</span>
+              <span className="text-lg font-bold text-[#10B981]">
+                {announcements.filter(a => {
+                  const now = new Date();
+                  const publishDate = new Date(a.publish_date);
+                  const expiryDate = new Date(a.expiry_date);
+                  return publishDate <= now && now <= expiryDate && a.status === "published";
+                }).length}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Upcoming</span>
+              <span className="text-lg font-bold text-[#F59E0B]">
+                {announcements.filter(a => new Date(a.publish_date) > new Date()).length}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Expired</span>
+              <span className="text-lg font-bold text-[#EF4444]">
+                {announcements.filter(a => new Date(a.expiry_date) < new Date()).length}
+              </span>
+            </div>
           </div>
         </div>
       </div>

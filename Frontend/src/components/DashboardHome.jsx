@@ -1,286 +1,1711 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import {
-  BarChart,
-  BookOpen,
-  Calendar,
-  FileText,
-  GraduationCap,
-  MessageSquare,
   Users,
+  GraduationCap,
+  MapPin,
+  Calendar,
+  Activity,
+  RefreshCw,
+  BookOpen,
 } from "lucide-react";
-import StatCard from "./common/StatCard";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  PointElement,
+  LineElement,
+} from 'chart.js';
+import { Bar, Pie, Line, Doughnut } from 'react-chartjs-2';
+import axios from 'axios';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  PointElement,
+  LineElement
+);
 
 const DashboardHome = () => {
-  // Sample stats data
-  const stats = [
-    {
-      title: "Students",
-      value: 1245,
-      change: "+12% from last semester",
-      icon: <GraduationCap size={24} />,
-      iconBg: "bg-[#004B87]",
-    },
-    {
-      title: "Faculty",
-      value: 48,
-      change: "+3 new professors",
-      icon: <Users size={24} />,
-      iconBg: "bg-[#F4B400]",
-    },
-    {
-      title: "Courses",
-      value: 72,
-      change: "Same as last semester",
-      icon: <BookOpen size={24} />,
-      iconBg: "bg-blue-500",
-    },
-    {
-      title: "Research Papers",
-      value: 156,
-      change: "+24 this year",
-      icon: <FileText size={24} />,
-      iconBg: "bg-green-500",
-    },
-  ];
+  // State for API data
+  const [departmentData, setDepartmentData] = useState([]);
+  const [yearData, setYearData] = useState([]);
+  const [cityData, setCityData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [refreshSuccess, setRefreshSuccess] = useState(false);
 
-  // Sample announcements
-  const announcements = [
-    {
-      id: 1,
-      title: "Midterm Exams Schedule Announced",
-      content:
-        "The midterm examination schedule for Spring 2025 has been published. Please check your respective department for details.",
-      date: "15 APR",
-      category: "academic",
-      timeAgo: "2 hours ago",
-    },
-    {
-      id: 2,
-      title: "Economics Research Symposium",
-      content:
-        "Faculty of Economics will host the annual research symposium on April 25th. All students and faculty members are encouraged to attend.",
-      date: "14 APR",
-      category: "event",
-      timeAgo: "1 day ago",
-    },
-    {
-      id: 3,
-      title: "New Research Grant Opportunities",
-      content:
-        "The Ministry of Higher Education has announced new research grants for faculty members. Application deadline is May 15th.",
-      date: "12 APR",
-      category: "opportunity",
-      timeAgo: "3 days ago",
-    },
-  ];
+  // Overview stats
+  const [overviewStats, setOverviewStats] = useState({
+    totalStudents: 0,
+    totalCourses: 0,
+    totalFaculty: 0,
+    totalDepartments: 0,
+    totalFaculties: 0,
+    totalResearch: 0,
+    totalEvents: 0,
+    totalNews: 0,
+    activePrograms: 0,
+    graduationRate: 0
+  });
 
-  // Sample events
-  const events = [
-    {
-      id: 1,
-      title: "Economics Research Symposium",
-      location: "Main Auditorium, 10:00 AM - 4:00 PM",
-      date: "Apr 25, 2025",
-    },
-    {
-      id: 2,
-      title: "Guest Lecture: International Trade",
-      location: "Room 201, 2:00 PM - 4:00 PM",
-      date: "May 2, 2025",
-    },
-    {
-      id: 3,
-      title: "Faculty Meeting",
-      location: "Conference Room, 9:00 AM - 11:00 AM",
-      date: "May 10, 2025",
-    },
-    {
-      id: 4,
-      title: "Research Grant Application Deadline",
-      location: "Submit online by 11:59 PM",
-      date: "May 15, 2025",
-    },
-  ];
+  // Additional dashboard data
+  const [courseStats, setCourseStats] = useState({});
+  const [teacherStats, setTeacherStats] = useState({});
+  const [researchStats, setResearchStats] = useState({});
+  const [activityStats, setActivityStats] = useState({});
+  const [recentActivities, setRecentActivities] = useState({});
 
-  // Sample research publications
-  const researchPublications = [
-    {
-      id: 1,
-      title: "Economic Impact of Agricultural Development in Kandahar",
-      authors: "Dr. Ahmad Ahmadi, Dr. Sarah Johnson",
-      category: "Economics",
-      date: "Published: April 10, 2025",
+  // Fetch data from APIs
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [
+          overviewResponse,
+          courseStatsResponse,
+          teacherStatsResponse,
+          researchStatsResponse,
+          activityStatsResponse,
+          recentActivitiesResponse,
+          deptResponse,
+          yearResponse,
+          cityResponse
+        ] = await Promise.all([
+          axios.get('http://localhost:4400/api/v1/dashboard/overview'),
+          axios.get('http://localhost:4400/api/v1/dashboard/course-stats'),
+          axios.get('http://localhost:4400/api/v1/dashboard/teacher-stats'),
+          axios.get('http://localhost:4400/api/v1/dashboard/research-stats'),
+          axios.get('http://localhost:4400/api/v1/dashboard/activity-stats'),
+          axios.get('http://localhost:4400/api/v1/dashboard/recent-activities'),
+          axios.get('http://localhost:4400/api/v1/students/count-by-department'),
+          axios.get('http://localhost:4400/api/v1/students/count-by-year'),
+          axios.get('http://localhost:4400/api/v1/students/count-by-city')
+        ]);
+
+        // Extract data from API responses
+        const overviewData = overviewResponse.data?.data?.overview || {};
+        const courseStatsData = courseStatsResponse.data?.data?.data || {};
+        const teacherStatsData = teacherStatsResponse.data?.data?.data || {};
+        const researchStatsData = researchStatsResponse.data?.data?.data || {};
+        const activityStatsData = activityStatsResponse.data?.data?.data || {};
+        const recentActivitiesData = recentActivitiesResponse.data?.data?.data || {};
+        const deptData = deptResponse.data?.data?.data || [];
+        const yearDataRes = yearResponse.data?.data?.data || [];
+        const cityDataRes = cityResponse.data?.data?.data || [];
+
+        // Set all data states
+        setDepartmentData(deptData);
+        setYearData(yearDataRes);
+        setCityData(cityDataRes);
+        setCourseStats(courseStatsData);
+        setTeacherStats(teacherStatsData);
+        setResearchStats(researchStatsData);
+        setActivityStats(activityStatsData);
+        setRecentActivities(recentActivitiesData);
+
+        // Set overview statistics from API
+        setOverviewStats({
+          totalStudents: overviewData.totalStudents || 0,
+          totalCourses: overviewData.totalCourses || 0,
+          totalFaculty: overviewData.totalTeachers || 0,
+          totalDepartments: overviewData.totalDepartments || 0,
+          totalFaculties: overviewData.totalFaculties || 0,
+          totalResearch: overviewData.totalResearch || 0,
+          totalEvents: overviewData.totalEvents || 0,
+          totalNews: overviewData.totalNews || 0,
+          activePrograms: overviewData.activePrograms || 0,
+          graduationRate: overviewData.graduationRate || 0
+        });
+
+        // Calculate total students for backward compatibility
+        const total = deptData.reduce((sum, dept) => sum + dept.count, 0);
+        setTotalStudents(total);
+
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+        setError('Failed to load dashboard data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Enhanced refresh data function
+  const refreshData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const [
+        overviewResponse,
+        courseStatsResponse,
+        teacherStatsResponse,
+        researchStatsResponse,
+        activityStatsResponse,
+        recentActivitiesResponse,
+        deptResponse,
+        yearResponse,
+        cityResponse
+      ] = await Promise.all([
+        axios.get('http://localhost:4400/api/v1/dashboard/overview'),
+        axios.get('http://localhost:4400/api/v1/dashboard/course-stats'),
+        axios.get('http://localhost:4400/api/v1/dashboard/teacher-stats'),
+        axios.get('http://localhost:4400/api/v1/dashboard/research-stats'),
+        axios.get('http://localhost:4400/api/v1/dashboard/activity-stats'),
+        axios.get('http://localhost:4400/api/v1/dashboard/recent-activities'),
+        axios.get('http://localhost:4400/api/v1/students/count-by-department'),
+        axios.get('http://localhost:4400/api/v1/students/count-by-year'),
+        axios.get('http://localhost:4400/api/v1/students/count-by-city')
+      ]);
+
+      // Extract data from API responses
+      const overviewData = overviewResponse.data?.data?.overview || {};
+      const courseStatsData = courseStatsResponse.data?.data?.data || {};
+      const teacherStatsData = teacherStatsResponse.data?.data?.data || {};
+      const researchStatsData = researchStatsResponse.data?.data?.data || {};
+      const activityStatsData = activityStatsResponse.data?.data?.data || {};
+      const recentActivitiesData = recentActivitiesResponse.data?.data?.data || {};
+      const deptData = deptResponse.data?.data?.data || [];
+      const yearDataRes = yearResponse.data?.data?.data || [];
+      const cityDataRes = cityResponse.data?.data?.data || [];
+
+      // Set all data states
+      setDepartmentData(deptData);
+      setYearData(yearDataRes);
+      setCityData(cityDataRes);
+      setCourseStats(courseStatsData);
+      setTeacherStats(teacherStatsData);
+      setResearchStats(researchStatsData);
+      setActivityStats(activityStatsData);
+      setRecentActivities(recentActivitiesData);
+
+      // Set overview statistics from API
+      setOverviewStats({
+        totalStudents: overviewData.totalStudents || 0,
+        totalCourses: overviewData.totalCourses || 0,
+        totalFaculty: overviewData.totalTeachers || 0,
+        totalDepartments: overviewData.totalDepartments || 0,
+        totalFaculties: overviewData.totalFaculties || 0,
+        totalResearch: overviewData.totalResearch || 0,
+        totalEvents: overviewData.totalEvents || 0,
+        totalNews: overviewData.totalNews || 0,
+        activePrograms: overviewData.activePrograms || 0,
+        graduationRate: overviewData.graduationRate || 0
+      });
+
+      // Calculate total students for backward compatibility
+      const total = deptData.reduce((sum, dept) => sum + dept.count, 0);
+      setTotalStudents(total);
+
+      // Show success notification
+      setRefreshSuccess(true);
+      setTimeout(() => setRefreshSuccess(false), 3000);
+
+    } catch (err) {
+      console.error('Error refreshing dashboard data:', err);
+      setError('Failed to refresh data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Advanced Chart Configurations
+  const getAdvancedBarOptions = () => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: 'nearest',
+      intersect: true,
+      axis: 'x'
     },
-    {
-      id: 2,
-      title: "Financial Market Analysis: Trends and Opportunities",
-      authors: "Prof. Mohammad Karimi",
-      category: "Finance",
-      date: "Published: March 28, 2025",
+    hover: {
+      mode: 'nearest',
+      intersect: true,
+      animationDuration: 200
     },
-    {
-      id: 3,
-      title: "Sustainable Business Practices in Developing Economies",
-      authors: "Dr. Fatima Noori, Dr. John Smith",
-      category: "Business",
-      date: "Published: March 15, 2025",
+    onHover: (event, activeElements) => {
+      event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
     },
-  ];
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        enabled: true,
+        external: null,
+        mode: 'nearest',
+        intersect: true,
+        position: 'nearest',
+        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+        titleColor: '#F4B400',
+        bodyColor: '#ffffff',
+        borderColor: '#F4B400',
+        borderWidth: 3,
+        cornerRadius: 12,
+        displayColors: false,
+        titleFont: {
+          size: 16,
+          weight: 'bold',
+          family: "'Inter', sans-serif"
+        },
+        bodyFont: {
+          size: 14,
+          family: "'Inter', sans-serif"
+        },
+        footerFont: {
+          size: 12,
+          family: "'Inter', sans-serif",
+          style: 'italic'
+        },
+        padding: 20,
+        caretSize: 10,
+        caretPadding: 8,
+        xAlign: 'center',
+        yAlign: 'bottom',
+        callbacks: {
+          title: function(context) {
+            return `📚 ${context[0].label} Department`;
+          },
+          label: function(context) {
+            return `👥 ${context.parsed.y.toLocaleString()} Students Enrolled`;
+          },
+          afterLabel: function(context) {
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = ((context.parsed.y / total) * 100).toFixed(1);
+            const rank = context.dataset.data
+              .map((value, index) => ({ value, index }))
+              .sort((a, b) => b.value - a.value)
+              .findIndex(item => item.index === context.dataIndex) + 1;
+
+            return [
+              `📊 ${percentage}% of total students`,
+              `🏆 Rank #${rank} among all departments`,
+              `📈 ${context.parsed.y > total/context.dataset.data.length ? 'Above' : 'Below'} average enrollment`
+            ];
+          },
+          footer: function(context) {
+            return `💡 Click to view detailed department info`;
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(0, 75, 135, 0.1)',
+          drawBorder: false,
+          lineWidth: 1
+        },
+        ticks: {
+          color: '#4B5563',
+          font: {
+            size: 12,
+            weight: '500',
+            family: "'Inter', sans-serif"
+          },
+          padding: 10,
+          callback: function(value) {
+            return value + ' 👥';
+          }
+        },
+        title: {
+          display: true,
+          text: 'Number of Students',
+          color: '#374151',
+          font: {
+            size: 14,
+            weight: 'bold',
+            family: "'Inter', sans-serif"
+          },
+          padding: 20
+        }
+      },
+      x: {
+        grid: {
+          display: false
+        },
+        ticks: {
+          color: '#4B5563',
+          font: {
+            size: 12,
+            weight: '500',
+            family: "'Inter', sans-serif"
+          },
+          maxRotation: 0,
+          padding: 10
+        },
+        title: {
+          display: true,
+          text: 'Academic Departments',
+          color: '#374151',
+          font: {
+            size: 14,
+            weight: 'bold',
+            family: "'Inter', sans-serif"
+          },
+          padding: 20
+        }
+      }
+    },
+    animation: {
+      duration: 2000,
+      easing: 'easeInOutQuart',
+      delay: (context) => context.dataIndex * 200
+    },
+    onClick: (event, elements) => {
+      if (elements.length > 0) {
+        const elementIndex = elements[0].index;
+        const department = departmentData[elementIndex];
+        if (department) {
+          alert(`📚 ${department.departmentName}\n👥 ${department.count} Students\n📊 ${((department.count / totalStudents) * 100).toFixed(1)}% of total enrollment\n\n💡 This department is ${department.count > totalStudents/departmentData.length ? 'above' : 'below'} average enrollment.`);
+        }
+      }
+    }
+  });
+
+  const getAdvancedPieOptions = () => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: 'nearest',
+      intersect: true
+    },
+    hover: {
+      mode: 'nearest',
+      intersect: true,
+      animationDuration: 200
+    },
+    onHover: (event, activeElements) => {
+      event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+    },
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 20,
+          font: {
+            size: 12,
+            weight: '500',
+            family: "'Inter', sans-serif"
+          },
+          color: '#374151',
+          generateLabels: function(chart) {
+            const data = chart.data;
+            if (data.labels.length && data.datasets.length) {
+              return data.labels.map((label, i) => {
+                const dataset = data.datasets[0];
+                const value = dataset.data[i];
+                const total = dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return {
+                  text: `${label} (${percentage}%)`,
+                  fillStyle: dataset.backgroundColor[i],
+                  strokeStyle: dataset.borderColor,
+                  lineWidth: dataset.borderWidth,
+                  pointStyle: 'circle',
+                  hidden: false,
+                  index: i
+                };
+              });
+            }
+            return [];
+          }
+        }
+      },
+      tooltip: {
+        enabled: true,
+        external: null,
+        mode: 'nearest',
+        intersect: true,
+        position: 'nearest',
+        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+        titleColor: '#F4B400',
+        bodyColor: '#ffffff',
+        borderColor: '#F4B400',
+        borderWidth: 3,
+        cornerRadius: 12,
+        displayColors: true,
+        titleFont: {
+          size: 16,
+          weight: 'bold',
+          family: "'Inter', sans-serif"
+        },
+        bodyFont: {
+          size: 14,
+          family: "'Inter', sans-serif"
+        },
+        footerFont: {
+          size: 12,
+          family: "'Inter', sans-serif",
+          style: 'italic'
+        },
+        padding: 20,
+        caretSize: 10,
+        caretPadding: 8,
+        callbacks: {
+          title: function(context) {
+            return `🏙️ ${context[0].label} City`;
+          },
+          label: function(context) {
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = ((context.parsed / total) * 100).toFixed(1);
+            const rank = context.dataset.data
+              .map((value, index) => ({ value, index }))
+              .sort((a, b) => b.value - a.value)
+              .findIndex(item => item.index === context.dataIndex) + 1;
+
+            return [
+              `👥 ${context.parsed.toLocaleString()} Students`,
+              `📊 ${percentage}% of total enrollment`,
+              `🏆 #${rank} most popular city`
+            ];
+          },
+          afterLabel: function(context) {
+            const isTopCity = context.dataIndex === 0;
+            const citySize = context.parsed > 100 ? 'Major' : context.parsed > 50 ? 'Medium' : 'Small';
+
+            return [
+              `📍 ${citySize} student population`,
+              isTopCity ? '⭐ Top recruiting city' : '🌟 Important student source',
+              '💡 Click for geographic details'
+            ];
+          }
+        }
+      }
+    },
+    animation: {
+      animateRotate: true,
+      animateScale: true,
+      duration: 2000,
+      easing: 'easeInOutQuart'
+    },
+    onClick: (event, elements) => {
+      if (elements.length > 0) {
+        const elementIndex = elements[0].index;
+        const city = cityData[elementIndex];
+        if (city) {
+          const percentage = ((city.count / totalStudents) * 100).toFixed(1);
+          const rank = cityData
+            .map((c, i) => ({ ...c, originalIndex: i }))
+            .sort((a, b) => b.count - a.count)
+            .findIndex(c => c.originalIndex === elementIndex) + 1;
+
+          alert(`🏙️ ${city.city} City\n👥 ${city.count} Students\n📊 ${percentage}% of total enrollment\n🏆 Rank #${rank} among all cities\n\n💡 This is ${rank <= 3 ? 'a top recruiting city' : 'an important student source'} for the university.`);
+        }
+      }
+    }
+  });
+
+  const getAdvancedLineOptions = () => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: 'nearest',
+      intersect: false,
+      axis: 'x'
+    },
+    hover: {
+      mode: 'nearest',
+      intersect: false,
+      animationDuration: 200
+    },
+    onHover: (event, activeElements) => {
+      event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+    },
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        enabled: true,
+        external: null,
+        mode: 'nearest',
+        intersect: false,
+        position: 'nearest',
+        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+        titleColor: '#F4B400',
+        bodyColor: '#ffffff',
+        borderColor: '#F4B400',
+        borderWidth: 3,
+        cornerRadius: 12,
+        displayColors: false,
+        titleFont: {
+          size: 16,
+          weight: 'bold',
+          family: "'Inter', sans-serif"
+        },
+        bodyFont: {
+          size: 14,
+          family: "'Inter', sans-serif"
+        },
+        footerFont: {
+          size: 12,
+          family: "'Inter', sans-serif",
+          style: 'italic'
+        },
+        padding: 20,
+        caretSize: 10,
+        caretPadding: 8,
+        callbacks: {
+          title: function(context) {
+            return `📅 Academic Year ${context[0].label}`;
+          },
+          label: function(context) {
+            return `🎓 ${context.parsed.y.toLocaleString()} New Students Enrolled`;
+          },
+          afterLabel: function(context) {
+            const currentYear = context.parsed.y;
+            const allYears = context.chart.data.datasets[0].data;
+            const yearIndex = context.dataIndex;
+
+            // Calculate trend
+            let trend = '';
+            if (yearIndex > 0) {
+              const previousYear = allYears[yearIndex - 1];
+              const change = currentYear - previousYear;
+              const changePercent = ((change / previousYear) * 100).toFixed(1);
+
+              if (change > 0) {
+                trend = `📈 +${change} students (+${changePercent}%) from previous year`;
+              } else if (change < 0) {
+                trend = `📉 ${change} students (${changePercent}%) from previous year`;
+              } else {
+                trend = `➡️ Same as previous year`;
+              }
+            }
+
+            // Calculate average
+            const average = (allYears.reduce((a, b) => a + b, 0) / allYears.length).toFixed(0);
+            const vsAverage = currentYear > average ? 'Above' : currentYear < average ? 'Below' : 'Equal to';
+
+            return [
+              trend,
+              `📊 ${vsAverage} average enrollment (${average})`,
+              `🏆 ${yearIndex === allYears.indexOf(Math.max(...allYears)) ? 'Peak enrollment year' : 'Historical data point'}`,
+              '💡 Click for detailed year analysis'
+            ].filter(Boolean);
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(22, 160, 133, 0.1)',
+          drawBorder: false,
+          lineWidth: 1
+        },
+        ticks: {
+          color: '#4B5563',
+          font: {
+            size: 12,
+            weight: '500',
+            family: "'Inter', sans-serif"
+          },
+          padding: 10,
+          callback: function(value) {
+            return value + ' 🎓';
+          }
+        },
+        title: {
+          display: true,
+          text: 'Number of Students',
+          color: '#374151',
+          font: {
+            size: 14,
+            weight: 'bold',
+            family: "'Inter', sans-serif"
+          },
+          padding: 20
+        }
+      },
+      x: {
+        grid: {
+          color: 'rgba(22, 160, 133, 0.1)',
+          drawBorder: false
+        },
+        ticks: {
+          color: '#4B5563',
+          font: {
+            size: 12,
+            weight: '500',
+            family: "'Inter', sans-serif"
+          },
+          padding: 10
+        },
+        title: {
+          display: true,
+          text: 'Enrollment Year',
+          color: '#374151',
+          font: {
+            size: 14,
+            weight: 'bold',
+            family: "'Inter', sans-serif"
+          },
+          padding: 20
+        }
+      }
+    },
+    animation: {
+      duration: 2000,
+      easing: 'easeInOutQuart'
+    },
+    onClick: (event, elements) => {
+      if (elements.length > 0) {
+        const elementIndex = elements[0].index;
+        const year = yearData[elementIndex];
+        if (year) {
+          const allYears = yearData.map(y => y.count);
+          const average = (allYears.reduce((a, b) => a + b, 0) / allYears.length).toFixed(0);
+          const isHighest = year.count === Math.max(...allYears);
+          const isLowest = year.count === Math.min(...allYears);
+
+          let trend = '';
+          if (elementIndex > 0) {
+            const previousYear = yearData[elementIndex - 1].count;
+            const change = year.count - previousYear;
+            const changePercent = ((change / previousYear) * 100).toFixed(1);
+
+            if (change > 0) {
+              trend = `📈 Increased by ${change} students (+${changePercent}%) from previous year`;
+            } else if (change < 0) {
+              trend = `📉 Decreased by ${Math.abs(change)} students (${changePercent}%) from previous year`;
+            } else {
+              trend = `➡️ Same enrollment as previous year`;
+            }
+          }
+
+          alert(`📅 Academic Year ${year.year}\n🎓 ${year.count} New Students Enrolled\n📊 ${year.count > average ? 'Above' : year.count < average ? 'Below' : 'Equal to'} average (${average})\n${isHighest ? '🏆 Peak enrollment year' : isLowest ? '📉 Lowest enrollment year' : '📈 Historical data point'}\n\n${trend}\n\n💡 This year represents ${((year.count / totalStudents) * 100).toFixed(1)}% of current total enrollment.`);
+        }
+      }
+    }
+  });
+
+  // Advanced Department Chart Data with Gradients
+  const createGradient = (ctx, colorStart, colorEnd) => {
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, colorStart);
+    gradient.addColorStop(1, colorEnd);
+    return gradient;
+  };
+
+  const departmentChartData = {
+    labels: departmentData.map(dept => dept.departmentName || 'Unknown'),
+    datasets: [
+      {
+        label: 'Students by Department',
+        data: departmentData.map(dept => dept.count),
+        backgroundColor: function(context) {
+          const chart = context.chart;
+          const {ctx} = chart;
+          const colors = [
+            ['rgba(0, 75, 135, 0.9)', 'rgba(0, 75, 135, 0.3)'],
+            ['rgba(244, 180, 0, 0.9)', 'rgba(244, 180, 0, 0.3)'],
+            ['rgba(59, 130, 246, 0.9)', 'rgba(59, 130, 246, 0.3)'],
+            ['rgba(16, 185, 129, 0.9)', 'rgba(16, 185, 129, 0.3)'],
+            ['rgba(139, 92, 246, 0.9)', 'rgba(139, 92, 246, 0.3)'],
+            ['rgba(236, 72, 153, 0.9)', 'rgba(236, 72, 153, 0.3)'],
+            ['rgba(245, 101, 101, 0.9)', 'rgba(245, 101, 101, 0.3)'],
+            ['rgba(168, 85, 247, 0.9)', 'rgba(168, 85, 247, 0.3)']
+          ];
+          const colorIndex = context.dataIndex % colors.length;
+          return createGradient(ctx, colors[colorIndex][0], colors[colorIndex][1]);
+        },
+        borderColor: [
+          '#004B87',
+          '#F4B400',
+          '#3B82F6',
+          '#10B981',
+          '#8B5CF6',
+          '#EC4899',
+          '#F56565',
+          '#A855F7'
+        ],
+        borderWidth: 3,
+        borderRadius: {
+          topLeft: 12,
+          topRight: 12,
+          bottomLeft: 4,
+          bottomRight: 4
+        },
+        borderSkipped: false,
+        hoverBackgroundColor: [
+          'rgba(0, 75, 135, 1)',
+          'rgba(244, 180, 0, 1)',
+          'rgba(59, 130, 246, 1)',
+          'rgba(16, 185, 129, 1)',
+          'rgba(139, 92, 246, 1)',
+          'rgba(236, 72, 153, 1)',
+          'rgba(245, 101, 101, 1)',
+          'rgba(168, 85, 247, 1)'
+        ],
+        hoverBorderWidth: 5,
+        hoverBorderColor: '#F4B400',
+        hoverBorderRadius: 15,
+        shadowOffsetX: 3,
+        shadowOffsetY: 3,
+        shadowBlur: 10,
+        shadowColor: 'rgba(0, 0, 0, 0.3)'
+      }
+    ]
+  };
+
+  // Advanced Year Chart Data with Gradient Fill
+  const yearChartData = {
+    labels: yearData.map(year => year.year?.toString() || 'Unknown'),
+    datasets: [
+      {
+        label: 'Students by Enrollment Year',
+        data: yearData.map(year => year.count),
+        backgroundColor: function(context) {
+          const chart = context.chart;
+          const {ctx, chartArea} = chart;
+          if (!chartArea) return null;
+
+          const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          gradient.addColorStop(0, 'rgba(22, 160, 133, 0.8)');
+          gradient.addColorStop(0.5, 'rgba(22, 160, 133, 0.4)');
+          gradient.addColorStop(1, 'rgba(22, 160, 133, 0.1)');
+          return gradient;
+        },
+        borderColor: '#16A085',
+        borderWidth: 4,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: function(context) {
+          const colors = ['#004B87', '#F4B400', '#16A085', '#8B5CF6', '#EC4899'];
+          return colors[context.dataIndex % colors.length];
+        },
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 3,
+        pointRadius: 8,
+        pointHoverRadius: 12,
+        pointHoverBackgroundColor: '#F4B400',
+        pointHoverBorderColor: '#004B87',
+        pointHoverBorderWidth: 4,
+        shadowOffsetX: 2,
+        shadowOffsetY: 2,
+        shadowBlur: 8,
+        shadowColor: 'rgba(22, 160, 133, 0.3)'
+      }
+    ]
+  };
+
+  // Advanced City Chart Data (Pie Chart) with Gradients and Effects
+  const cityChartData = {
+    labels: cityData.slice(0, 8).map(city => city.city || 'Unknown'),
+    datasets: [
+      {
+        label: 'Students by City',
+        data: cityData.slice(0, 8).map(city => city.count),
+        backgroundColor: function(context) {
+          const chart = context.chart;
+          const {ctx} = chart;
+          const colors = [
+            ['#004B87', '#1E5A8A'],
+            ['#F4B400', '#F59E0B'],
+            ['#3B82F6', '#2563EB'],
+            ['#10B981', '#059669'],
+            ['#8B5CF6', '#7C3AED'],
+            ['#EC4899', '#DB2777'],
+            ['#F56565', '#EF4444'],
+            ['#A855F7', '#9333EA']
+          ];
+
+          const colorIndex = context.dataIndex % colors.length;
+          const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 200);
+          gradient.addColorStop(0, colors[colorIndex][0]);
+          gradient.addColorStop(1, colors[colorIndex][1]);
+          return gradient;
+        },
+        borderColor: '#ffffff',
+        borderWidth: 4,
+        hoverOffset: 15,
+        hoverBorderWidth: 6,
+        hoverBorderColor: '#F4B400',
+        hoverBackgroundColor: [
+          '#1E40AF',
+          '#D97706',
+          '#1D4ED8',
+          '#047857',
+          '#6D28D9',
+          '#BE185D',
+          '#DC2626',
+          '#7C2D12'
+        ],
+        shadowOffsetX: 5,
+        shadowOffsetY: 5,
+        shadowBlur: 15,
+        shadowColor: 'rgba(0, 0, 0, 0.2)',
+        cutout: '20%',
+        radius: '90%',
+        spacing: 2
+      }
+    ]
+  };
+
+  // Overview Statistics Chart Data (Doughnut Chart)
+  const overviewChartData = {
+    labels: [
+      'Students', 'Courses', 'Teachers', 'Departments',
+      'Faculties', 'Research', 'Events', 'News', 'Programs'
+    ],
+    datasets: [
+      {
+        label: 'Economic Faculty Overview',
+        data: [
+          overviewStats.totalStudents,
+          overviewStats.totalCourses,
+          overviewStats.totalFaculty,
+          overviewStats.totalDepartments,
+          overviewStats.totalFaculties,
+          overviewStats.totalResearch,
+          overviewStats.totalEvents,
+          overviewStats.totalNews,
+          overviewStats.activePrograms
+        ],
+        backgroundColor: [
+          '#F4B400', '#16A085', '#8B5CF6', '#EC4899',
+          '#06B6D4', '#10B981', '#F59E0B', '#EF4444', '#3B82F6'
+        ],
+        borderColor: '#ffffff',
+        borderWidth: 3,
+        hoverOffset: 15,
+        hoverBorderWidth: 4,
+        cutout: '40%'
+      }
+    ]
+  };
+
+  // Course Statistics Chart Data (Bar Chart)
+  const courseStatsChartData = {
+    labels: courseStats.coursesByDepartment?.map(item => item.departmentName) || [],
+    datasets: [
+      {
+        label: 'Courses by Department',
+        data: courseStats.coursesByDepartment?.map(item => item.count) || [],
+        backgroundColor: [
+          '#F4B400', '#16A085', '#8B5CF6', '#EC4899',
+          '#06B6D4', '#10B981', '#F59E0B', '#EF4444'
+        ],
+        borderColor: '#ffffff',
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false,
+      }
+    ]
+  };
+
+  // Teacher Statistics Chart Data (Pie Chart)
+  const teacherStatsChartData = {
+    labels: teacherStats.teachersByDepartment?.map(item => item.departmentName) || [],
+    datasets: [
+      {
+        label: 'Teachers by Department',
+        data: teacherStats.teachersByDepartment?.map(item => item.count) || [],
+        backgroundColor: [
+          '#8B5CF6', '#EC4899', '#06B6D4', '#10B981',
+          '#F59E0B', '#EF4444', '#3B82F6', '#F4B400'
+        ],
+        borderColor: '#ffffff',
+        borderWidth: 2,
+        hoverOffset: 10
+      }
+    ]
+  };
+
+  // Research Statistics Chart Data (Line Chart)
+  const researchStatsChartData = {
+    labels: researchStats.researchByDepartment?.map(item => item.departmentName) || [],
+    datasets: [
+      {
+        label: 'Research by Department',
+        data: researchStats.researchByDepartment?.map(item => item.count) || [],
+        borderColor: '#10B981',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#10B981',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        pointRadius: 6,
+        pointHoverRadius: 10
+      }
+    ]
+  };
+
+  // Activity Statistics Chart Data (Mixed Chart)
+  const activityStatsChartData = {
+    labels: ['Events', 'News'],
+    datasets: [
+      {
+        label: 'Total',
+        data: [activityStats.events?.total || 0, activityStats.news?.total || 0],
+        backgroundColor: ['#F59E0B', '#EF4444'],
+        borderColor: '#ffffff',
+        borderWidth: 2
+      },
+      {
+        label: 'This Year',
+        data: [activityStats.events?.thisYear || 0, activityStats.news?.thisYear || 0],
+        backgroundColor: ['#D97706', '#DC2626'],
+        borderColor: '#ffffff',
+        borderWidth: 2
+      }
+    ]
+  };
+
+  // Loading component
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#004B87] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error component
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+          <button
+            onClick={refreshData}
+            className="bg-[#004B87] text-white px-4 py-2 rounded hover:bg-[#003366] transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className='space-y-6'>
-      {/* Stats Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-        {stats.map((stat, index) => (
-          <StatCard key={index} {...stat} />
-        ))}
+    <div className='space-y-8'>
+      {/* Success Notification */}
+      {refreshSuccess && (
+        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center animate-slide-in-right">
+          <div className="w-2 h-2 bg-white rounded-full mr-3 animate-pulse"></div>
+          <span className="font-medium">✅ Data refreshed successfully!</span>
+        </div>
+      )}
+
+      {/* Enhanced Header with Beautiful Gradient */}
+      <div className="relative bg-gradient-to-br from-[#004B87] via-[#1D3D6F] to-[#2C4F85] rounded-3xl p-8 text-white overflow-hidden shadow-2xl">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#F4B400] rounded-full -translate-y-48 translate-x-48 animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#16A085] rounded-full translate-y-32 -translate-x-32 animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16 animate-ping delay-2000"></div>
+        </div>
+
+        <div className="relative z-10 flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
+              Faculty Of Ecconomic Analytics Dashboard
+            </h1>
+            <p className="text-white/90 text-lg">Real-time insights into your complete university ecosystem</p>
+            <div className="flex items-center mt-3 text-white/70">
+              <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
+              <span className="text-sm">Live data • Updated every minute</span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <div className="text-2xl font-bold text-[#F4B400]">{overviewStats.totalStudents.toLocaleString()}</div>
+              <div className="text-white/60 text-sm">Total Students</div>
+            </div>
+            <button
+              onClick={refreshData}
+              disabled={loading}
+              className={`group bg-white/20 hover:bg-[#F4B400] p-4 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 ${
+                loading ? 'cursor-not-allowed opacity-50' : 'hover:scale-110 hover:shadow-xl hover:border-[#F4B400]'
+              }`}
+              title={loading ? "Refreshing data..." : "Refresh Data"}
+            >
+              <RefreshCw className={`h-6 w-6 transition-all duration-500 ${
+                loading ? 'animate-spin text-white' : 'group-hover:rotate-180 group-hover:text-[#004B87] text-white'
+              }`} />
+            </button>
+          </div>
+        </div>
+
+        <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {/* Students Card */}
+          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-[#F4B400] to-[#E6A200] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Users className="h-6 w-6 text-[#004B87]" />
+              </div>
+              <p className="text-white/90 text-sm font-medium">Total Students</p>
+              <p className="text-2xl font-bold text-[#F4B400] mt-1">{overviewStats.totalStudents.toLocaleString()}</p>
+              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
+                <div className="bg-[#F4B400] h-1 rounded-full" style={{width: '85%'}}></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Departments Card */}
+          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-[#16A085] to-[#1ABC9C] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <GraduationCap className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white/90 text-sm font-medium">Departments</p>
+              <p className="text-2xl font-bold text-[#16A085] mt-1">{overviewStats.totalDepartments}</p>
+              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
+                <div className="bg-[#16A085] h-1 rounded-full" style={{width: '70%'}}></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Cities Card */}
+          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-[#8B5CF6] to-[#A855F7] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <MapPin className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white/90 text-sm font-medium">Cities</p>
+              <p className="text-2xl font-bold text-[#8B5CF6] mt-1">{cityData.length}</p>
+              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
+                <div className="bg-[#8B5CF6] h-1 rounded-full" style={{width: '60%'}}></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Courses Card */}
+          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <BookOpen className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white/90 text-sm font-medium">Total Courses</p>
+              <p className="text-2xl font-bold text-[#EC4899] mt-1">{overviewStats.totalCourses}</p>
+              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
+                <div className="bg-[#EC4899] h-1 rounded-full" style={{width: '75%'}}></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Faculty Card */}
+          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Users className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white/90 text-sm font-medium">Faculty Members</p>
+              <p className="text-2xl font-bold text-[#06B6D4] mt-1">{overviewStats.totalFaculty}</p>
+              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
+                <div className="bg-[#06B6D4] h-1 rounded-full" style={{width: '65%'}}></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Research Card */}
+          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-[#10B981] to-[#059669] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Activity className="h-6 w-6 text-white" />
+              </div>
+              <p className="text-white/90 text-sm font-medium">Research Papers</p>
+              <p className="text-2xl font-bold text-[#10B981] mt-1">{overviewStats.totalResearch}</p>
+              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
+                <div className="bg-[#10B981] h-1 rounded-full" style={{width: '80%'}}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Metrics Row */}
+        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+          {/* Events Card */}
+          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-xl mx-auto mb-2 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Calendar className="h-5 w-5 text-white" />
+              </div>
+              <p className="text-white/90 text-xs font-medium">Events</p>
+              <p className="text-xl font-bold text-[#F59E0B] mt-1">{overviewStats.totalEvents}</p>
+            </div>
+          </div>
+
+          {/* News Card */}
+          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-[#EF4444] to-[#DC2626] p-2 rounded-xl mx-auto mb-2 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Activity className="h-5 w-5 text-white" />
+              </div>
+              <p className="text-white/90 text-xs font-medium">News</p>
+              <p className="text-xl font-bold text-[#EF4444] mt-1">{overviewStats.totalNews}</p>
+            </div>
+          </div>
+
+          {/* Active Programs Card */}
+          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-[#3B82F6] to-[#2563EB] p-2 rounded-xl mx-auto mb-2 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
+              <p className="text-white/90 text-xs font-medium">Programs</p>
+              <p className="text-xl font-bold text-[#3B82F6] mt-1">{overviewStats.activePrograms}</p>
+            </div>
+          </div>
+
+          {/* Faculties Card */}
+          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <div className="text-center">
+              <div className="bg-gradient-to-br from-[#A855F7] to-[#9333EA] p-2 rounded-xl mx-auto mb-2 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <p className="text-white/90 text-xs font-medium">Faculties</p>
+              <p className="text-xl font-bold text-[#A855F7] mt-1">{overviewStats.totalFaculties}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Main Dashboard Widgets */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-        {/* Recent Announcements */}
-        <div className='bg-white rounded-lg shadow overflow-hidden'>
-          <div className='flex justify-between items-center p-4 border-b border-gray-200'>
-            <h2 className='text-lg font-medium text-gray-800'>
-              Recent Announcements
-            </h2>
-            <button className='text-[#004B87] hover:text-[#003a6a] text-sm font-medium'>
-              View All
-            </button>
-          </div>
-          <div className='p-4 space-y-4'>
-            {announcements.map((announcement) => (
-              <div
-                key={announcement.id}
-                className='flex border-b border-gray-100 pb-4 last:border-0 last:pb-0'
-              >
-                <div className='min-w-[60px] h-[60px] bg-[#004B87] text-white rounded flex flex-col items-center justify-center mr-4'>
-                  <p className='text-lg font-bold leading-none'>
-                    {announcement.date.split(" ")[0]}
-                  </p>
-                  <p className='text-xs'>{announcement.date.split(" ")[1]}</p>
-                </div>
-                <div>
-                  <h3 className='font-medium text-gray-800'>
-                    {announcement.title}
-                  </h3>
-                  <p className='text-sm text-gray-600 mt-1'>
-                    {announcement.content}
-                  </p>
-                  <div className='flex items-center mt-2 text-xs'>
-                    <span
-                      className={`px-2 py-1 rounded-full ${
-                        announcement.category === "academic"
-                          ? "bg-blue-100 text-blue-800"
-                          : announcement.category === "event"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {announcement.category.charAt(0).toUpperCase() +
-                        announcement.category.slice(1)}
-                    </span>
-                    <span className='ml-2 text-gray-500'>
-                      {announcement.timeAgo}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Upcoming Events */}
-        <div className='bg-white rounded-lg shadow overflow-hidden'>
-          <div className='flex justify-between items-center p-4 border-b border-gray-200'>
-            <h2 className='text-lg font-medium text-gray-800'>
-              Upcoming Events
-            </h2>
-            <button className='text-[#004B87] hover:text-[#003a6a] text-sm font-medium'>
-              View Calendar
-            </button>
-          </div>
-          <div className='p-4 space-y-4'>
-            {events.map((event) => (
-              <div
-                key={event.id}
-                className='border-b border-gray-100 pb-4 last:border-0 last:pb-0'
-              >
-                <div className='flex items-center text-sm text-gray-500 mb-1'>
-                  <Calendar size={16} className='mr-2' />
-                  <span>{event.date}</span>
-                </div>
-                <h3 className='font-medium text-gray-800'>{event.title}</h3>
-                <p className='text-sm text-gray-600 mt-1'>{event.location}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* Section Title */}
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-[#004B87] mb-3">Student Distribution Analytics</h2>
+        <p className="text-gray-600 text-lg">Detailed insights into student enrollment patterns</p>
+        <div className="w-24 h-1 bg-gradient-to-r from-[#F4B400] to-[#16A085] mx-auto mt-4 rounded-full"></div>
       </div>
 
-      {/* Bottom Widgets */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-        {/* Recent Research Publications */}
-        <div className='bg-white rounded-lg shadow overflow-hidden'>
-          <div className='flex justify-between items-center p-4 border-b border-gray-200'>
-            <h2 className='text-lg font-medium text-gray-800'>
-              Recent Research Publications
-            </h2>
-            <button className='text-[#004B87] hover:text-[#003a6a] text-sm font-medium'>
-              View All
-            </button>
+      {/* Enhanced Analytics Section */}
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+        {/* Students by Department - Advanced Bar Chart */}
+        <div className='group bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20 hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] relative'>
+          {/* Animated Background Pattern */}
+          <div className='absolute inset-0 opacity-5'>
+            <div className='absolute top-0 right-0 w-32 h-32 bg-[#F4B400] rounded-full -translate-y-16 translate-x-16 animate-pulse'></div>
+            <div className='absolute bottom-0 left-0 w-24 h-24 bg-[#004B87] rounded-full translate-y-12 -translate-x-12 animate-pulse delay-1000'></div>
           </div>
-          <div className='p-4 space-y-4'>
-            {researchPublications.map((research) => (
-              <div
-                key={research.id}
-                className='flex border-b border-gray-100 pb-4 last:border-0 last:pb-0'
-              >
-                <div className='w-10 h-10 bg-blue-100 text-[#004B87] rounded-full flex items-center justify-center mr-3'>
-                  <FileText size={20} />
+
+          <div className='relative bg-gradient-to-br from-[#004B87] via-[#1D3D6F] to-[#2C4F85] p-4 text-white'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center'>
+                <div className='bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3 border border-white/30'>
+                  <Users className='h-5 w-5 text-[#F4B400]' />
                 </div>
                 <div>
-                  <h3 className='font-medium text-gray-800'>
-                    {research.title}
-                  </h3>
-                  <p className='text-sm text-gray-600 mt-1'>
-                    By: {research.authors}
-                  </p>
-                  <div className='flex items-center mt-2 text-xs'>
-                    <span className='px-2 py-1 rounded-full bg-blue-100 text-blue-800'>
-                      {research.category}
-                    </span>
-                    <span className='ml-2 text-gray-500'>{research.date}</span>
-                  </div>
+                  <h3 className='text-lg font-bold'>Students by Department</h3>
+                  <p className='text-white/80 text-xs'>Academic distribution</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Quick Access */}
-        <div className='bg-white rounded-lg shadow overflow-hidden'>
-          <div className='p-4 border-b border-gray-200'>
-            <h2 className='text-lg font-medium text-gray-800'>Quick Access</h2>
+              <div className='text-right'>
+                <div className='text-xl font-bold text-[#F4B400]'>{departmentData.length}</div>
+                <div className='text-white/60 text-xs'>Depts</div>
+              </div>
+            </div>
           </div>
           <div className='p-4'>
-            <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
-              {[
-                { title: "Course Catalog", icon: <BookOpen size={24} /> },
-                { title: "Faculty Directory", icon: <Users size={24} /> },
-                { title: "Academic Calendar", icon: <Calendar size={24} /> },
-                { title: "Research Library", icon: <FileText size={24} /> },
-                { title: "Announcements", icon: <MessageSquare size={24} /> },
-                { title: "Analytics", icon: <BarChart size={24} /> },
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className='bg-gray-100 hover:bg-[#004B87] hover:text-white p-4 rounded-lg flex flex-col items-center justify-center text-center transition-colors cursor-pointer group'
-                >
-                  <div className='w-12 h-12 bg-white text-[#004B87] group-hover:bg-opacity-20 group-hover:text-white rounded-full flex items-center justify-center mb-2 transition-colors'>
-                    {item.icon}
+            <div className='h-48 relative'>
+              {departmentData.length > 0 ? (
+                <>
+                  <Bar
+                    data={departmentChartData}
+                    options={getAdvancedBarOptions()}
+                    key={`dept-chart-${departmentData.length}`}
+                  />
+                  <div className='absolute top-2 right-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded'>
+                    {departmentData.length} departments • Hover for details
                   </div>
-                  <span className='text-sm font-medium'>{item.title}</span>
+                </>
+              ) : (
+                <div className='flex items-center justify-center h-full text-gray-500'>
+                  <div className='text-center'>
+                    <Users className='h-12 w-12 mx-auto mb-4 text-gray-300' />
+                    <p>No department data available</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Students by City - Advanced Pie Chart */}
+        <div className='group bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20 hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] relative'>
+          {/* Animated Background Pattern */}
+          <div className='absolute inset-0 opacity-5'>
+            <div className='absolute top-0 left-0 w-28 h-28 bg-[#004B87] rounded-full -translate-y-14 -translate-x-14 animate-bounce'></div>
+            <div className='absolute bottom-0 right-0 w-20 h-20 bg-[#F4B400] rounded-full translate-y-10 translate-x-10 animate-bounce delay-500'></div>
+          </div>
+
+          <div className='relative bg-gradient-to-br from-[#F4B400] via-[#E6A200] to-[#D97706] p-4 text-white'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center'>
+                <div className='bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3 border border-white/30'>
+                  <MapPin className='h-5 w-5 text-white' />
+                </div>
+                <div>
+                  <h3 className='text-lg font-bold text-[#004B87]'>Students by City</h3>
+                  <p className='text-[#004B87]/80 text-xs'>Geographic distribution</p>
+                </div>
+              </div>
+              <div className='text-right'>
+                <div className='text-xl font-bold text-white'>{cityData.length}</div>
+                <div className='text-white/60 text-xs'>Cities</div>
+              </div>
+            </div>
+          </div>
+          <div className='p-4'>
+            <div className='h-48 relative'>
+              {cityData.length > 0 ? (
+                <>
+                  <Pie
+                    data={cityChartData}
+                    options={getAdvancedPieOptions()}
+                    key={`city-chart-${cityData.length}`}
+                  />
+                  <div className='absolute top-2 right-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded'>
+                    {cityData.length} cities • Hover for details
+                  </div>
+                </>
+              ) : (
+                <div className='flex items-center justify-center h-full text-gray-500'>
+                  <div className='text-center'>
+                    <MapPin className='h-12 w-12 mx-auto mb-4 text-gray-300' />
+                    <p>No city data available</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      {/* Full-width Enrollment Trends Chart */}
+      <div className='group bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20 hover:shadow-3xl transition-all duration-500 hover:scale-[1.01] relative'>
+        {/* Animated Background Pattern */}
+        <div className='absolute inset-0 opacity-5'>
+          <div className='absolute top-1/2 left-1/4 w-12 h-12 bg-[#16A085] rounded-full animate-ping'></div>
+          <div className='absolute bottom-1/3 right-1/3 w-8 h-8 bg-[#F4B400] rounded-full animate-ping delay-500'></div>
+        </div>
+
+        <div className='relative bg-gradient-to-br from-[#16A085] via-[#1ABC9C] to-[#48C9B0] p-4 text-white'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center'>
+              <div className='bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3 border border-white/30'>
+                <Calendar className='h-5 w-5 text-white' />
+              </div>
+              <div>
+                <h3 className='text-lg font-bold'>Enrollment Trends</h3>
+                <p className='text-white/80 text-xs'>Year-over-year growth patterns</p>
+              </div>
+            </div>
+            <div className='text-right'>
+              <div className='text-xl font-bold text-white'>{yearData.length}</div>
+              <div className='text-white/60 text-xs'>Years</div>
+            </div>
+          </div>
+        </div>
+        <div className='p-4'>
+          <div className='h-48 relative'>
+            {yearData.length > 0 ? (
+              <>
+                <Line
+                  data={yearChartData}
+                  options={getAdvancedLineOptions()}
+                  key={`year-chart-${yearData.length}`}
+                />
+                <div className='absolute top-2 right-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded'>
+                  {yearData.length} years • Hover for trends
+                </div>
+              </>
+            ) : (
+              <div className='flex items-center justify-center h-full text-gray-500'>
+                <div className='text-center'>
+                  <Calendar className='h-8 w-8 mx-auto mb-2 text-gray-300' />
+                  <p className='text-sm'>No enrollment data</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Section Title for Comprehensive Analytics */}
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-[#004B87] mb-3">Ecconomic Faculty Overview</h2>
+        <p className="text-gray-600 text-lg">Complete analytics across all ecconomic faculty modules</p>
+        <div className="w-32 h-1 bg-gradient-to-r from-[#004B87] via-[#F4B400] to-[#16A085] mx-auto mt-4 rounded-full"></div>
+      </div>
+
+      {/* Enhanced Comprehensive Dashboard Charts */}
+      <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8'>
+        {/* University Overview Chart */}
+        <div className='group bg-white rounded-3xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] relative overflow-hidden'>
+          {/* Subtle Background Pattern */}
+          <div className='absolute inset-0 opacity-5'>
+            <div className='absolute top-0 right-0 w-32 h-32 bg-[#F4B400] rounded-full -translate-y-16 translate-x-16'></div>
+            <div className='absolute bottom-0 left-0 w-24 h-24 bg-[#004B87] rounded-full translate-y-12 -translate-x-12'></div>
+          </div>
+          <div className='relative z-10 flex items-center justify-between mb-6'>
+            <div className='flex items-center'>
+              <div className='bg-gradient-to-br from-[#F4B400] to-[#E6A200] p-3 rounded-xl mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300'>
+                <Activity className='h-6 w-6 text-white' />
+              </div>
+              <div>
+                <h3 className='text-xl font-bold text-[#004B87]'>Economic Faculty Overview</h3>
+                <p className='text-gray-600 text-sm'>Complete system metrics</p>
+              </div>
+            </div>
+            <div className='text-right'>
+              <div className='text-sm text-gray-500'>Total Metrics</div>
+              <div className='text-lg font-bold text-[#F4B400]'>9</div>
+            </div>
+          </div>
+          <div className='h-64 relative'>
+            <Doughnut
+              data={overviewChartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: {
+                      padding: 15,
+                      usePointStyle: true,
+                      font: { size: 10 }
+                    }
+                  },
+                  tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#F4B400',
+                    bodyColor: '#ffffff',
+                    borderColor: '#F4B400',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    padding: 12
+                  }
+                }
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Course Statistics Chart */}
+        <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='flex items-center'>
+              <div className='bg-[#16A085] p-2 rounded-lg mr-3'>
+                <BookOpen className='h-5 w-5 text-white' />
+              </div>
+              <div>
+                <h3 className='text-lg font-bold text-[#004B87]'>Courses by Department</h3>
+                <p className='text-gray-600 text-sm'>Course distribution</p>
+              </div>
+            </div>
+          </div>
+          <div className='h-64 relative'>
+            {courseStats.coursesByDepartment?.length > 0 ? (
+              <Bar
+                data={courseStatsChartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                      titleColor: '#16A085',
+                      bodyColor: '#ffffff'
+                    }
+                  },
+                  scales: {
+                    y: { beginAtZero: true },
+                    x: {
+                      ticks: {
+                        maxRotation: 45,
+                        font: { size: 10 }
+                      }
+                    }
+                  }
+                }}
+              />
+            ) : (
+              <div className='flex items-center justify-center h-full text-gray-500'>
+                <div className='text-center'>
+                  <BookOpen className='h-12 w-12 mx-auto mb-2 text-gray-300' />
+                  <p className='text-sm'>No course data available</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Teacher Statistics Chart */}
+        <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='flex items-center'>
+              <div className='bg-[#8B5CF6] p-2 rounded-lg mr-3'>
+                <Users className='h-5 w-5 text-white' />
+              </div>
+              <div>
+                <h3 className='text-lg font-bold text-[#004B87]'>Teachers by Department</h3>
+                <p className='text-gray-600 text-sm'>Faculty distribution</p>
+              </div>
+            </div>
+          </div>
+          <div className='h-64 relative'>
+            {teacherStats.teachersByDepartment?.length > 0 ? (
+              <Pie
+                data={teacherStatsChartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: 'bottom',
+                      labels: {
+                        padding: 10,
+                        usePointStyle: true,
+                        font: { size: 10 }
+                      }
+                    },
+                    tooltip: {
+                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                      titleColor: '#8B5CF6',
+                      bodyColor: '#ffffff'
+                    }
+                  }
+                }}
+              />
+            ) : (
+              <div className='flex items-center justify-center h-full text-gray-500'>
+                <div className='text-center'>
+                  <Users className='h-12 w-12 mx-auto mb-2 text-gray-300' />
+                  <p className='text-sm'>No teacher data available</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Research Statistics Chart */}
+        <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='flex items-center'>
+              <div className='bg-[#10B981] p-2 rounded-lg mr-3'>
+                <Activity className='h-5 w-5 text-white' />
+              </div>
+              <div>
+                <h3 className='text-lg font-bold text-[#004B87]'>Research by Department</h3>
+                <p className='text-gray-600 text-sm'>Research distribution</p>
+              </div>
+            </div>
+          </div>
+          <div className='h-64 relative'>
+            {researchStats.researchByDepartment?.length > 0 ? (
+              <Line
+                data={researchStatsChartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                      titleColor: '#10B981',
+                      bodyColor: '#ffffff'
+                    }
+                  },
+                  scales: {
+                    y: { beginAtZero: true },
+                    x: {
+                      ticks: {
+                        maxRotation: 45,
+                        font: { size: 10 }
+                      }
+                    }
+                  }
+                }}
+              />
+            ) : (
+              <div className='flex items-center justify-center h-full text-gray-500'>
+                <div className='text-center'>
+                  <Activity className='h-12 w-12 mx-auto mb-2 text-gray-300' />
+                  <p className='text-sm'>No research data available</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Activity Statistics Chart */}
+        <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='flex items-center'>
+              <div className='bg-[#F59E0B] p-2 rounded-lg mr-3'>
+                <Calendar className='h-5 w-5 text-white' />
+              </div>
+              <div>
+                <h3 className='text-lg font-bold text-[#004B87]'>Events & News</h3>
+                <p className='text-gray-600 text-sm'>Activity statistics</p>
+              </div>
+            </div>
+          </div>
+          <div className='h-64 relative'>
+            <Bar
+              data={activityStatsChartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'top',
+                    labels: { font: { size: 12 } }
+                  },
+                  tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#F59E0B',
+                    bodyColor: '#ffffff'
+                  }
+                },
+                scales: {
+                  y: { beginAtZero: true }
+                }
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Recent Activities Summary */}
+        <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
+          <div className='flex items-center justify-between mb-4'>
+            <div className='flex items-center'>
+              <div className='bg-[#EC4899] p-2 rounded-lg mr-3'>
+                <Activity className='h-5 w-5 text-white' />
+              </div>
+              <div>
+                <h3 className='text-lg font-bold text-[#004B87]'>Recent Activities</h3>
+                <p className='text-gray-600 text-sm'>Latest updates</p>
+              </div>
+            </div>
+          </div>
+          <div className='space-y-4'>
+            <div className='flex items-center justify-between p-3 bg-blue-50 rounded-lg'>
+              <span className='text-sm font-medium text-gray-700'>New Students</span>
+              <span className='bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold'>
+                {overviewStats.totalStudents}
+              </span>
+            </div>
+            <div className='flex items-center justify-between p-3 bg-green-50 rounded-lg'>
+              <span className='text-sm font-medium text-gray-700'>Total Courses</span>
+              <span className='bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold'>
+                {overviewStats.totalCourses}
+              </span>
+            </div>
+            <div className='flex items-center justify-between p-3 bg-purple-50 rounded-lg'>
+              <span className='text-sm font-medium text-gray-700'>Research Papers</span>
+              <span className='bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold'>
+                {overviewStats.totalResearch}
+              </span>
+            </div>
+            <div className='flex items-center justify-between p-3 bg-yellow-50 rounded-lg'>
+              <span className='text-sm font-medium text-gray-700'>Active Events</span>
+              <span className='bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold'>
+                {overviewStats.totalEvents}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Data Summary */}
+      <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
+        <div className='flex items-center justify-between mb-6'>
+          <div className='flex items-center'>
+            <div className='bg-[#6C5CE7] p-3 rounded-lg mr-4'>
+              <Activity className='h-6 w-6 text-white' />
+            </div>
+            <div>
+              <h2 className='text-xl font-bold text-[#004B87]'>Quick Overview</h2>
+              <p className='text-gray-600 text-sm'>Key statistics at a glance</p>
+            </div>
+          </div>
+        </div>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+          {/* Top Departments */}
+          <div>
+            <h3 className='text-lg font-semibold text-[#004B87] mb-3 flex items-center'>
+              <Users className='h-5 w-5 mr-2' />
+              Top Departments
+            </h3>
+            <div className='space-y-2'>
+              {departmentData.slice(0, 3).map((dept, index) => (
+                <div key={index} className='flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'>
+                  <span className='font-medium text-gray-700 text-sm'>{dept.departmentName}</span>
+                  <span className='bg-[#004B87] text-white px-3 py-1 rounded-full text-xs font-bold'>
+                    {dept.count}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Top Cities */}
+          <div>
+            <h3 className='text-lg font-semibold text-[#004B87] mb-3 flex items-center'>
+              <MapPin className='h-5 w-5 mr-2' />
+              Top Cities
+            </h3>
+            <div className='space-y-2'>
+              {cityData.slice(0, 3).map((city, index) => (
+                <div key={index} className='flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'>
+                  <span className='font-medium text-gray-700 text-sm'>{city.city}</span>
+                  <span className='bg-[#F4B400] text-[#004B87] px-3 py-1 rounded-full text-xs font-bold'>
+                    {city.count}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Years */}
+          <div>
+            <h3 className='text-lg font-semibold text-[#004B87] mb-3 flex items-center'>
+              <Calendar className='h-5 w-5 mr-2' />
+              Recent Years
+            </h3>
+            <div className='space-y-2'>
+              {yearData.slice(0, 3).map((year, index) => (
+                <div key={index} className='flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'>
+                  <span className='font-medium text-gray-700 text-sm'>{year.year}</span>
+                  <span className='bg-[#16A085] text-white px-3 py-1 rounded-full text-xs font-bold'>
+                    {year.count}
+                  </span>
                 </div>
               ))}
             </div>

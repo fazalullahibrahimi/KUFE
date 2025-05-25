@@ -1,6 +1,6 @@
 const express = require("express")
 const { getCourses, getCourse, createCourse, updateCourse, deleteCourse, uploadCoursePhoto,
-  resizeCoursePhoto } = require("../controllers/courseController")
+  resizeCoursePhoto, getCourseCount, getCoursesByDepartment, getCourseStatistics } = require("../controllers/courseController")
 const { authMiddleware } = require("../middleware/authMiddleware")
 const { authorize, checkPermission } = require("../middleware/roleCheck")
 const roles = require("../config/roles")
@@ -9,7 +9,9 @@ const router = express.Router()
 
 // Public routes
 router.get("/", getCourses)
-
+router.get("/count", getCourseCount)
+router.get("/statistics", getCourseStatistics)
+router.get("/by-department/:departmentId", getCoursesByDepartment)
 router.get("/:id", getCourse)
 
 // Protected routes
@@ -24,7 +26,7 @@ router.post(
   createCourse,
 )
 
-router.patch("/:id", authorize(roles.ADMIN, roles.FACULTY), checkPermission("manage_courses"), 
+router.patch("/:id", authorize(roles.ADMIN, roles.FACULTY), checkPermission("manage_courses"),
 uploadCoursePhoto,
 resizeCoursePhoto,
 updateCourse

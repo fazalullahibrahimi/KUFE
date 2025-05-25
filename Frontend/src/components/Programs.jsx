@@ -169,7 +169,7 @@ const Programs = () => {
           aria-level='2'
           style={{ fontFamily: "'Poppins', sans-serif" }}
         >
-          {t("Our Academic Programs")}
+          {t("Our Departments")}
         </h2>
 
         <div className='w-24 h-1 bg-[#F4B400] mx-auto mb-8 rounded-full'></div>

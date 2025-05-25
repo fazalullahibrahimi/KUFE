@@ -1,6 +1,10 @@
 import React from "react"
 import { useState, useEffect, useRef } from "react"
-import { Plus, Save, Calendar, ImageIcon } from "lucide-react"
+import {
+  Plus, Save, Calendar, ImageIcon, Clock, MapPin, Users, Star,
+  TrendingUp, Activity, Eye, Edit, Target, Award, CheckCircle,
+  BarChart3, PieChart, Settings, Building2
+} from "lucide-react"
 import Table from "../common/Table"
 import Modal from "../common/Modal"
 import FormField from "../common/FormField"
@@ -389,52 +393,261 @@ const EventManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-800">Event Management</h2>
-        <button
-          className="flex items-center px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
-          onClick={() => {
-            resetForm()
-            setIsAddModalOpen(true)
-          }}
-        >
-          <Plus size={18} className="mr-2" />
-          Add New Event
-        </button>
+    <div className="space-y-8">
+      {/* Enhanced Header Section */}
+      <div className="relative bg-gradient-to-br from-[#004B87] via-[#1D3D6F] to-[#2C4F85] rounded-3xl p-8 text-white overflow-hidden shadow-2xl">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#F4B400] rounded-full -translate-y-48 translate-x-48 animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#16A085] rounded-full translate-y-32 -translate-x-32 animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16 animate-ping delay-2000"></div>
+        </div>
+
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div className="mb-6 md:mb-0">
+            <div className="flex items-center mb-4">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl mr-4 border border-white/30">
+                <Calendar className="h-8 w-8 text-[#F4B400]" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
+                  Event Management
+                </h1>
+                <p className="text-white/90 text-lg">Organize and manage university events</p>
+              </div>
+            </div>
+            <div className="flex items-center text-white/70">
+              <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
+              <span className="text-sm">Event coordination • {events.length} events</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="text-right mb-3 sm:mb-0">
+              <div className="text-2xl font-bold text-[#F4B400]">{events.length}</div>
+              <div className="text-white/60 text-sm">Total Events</div>
+            </div>
+            <button
+              className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
+              onClick={() => {
+                resetForm()
+                setIsAddModalOpen(true)
+              }}
+            >
+              <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
+              <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
+                Add New Event
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Event Stats */}
+      {/* Enhanced Event Analytics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Events Card */}
+        <div className="group bg-gradient-to-br from-[#004B87] to-[#1D3D6F] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">Total Events</p>
+              </div>
+              <p className="text-3xl font-bold text-white">{events.length}</p>
+              <div className="flex items-center mt-2">
+                <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
+                <span className="text-green-300 text-xs">+18% this year</span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-[#F4B400]">{events.length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Upcoming Events Card */}
+        <div className="group bg-gradient-to-br from-[#F4B400] to-[#E6A200] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#004B87] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <Clock className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">Upcoming Events</p>
+              </div>
+              <p className="text-3xl font-bold text-white">{events.filter((event) => new Date(event.date) > new Date()).length}</p>
+              <div className="flex items-center mt-2">
+                <Star className="h-4 w-4 text-white/70 mr-1" />
+                <span className="text-white/70 text-xs">Next 30 days</span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-white">{events.filter((event) => new Date(event.date) > new Date()).length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Event Types Card */}
+        <div className="group bg-gradient-to-br from-[#10B981] to-[#059669] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <CheckCircle className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">Event Types</p>
+              </div>
+              <p className="text-3xl font-bold text-white">{new Set(events.map((event) => event.type)).size}</p>
+              <div className="flex items-center mt-2">
+                <Target className="h-4 w-4 text-green-200 mr-1" />
+                <span className="text-green-200 text-xs">Diverse categories</span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-white">{new Set(events.map((event) => event.type)).size}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Locations Card */}
+        <div className="group bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <MapPin className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">Locations</p>
+              </div>
+              <p className="text-3xl font-bold text-white">{new Set(events.map((event) => event.location)).size}</p>
+              <div className="flex items-center mt-2">
+                <Building2 className="h-4 w-4 text-purple-200 mr-1" />
+                <span className="text-purple-200 text-xs">Venues used</span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-white">{new Set(events.map((event) => event.location)).size}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Analytics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
-          <div className="w-12 h-12 rounded-full bg-[#004B87] bg-opacity-10 flex items-center justify-center mr-4">
-            <span className="text-[#004B87] font-bold">{events.length}</span>
+        {/* Event Types Distribution */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
+                <BarChart3 className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">Event Types</h3>
+            </div>
+            <Eye className="h-5 w-5 text-gray-400" />
           </div>
-          <div>
-            <p className="text-gray-500 text-sm">Total Events</p>
-            <p className="text-lg font-semibold text-gray-800">{events.length}</p>
+          <div className="space-y-3">
+            {[...new Set(events.map(e => e.type))].filter(Boolean).slice(0, 4).map((type, index) => {
+              const count = events.filter(e => e.type === type).length;
+              const percentage = events.length > 0 ? ((count / events.length) * 100).toFixed(1) : 0;
+              return (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 capitalize">{type}</span>
+                  <div className="flex items-center">
+                    <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                      <div
+                        className="bg-gradient-to-r from-[#EC4899] to-[#DB2777] h-2 rounded-full"
+                        style={{width: `${percentage}%`}}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-800">{count}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
-          <div className="w-12 h-12 rounded-full bg-[#F4B400] bg-opacity-10 flex items-center justify-center mr-4">
-            <span className="text-[#F4B400] font-bold">
-              {events.filter((event) => new Date(event.date) > new Date()).length}
-            </span>
+        {/* Event Timeline */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
+                <Clock className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">Event Timeline</h3>
+            </div>
+            <Calendar className="h-5 w-5 text-gray-400" />
           </div>
-          <div>
-            <p className="text-gray-500 text-sm">Upcoming Events</p>
-            <p className="text-lg font-semibold text-gray-800"> {events.filter((event) => new Date(event.date) > new Date()).length}</p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Past Events</span>
+              <span className="text-lg font-bold text-[#06B6D4]">
+                {events.filter(e => new Date(e.date) < new Date()).length}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">This Month</span>
+              <span className="text-lg font-bold text-[#06B6D4]">
+                {events.filter(e => {
+                  const eventDate = new Date(e.date);
+                  const now = new Date();
+                  return eventDate.getMonth() === now.getMonth() && eventDate.getFullYear() === now.getFullYear();
+                }).length}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Next Month</span>
+              <span className="text-lg font-bold text-[#06B6D4]">
+                {events.filter(e => {
+                  const eventDate = new Date(e.date);
+                  const nextMonth = new Date();
+                  nextMonth.setMonth(nextMonth.getMonth() + 1);
+                  return eventDate.getMonth() === nextMonth.getMonth() && eventDate.getFullYear() === nextMonth.getFullYear();
+                }).length}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 flex items-center">
-          <div className="w-12 h-12 rounded-full bg-green-500 bg-opacity-10 flex items-center justify-center mr-4">
-            <span className="text-green-500 font-bold">{new Set(events.map((event) => event.type)).size}</span>
+        {/* Event Locations */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
+                <MapPin className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">Popular Locations</h3>
+            </div>
+            <Settings className="h-5 w-5 text-gray-400" />
           </div>
-          <div>
-            <p className="text-gray-500 text-sm">Event Types</p>
-            <p className="text-lg font-semibold text-gray-800">{new Set(events.map((event) => event.type)).size}</p>
+          <div className="space-y-3">
+            {[...new Set(events.map(e => e.location))].filter(Boolean).slice(0, 4).map((location, index) => {
+              const count = events.filter(e => e.location === location).length;
+              return (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">{location}</span>
+                  <span className="text-lg font-bold text-[#F59E0B]">{count}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
