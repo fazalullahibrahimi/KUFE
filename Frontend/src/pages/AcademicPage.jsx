@@ -366,6 +366,10 @@ const AcademicPage = () => {
             (program, index) => ({
               title: program.title,
               description: program.description,
+              mission: program.mission || "Mission statement not available",
+              vision: program.vision || "Vision statement not available",
+              values: program.values || "Values statement not available",
+              department_id: program.department_id,
               icon: icons[index % icons.length],
               type:
                 program.type ||
@@ -893,6 +897,42 @@ const AcademicPage = () => {
               <h4 className="text-lg font-medium text-gray-800 mb-3">Program Description</h4>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-gray-700 leading-relaxed">{selectedProgram.description}</p>
+              </div>
+            </div>
+
+            {/* Mission, Vision, Values Grid */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Mission */}
+              <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white font-bold text-sm">M</span>
+                  </div>
+                  <h4 className="text-lg font-semibold text-blue-800">Mission</h4>
+                </div>
+                <p className="text-blue-700 leading-relaxed">{selectedProgram.mission}</p>
+              </div>
+
+              {/* Vision */}
+              <div className="bg-green-50 p-6 rounded-xl border border-green-100">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white font-bold text-sm">V</span>
+                  </div>
+                  <h4 className="text-lg font-semibold text-green-800">Vision</h4>
+                </div>
+                <p className="text-green-700 leading-relaxed">{selectedProgram.vision}</p>
+              </div>
+
+              {/* Values */}
+              <div className="bg-purple-50 p-6 rounded-xl border border-purple-100">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white font-bold text-sm">V</span>
+                  </div>
+                  <h4 className="text-lg font-semibold text-purple-800">Values</h4>
+                </div>
+                <p className="text-purple-700 leading-relaxed">{selectedProgram.values}</p>
               </div>
             </div>
 

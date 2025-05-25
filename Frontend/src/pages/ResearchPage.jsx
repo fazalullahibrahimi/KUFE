@@ -42,6 +42,9 @@ export default function ResearchPage() {
   const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
   const [showFundingModal, setShowFundingModal] = useState(false);
 
+  // Download states
+  const [downloadingPapers, setDownloadingPapers] = useState(new Set());
+
   const { t, language, direction } = useLanguage();
   const sectionRefs = {
     hero: useRef(null),
@@ -366,6 +369,138 @@ export default function ResearchPage() {
 
   const handleExploreFunding = () => {
     setShowFundingModal(true);
+  };
+
+  // Download PDF function - Force direct download
+  const handleDownloadPDF = async (paper) => {
+    // Use the correct field name from backend (file_path with underscore)
+    const filePath = paper.file_path;
+    if (!filePath || filePath === "#" || filePath === "") {
+      alert("PDF file is not available for download.");
+      return;
+    }
+
+    // Set downloading state
+    setDownloadingPapers(prev => new Set([...prev, paper._id]));
+
+    try {
+      // Construct the full URL - backend serves static files from /public route
+      const fullUrl = `http://localhost:4400/public${filePath}`;
+
+      // Generate a clean filename
+      const cleanTitle = paper.title.replace(/[^a-z0-9\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
+      const filename = `${cleanTitle}.pdf`;
+
+      // Create a temporary link element for direct download
+      const link = document.createElement('a');
+      link.href = fullUrl;
+      link.download = filename;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+
+      // Add download attribute to force download instead of opening
+      link.setAttribute('download', filename);
+
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      console.log(`Download initiated: ${paper.title} as ${filename}`);
+
+      // Show success message
+      setTimeout(() => {
+        console.log("Download should have started successfully!");
+      }, 1000);
+
+    } catch (error) {
+      console.error('Download error:', error);
+      alert("An error occurred while downloading the file. Please try again.");
+    } finally {
+      // Remove downloading state after a short delay
+      setTimeout(() => {
+        setDownloadingPapers(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(paper._id);
+          return newSet;
+        });
+      }, 1500);
+    }
+  };
+
+  // View PDF function - Open in viewer mode without download prompt
+  const handleViewPDF = (paper) => {
+    // Use the correct field name from backend (file_path with underscore)
+    const filePath = paper.file_path;
+    if (!filePath || filePath === "#" || filePath === "") {
+      alert("PDF file is not available for viewing.");
+      return;
+    }
+
+    try {
+      // Construct the full URL - backend serves static files from /public route
+      const fullUrl = `http://localhost:4400/public${filePath}`;
+
+      // Create a new window with PDF viewer that prevents download
+      const newWindow = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes');
+
+      if (newWindow) {
+        newWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>PDF Viewer - ${paper.title}</title>
+            <style>
+              body {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                background: #f5f5f5;
+              }
+              .header {
+                background: #1D3D6F;
+                color: white;
+                padding: 15px 20px;
+                font-size: 18px;
+                font-weight: bold;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+              }
+              .pdf-container {
+                width: 100%;
+                height: calc(100vh - 60px);
+                border: none;
+              }
+              .error {
+                text-align: center;
+                padding: 50px;
+                color: #666;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">📄 ${paper.title}</div>
+            <iframe
+              src="${fullUrl}#toolbar=0&navpanes=0&scrollbar=1"
+              class="pdf-container"
+              onload="this.style.display='block'"
+              onerror="document.querySelector('.error').style.display='block'"
+            ></iframe>
+            <div class="error" style="display:none;">
+              <h3>Unable to load PDF</h3>
+              <p>The PDF file could not be displayed. Please try downloading it instead.</p>
+              <button onclick="window.close()" style="padding: 10px 20px; background: #1D3D6F; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+            </div>
+          </body>
+          </html>
+        `);
+        newWindow.document.close();
+      }
+
+      console.log(`Opening PDF in viewer: ${paper.title}`);
+    } catch (error) {
+      console.error('View PDF error:', error);
+      alert("An error occurred while opening the PDF. Please try again.");
+    }
   };
 
   return (
@@ -760,14 +895,35 @@ export default function ResearchPage() {
                             )}
                           </div>
 
-                          <a
-                            href={paper.filePath || paper.fileUrl || "#"}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='inline-flex items-center gap-2 bg-[#1D3D6F] hover:bg-[#2C4F85] text-white font-medium py-2 px-4 rounded-lg transition-colors shadow-sm group-hover:shadow-md'
-                          >
-                            <FileText className='h-4 w-4' /> {t("View_PDF")}
-                          </a>
+                          <div className='flex items-center gap-2'>
+                            <button
+                              onClick={() => handleViewPDF(paper)}
+                              className='inline-flex items-center gap-2 bg-[#1D3D6F] hover:bg-[#2C4F85] text-white font-medium py-2 px-3 rounded-lg transition-colors shadow-sm group-hover:shadow-md text-sm'
+                            >
+                              <FileText className='h-4 w-4' /> {t("View_PDF")}
+                            </button>
+                            <button
+                              onClick={() => handleDownloadPDF(paper)}
+                              disabled={downloadingPapers.has(paper._id)}
+                              className={`inline-flex items-center gap-2 font-medium py-2 px-3 rounded-lg transition-colors shadow-sm group-hover:shadow-md text-sm min-w-[100px] justify-center ${
+                                downloadingPapers.has(paper._id)
+                                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                  : 'bg-[#F7B500] hover:bg-[#e5a700] text-[#1D3D6F]'
+                              }`}
+                            >
+                              {downloadingPapers.has(paper._id) ? (
+                                <>
+                                  <RefreshCw className='h-4 w-4 animate-spin' />
+                                  <span className='hidden sm:inline'>Downloading...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Download className='h-4 w-4' />
+                                  <span className='hidden sm:inline'>{t("Download")}</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -859,17 +1015,35 @@ export default function ResearchPage() {
                           </span>
                         </div>
 
-                        <a
-                          href={paper.filePath || paper.fileUrl || "#"}
-                          className='text-[#F7B500] group-hover:text-white font-medium text-sm flex items-center transition-colors'
-                        >
-                          {t("View_Paper")}{" "}
-                          <ArrowUpRight
-                            className={`h-4 w-4 ${
-                              direction === "rtl" ? "mr-1" : "ml-1"
+                        <div className='flex items-center gap-3'>
+                          <button
+                            onClick={() => handleViewPDF(paper)}
+                            className='text-[#F7B500] group-hover:text-white font-medium text-sm flex items-center transition-colors hover:underline'
+                          >
+                            {t("View_Paper")}{" "}
+                            <ExternalLink
+                              className={`h-4 w-4 ${
+                                direction === "rtl" ? "mr-1" : "ml-1"
+                              }`}
+                            />
+                          </button>
+                          <button
+                            onClick={() => handleDownloadPDF(paper)}
+                            disabled={downloadingPapers.has(paper._id)}
+                            className={`font-medium text-sm flex items-center transition-colors hover:underline min-w-[24px] justify-center ${
+                              downloadingPapers.has(paper._id)
+                                ? 'text-gray-400 cursor-not-allowed'
+                                : 'text-white/70 group-hover:text-[#F7B500]'
                             }`}
-                          />
-                        </a>
+                            title={downloadingPapers.has(paper._id) ? "Downloading..." : "Download PDF"}
+                          >
+                            {downloadingPapers.has(paper._id) ? (
+                              <RefreshCw className='h-4 w-4 animate-spin' />
+                            ) : (
+                              <Download className='h-4 w-4' />
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

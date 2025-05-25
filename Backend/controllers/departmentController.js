@@ -104,7 +104,7 @@ const getDepartmentName = asyncHandler(async (req, res) => {
   );
 });
 
-module.exports = { getDepartments };
+
 
 
 // @desc    Get single department
@@ -188,12 +188,15 @@ const deleteDepartment = asyncHandler(async (req, res) => {
 });
 
 const getAcademicPrograms = asyncHandler(async (req, res) => {
-  const departments = await Department.find().select("name description")
+  const departments = await Department.find().select("name description mission vision values")
   // Transform departments into programs format without icons
   const programs = departments.map((dept) => {
     return {
       title: dept.name,
       description: dept.description || "Program offered by the department",
+      mission: dept.mission || "Department mission",
+      vision: dept.vision || "Department vision",
+      values: dept.values || "Department values",
       department_id: dept._id
     };
   });
@@ -275,7 +278,7 @@ const getDepartmentDetails = asyncHandler(async (req, res) => {
 const getFeaturedDepartments = asyncHandler(async (req, res) => {
   // Get a limited number of departments with some basic info
   const departments = await Department.find()
-    .select("name description")
+    .select("name description mission vision values")
     .limit(3);  // Limit to 3 for homepage feature
 
   res.status(200).json(
@@ -426,6 +429,7 @@ const getResearchPaperCount = asyncHandler(async (req, res) => {
 
 module.exports = {
   getDepartments,
+  getDepartmentName,
   getDepartment,
   createDepartment,
   updateDepartment,
@@ -436,7 +440,6 @@ module.exports = {
   getFeaturedDepartments,
   getDepartmentStatistics,
   getUniversityStatistics,
-  getDepartmentName,
   getAcademicProgramCount,
   getResearchPaperCount
 }

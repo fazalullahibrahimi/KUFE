@@ -17,6 +17,9 @@ const DepartmentManagement = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    mission: "",
+    vision: "",
+    values: "",
     faculty: "",
   })
 
@@ -84,6 +87,9 @@ const DepartmentManagement = () => {
           name: "Accounting",
           description:
             "The Department of Accounting prepares students for careers in financial accounting, managerial accounting, auditing, and taxation through theoretical and practical education.",
+          mission: "To provide excellence in accounting education and research that prepares students for successful careers in the accounting profession.",
+          vision: "To be a leading department in accounting education, recognized for innovation, integrity, and impact in the global business community.",
+          values: "Integrity, Excellence, Innovation, Professional Ethics, and Continuous Learning.",
           faculty: "60a1c2b3d4e5f6a7b8c9d0e1",
         },
         {
@@ -91,6 +97,9 @@ const DepartmentManagement = () => {
           name: "Computer Science",
           description:
             "The Department of Computer Science offers programs in software development, artificial intelligence, data science, and cybersecurity.",
+          mission: "To advance the field of computer science through cutting-edge research and education, preparing students to be leaders in technology.",
+          vision: "To be a premier computer science department that shapes the future of technology and digital innovation.",
+          values: "Innovation, Collaboration, Technical Excellence, Ethical Computing, and Lifelong Learning.",
           faculty: "60a1c2b3d4e5f6a7b8c9d0e2",
         },
       ])
@@ -243,6 +252,9 @@ const DepartmentManagement = () => {
     setFormData({
       name: department.name,
       description: department.description,
+      mission: department.mission || "",
+      vision: department.vision || "",
+      values: department.values || "",
       faculty: department.faculty,
     })
     setIsEditModalOpen(true)
@@ -257,6 +269,9 @@ const DepartmentManagement = () => {
     setFormData({
       name: "",
       description: "",
+      mission: "",
+      vision: "",
+      values: "",
       faculty: "",
     })
   }
@@ -380,6 +395,30 @@ const DepartmentManagement = () => {
               onChange={handleInputChange}
               required
             />
+            <FormField
+              label="Mission"
+              name="mission"
+              type="textarea"
+              value={formData.mission}
+              onChange={handleInputChange}
+              required
+            />
+            <FormField
+              label="Vision"
+              name="vision"
+              type="textarea"
+              value={formData.vision}
+              onChange={handleInputChange}
+              required
+            />
+            <FormField
+              label="Values"
+              name="values"
+              type="textarea"
+              value={formData.values}
+              onChange={handleInputChange}
+              required
+            />
 
             {/* Faculty Dropdown */}
             <div className="mb-4">
@@ -446,6 +485,30 @@ const DepartmentManagement = () => {
               onChange={handleInputChange}
               required
             />
+            <FormField
+              label="Mission"
+              name="mission"
+              type="textarea"
+              value={formData.mission}
+              onChange={handleInputChange}
+              required
+            />
+            <FormField
+              label="Vision"
+              name="vision"
+              type="textarea"
+              value={formData.vision}
+              onChange={handleInputChange}
+              required
+            />
+            <FormField
+              label="Values"
+              name="values"
+              type="textarea"
+              value={formData.values}
+              onChange={handleInputChange}
+              required
+            />
 
             {/* Faculty Dropdown */}
             <div className="mb-4">
@@ -499,6 +562,21 @@ const DepartmentManagement = () => {
             <div>
               <h4 className="text-lg font-medium text-gray-800 mb-2">Description</h4>
               <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.description}</p>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">Mission</h4>
+              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.mission || "No mission statement available"}</p>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">Vision</h4>
+              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.vision || "No vision statement available"}</p>
+            </div>
+
+            <div>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">Values</h4>
+              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.values || "No values statement available"}</p>
             </div>
 
             <div>

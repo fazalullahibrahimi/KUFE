@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
+import MissionVisionValues from "../components/MissionVisionValues";
 import Programs from "../components/Programs";
 import Stats from "../components/Stats";
 import Events from "../components/Events";
@@ -12,6 +13,7 @@ const Home = () => {
     <>
       <Navbar />
       <Hero />
+      <MissionVisionValues />
       <Programs />
       <Stats />
       <TopPerformers />

@@ -5,6 +5,7 @@ import {
   FaUniversity,
   FaExclamationTriangle,
   FaSpinner,
+  FaTimes,
 } from "react-icons/fa";
 import axios from "axios";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -20,6 +21,8 @@ const Programs = () => {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const { t, language, direction } = useLanguage();
 
   useEffect(() => {
@@ -51,6 +54,10 @@ const Programs = () => {
           (program, index) => ({
             title: program.title,
             description: program.description,
+            mission: program.mission || "Mission statement not available",
+            vision: program.vision || "Vision statement not available",
+            values: program.values || "Values statement not available",
+            department_id: program.department_id,
             icon: icons[index % icons.length], // Cycle through icons
           })
         );
@@ -89,6 +96,17 @@ const Programs = () => {
 
     fetchPrograms();
   }, [language, t]);
+
+  // Modal handlers
+  const handleLearnMore = (program) => {
+    setSelectedProgram(program);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedProgram(null);
+  };
 
   // Loading state
   const renderLoading = () => (
@@ -168,13 +186,13 @@ const Programs = () => {
               <div key={index} className='group relative h-full'>
                 {/* Glass card */}
                 <div
-                  className='h-full p-6 md:p-8 rounded-xl overflow-hidden flex flex-col items-center transform transition-all duration-500 group-hover:scale-[1.02]'
+                  className='h-full p-6 md:p-8 rounded-xl overflow-hidden flex flex-col items-center transform transition-all duration-500 group-hover:scale-[1.02] group-hover:shadow-2xl'
                   style={{
-                    background: "rgba(0, 75, 135, 0.85)",
-                    backdropFilter: "blur(10px)",
-                    WebkitBackdropFilter: "blur(10px)",
-                    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.15)",
-                    border: "1px solid rgba(255, 255, 255, 0.18)",
+                    background: "rgba(0, 75, 135, 0.9)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    boxShadow: "0 12px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+                    border: "1px solid rgba(255, 255, 255, 0.25)",
                   }}
                 >
                   {/* Icon with glow effect */}
@@ -208,7 +226,8 @@ const Programs = () => {
                   {/* Learn more button that appears on hover */}
                   <div className='mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
                     <button
-                      className='px-4 py-2 bg-[#F4B400] text-[#333333] rounded-md hover:bg-[#e5a800] transition-colors font-medium'
+                      onClick={() => handleLearnMore(program)}
+                      className='px-4 py-2 bg-[#F4B400] text-[#333333] rounded-md hover:bg-[#e5a800] transition-colors font-medium transform hover:scale-105'
                       style={{ fontFamily: "'Roboto', sans-serif" }}
                     >
                       {t("Learn More")}
@@ -227,6 +246,95 @@ const Programs = () => {
           </div>
         )}
       </div>
+
+      {/* Modal for Mission, Vision, Values */}
+      {showModal && selectedProgram && (
+        <div
+          className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50'
+          onClick={closeModal}
+        >
+          <div
+            className='bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl'
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className='sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl z-10'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center'>
+                  <div className='inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#004B87]/10 mr-4'>
+                    {React.createElement(selectedProgram.icon)}
+                  </div>
+                  <h2 className='text-2xl font-bold text-[#004B87]'>
+                    {selectedProgram.title}
+                  </h2>
+                </div>
+                <button
+                  onClick={closeModal}
+                  className='p-2 hover:bg-gray-100 rounded-full transition-colors'
+                >
+                  <FaTimes className='w-6 h-6 text-gray-500' />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className='p-6'>
+              {/* Description */}
+              <div className='mb-8'>
+                <h3 className='text-lg font-semibold text-[#004B87] mb-3'>Program Overview</h3>
+                <div className='bg-gray-50 p-4 rounded-lg'>
+                  <p className='text-gray-700 leading-relaxed'>{selectedProgram.description}</p>
+                </div>
+              </div>
+
+              {/* Mission, Vision, Values Grid */}
+              <div className='grid md:grid-cols-3 gap-6'>
+                {/* Mission */}
+                <div className='bg-blue-50 p-6 rounded-xl border border-blue-100'>
+                  <div className='flex items-center mb-4'>
+                    <div className='w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3'>
+                      <span className='text-white font-bold text-sm'>M</span>
+                    </div>
+                    <h4 className='text-lg font-semibold text-blue-800'>Mission</h4>
+                  </div>
+                  <p className='text-blue-700 leading-relaxed'>{selectedProgram.mission}</p>
+                </div>
+
+                {/* Vision */}
+                <div className='bg-green-50 p-6 rounded-xl border border-green-100'>
+                  <div className='flex items-center mb-4'>
+                    <div className='w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-3'>
+                      <span className='text-white font-bold text-sm'>V</span>
+                    </div>
+                    <h4 className='text-lg font-semibold text-green-800'>Vision</h4>
+                  </div>
+                  <p className='text-green-700 leading-relaxed'>{selectedProgram.vision}</p>
+                </div>
+
+                {/* Values */}
+                <div className='bg-purple-50 p-6 rounded-xl border border-purple-100'>
+                  <div className='flex items-center mb-4'>
+                    <div className='w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mr-3'>
+                      <span className='text-white font-bold text-sm'>V</span>
+                    </div>
+                    <h4 className='text-lg font-semibold text-purple-800'>Values</h4>
+                  </div>
+                  <p className='text-purple-700 leading-relaxed'>{selectedProgram.values}</p>
+                </div>
+              </div>
+
+              {/* Additional Information */}
+              <div className='mt-8 bg-yellow-50 p-6 rounded-xl border border-yellow-100'>
+                <h4 className='text-lg font-semibold text-yellow-800 mb-3'>Additional Information</h4>
+                <p className='text-yellow-700'>
+                  For more detailed information about admission requirements, curriculum, and career prospects,
+                  please contact our admissions office or visit the program's dedicated page.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
