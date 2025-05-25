@@ -334,37 +334,121 @@ export default function ResearchPage() {
   };
 
   const handleDownloadTemplates = () => {
-    // Create and trigger download of research templates
+    // Comprehensive research templates with advanced design and content
     const templates = [
       {
-        name: "Research_Proposal_Template.txt",
-        url: "/templates/Research_Proposal_Template.txt"
+        name: "README_Templates_Guide.md",
+        url: "/templates/README_Templates_Guide.md",
+        description: "Complete guide on how to use all research templates"
       },
       {
-        name: "Research_Paper_Template.txt",
-        url: "/templates/Research_Paper_Template.txt"
+        name: "Research_Proposal_Template.md",
+        url: "/templates/Research_Proposal_Template.md",
+        description: "Comprehensive research proposal format with detailed sections"
       },
       {
-        name: "Presentation_Template.txt",
-        url: "/templates/Presentation_Template.txt"
+        name: "Research_Paper_Template.md",
+        url: "/templates/Research_Paper_Template.md",
+        description: "Complete academic paper structure with APA formatting"
+      },
+      {
+        name: "Research_Presentation_Template.md",
+        url: "/templates/Research_Presentation_Template.md",
+        description: "Professional presentation template with slide-by-slide guide"
+      },
+      {
+        name: "Literature_Review_Template.md",
+        url: "/templates/Literature_Review_Template.md",
+        description: "Systematic literature review template with methodology"
+      },
+      {
+        name: "Data_Collection_Template.md",
+        url: "/templates/Data_Collection_Template.md",
+        description: "Survey, interview, and focus group templates with ethics"
       }
     ];
 
-    // Download each template file
+    // Show loading state
+    const originalText = document.querySelector('[data-download-btn]')?.textContent;
+    const downloadBtn = document.querySelector('[data-download-btn]');
+    if (downloadBtn) {
+      downloadBtn.textContent = 'Downloading...';
+      downloadBtn.disabled = true;
+    }
+
+    // Download each template file with improved error handling
+    let downloadCount = 0;
+    const totalTemplates = templates.length;
+
     templates.forEach((template, index) => {
       setTimeout(() => {
-        const link = document.createElement('a');
-        link.href = template.url;
-        link.download = template.name;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }, index * 500); // Stagger downloads by 500ms
-    });
+        try {
+          const link = document.createElement('a');
+          link.href = template.url;
+          link.download = template.name;
+          link.style.display = 'none';
 
-    // Show success message
-    alert("Templates download started. Please check your downloads folder.");
+          // Add additional attributes for better browser compatibility
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          downloadCount++;
+
+          // Show progress
+          console.log(`Downloaded: ${template.name} (${downloadCount}/${totalTemplates})`);
+
+          // Reset button state after all downloads
+          if (downloadCount === totalTemplates) {
+            setTimeout(() => {
+              if (downloadBtn) {
+                downloadBtn.textContent = originalText || 'Download Templates';
+                downloadBtn.disabled = false;
+              }
+
+              // Show detailed success message
+              const successMessage = `
+✅ Successfully downloaded ${totalTemplates} research templates:
+
+📖 Templates Guide - Complete usage instructions
+📋 Research Proposal Template - Complete proposal structure
+📄 Research Paper Template - Academic paper format
+🎯 Presentation Template - Professional slides guide
+📚 Literature Review Template - Systematic review format
+📊 Data Collection Template - Surveys & interviews
+
+All templates include:
+• Professional formatting guidelines
+• Step-by-step instructions
+• Quality checklists
+• APA citation examples
+• Ethical considerations
+• Academic integrity guidelines
+
+📌 Start with the Templates Guide for instructions!
+Check your Downloads folder for all files.
+              `;
+
+              alert(successMessage);
+            }, 1000);
+          }
+
+        } catch (error) {
+          console.error(`Error downloading ${template.name}:`, error);
+
+          // Reset button on error
+          if (downloadBtn) {
+            downloadBtn.textContent = originalText || 'Download Templates';
+            downloadBtn.disabled = false;
+          }
+
+          alert(`Error downloading ${template.name}. Please try again or contact support.`);
+        }
+      }, index * 800); // Stagger downloads by 800ms for better reliability
+    });
   };
 
   const handleExploreFunding = () => {
@@ -1215,7 +1299,8 @@ export default function ResearchPage() {
               </p>
               <button
                 onClick={handleDownloadTemplates}
-                className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors cursor-pointer'
+                data-download-btn
+                className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
               >
                 {t("Download_Templates")}{" "}
                 <Download

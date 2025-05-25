@@ -52,7 +52,6 @@ export default function CoursesPage() {
   // Modal states for Featured Academic Programs
   const [showProgramModal, setShowProgramModal] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
-  const [showContactModal, setShowContactModal] = useState(false);
 
   const { t, language, direction } = useLanguage();
 
@@ -218,28 +217,7 @@ export default function CoursesPage() {
     setSelectedProgram(null);
   };
 
-  // Handler functions for modal buttons
-  const handleContactAdmissions = () => {
-    setShowContactModal(true);
-  };
 
-  const closeContactModal = () => {
-    setShowContactModal(false);
-  };
-
-  const copyContactInfo = () => {
-    const contactText = `Email: admissions@kufe.edu.af\nPhone: +93 (0) 30 222 0000\nProgram: ${selectedProgram?.title}`;
-
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(contactText).then(() => {
-        alert('Contact information copied to clipboard!');
-      }).catch(() => {
-        alert('Contact information:\n' + contactText);
-      });
-    } else {
-      alert('Contact information:\n' + contactText);
-    }
-  };
 
   // Handler functions for hero section buttons
   const handleBrowseCourses = () => {
@@ -421,74 +399,83 @@ Generated on: ${new Date().toLocaleDateString()}
   const handleDownloadBrochure = () => {
     if (!selectedProgram) return;
 
-    // Map program titles to brochure file names
+    // Show loading state
+    const downloadBtn = document.querySelector('[data-brochure-btn]');
+    const originalText = downloadBtn?.textContent;
+    if (downloadBtn) {
+      downloadBtn.textContent = 'Downloading...';
+      downloadBtn.disabled = true;
+    }
+
+    // Map program titles to brochure file names (updated to .md files)
     const brochureFiles = {
-      "Bachelor in Economics": "/brochures/Bachelor_in_Economics_Brochure.txt",
-      "Master in Finance": "/brochures/Master_in_Finance_Brochure.txt",
-      "Business Administration": "/brochures/Business_Administration_Brochure.txt"
+      "Bachelor in Economics": "/brochures/Bachelor_in_Economics_Brochure.md",
+      "Master in Finance": "/brochures/Master_in_Finance_Brochure.md",
+      "Business Administration": "/brochures/Business_Administration_Brochure.md"
     };
 
     const brochureUrl = brochureFiles[selectedProgram.title];
 
     if (brochureUrl) {
-      // Download the pre-created brochure file
-      const link = document.createElement('a');
-      link.href = brochureUrl;
-      link.download = `${selectedProgram.title.replace(/\s+/g, '_')}_Brochure.txt`;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        // Download the comprehensive brochure file
+        const link = document.createElement('a');
+        link.href = brochureUrl;
+        link.download = `${selectedProgram.title.replace(/\s+/g, '_')}_Brochure.md`;
+        link.style.display = 'none';
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
 
-      // Show success message
-      alert(`${selectedProgram.title} brochure downloaded successfully!`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Reset button and show success message
+        setTimeout(() => {
+          if (downloadBtn) {
+            downloadBtn.textContent = originalText || 'Download Brochure';
+            downloadBtn.disabled = false;
+          }
+
+          const successMessage = `
+✅ ${selectedProgram.title} Brochure Downloaded Successfully!
+
+📋 Your comprehensive program brochure includes:
+• Complete program overview and curriculum
+• Mission, Vision, and Values
+• Career opportunities and salary information
+• Admission requirements and deadlines
+• Faculty profiles and expertise
+• Facilities and resources
+• Financial aid and scholarship options
+• Contact information and important dates
+
+📁 Check your Downloads folder for the file.
+📧 For questions, contact: admissions@kufe.edu.af
+          `;
+
+          alert(successMessage);
+        }, 1000);
+
+      } catch (error) {
+        console.error('Error downloading brochure:', error);
+
+        // Reset button on error
+        if (downloadBtn) {
+          downloadBtn.textContent = originalText || 'Download Brochure';
+          downloadBtn.disabled = false;
+        }
+
+        alert(`Error downloading brochure. Please try again or contact support at admissions@kufe.edu.af`);
+      }
     } else {
-      // Fallback: create dynamic brochure if file not found
-      const brochureContent = `
-FACULTY OF ECONOMICS - KANDAHAR UNIVERSITY
-${selectedProgram.title.toUpperCase()} PROGRAM BROCHURE
+      // Reset button if no file found
+      if (downloadBtn) {
+        downloadBtn.textContent = originalText || 'Download Brochure';
+        downloadBtn.disabled = false;
+      }
 
-PROGRAM OVERVIEW
-${selectedProgram.description}
-
-PROGRAM DETAILS
-Duration: ${selectedProgram.duration}
-Total Credits: ${selectedProgram.credits}
-
-CAREER OPPORTUNITIES
-${selectedProgram.title === "Bachelor in Economics" ?
-  "• Economic Analyst\n• Financial Consultant\n• Policy Researcher\n• Banking Professional" :
-  selectedProgram.title === "Master in Finance" ?
-  "• Investment Manager\n• Financial Analyst\n• Risk Manager\n• Corporate Finance Specialist" :
-  "• Business Manager\n• Operations Director\n• Entrepreneur\n• Management Consultant"
-}
-
-ADMISSION REQUIREMENTS
-• High school diploma or equivalent
-• Entrance examination
-• English proficiency test
-• Personal statement
-
-CONTACT INFORMATION
-Faculty of Economics, Kandahar University
-Email: admissions@kufe.edu.af
-Phone: +93 (0) 30 222 0000
-
-Generated on: ${new Date().toLocaleDateString()}
-`;
-
-      const blob = new Blob([brochureContent], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${selectedProgram.title.replace(/\s+/g, '_')}_Brochure.txt`;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      alert(`${selectedProgram.title} brochure downloaded successfully!`);
+      alert(`Brochure for ${selectedProgram.title} is not available. Please contact admissions@kufe.edu.af for more information.`);
     }
   };
 
@@ -1084,185 +1071,195 @@ Generated on: ${new Date().toLocaleDateString()}
       <Modal
         isOpen={showProgramModal}
         onClose={closeProgramModal}
-        title={selectedProgram?.title || "Program Details"}
+        title=""
         size="lg"
       >
         {selectedProgram && (
-          <div className="space-y-6">
-            <div className="flex items-center mb-4">
-              <div className="bg-gradient-to-r from-[#004B87] to-[#1D3D6F] p-3 rounded-lg mr-4">
-                {selectedProgram.icon}
+          <div className="space-y-8">
+            {/* Enhanced Header Section */}
+            <div className="relative bg-gradient-to-br from-[#004B87] via-[#1D3D6F] to-[#2C4F85] rounded-2xl p-8 text-white overflow-hidden">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#F4B400] rounded-full -translate-y-16 translate-x-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#F4B400] rounded-full translate-y-12 -translate-x-12"></div>
               </div>
-              <div>
-                <h3 className="text-2xl font-bold text-[#1D3D6F]">{selectedProgram.title}</h3>
-                <p className="text-gray-500">Academic Program</p>
+
+              <div className="relative z-10 flex items-center">
+                <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl mr-6 border border-white/30">
+                  <div className="text-[#F4B400] text-4xl">
+                    {selectedProgram.icon}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold mb-2">{selectedProgram.title}</h3>
+                  <p className="text-white/80 text-lg">Faculty of Economics • Kandahar University</p>
+                  <div className="flex items-center mt-3 space-x-6">
+                    <div className="flex items-center">
+                      <Clock className="h-5 w-5 mr-2 text-[#F4B400]" />
+                      <span className="text-white/90">{selectedProgram.duration}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Award className="h-5 w-5 mr-2 text-[#F4B400]" />
+                      <span className="text-white/90">{selectedProgram.credits}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-3">Program Description</h4>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700 leading-relaxed">{selectedProgram.description}</p>
-              </div>
+            {/* Program Overview */}
+            <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-100">
+              <h4 className="text-2xl font-bold text-[#004B87] mb-4 flex items-center">
+                <BookOpen className="h-6 w-6 mr-3 text-[#F4B400]" />
+                Program Overview
+              </h4>
+              <p className="text-gray-700 leading-relaxed text-lg">{selectedProgram.description}</p>
             </div>
 
+            {/* Key Information Grid */}
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h5 className="font-medium text-[#1D3D6F] mb-2">Duration</h5>
-                <p className="text-gray-700">{selectedProgram.duration}</p>
+              <div className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-[#004B87] hover:shadow-xl transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="bg-[#004B87] p-3 rounded-lg mr-4">
+                    <Clock className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h5 className="text-xl font-bold text-[#004B87]">Program Duration</h5>
+                    <p className="text-gray-600">Complete your degree in</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-[#F4B400]">{selectedProgram.duration}</p>
               </div>
-              <div className="bg-green-50 p-4 rounded-lg">
-                <h5 className="font-medium text-[#1D3D6F] mb-2">Total Credits</h5>
-                <p className="text-gray-700">{selectedProgram.credits}</p>
+
+              <div className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-[#F4B400] hover:shadow-xl transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="bg-[#F4B400] p-3 rounded-lg mr-4">
+                    <Award className="h-6 w-6 text-[#004B87]" />
+                  </div>
+                  <div>
+                    <h5 className="text-xl font-bold text-[#004B87]">Credit Hours</h5>
+                    <p className="text-gray-600">Total academic credits</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-[#004B87]">{selectedProgram.credits}</p>
               </div>
             </div>
 
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <h5 className="font-medium text-[#1D3D6F] mb-2">Career Opportunities</h5>
-              <div className="space-y-2">
+            {/* Career Opportunities Section */}
+            <div className="bg-gradient-to-br from-[#F4B400]/10 to-[#F4B400]/5 rounded-xl p-6 border border-[#F4B400]/20">
+              <h5 className="text-2xl font-bold text-[#004B87] mb-6 flex items-center">
+                <Users className="h-6 w-6 mr-3 text-[#F4B400]" />
+                Career Opportunities
+              </h5>
+              <div className="grid md:grid-cols-2 gap-4">
                 {selectedProgram.title === "Bachelor in Economics" && (
-                  <ul className="text-gray-700 space-y-1">
-                    <li>• Economic Analyst</li>
-                    <li>• Financial Consultant</li>
-                    <li>• Policy Researcher</li>
-                    <li>• Banking Professional</li>
-                  </ul>
+                  <>
+                    <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#004B87]">
+                      <h6 className="font-semibold text-[#004B87] mb-2">Government Sector</h6>
+                      <ul className="text-gray-700 space-y-1 text-sm">
+                        <li>• Economic Policy Analyst</li>
+                        <li>• Budget Analyst</li>
+                      </ul>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#F4B400]">
+                      <h6 className="font-semibold text-[#004B87] mb-2">Private Sector</h6>
+                      <ul className="text-gray-700 space-y-1 text-sm">
+                        <li>• Financial Consultant</li>
+                        <li>• Banking Professional</li>
+                      </ul>
+                    </div>
+                  </>
                 )}
                 {selectedProgram.title === "Master in Finance" && (
-                  <ul className="text-gray-700 space-y-1">
-                    <li>• Investment Manager</li>
-                    <li>• Financial Analyst</li>
-                    <li>• Risk Manager</li>
-                    <li>• Corporate Finance Specialist</li>
-                  </ul>
+                  <>
+                    <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#004B87]">
+                      <h6 className="font-semibold text-[#004B87] mb-2">Investment Management</h6>
+                      <ul className="text-gray-700 space-y-1 text-sm">
+                        <li>• Investment Manager</li>
+                        <li>• Portfolio Manager</li>
+                      </ul>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#F4B400]">
+                      <h6 className="font-semibold text-[#004B87] mb-2">Corporate Finance</h6>
+                      <ul className="text-gray-700 space-y-1 text-sm">
+                        <li>• Financial Analyst</li>
+                        <li>• Risk Manager</li>
+                      </ul>
+                    </div>
+                  </>
                 )}
                 {selectedProgram.title === "Business Administration" && (
-                  <ul className="text-gray-700 space-y-1">
-                    <li>• Business Manager</li>
-                    <li>• Operations Director</li>
-                    <li>• Entrepreneur</li>
-                    <li>• Management Consultant</li>
-                  </ul>
+                  <>
+                    <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#004B87]">
+                      <h6 className="font-semibold text-[#004B87] mb-2">Management</h6>
+                      <ul className="text-gray-700 space-y-1 text-sm">
+                        <li>• Business Manager</li>
+                        <li>• Operations Director</li>
+                      </ul>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#F4B400]">
+                      <h6 className="font-semibold text-[#004B87] mb-2">Entrepreneurship</h6>
+                      <ul className="text-gray-700 space-y-1 text-sm">
+                        <li>• Entrepreneur</li>
+                        <li>• Management Consultant</li>
+                      </ul>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
 
-            <div className="bg-[#1D3D6F] text-white p-4 rounded-lg">
-              <h5 className="font-medium mb-2">Admission Requirements</h5>
-              <ul className="text-sm space-y-1">
-                <li>• High school diploma or equivalent</li>
-                <li>• Entrance examination</li>
-                <li>• English proficiency test</li>
-                <li>• Personal statement</li>
-              </ul>
-            </div>
+            {/* Admission Requirements Section */}
+            <div className="bg-gradient-to-br from-[#004B87] to-[#1D3D6F] text-white rounded-xl p-6 relative overflow-hidden">
+              {/* Background decoration */}
+              <div className="absolute top-0 right-0 w-20 h-20 bg-[#F4B400] rounded-full opacity-20 -translate-y-10 translate-x-10"></div>
 
-            <div className="bg-[#F7B500] text-[#1D3D6F] p-4 rounded-lg">
-              <h5 className="font-medium mb-2">Ready to Apply?</h5>
-              <p className="text-sm mb-3">
-                Contact our admissions office for more information about this program and application procedures.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={handleContactAdmissions}
-                  className="bg-[#1D3D6F] text-white px-3 py-1 rounded text-sm hover:bg-[#2C4F85] transition-colors cursor-pointer"
-                >
-                  Contact Admissions
-                </button>
-                <button
-                  onClick={handleDownloadBrochure}
-                  className="bg-white text-[#1D3D6F] px-3 py-1 rounded text-sm border border-[#1D3D6F] hover:bg-gray-50 transition-colors cursor-pointer"
-                >
-                  Download Brochure
-                </button>
+              <div className="relative z-10">
+                <h5 className="text-2xl font-bold mb-6 flex items-center">
+                  <CheckCircle2 className="h-6 w-6 mr-3 text-[#F4B400]" />
+                  Admission Requirements
+                </h5>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center bg-white/10 p-3 rounded-lg backdrop-blur-sm">
+                      <div className="bg-[#F4B400] p-2 rounded-full mr-3">
+                        <GraduationCap className="h-4 w-4 text-[#004B87]" />
+                      </div>
+                      <span className="text-white/90">High school diploma or equivalent</span>
+                    </div>
+                    <div className="flex items-center bg-white/10 p-3 rounded-lg backdrop-blur-sm">
+                      <div className="bg-[#F4B400] p-2 rounded-full mr-3">
+                        <FileText className="h-4 w-4 text-[#004B87]" />
+                      </div>
+                      <span className="text-white/90">Entrance examination</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center bg-white/10 p-3 rounded-lg backdrop-blur-sm">
+                      <div className="bg-[#F4B400] p-2 rounded-full mr-3">
+                        <BookOpen className="h-4 w-4 text-[#004B87]" />
+                      </div>
+                      <span className="text-white/90">English proficiency test</span>
+                    </div>
+                    <div className="flex items-center bg-white/10 p-3 rounded-lg backdrop-blur-sm">
+                      <div className="bg-[#F4B400] p-2 rounded-full mr-3">
+                        <User className="h-4 w-4 text-[#004B87]" />
+                      </div>
+                      <span className="text-white/90">Personal statement</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+
+
+
+
           </div>
         )}
       </Modal>
 
-      {/* Contact Admissions Modal */}
-      <Modal
-        isOpen={showContactModal}
-        onClose={closeContactModal}
-        title="Contact Admissions Office"
-        size="md"
-      >
-        <div className="space-y-6">
-          <div className="bg-[#1D3D6F] text-white p-4 rounded-lg">
-            <h3 className="text-lg font-medium mb-2">Program Inquiry</h3>
-            <p className="text-sm">{selectedProgram?.title || 'Academic Program'}</p>
-          </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center p-3 bg-blue-50 rounded-lg">
-              <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                📧
-              </div>
-              <div>
-                <p className="font-medium text-gray-800">Email</p>
-                <p className="text-blue-600">admissions@kufe.edu.af</p>
-              </div>
-            </div>
-
-            <div className="flex items-center p-3 bg-green-50 rounded-lg">
-              <div className="bg-green-100 p-2 rounded-lg mr-3">
-                📞
-              </div>
-              <div>
-                <p className="font-medium text-gray-800">Phone</p>
-                <p className="text-green-600">+93 (0) 30 222 0000</p>
-              </div>
-            </div>
-
-            <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
-              <div className="bg-yellow-100 p-2 rounded-lg mr-3">
-                📍
-              </div>
-              <div>
-                <p className="font-medium text-gray-800">Address</p>
-                <p className="text-gray-600">University Road, Kandahar, Afghanistan</p>
-              </div>
-            </div>
-
-            <div className="flex items-center p-3 bg-purple-50 rounded-lg">
-              <div className="bg-purple-100 p-2 rounded-lg mr-3">
-                🕒
-              </div>
-              <div>
-                <p className="font-medium text-gray-800">Office Hours</p>
-                <p className="text-gray-600">Sunday-Thursday, 8:00 AM - 4:00 PM</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h4 className="font-medium text-gray-800 mb-2">Information Available</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Application procedures and deadlines</li>
-              <li>• Admission requirements</li>
-              <li>• Tuition fees and financial aid options</li>
-              <li>• Course curriculum details</li>
-              <li>• Career support services</li>
-            </ul>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={copyContactInfo}
-              className="flex-1 bg-[#1D3D6F] text-white px-4 py-2 rounded-lg hover:bg-[#2C4F85] transition-colors"
-            >
-              Copy Contact Info
-            </button>
-            <button
-              onClick={() => window.open('mailto:admissions@kufe.edu.af?subject=Inquiry about ' + encodeURIComponent(selectedProgram?.title || 'Academic Program'), '_blank')}
-              className="flex-1 bg-[#F7B500] text-[#1D3D6F] px-4 py-2 rounded-lg hover:bg-[#F7B500]/90 transition-colors"
-            >
-              Send Email
-            </button>
-          </div>
-        </div>
-      </Modal>
 
       <Footer />
     </div>
