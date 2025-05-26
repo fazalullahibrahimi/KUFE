@@ -99,37 +99,56 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Navigation */}
-        <ul className='hidden md:flex space-x-5'>
-          {navItems.map((item) => (
-            <li
-              key={item.name}
-              className={`transition-colors ${
-                location.pathname === item.path
-                  ? "text-[#F7B500] font-medium border-b-2 border-[#F7B500]"
-                  : "text-[#E8ECEF] hover:text-[#F7B500]"
-              }`}
-            >
-              <Link to={item.path}>{item.name}</Link>
-            </li>
-          ))}
-
-          {/* Student Marks Button - Only visible to students */}
-          {isStudent && (
-            <li>
-              <Link
-                to='/studentmarks'
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
-                  location.pathname === "/studentmarks"
-                    ? "bg-[#F7B500] text-[#004B87] font-medium"
-                    : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
+        <div className='hidden md:flex items-center justify-center flex-1'>
+          <ul className='flex space-x-5 items-center'>
+            {navItems.map((item) => (
+              <li
+                key={item.name}
+                className={`transition-colors ${
+                  location.pathname === item.path
+                    ? "text-[#F7B500] font-medium border-b-2 border-[#F7B500]"
+                    : "text-[#E8ECEF] hover:text-[#F7B500]"
                 }`}
               >
-                <BookOpen size={16} />
-                <span>My Marks</span>
-              </Link>
-            </li>
-          )}
+                <Link to={item.path}>{item.name}</Link>
+              </li>
+            ))}
 
+            {/* Student Marks Button - Only visible to students */}
+            {isStudent && (
+              <li>
+                <Link
+                  to='/studentmarks'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+                    location.pathname === "/studentmarks"
+                      ? "bg-[#F7B500] text-[#004B87] font-medium"
+                      : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
+                  }`}
+                >
+                  <BookOpen size={16} />
+                  <span>My Marks</span>
+                </Link>
+              </li>
+            )}
+
+            {/* Teacher Marks Button - Only visible to teachers */}
+            {isTeacher && (
+              <li>
+                <Link
+                  to='/teachermarks'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+                    location.pathname === "/teachermarks"
+                      ? "bg-[#F7B500] text-[#004B87] font-medium"
+                      : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
+                  }`}
+                >
+                  <BookOpen size={16} />
+                  <span>Upload Marks</span>
+                </Link>
+              </li>
+            )}
+          </ul>
+        </div>
           {/* Teacher Marks Button - Only visible to teachers */}
           {isTeacher && (
             <li>

@@ -21,7 +21,7 @@ import Footer from "../components/Footer";
 import { useLanguage } from "../contexts/LanguageContext";
 
 function AboutPage() {
-  const { t, language } = useLanguage();
+  const { t, language, direction } = useLanguage();
   const [departments, setDepartments] = useState([]);
   const [studentCount, setStudentCount] = useState(1200);
   const [facultyMemberCount, setFacultyMemberCount] = useState(45);
@@ -222,22 +222,26 @@ function AboutPage() {
   // Department icon mapping
   const getDepartmentIcon = (departmentName) => {
     const iconMap = {
-      'Economics': <BookOpen className='h-8 w-8 text-[#F7B500]' />,
-      'Business Administration': <Users className='h-8 w-8 text-[#F7B500]' />,
-      'Finance': <Award className='h-8 w-8 text-[#F7B500]' />,
-      'Statistics': <Calendar className='h-8 w-8 text-[#F7B500]' />,
-      'Management': <Users className='h-8 w-8 text-[#F7B500]' />,
-      'Accounting': <BookOpen className='h-8 w-8 text-[#F7B500]' />,
-      'Marketing': <Award className='h-8 w-8 text-[#F7B500]' />,
-      'Banking': <Calendar className='h-8 w-8 text-[#F7B500]' />,
+      Economics: <BookOpen className='h-8 w-8 text-[#F7B500]' />,
+      "Business Administration": <Users className='h-8 w-8 text-[#F7B500]' />,
+      Finance: <Award className='h-8 w-8 text-[#F7B500]' />,
+      Statistics: <Calendar className='h-8 w-8 text-[#F7B500]' />,
+      Management: <Users className='h-8 w-8 text-[#F7B500]' />,
+      Accounting: <BookOpen className='h-8 w-8 text-[#F7B500]' />,
+      Marketing: <Award className='h-8 w-8 text-[#F7B500]' />,
+      Banking: <Calendar className='h-8 w-8 text-[#F7B500]' />,
     };
 
     // Find matching icon or return default
-    const matchedKey = Object.keys(iconMap).find(key =>
+    const matchedKey = Object.keys(iconMap).find((key) =>
       departmentName.toLowerCase().includes(key.toLowerCase())
     );
 
-    return matchedKey ? iconMap[matchedKey] : <BookOpen className='h-8 w-8 text-[#F7B500]' />;
+    return matchedKey ? (
+      iconMap[matchedKey]
+    ) : (
+      <BookOpen className='h-8 w-8 text-[#F7B500]' />
+    );
   };
 
   // Department handlers
@@ -251,17 +255,8 @@ function AboutPage() {
     setSelectedDepartment(null);
   };
 
-
-
-  // Determine text direction based on language
-  const isRTL = language === "dr" || language === "ps";
-  const textDirection = isRTL ? "rtl" : "ltr";
-
   return (
-    <div
-      className={`min-h-screen bg-[#F9F9F9] ${textDirection}`}
-      dir={textDirection}
-    >
+    <div className={`min-h-screen bg-[#F9F9F9]`} dir={direction}>
       <Navbar />
 
       {/* Hero Section */}
@@ -282,10 +277,10 @@ function AboutPage() {
           <div className='flex items-center text-sm text-white/70'>
             <a href='/' className='hover:text-white flex items-center'>
               <Home className='h-3.5 w-3.5 mr-1' />
-              <span>Home</span>
+              <span>{t("Home")}</span>
             </a>
             <ChevronRight className='h-3.5 w-3.5 mx-2' />
-            <span className='text-white'>About Us</span>
+            <span className='text-white'>{t("about.page_title")}</span>
           </div>
         </div>
 
@@ -293,12 +288,11 @@ function AboutPage() {
           <div className='flex flex-col md:flex-row justify-between items-center'>
             <div className='max-w-2xl mb-10 md:mb-0'>
               <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 text-white'>
-                About <span className='text-[#F7B500]'>Our Faculty</span>
+                {t("about.page_title")}{" "}
+                <span className='text-[#F7B500]'>{t("about.faculty")}</span>
               </h1>
               <p className='mt-4 text-white/90 text-lg md:text-xl leading-relaxed'>
-                {t(
-                  "Learn about the Faculty of Economics at Kandahar University, our mission, vision, and commitment to academic excellence."
-                )}
+                {t("about.hero_description")}
               </p>
 
               <div className='mt-8 flex flex-wrap gap-4'>
@@ -306,13 +300,13 @@ function AboutPage() {
                   href='#mission'
                   className='px-6 py-3 bg-[#F7B500] text-[#1D3D6F] font-bold rounded-lg hover:bg-[#F7B500]/90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                 >
-                  {t("Our Mission")}
+                  {t("about.our_mission")}
                 </a>
                 <a
                   href='#contact'
                   className='px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/20 transition border border-white/20'
                 >
-                  {t("Contact Us")}
+                  {t("about.contact_us")}
                 </a>
               </div>
             </div>
@@ -322,27 +316,31 @@ function AboutPage() {
               <div className='relative bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20'>
                 <h3 className='text-xl font-bold mb-4 flex items-center'>
                   <Search className='h-5 w-5 mr-2' />
-                  {t("Quick Facts")}
+                  {t("about.quick_facts")}
                 </h3>
                 <div className='space-y-4'>
                   <div className='flex justify-between items-center border-b border-white/20 pb-3'>
-                    <span className='text-white/80'>{t("Established")}</span>
+                    <span className='text-white/80'>
+                      {t("about.established")}
+                    </span>
                     <span className='text-white font-semibold'>2010</span>
                   </div>
                   <div className='flex justify-between items-center border-b border-white/20 pb-3'>
-                    <span className='text-white/80'>{t("Departments")}</span>
+                    <span className='text-white/80'>
+                      {t("about.departments")}
+                    </span>
                     <span className='text-white font-semibold'>4</span>
                   </div>
                   <div className='flex justify-between items-center border-b border-white/20 pb-3'>
-                    <span className='text-white/80'>{t("Programs")}</span>
+                    <span className='text-white/80'>{t("about.programs")}</span>
                     <span className='text-white font-semibold'>
                       {academicProgramCount}
                     </span>
                   </div>
                   <div className='flex justify-between items-center'>
-                    <span className='text-white/80'>{t("Location")}</span>
+                    <span className='text-white/80'>{t("about.location")}</span>
                     <span className='text-white font-semibold'>
-                      {t("Kandahar")}
+                      {t("about.kandahar")}
                     </span>
                   </div>
                 </div>
@@ -382,12 +380,10 @@ function AboutPage() {
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
             </div>
             <h2 className='text-3xl md:text-4xl font-bold mb-6 text-[#1D3D6F]'>
-              {t("Faculty Overview")}
+              {t("about.faculty_overview")}
             </h2>
             <p className='text-gray-600 text-lg leading-relaxed'>
-              {t(
-                "The Faculty of Economics at Kandahar University is one of the leading educational institutions in Afghanistan dedicated to providing quality education in economics, finance, business management, and statistics. Established in 2002, our faculty has been committed to academic excellence and preparing students for successful careers in the economic and business sectors."
-              )}
+              {t("about.faculty_overview_text")}
             </p>
           </div>
         </section>
@@ -408,22 +404,22 @@ function AboutPage() {
           >
             {[
               {
-                label: t("Students"),
+                label: t("about.students"),
                 value: studentCount,
                 icon: <Users className='h-6 w-6 text-[#F7B500]' />,
               },
               {
-                label: t("Faculty"),
+                label: t("about.faculty"),
                 value: facultyMemberCount,
                 icon: <BookOpen className='h-6 w-6 text-[#F7B500]' />,
               },
               {
-                label: t("Programs"),
+                label: t("about.programs"),
                 value: academicProgramCount,
                 icon: <Award className='h-6 w-6 text-[#F7B500]' />,
               },
               {
-                label: t("Research Papers"),
+                label: t("about.research_papers"),
                 value: researchPaperCount,
                 icon: <Calendar className='h-6 w-6 text-[#F7B500]' />,
               },
@@ -475,60 +471,46 @@ function AboutPage() {
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
             </div>
             <h2 className='text-3xl md:text-4xl font-bold mb-6 text-[#1D3D6F]'>
-              {t("Mission, Vision & Values")}
+              {t("about.mission_vision_values")}
             </h2>
             <p className='text-gray-600 text-lg'>
-              {t(
-                "Our guiding principles shape our approach to education, research, and community engagement."
-              )}
+              {t("about.guiding_principles")}
             </p>
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
             {[
               {
-                title: t("Our Mission"),
+                title: t("about.our_mission"),
                 icon: <BookOpen className='h-8 w-8 text-[#F7B500]' />,
-                content: t(
-                  "To provide high-quality education in economics and business disciplines, conduct impactful research, and contribute to the economic development of Afghanistan through knowledge creation and dissemination."
-                ),
+                content: t("about.mission_text"),
               },
               {
-                title: t("Our Vision"),
+                title: t("about.our_vision"),
                 icon: <Award className='h-8 w-8 text-[#F7B500]' />,
-                content: t(
-                  "To be recognized as a center of excellence in economics education and research in Afghanistan and the region, producing graduates who are innovative, ethical, and capable of addressing complex economic challenges."
-                ),
+                content: t("about.vision_text"),
               },
               {
-                title: t("Our Values"),
+                title: t("about.our_values"),
                 icon: <Users className='h-8 w-8 text-[#F7B500]' />,
                 content: (
                   <ul className='space-y-3'>
                     {[
                       {
-                        title: t("Academic Excellence"),
-                        description: t(
-                          "We are committed to maintaining high standards in teaching, learning, and research."
-                        ),
+                        title: t("about.academic_excellence"),
+                        description: t("about.academic_excellence_text"),
                       },
                       {
-                        title: t("Integrity"),
-                        description: t(
-                          "We uphold ethical principles and promote honesty and transparency in all our activities."
-                        ),
+                        title: t("about.integrity"),
+                        description: t("about.integrity_text"),
                       },
                       {
-                        title: t("Innovation"),
-                        description: t(
-                          "We encourage creative thinking and innovative approaches to economic challenges."
-                        ),
+                        title: t("about.innovation"),
+                        description: t("about.innovation_text"),
                       },
                       {
-                        title: t("Inclusivity"),
-                        description: t(
-                          "We value diversity and provide equal opportunities for all students and staff."
-                        ),
+                        title: t("about.inclusivity"),
+                        description: t("about.inclusivity_text"),
                       },
                     ].map((value, index) => (
                       <li key={index} className='flex items-start'>
@@ -598,7 +580,7 @@ function AboutPage() {
             <div className='grid grid-cols-1 md:grid-cols-3'>
               <div className='bg-gradient-to-br from-[#1D3D6F] to-[#0F2A5C] p-8 text-white'>
                 <h3 className='text-2xl font-bold mb-8'>
-                  {t("Dean's Message")}
+                  {t("about.deans_message")}
                 </h3>
                 <div className='mb-8'>
                   <div className='w-40 h-40 rounded-full bg-white/10 backdrop-blur-sm border-4 border-[#F7B500] mx-auto flex items-center justify-center text-5xl font-bold text-white relative overflow-hidden'>
@@ -608,26 +590,20 @@ function AboutPage() {
                 </div>
                 <div className='text-center'>
                   <h4 className='text-xl font-semibold'>
-                    {t("Dr. Ahmad Ahmadi")}
+                    {t("about.dean_name")}
                   </h4>
-                  <p className='text-white/80 mt-1'>
-                    {t("Dean, Faculty of Economics")}
-                  </p>
+                  <p className='text-white/80 mt-1'>{t("about.dean_title")}</p>
                 </div>
               </div>
               <div className='md:col-span-2 p-8'>
                 <p className='text-gray-600 leading-relaxed mb-6 text-lg'>
-                  {t(
-                    "Welcome to the Faculty of Economics at Kandahar University. Our faculty is dedicated to providing a stimulating learning environment where students can develop their knowledge and skills in economics and business disciplines. We are committed to academic excellence, innovative research, and community engagement."
-                  )}
+                  {t("about.dean_welcome")}
                 </p>
                 <p className='text-gray-600 leading-relaxed mb-6 text-lg'>
-                  {t(
-                    "Our goal is to prepare our graduates to become future leaders who can contribute to the economic development of Afghanistan. I invite you to explore our programs and join our academic community."
-                  )}
+                  {t("about.dean_goal")}
                 </p>
                 <button className='bg-[#1D3D6F] hover:bg-[#2C4F85] text-white rounded-lg px-6 py-3 flex items-center transition-all duration-300 transform hover:scale-105'>
-                  {t("Read Full Message")}
+                  {t("about.read_full_message")}
                   <ArrowRight className='ml-2 h-4 w-4' />
                 </button>
               </div>
@@ -656,12 +632,10 @@ function AboutPage() {
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
             </div>
             <h2 className='text-3xl md:text-4xl font-bold mb-6 text-[#1D3D6F]'>
-              {t("Our Departments")}
+              {t("about.our_departments")}
             </h2>
             <p className='text-gray-600 text-lg'>
-              {t(
-                "Explore our specialized departments offering comprehensive education in various fields of economics and business."
-              )}
+              {t("about.departments_description")}
             </p>
           </div>
 
@@ -706,22 +680,24 @@ function AboutPage() {
                     <h4 className='text-xl font-semibold mb-3 text-[#1D3D6F]'>
                       {t(dept.name)}
                     </h4>
-                    <p className='text-gray-600 mb-4 line-clamp-3'>{t(dept.description)}</p>
+                    <p className='text-gray-600 mb-4 line-clamp-3'>
+                      {t(dept.description)}
+                    </p>
                     <div className='flex justify-between items-center text-sm text-gray-500 mb-4'>
                       <div className='flex items-center'>
                         <Clock className='h-4 w-4 mr-1 text-[#1D3D6F]' />
-                        {t("4-Year Program")}
+                        {t("about.four_year_program")}
                       </div>
                       <div className='flex items-center'>
                         <Calendar className='h-4 w-4 mr-1 text-[#1D3D6F]' />
-                        {t("Fall & Spring Intake")}
+                        {t("about.fall_spring_intake")}
                       </div>
                     </div>
                     <button
                       onClick={() => handleReadMore(dept)}
                       className='inline-flex items-center text-[#1D3D6F] font-medium hover:text-[#F7B500] transition hover:translate-x-1 duration-300 cursor-pointer'
                     >
-                      {t("Learn more")}{" "}
+                      {t("about.learn_more")}{" "}
                       <ChevronRight className='h-4 w-4 ml-1 transition-transform hover:translate-x-1' />
                     </button>
                   </div>
@@ -729,7 +705,7 @@ function AboutPage() {
               ))
             ) : (
               <div className='col-span-2 text-center py-8'>
-                <p className='text-[#1D3D6F]'>{t("No departments found.")}</p>
+                <p className='text-[#1D3D6F]'>{t("about.no_departments")}</p>
               </div>
             )}
           </div>
@@ -752,12 +728,10 @@ function AboutPage() {
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
             </div>
             <h2 className='text-3xl md:text-4xl font-bold mb-6 text-[#1D3D6F]'>
-              {t("Our History")}
+              {t("about.our_history")}
             </h2>
             <p className='text-gray-600 text-lg'>
-              {t(
-                "Tracing our journey from establishment to becoming a leading institution in economics education."
-              )}
+              {t("about.history_description")}
             </p>
           </div>
 
@@ -787,14 +761,10 @@ function AboutPage() {
                   </div>
                   <div className='md:w-2/3'>
                     <p className='text-gray-600 leading-relaxed text-lg'>
-                      {t(
-                        "The Faculty of Economics at Kandahar University was established in 2002 as part of the university's expansion efforts. Starting with just two departments and a handful of students, the faculty has grown significantly over the years."
-                      )}
+                      {t("about.history_text1")}
                     </p>
                     <p className='text-gray-600 leading-relaxed text-lg mt-4'>
-                      {t(
-                        "In 2010, we introduced our first Master's program, and by 2015, we had expanded to four specialized departments. Throughout our history, we have remained committed to providing quality education and contributing to Afghanistan's economic development through research and community engagement."
-                      )}
+                      {t("about.history_text2")}
                     </p>
                   </div>
                 </div>
@@ -820,13 +790,9 @@ function AboutPage() {
               <div className='h-0.5 w-6 bg-[#F7B500]'></div>
             </div>
             <h2 className='text-3xl md:text-4xl font-bold mb-6 text-[#1D3D6F]'>
-              {t("Contact Us")}
+              {t("about.contact_us")}
             </h2>
-            <p className='text-gray-600 text-lg'>
-              {t(
-                "Have questions or need more information? We're here to help."
-              )}
-            </p>
+            <p className='text-gray-600 text-lg'>{t("about.contact_help")}</p>
           </div>
 
           <div
@@ -839,7 +805,7 @@ function AboutPage() {
             <div className='grid grid-cols-1 md:grid-cols-2'>
               <div className='bg-gradient-to-br from-[#1D3D6F] to-[#0F2A5C] p-8 text-white'>
                 <h3 className='text-2xl md:text-3xl font-bold mb-8'>
-                  {t("Get In Touch")}
+                  {t("about.get_in_touch")}
                 </h3>
                 <div className='space-y-6'>
                   <div className='flex items-start'>
@@ -848,9 +814,7 @@ function AboutPage() {
                     </div>
                     <div className='ml-4'>
                       <p className='text-white text-lg'>
-                        {t(
-                          "Kandahar University, Faculty of Economics, Kandahar, Afghanistan"
-                        )}
+                        {t("about.university_address")}
                       </p>
                     </div>
                   </div>
@@ -873,25 +837,25 @@ function AboutPage() {
                 </div>
                 <div className='mt-8'>
                   <button className='bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-bold rounded-lg px-6 py-3 transition-all duration-300 transform hover:scale-105 flex items-center'>
-                    {t("Visit Us")}
+                    {t("about.visit_us")}
                     <ExternalLink className='ml-2 h-4 w-4' />
                   </button>
                 </div>
 
                 <div className='mt-8 pt-8 border-t border-white/20'>
                   <h4 className='text-xl font-semibold mb-4'>
-                    {t("Office Hours")}
+                    {t("about.office_hours")}
                   </h4>
                   <div className='space-y-2'>
                     <div className='flex justify-between'>
                       <span className='text-white/80'>
-                        {t("Saturday - Thursday")}
+                        {t("about.saturday_thursday")}
                       </span>
                       <span className='text-white'>8:00 AM - 4:00 PM</span>
                     </div>
                     <div className='flex justify-between'>
-                      <span className='text-white/80'>{t("Friday")}</span>
-                      <span className='text-white'>{t("Closed")}</span>
+                      <span className='text-white/80'>{t("about.friday")}</span>
+                      <span className='text-white'>{t("about.closed")}</span>
                     </div>
                   </div>
                 </div>
@@ -923,30 +887,28 @@ function AboutPage() {
               <div className='flex flex-col md:flex-row md:items-center justify-between gap-10'>
                 <div className='max-w-2xl'>
                   <h2 className='text-3xl md:text-4xl font-bold mb-4 text-white'>
-                    {t("Ready to Begin Your")}{" "}
+                    {t("about.ready_begin")}{" "}
                     <span className='text-[#F7B500]'>
-                      {t("Academic Journey")}
+                      {t("about.academic_journey")}
                     </span>
                     ?
                   </h2>
                   <p className='text-white/90 text-lg leading-relaxed mb-8'>
-                    {t(
-                      "Take the next step in your academic career. Apply now to join our programs at the Faculty of Economics and be part of a community dedicated to excellence and innovation."
-                    )}
+                    {t("about.cta_description")}
                   </p>
                   <div className='flex flex-wrap gap-4'>
                     <a
                       href='#'
                       className='px-8 py-4 bg-[#F7B500] text-[#1D3D6F] font-bold rounded-lg hover:bg-[#F7B500]/90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center'
                     >
-                      {t("Apply Now")}
+                      {t("about.apply_now")}
                       <ArrowRight className='ml-2 h-5 w-5' />
                     </a>
                     <a
                       href='#'
                       className='px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/20 transition border border-white/20 flex items-center'
                     >
-                      {t("Request Information")}
+                      {t("about.request_information")}
                       <ExternalLink className='ml-2 h-4 w-4' />
                     </a>
                   </div>
@@ -1004,8 +966,18 @@ function AboutPage() {
                   onClick={closeDepartmentModal}
                   className='p-2 hover:bg-gray-100 rounded-full transition-colors'
                 >
-                  <svg className='w-6 h-6 text-gray-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                  <svg
+                    className='w-6 h-6 text-gray-500'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M6 18L18 6M6 6l12 12'
+                    />
                   </svg>
                 </button>
               </div>
@@ -1013,7 +985,9 @@ function AboutPage() {
 
             <div className='p-6'>
               <div className='mb-6'>
-                <h3 className='text-lg font-semibold text-[#1D3D6F] mb-3'>Department Overview</h3>
+                <h3 className='text-lg font-semibold text-[#1D3D6F] mb-3'>
+                  {t("about.department_overview")}
+                </h3>
                 <p className='text-gray-600 leading-relaxed'>
                   {t(selectedDepartment.description)}
                 </p>
@@ -1027,10 +1001,13 @@ function AboutPage() {
                     <div className='w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3'>
                       <span className='text-white font-bold text-sm'>M</span>
                     </div>
-                    <h4 className='text-lg font-semibold text-blue-800'>Mission</h4>
+                    <h4 className='text-lg font-semibold text-blue-800'>
+                      {t("about.mission")}
+                    </h4>
                   </div>
                   <p className='text-blue-700 leading-relaxed'>
-                    {selectedDepartment.mission || "Mission statement not available"}
+                    {selectedDepartment.mission ||
+                      t("about.mission_not_available")}
                   </p>
                 </div>
 
@@ -1040,10 +1017,13 @@ function AboutPage() {
                     <div className='w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-3'>
                       <span className='text-white font-bold text-sm'>V</span>
                     </div>
-                    <h4 className='text-lg font-semibold text-green-800'>Vision</h4>
+                    <h4 className='text-lg font-semibold text-green-800'>
+                      {t("about.vision")}
+                    </h4>
                   </div>
                   <p className='text-green-700 leading-relaxed'>
-                    {selectedDepartment.vision || "Vision statement not available"}
+                    {selectedDepartment.vision ||
+                      t("about.vision_not_available")}
                   </p>
                 </div>
 
@@ -1053,10 +1033,13 @@ function AboutPage() {
                     <div className='w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mr-3'>
                       <span className='text-white font-bold text-sm'>V</span>
                     </div>
-                    <h4 className='text-lg font-semibold text-purple-800'>Values</h4>
+                    <h4 className='text-lg font-semibold text-purple-800'>
+                      {t("about.values")}
+                    </h4>
                   </div>
                   <p className='text-purple-700 leading-relaxed'>
-                    {selectedDepartment.values || "Values statement not available"}
+                    {selectedDepartment.values ||
+                      t("about.values_not_available")}
                   </p>
                 </div>
               </div>
@@ -1065,50 +1048,61 @@ function AboutPage() {
                 <div className='bg-blue-50 p-4 rounded-lg'>
                   <h4 className='font-semibold text-[#1D3D6F] mb-2 flex items-center'>
                     <Clock className='h-5 w-5 mr-2 text-[#F7B500]' />
-                    Program Duration
+                    {t("about.program_duration")}
                   </h4>
-                  <p className='text-gray-600'>4-Year Bachelor's Degree Program</p>
+                  <p className='text-gray-600'>
+                    {t("about.four_year_bachelor")}
+                  </p>
                 </div>
 
                 <div className='bg-green-50 p-4 rounded-lg'>
                   <h4 className='font-semibold text-[#1D3D6F] mb-2 flex items-center'>
                     <Calendar className='h-5 w-5 mr-2 text-[#F7B500]' />
-                    Intake Periods
+                    {t("about.intake_periods")}
                   </h4>
-                  <p className='text-gray-600'>Fall & Spring Semesters</p>
+                  <p className='text-gray-600'>
+                    {t("about.fall_spring_semesters")}
+                  </p>
                 </div>
 
                 <div className='bg-yellow-50 p-4 rounded-lg'>
                   <h4 className='font-semibold text-[#1D3D6F] mb-2 flex items-center'>
                     <Users className='h-5 w-5 mr-2 text-[#F7B500]' />
-                    Faculty Members
+                    {t("about.faculty_members")}
                   </h4>
-                  <p className='text-gray-600'>Experienced Professors & Lecturers</p>
+                  <p className='text-gray-600'>
+                    {t("about.experienced_professors")}
+                  </p>
                 </div>
 
                 <div className='bg-purple-50 p-4 rounded-lg'>
                   <h4 className='font-semibold text-[#1D3D6F] mb-2 flex items-center'>
                     <Award className='h-5 w-5 mr-2 text-[#F7B500]' />
-                    Degree Type
+                    {t("about.degree_type")}
                   </h4>
-                  <p className='text-gray-600'>Bachelor of Science (B.S.)</p>
+                  <p className='text-gray-600'>{t("about.bachelor_science")}</p>
                 </div>
               </div>
 
               <div className='mb-6'>
-                <h3 className='text-lg font-semibold text-[#1D3D6F] mb-3'>Career Opportunities</h3>
+                <h3 className='text-lg font-semibold text-[#1D3D6F] mb-3'>
+                  {t("about.career_opportunities")}
+                </h3>
                 <div className='grid md:grid-cols-2 gap-3'>
                   {[
-                    'Government Economic Analyst',
-                    'Financial Consultant',
-                    'Business Development Manager',
-                    'Research Analyst',
-                    'Banking Professional',
-                    'Investment Advisor',
-                    'Policy Researcher',
-                    'Corporate Finance Specialist'
+                    t("about.government_analyst"),
+                    t("about.financial_consultant"),
+                    t("about.business_manager"),
+                    t("about.research_analyst"),
+                    t("about.banking_professional"),
+                    t("about.investment_advisor"),
+                    t("about.policy_researcher"),
+                    t("about.finance_specialist"),
                   ].map((career, index) => (
-                    <div key={index} className='flex items-center p-2 bg-gray-50 rounded-lg'>
+                    <div
+                      key={index}
+                      className='flex items-center p-2 bg-gray-50 rounded-lg'
+                    >
                       <ChevronRight className='h-4 w-4 text-[#F7B500] mr-2' />
                       <span className='text-gray-700'>{career}</span>
                     </div>
@@ -1117,33 +1111,45 @@ function AboutPage() {
               </div>
 
               <div className='mb-6'>
-                <h3 className='text-lg font-semibold text-[#1D3D6F] mb-3'>Key Features</h3>
+                <h3 className='text-lg font-semibold text-[#1D3D6F] mb-3'>
+                  {t("about.key_features")}
+                </h3>
                 <div className='space-y-3'>
                   <div className='flex items-start'>
                     <BookOpen className='h-5 w-5 text-[#F7B500] mr-3 mt-0.5' />
                     <div>
-                      <h4 className='font-medium text-gray-800'>Comprehensive Curriculum</h4>
-                      <p className='text-gray-600 text-sm'>Modern curriculum designed to meet industry standards</p>
+                      <h4 className='font-medium text-gray-800'>
+                        {t("about.comprehensive_curriculum")}
+                      </h4>
+                      <p className='text-gray-600 text-sm'>
+                        {t("about.modern_curriculum")}
+                      </p>
                     </div>
                   </div>
                   <div className='flex items-start'>
                     <Users className='h-5 w-5 text-[#F7B500] mr-3 mt-0.5' />
                     <div>
-                      <h4 className='font-medium text-gray-800'>Expert Faculty</h4>
-                      <p className='text-gray-600 text-sm'>Learn from experienced professors and industry professionals</p>
+                      <h4 className='font-medium text-gray-800'>
+                        {t("about.expert_faculty")}
+                      </h4>
+                      <p className='text-gray-600 text-sm'>
+                        {t("about.learn_from_experts")}
+                      </p>
                     </div>
                   </div>
                   <div className='flex items-start'>
                     <Award className='h-5 w-5 text-[#F7B500] mr-3 mt-0.5' />
                     <div>
-                      <h4 className='font-medium text-gray-800'>Research Opportunities</h4>
-                      <p className='text-gray-600 text-sm'>Engage in cutting-edge research projects and publications</p>
+                      <h4 className='font-medium text-gray-800'>
+                        {t("about.research_opportunities")}
+                      </h4>
+                      <p className='text-gray-600 text-sm'>
+                        {t("about.cutting_edge_research")}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
-
-
             </div>
           </div>
         </div>

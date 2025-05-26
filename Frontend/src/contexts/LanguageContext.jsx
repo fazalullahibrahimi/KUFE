@@ -126,71 +126,52 @@ export const LanguageProvider = ({ children }) => {
       return key || "";
     }
 
-    // For Pashto language, check both translation sources
-    if (language === "ps") {
-      // Check if it's a nested key with dot notation (safely)
-      if (key && typeof key === "string" && key.includes(".")) {
-        const [section, nestedKey] = key.split(".");
+    // First, always check the main translations object
+    const currentTranslations = translations[language];
 
-        // First check in psTranslations
-        if (psTranslations[section]?.[nestedKey]) {
-          return psTranslations[section][nestedKey];
+    // Check if key exists directly in the translations
+    if (currentTranslations[key]) {
+      return currentTranslations[key];
+    }
+
+    // For nested keys with dot notation, split and navigate
+    if (key && typeof key === "string" && key.includes(".")) {
+      const keyParts = key.split(".");
+      let value = currentTranslations;
+
+      for (const part of keyParts) {
+        if (value && typeof value === "object" && value[part] !== undefined) {
+          value = value[part];
+        } else {
+          value = null;
+          break;
         }
-
-        // Then check in main translations
-        return translations[language][section]?.[nestedKey] || key;
       }
 
+      if (value !== null && typeof value === "string") {
+        return value;
+      }
+    }
+
+    // Additional fallback for Pashto language
+    if (language === "ps") {
       // Check if key exists directly in psTranslations nested objects
       for (const section in psTranslations) {
         if (psTranslations[section]?.[key]) {
           return psTranslations[section][key];
         }
       }
-
-      // Check if key exists directly in the main translations
-      if (translations[language][key]) {
-        return translations[language][key];
-      }
     } else if (language === "dr") {
-      // For Dari language, check both translation sources
-      // Check if it's a nested key with dot notation (safely)
-      if (key && typeof key === "string" && key.includes(".")) {
-        const [section, nestedKey] = key.split(".");
-
-        // First check in drTranslations
-        if (drTranslations.dr?.[section]?.[nestedKey]) {
-          return drTranslations.dr[section][nestedKey];
-        }
-
-        // Then check in main translations
-        return translations[language][section]?.[nestedKey] || key;
-      }
-
-      // Check if key exists directly in drTranslations
+      // Additional fallback for Dari language
       if (drTranslations.dr?.[key]) {
         return drTranslations.dr[key];
-      }
-
-      // Check if key exists directly in the main translations
-      if (translations[language][key]) {
-        return translations[language][key];
-      }
-    } else {
-      // For other languages, use the standard approach
-      // Check if it's a nested key with dot notation (safely)
-      if (key && typeof key === "string" && key.includes(".")) {
-        const [section, nestedKey] = key.split(".");
-        return translations[language][section]?.[nestedKey] || key;
-      }
-
-      // Check if key exists directly in the translations
-      if (translations[language][key]) {
-        return translations[language][key];
       }
     }
 
     // Return the key itself if no translation found
+    console.warn(
+      `Translation not found for key: "${key}" in language: "${language}"`
+    );
     return key;
   };
 

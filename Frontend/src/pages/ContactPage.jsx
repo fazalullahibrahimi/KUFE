@@ -47,7 +47,7 @@ const useElementOnScreen = (options) => {
 };
 
 function ContactPage() {
-  const { t, language, isRTL } = useLanguage();
+  const { t, direction } = useLanguage();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -268,27 +268,36 @@ function ContactPage() {
   }, [formSubmitted]);
 
   return (
-    <div className='min-h-screen bg-gradient-to-b from-[#E8ECEF] to-white'>
+    <div
+      className='min-h-screen bg-gradient-to-b from-[#E8ECEF] to-white'
+      dir={direction}
+    >
       <Navbar />
 
       {/* Hero Section with Enhanced Design */}
       <div
         ref={heroRef}
-        className={`pt-16 relative bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white overflow-hidden
+        className={`pt-16 relative bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white
           ${heroVisible ? "opacity-100 animate-fade-in-down" : "opacity-0"}`}
         style={{
           animationDelay: "0.2s",
           transition: "opacity 0.5s ease-in-out",
+          minHeight: "100vh",
+          height: "100vh",
+          position: "relative",
         }}
       >
-        {/* Decorative Elements */}
-        <div className='absolute top-0 left-0 w-full h-full overflow-hidden'>
+        {/* Static Decorative Elements - never change with language */}
+        <div
+          className='absolute top-0 left-0 w-full h-full overflow-hidden'
+          dir='ltr'
+        >
           <div className='absolute top-10 left-10 w-32 h-32 bg-[#F7B500]/10 rounded-full blur-3xl'></div>
           <div className='absolute bottom-10 right-10 w-64 h-64 bg-[#1D3D6F]/20 rounded-full blur-3xl'></div>
           <div className='absolute top-1/2 left-1/4 w-40 h-40 bg-white/5 rounded-full blur-xl'></div>
 
-          {/* Background Pattern */}
-          <div className='absolute inset-0 opacity-5'>
+          {/* Static Background Pattern - never changes */}
+          <div className='absolute inset-0 opacity-5' dir='ltr'>
             <div
               className='absolute inset-0'
               style={{
@@ -300,19 +309,17 @@ function ContactPage() {
           </div>
         </div>
 
-        <div className='container mx-auto px-4 py-16 md:py-24 relative z-10'>
+        <div className='container mx-auto px-4 py-16 md:py-24 relative z-10 flex items-center h-full'>
           <div className='max-w-3xl'>
             <div className='inline-flex items-center px-3 py-1 rounded-full bg-[#F7B500]/20 text-[#F7B500] text-sm font-medium mb-6'>
               <span className='mr-2'>•</span>
-              <span>Faculty of Economics</span>
+              <span>{t("contact.faculty_of_economics")}</span>
             </div>
             <h1 className='text-4xl md:text-6xl font-bold tracking-tight mb-4 text-white'>
-              Get in Touch
+              {t("contact.get_in_touch")}
             </h1>
             <p className='mt-4 text-white/80 text-lg md:text-xl max-w-2xl leading-relaxed'>
-              We're here to answer your questions about the Faculty of Economics
-              at Kandahar University. Reach out to us for information about
-              programs, admissions, or general inquiries.
+              {t("contact.hero_description")}
             </p>
 
             <div className='mt-8 flex flex-wrap gap-4'>
@@ -320,26 +327,41 @@ function ContactPage() {
                 href='#contact-form'
                 className='inline-flex items-center px-6 py-3 bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-[#F7B500]/30 transform hover:-translate-y-1'
               >
-                Send a Message
+                {t("contact.send_message")}
                 <ChevronRight className='ml-2 h-4 w-4' />
               </a>
               <a
                 href='#map'
                 className='inline-flex items-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg transition-all duration-300 backdrop-blur-sm'
               >
-                View on Map
+                {t("contact.view_on_map")}
                 <MapPin className='ml-2 h-4 w-4' />
               </a>
             </div>
           </div>
         </div>
 
-        {/* Decorative wave */}
-        <div className='absolute bottom-0 left-0 right-0 h-16 overflow-hidden'>
+        {/* Decorative wave - ALWAYS VISIBLE */}
+        <div
+          className='absolute bottom-0 left-0 w-full h-20 z-20'
+          style={{
+            bottom: "0px",
+            left: "0px",
+            right: "0px",
+            position: "absolute",
+            overflow: "visible",
+          }}
+        >
           <svg
             viewBox='0 0 1200 120'
             preserveAspectRatio='none'
-            className='absolute bottom-0 left-0 w-full h-full text-[#E8ECEF] fill-current'
+            className='w-full h-full'
+            style={{
+              display: "block",
+              width: "100%",
+              height: "100%",
+              fill: "#E8ECEF",
+            }}
           >
             <path d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C0,0,0,0,0,0z'></path>
           </svg>
@@ -369,25 +391,38 @@ function ContactPage() {
                   <div className='absolute bottom-0 left-0 w-60 h-60 bg-[#F7B500]/5 rounded-full blur-3xl -z-10'></div>
 
                   <h2 className='text-2xl font-bold mb-8 text-[#1D3D6F] border-b pb-4 border-[#E8ECEF] flex items-center'>
-                    <Send className='mr-3 h-5 w-5 text-[#F7B500]' />
-                    Send us a message
+                    <Send
+                      className={
+                        direction === "rtl"
+                          ? "ml-3 h-5 w-5 text-[#F7B500]"
+                          : "mr-3 h-5 w-5 text-[#F7B500]"
+                      }
+                    />
+                    {t("contact.send_us_message")}
                   </h2>
 
                   {error && (
                     <div className='mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg animate-fade-in flex items-start'>
-                      <AlertCircle className='h-5 w-5 mr-3 mt-0.5 flex-shrink-0' />
+                      <AlertCircle
+                        className={
+                          direction === "rtl"
+                            ? "h-5 w-5 ml-3 mt-0.5 flex-shrink-0"
+                            : "h-5 w-5 mr-3 mt-0.5 flex-shrink-0"
+                        }
+                      />
                       <div>
-                        <p className='font-medium'>Error: {error}</p>
+                        <p className='font-medium'>
+                          {t("contact.error")}: {error}
+                        </p>
                         <p className='text-sm mt-1'>
-                          Please try again or contact support if the issue
-                          persists.
+                          {t("contact.error_description")}
                         </p>
                         {error.includes("fetch departments") && (
                           <button
                             onClick={retryFetchDepartments}
                             className='mt-2 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-800 rounded-md text-sm font-medium transition-colors'
                           >
-                            Retry Loading Departments
+                            {t("contact.retry_departments")}
                           </button>
                         )}
                       </div>
@@ -400,10 +435,10 @@ function ContactPage() {
                         <CheckCircle className='h-8 w-8' />
                       </div>
                       <h3 className='text-xl font-medium text-[#1D3D6F] mb-2'>
-                        Thank you! Your message has been sent successfully.
+                        {t("contact.thank_you")}
                       </h3>
                       <p className='text-[#1D3D6F]/70'>
-                        We'll get back to you as soon as possible.
+                        {t("contact.response_message")}
                       </p>
                     </div>
                   ) : (
@@ -414,8 +449,16 @@ function ContactPage() {
                             htmlFor='name'
                             className='text-[#1D3D6F] font-medium flex items-center'
                           >
-                            Full Name{" "}
-                            <span className='text-red-500 ml-1'>*</span>
+                            {t("contact.full_name")}{" "}
+                            <span
+                              className={
+                                direction === "rtl"
+                                  ? "text-red-500 mr-1"
+                                  : "text-red-500 ml-1"
+                              }
+                            >
+                              *
+                            </span>
                           </Label>
                           <Input
                             id='name'
@@ -424,7 +467,7 @@ function ContactPage() {
                             onChange={handleInputChange}
                             required
                             className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20 transition-all duration-300 group-hover:border-[#1D3D6F]/50'
-                            placeholder='Enter your full name'
+                            placeholder={t("contact.placeholder_name")}
                           />
                         </div>
                         <div className='space-y-3 group'>
@@ -432,8 +475,16 @@ function ContactPage() {
                             htmlFor='email'
                             className='text-[#1D3D6F] font-medium flex items-center'
                           >
-                            Email Address{" "}
-                            <span className='text-red-500 ml-1'>*</span>
+                            {t("contact.email_address")}{" "}
+                            <span
+                              className={
+                                direction === "rtl"
+                                  ? "text-red-500 mr-1"
+                                  : "text-red-500 ml-1"
+                              }
+                            >
+                              *
+                            </span>
                           </Label>
                           <Input
                             id='email'
@@ -443,7 +494,7 @@ function ContactPage() {
                             onChange={handleInputChange}
                             required
                             className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20 transition-all duration-300 group-hover:border-[#1D3D6F]/50'
-                            placeholder='Enter your email address'
+                            placeholder={t("contact.placeholder_email")}
                           />
                         </div>
                       </div>
@@ -454,7 +505,16 @@ function ContactPage() {
                             htmlFor='subject'
                             className='text-[#1D3D6F] font-medium flex items-center'
                           >
-                            Subject <span className='text-red-500 ml-1'>*</span>
+                            {t("contact.subject")}{" "}
+                            <span
+                              className={
+                                direction === "rtl"
+                                  ? "text-red-500 mr-1"
+                                  : "text-red-500 ml-1"
+                              }
+                            >
+                              *
+                            </span>
                           </Label>
                           <Input
                             id='subject'
@@ -463,7 +523,7 @@ function ContactPage() {
                             onChange={handleInputChange}
                             required
                             className='border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20 transition-all duration-300 group-hover:border-[#1D3D6F]/50'
-                            placeholder='Enter message subject'
+                            placeholder={t("contact.placeholder_subject")}
                           />
                         </div>
 
@@ -472,7 +532,7 @@ function ContactPage() {
                             htmlFor='department_id'
                             className='text-[#1D3D6F] font-medium'
                           >
-                            Department
+                            {t("contact.department")}
                           </Label>
 
                           {/* Department Select Component */}
@@ -484,7 +544,9 @@ function ContactPage() {
                               onChange={handleDepartmentChange}
                               className='w-full px-3 py-2 border border-[#E8ECEF] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D3D6F]/20 focus:border-[#1D3D6F] transition-all duration-300 bg-white'
                             >
-                              <option value=''>Select Department</option>
+                              <option value=''>
+                                {t("contact.select_department")}
+                              </option>
                               {departments.map((dept) => (
                                 <option key={dept._id} value={dept._id}>
                                   {dept.name}
@@ -511,7 +573,7 @@ function ContactPage() {
 
                           {selectedDepartmentName && (
                             <p className='text-xs text-green-600 mt-1'>
-                              Selected: {selectedDepartmentName}
+                              {t("contact.selected")}: {selectedDepartmentName}
                             </p>
                           )}
                         </div>
@@ -522,8 +584,16 @@ function ContactPage() {
                           htmlFor='message'
                           className='text-[#1D3D6F] font-medium flex items-center'
                         >
-                          Your Message{" "}
-                          <span className='text-red-500 ml-1'>*</span>
+                          {t("contact.your_message")}{" "}
+                          <span
+                            className={
+                              direction === "rtl"
+                                ? "text-red-500 mr-1"
+                                : "text-red-500 ml-1"
+                            }
+                          >
+                            *
+                          </span>
                         </Label>
                         <Textarea
                           id='message'
@@ -532,7 +602,7 @@ function ContactPage() {
                           onChange={handleInputChange}
                           required
                           className='min-h-[180px] border-[#E8ECEF] rounded-lg focus:border-[#1D3D6F] focus:ring focus:ring-[#1D3D6F]/20 transition-all duration-300 group-hover:border-[#1D3D6F]/50'
-                          placeholder='Write your message here...'
+                          placeholder={t("contact.placeholder_message")}
                         />
                       </div>
 
@@ -564,12 +634,18 @@ function ContactPage() {
                                   d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
                                 ></path>
                               </svg>
-                              Sending...
+                              {t("contact.sending")}
                             </>
                           ) : (
                             <>
-                              <Send className='mr-2 h-4 w-4' />
-                              Send Message
+                              <Send
+                                className={
+                                  direction === "rtl"
+                                    ? "ml-2 h-4 w-4"
+                                    : "mr-2 h-4 w-4"
+                                }
+                              />
+                              {t("contact.send_message_btn")}
                             </>
                           )}
                         </Button>
@@ -600,8 +676,14 @@ function ContactPage() {
                   <div className='absolute bottom-0 left-0 w-60 h-60 bg-white/5 rounded-full blur-3xl'></div>
 
                   <h2 className='text-2xl font-bold mb-8 border-b border-[#2C4F85]/50 pb-4 flex items-center'>
-                    <Mail className='mr-3 h-5 w-5 text-[#F7B500]' />
-                    Contact Information
+                    <Mail
+                      className={
+                        direction === "rtl"
+                          ? "ml-3 h-5 w-5 text-[#F7B500]"
+                          : "mr-3 h-5 w-5 text-[#F7B500]"
+                      }
+                    />
+                    {t("contact.contact_information")}
                   </h2>
 
                   <div className='space-y-8 relative z-10'>
@@ -609,13 +691,12 @@ function ContactPage() {
                       <div className='flex-shrink-0 mt-1 bg-[#2C4F85] p-3 rounded-lg shadow-lg group-hover:bg-[#F7B500] group-hover:text-[#1D3D6F] transition-all duration-300'>
                         <MapPin className='h-5 w-5 text-[#F7B500] group-hover:text-[#1D3D6F]' />
                       </div>
-                      <div className='ml-4'>
+                      <div className={direction === "rtl" ? "mr-4" : "ml-4"}>
                         <h3 className='text-[#F7B500] font-medium mb-1'>
-                          Our Location
+                          {t("contact.our_location")}
                         </h3>
                         <p className='text-white/90'>
-                          Kandahar University, Faculty of Economics, Kandahar,
-                          Afghanistan
+                          {t("contact.university_address")}
                         </p>
                       </div>
                     </div>
@@ -624,13 +705,13 @@ function ContactPage() {
                       <div className='flex-shrink-0 mt-1 bg-[#2C4F85] p-3 rounded-lg shadow-lg group-hover:bg-[#F7B500] group-hover:text-[#1D3D6F] transition-all duration-300'>
                         <Phone className='h-5 w-5 text-[#F7B500] group-hover:text-[#1D3D6F]' />
                       </div>
-                      <div className='ml-4'>
+                      <div className={direction === "rtl" ? "mr-4" : "ml-4"}>
                         <h3 className='text-[#F7B500] font-medium mb-1'>
-                          Phone Number
+                          {t("contact.phone_number")}
                         </h3>
                         <p className='text-white/90'>+93 70 000 0000</p>
                         <p className='text-white/70 text-sm mt-1'>
-                          Monday to Thursday, 8am to 4pm
+                          {t("contact.phone_hours")}
                         </p>
                       </div>
                     </div>
@@ -639,13 +720,13 @@ function ContactPage() {
                       <div className='flex-shrink-0 mt-1 bg-[#2C4F85] p-3 rounded-lg shadow-lg group-hover:bg-[#F7B500] group-hover:text-[#1D3D6F] transition-all duration-300'>
                         <Mail className='h-5 w-5 text-[#F7B500] group-hover:text-[#1D3D6F]' />
                       </div>
-                      <div className='ml-4'>
+                      <div className={direction === "rtl" ? "mr-4" : "ml-4"}>
                         <h3 className='text-[#F7B500] font-medium mb-1'>
-                          Email Address
+                          {t("contact.email_address_label")}
                         </h3>
                         <p className='text-white/90'>info@kufe.edu.af</p>
                         <p className='text-white/70 text-sm mt-1'>
-                          We'll respond as soon as possible
+                          {t("contact.email_response")}
                         </p>
                       </div>
                     </div>
@@ -653,34 +734,58 @@ function ContactPage() {
 
                   <div className='mt-10 relative z-10'>
                     <h3 className='text-xl font-semibold mb-6 text-white flex items-center'>
-                      <Clock className='mr-3 h-5 w-5 text-[#F7B500]' />
-                      Office Hours
+                      <Clock
+                        className={
+                          direction === "rtl"
+                            ? "ml-3 h-5 w-5 text-[#F7B500]"
+                            : "mr-3 h-5 w-5 text-[#F7B500]"
+                        }
+                      />
+                      {t("contact.office_hours")}
                     </h3>
                     <div className='space-y-4 text-white'>
                       <div className='flex items-center bg-[#2C4F85]/50 backdrop-blur-sm p-4 rounded-lg hover:bg-[#2C4F85]/70 transition-colors duration-300 group'>
-                        <div className='p-2 bg-[#F7B500]/20 rounded-lg mr-3'>
+                        <div
+                          className={
+                            direction === "rtl"
+                              ? "p-2 bg-[#F7B500]/20 rounded-lg ml-3"
+                              : "p-2 bg-[#F7B500]/20 rounded-lg mr-3"
+                          }
+                        >
                           <Clock className='h-5 w-5 text-[#F7B500]' />
                         </div>
-                        <span>Monday - Thursday: 8:00 AM - 4:00 PM</span>
+                        <span>{t("contact.monday_thursday")}</span>
                       </div>
                       <div className='flex items-center bg-[#2C4F85]/50 backdrop-blur-sm p-4 rounded-lg hover:bg-[#2C4F85]/70 transition-colors duration-300 group'>
-                        <div className='p-2 bg-[#F7B500]/20 rounded-lg mr-3'>
+                        <div
+                          className={
+                            direction === "rtl"
+                              ? "p-2 bg-[#F7B500]/20 rounded-lg ml-3"
+                              : "p-2 bg-[#F7B500]/20 rounded-lg mr-3"
+                          }
+                        >
                           <Clock className='h-5 w-5 text-[#F7B500]' />
                         </div>
-                        <span>Friday: Closed</span>
+                        <span>{t("contact.friday")}</span>
                       </div>
                       <div className='flex items-center bg-[#2C4F85]/50 backdrop-blur-sm p-4 rounded-lg hover:bg-[#2C4F85]/70 transition-colors duration-300 group'>
-                        <div className='p-2 bg-[#F7B500]/20 rounded-lg mr-3'>
+                        <div
+                          className={
+                            direction === "rtl"
+                              ? "p-2 bg-[#F7B500]/20 rounded-lg ml-3"
+                              : "p-2 bg-[#F7B500]/20 rounded-lg mr-3"
+                          }
+                        >
                           <Clock className='h-5 w-5 text-[#F7B500]' />
                         </div>
-                        <span>Saturday - Sunday: 8:00 AM - 12:00 PM</span>
+                        <span>{t("contact.saturday_sunday")}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className='mt-10 relative z-10'>
                     <h3 className='text-xl font-semibold mb-6 text-white'>
-                      Follow Us
+                      {t("contact.follow_us")}
                     </h3>
                     <div className='flex space-x-4'>
                       <a
@@ -773,12 +878,11 @@ function ContactPage() {
       >
         <div className='text-center mb-10'>
           <h2 className='text-3xl font-bold text-[#1D3D6F] mb-4'>
-            Find Us on the Map
+            {t("contact.find_us_map")}
           </h2>
           <div className='w-20 h-1 bg-[#F7B500] mx-auto rounded-full'></div>
           <p className='mt-4 text-[#1D3D6F]/70 max-w-2xl mx-auto'>
-            Visit the Faculty of Economics at Kandahar University. We're located
-            in the heart of Kandahar city.
+            {t("contact.map_description")}
           </p>
         </div>
 
