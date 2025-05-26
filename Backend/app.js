@@ -34,6 +34,7 @@ const semesterRoutes = require("./routes/semesterRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
 const committeeMemberRoutes = require("./routes/committeeMemberRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const qualityAssuranceRoutes = require("./routes/qualityAssuranceRoutes");
 const app = express();
 app.use("/public", express.static(path.join(__dirname, "public")));
 // Security headereventRoutess
@@ -118,6 +119,7 @@ app.use("/api/v1/semesters", semesterRoutes);
 app.use("/api/v1/subjects", subjectRoutes);
 app.use("/api/v1/committee-members", committeeMemberRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
+app.use("/api/v1/quality-assurance", qualityAssuranceRoutes);
 
 // Error handler middleware
 app.use(errorHandler);

@@ -11,11 +11,6 @@ exports.authorize = (...allowedRoles) => {
     if (!allowedRoles.includes(req.user.role)) {
       return res
         .status(403)
-    }
-
-    if (!allowedRoles.includes(req.user.role)) {
-      return res
-        .status(403)
         .json(apiResponse.error(`User role ${req.user.role} is not authorized to access this route`, 403))
     }
 

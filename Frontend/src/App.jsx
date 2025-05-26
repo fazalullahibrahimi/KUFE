@@ -26,6 +26,7 @@ import CommitteeResearchView from "./pages/CommitteeResearchView";
 import AdminResearchView from "./pages/AdminResearchView";
 import MarksManagementPage from "./pages/MarksManagementPage.jsx";
 import CommitteeMemberManagement from "./components/DataManagement/CommitteeMemberManagement.jsx";
+import QualityAssurancePage from "./pages/QualityAssurancePage.jsx";
 
 function App() {
   return (
@@ -64,6 +65,7 @@ function App() {
         <Route path='/committe' element={<CommitteeMemberManagement />} />
         <Route path='/committee-research' element={<CommitteeResearchView />} />
         <Route path='/admin-research' element={<AdminResearchView />} />
+        <Route path='/quality-assurance' element={<QualityAssurancePage />} />
       </Routes>
     </Router>
   );

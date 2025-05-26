@@ -13,6 +13,7 @@ import {
   Building,
   Layers,
   User,
+  ClipboardCheck,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FacultyDirectoryManagement from "./DataManagement/FacultyDirectoryManagement";
@@ -45,6 +46,11 @@ const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
       id: "announcements",
       label: "Announcements",
       icon: <MessageSquare size={20} />,
+    },
+    {
+      id: "qualityAssurance",
+      label: "Quality Assurance",
+      icon: <ClipboardCheck size={20} />,
     },
     { id: "analytics", label: "Analytics", icon: <BarChart size={20} /> },
     { id: "settings", label: "Settings", icon: <Settings size={20} /> },
