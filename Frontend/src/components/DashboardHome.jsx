@@ -1030,7 +1030,7 @@ const DashboardHome = () => {
         <div className="relative z-10 flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-              Faculty Of Ecconomic Analytics Dashboard
+              Faculty Of Economics Analytics Dashboard
             </h1>
             <p className="text-white/90 text-lg">Real-time insights into your complete university ecosystem</p>
             <div className="flex items-center mt-3 text-white/70">

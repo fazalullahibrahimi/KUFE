@@ -20,6 +20,7 @@ const Header = ({ toggleSidebar, activeTab, language, setLanguage }) => {
       events: "Events Management",
       news: "News Management",
       announcements: "Announcements",
+      qualityAssurance: "Quality Assurance Management",
       analytics: "Analytics",
       settings: "Settings",
     };

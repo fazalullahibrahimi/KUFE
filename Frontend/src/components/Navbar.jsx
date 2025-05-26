@@ -8,6 +8,7 @@ import {
   Globe,
   ChevronRight,
   BookOpen,
+  MessageSquare,
 } from "lucide-react";
 import Logo from "/KufeLogo.jpeg";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -145,6 +146,24 @@ const Navbar = () => {
               </Link>
             </li>
           )}
+
+          {/* Quality Assurance Button - Only visible to students */}
+          {isStudent && (
+            <li>
+              <Link
+                to='/quality-assurance'
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+                  location.pathname === "/quality-assurance"
+                    ? "bg-[#F7B500] text-[#004B87] font-medium"
+                    : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
+                }`}
+                title="Share your opinion with Quality Assurance"
+              >
+                <MessageSquare size={16} />
+                <span>QA Feedback</span>
+              </Link>
+            </li>
+          )}
         </ul>
 
         <div className='flex items-center space-x-3'>
@@ -269,6 +288,27 @@ const Navbar = () => {
                   <div className='flex items-center gap-2'>
                     <BookOpen size={18} />
                     <span>Upload Marks</span>
+                  </div>
+                  <ChevronRight className='h-4 w-4' />
+                </Link>
+              </li>
+            )}
+
+            {/* Quality Assurance Button - Only visible to students in mobile menu */}
+            {isStudent && (
+              <li>
+                <Link
+                  to='/quality-assurance'
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex justify-between items-center px-6 py-3 hover:bg-gray-50 ${
+                    location.pathname === "/quality-assurance"
+                      ? "bg-blue-50 text-[#004B87] font-medium"
+                      : "text-gray-700"
+                  }`}
+                >
+                  <div className='flex items-center gap-2'>
+                    <MessageSquare size={18} />
+                    <span>QA Feedback</span>
                   </div>
                   <ChevronRight className='h-4 w-4' />
                 </Link>
