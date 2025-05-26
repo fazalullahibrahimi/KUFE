@@ -1,4 +1,4 @@
-const Semester = require('../models/semester');
+const Semester = require('../models/Semester');
 
 // Create a new semester
 const createSemester = async (req, res) => {

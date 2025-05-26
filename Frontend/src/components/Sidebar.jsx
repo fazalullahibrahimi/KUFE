@@ -27,6 +27,7 @@ const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
     { id: "departments", label: "Departments", icon: <Layers size={20} /> },
     { id: "students", label: "Students", icon: <GraduationCap size={20} /> },
     { id: "courses", label: "Courses", icon: <BookOpen size={20} /> },
+    { id: "semesters", label: "Semesters", icon: <Calendar size={20} /> },
     {
       id: "marks",
       label: "Marks Management",

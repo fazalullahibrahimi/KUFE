@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 // import "../styles/Dashboard.css";
 import Logo from "../../public/KufeLogo.jpeg";
+import SemesterManagement from "../components/DataManagement/SemesterManagement";
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -249,6 +250,20 @@ const Dashboard = () => {
 
           <div
             className={`flex items-center px-4 py-3 ${
+              activeTab === "semesters"
+                ? "bg-white bg-opacity-20 text-sky-700 border-l-4 border-[#F4B400]"
+                : "hover:bg-white text-sky-700 hover:bg-opacity-10"
+            } cursor-pointer`}
+            onClick={() => setActiveTab("semesters")}
+          >
+            <Calendar size={20} />
+            <span className={`ml-3 ${!isSidebarOpen && "hidden"}`}>
+              Semesters
+            </span>
+          </div>
+
+          <div
+            className={`flex items-center px-4 py-3 ${
               activeTab === "marks"
                 ? "bg-white bg-opacity-20 text-sky-700 border-l-4 border-[#F4B400]"
                 : "hover:bg-white text-sky-700 hover:bg-opacity-10"
@@ -345,6 +360,7 @@ const Dashboard = () => {
               {activeTab === "faculty" && "Faculty Management"}
               {activeTab === "students" && "Student Management"}
               {activeTab === "courses" && "Course Management"}
+              {activeTab === "semesters" && "Semester Management"}
               {activeTab === "marks" && "Marks Management"}
               {activeTab === "research" && "Research Publications"}
               {activeTab === "announcements" && "Announcements"}
@@ -646,7 +662,11 @@ const Dashboard = () => {
             </div>
           )}
 
-          {activeTab !== "courses" && (
+          {activeTab === "semesters" && (
+            <SemesterManagement />
+          )}
+
+          {activeTab !== "courses" && activeTab !== "semesters" && (
             <div className='bg-white rounded-lg shadow p-6'>
               <h2 className='text-xl font-semibold text-gray-800 mb-4'>
                 {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Page

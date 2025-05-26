@@ -1,7 +1,7 @@
 const Student = require("../models/Student");
 const Department = require("../models/Department");
 const Subject = require("../models/subject");
-const Semester = require("../models/semester");
+const Semester = require("../models/Semester");
 const apiResponse = require("../utils/apiResponse");
 const asyncHandler = require("../middleware/asyncHandler");
 

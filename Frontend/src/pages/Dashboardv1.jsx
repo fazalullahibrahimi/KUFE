@@ -15,6 +15,7 @@ import DashboardHome from "../components/DashboardHome";
 import FacultyDirectoryManagement from "../components/DataManagement/FacultyDirectoryManagement";
 import CommitteeMemberManagement from "../components/DataManagement/CommitteeMemberManagement";
 import QualityAssuranceManagement from "../components/DataManagement/QualityAssuranceManagement";
+import SemesterManagement from "../components/DataManagement/SemesterManagement";
 
 const Dashboardv1 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -52,6 +53,8 @@ const Dashboardv1 = () => {
         return <CommitteeMemberManagement />;
       case "qualityAssurance":
         return <QualityAssuranceManagement />;
+      case "semesters":
+        return <SemesterManagement />;
       default:
         return <DashboardHome />;
     }
