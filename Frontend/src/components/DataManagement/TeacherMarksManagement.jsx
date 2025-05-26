@@ -10,6 +10,17 @@ import {
   AlertCircle,
   Edit,
   Trash2,
+  BookOpen,
+  Users,
+  GraduationCap,
+  BarChart3,
+  Filter,
+  Calendar,
+  User,
+  Award,
+  TrendingUp,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import Modal from "../common/Modal";
 import FormField from "../common/FormField";
@@ -1080,31 +1091,59 @@ const TeacherMarksManagement = () => {
     : "";
 
   return (
-    <div className='space-y-6'>
-      <div className='flex justify-between items-center'>
-        <h2 className='text-xl font-semibold text-gray-800'>
-          {t("marks.teacher_management")}
-        </h2>
-      </div>
+    <div className='w-full min-h-screen space-y-6'>
+      {/* Header Section */}
+      <div className='relative overflow-hidden bg-gradient-to-br from-white via-[#E8ECEF]/30 to-[#E8ECEF]/50 rounded-2xl border border-[#E8ECEF]/50 shadow-lg'>
+        {/* Background Pattern */}
+        <div className='absolute inset-0 bg-gradient-to-br from-[#1D3D6F]/5 via-transparent to-[#2C4F85]/5'></div>
+        <div className='absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#F7B500]/10 to-transparent rounded-full blur-3xl'></div>
+        <div className='absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[#2C4F85]/10 to-transparent rounded-full blur-2xl'></div>
 
-      {/* Teacher View */}
-      <div className='bg-white rounded-lg shadow p-6'>
-        <div className='bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg shadow-md mb-8'>
-          <div className='flex flex-col md:flex-row gap-6 justify-between items-start'>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 w-full md:w-auto'>
+        <div className='relative p-8'>
+          <div className='flex items-center justify-between mb-6'>
+            <div className='flex items-center space-x-4'>
+              <div className='p-3 bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] rounded-xl shadow-lg'>
+                <BookOpen className='h-8 w-8 text-white' />
+              </div>
+              <div>
+                <h2 className='text-2xl font-bold bg-gradient-to-r from-[#000000] via-[#1D3D6F] to-[#2C4F85] bg-clip-text text-transparent'>
+                  Academic Grade Management System
+                </h2>
+                <p className='text-gray-600 mt-1'>
+                  Comprehensive academic records and grade management system for
+                  students and faculty
+                </p>
+              </div>
+            </div>
+            <div className='hidden md:flex items-center space-x-2 text-[#1D3D6F]'>
+              <BarChart3 className='h-5 w-5' />
+              <span className='text-sm font-medium'>Instructor Dashboard</span>
+            </div>
+          </div>
+
+          {/* Filters Section */}
+          <div className='bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-white/50 shadow-sm'>
+            <div className='flex items-center space-x-2 mb-4'>
+              <Filter className='h-5 w-5 text-[#1D3D6F]' />
+              <h3 className='text-lg font-medium text-gray-800'>
+                Filter & Search Options
+              </h3>
+            </div>
+
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-4'>
               <div>
                 <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='w-6 h-6 bg-blue-200 rounded-full flex items-center justify-center mr-2'>
-                    <span className='text-blue-700 text-xs font-bold'>S</span>
+                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                    <Calendar className='h-4 w-4 text-[#1D3D6F]' />
                   </div>
-                  {t("marks.semester")}
+                  Academic Semester
                 </label>
                 <select
-                  className='w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#004B87] focus:border-[#004B87] transition-colors'
+                  className='w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
                   value={selectedSemester}
                   onChange={handleSemesterChange}
                 >
-                  <option value=''>{t("marks.all_semesters")}</option>
+                  <option value=''>All Semesters</option>
                   {semesters.map((semester) => (
                     <option key={semester._id} value={semester._id}>
                       {semester.name}
@@ -1114,19 +1153,17 @@ const TeacherMarksManagement = () => {
               </div>
               <div>
                 <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='w-6 h-6 bg-purple-200 rounded-full flex items-center justify-center mr-2'>
-                    <span className='text-purple-700 text-xs font-bold'>
-                      SU
-                    </span>
+                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                    <BookOpen className='h-4 w-4 text-[#2C4F85]' />
                   </div>
-                  {t("marks.subject")}
+                  Course Subject
                 </label>
                 <select
-                  className='w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#004B87] focus:border-[#004B87] transition-colors'
+                  className='w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
                   value={selectedSubject || ""}
                   onChange={handleSubjectChange}
                 >
-                  <option value=''>{t("marks.all_subjects")}</option>
+                  <option value=''>All Course Subjects</option>
                   {subjects
                     .filter((subject) => {
                       if (!selectedSemester) return true;
@@ -1146,17 +1183,17 @@ const TeacherMarksManagement = () => {
               </div>
               <div>
                 <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='w-6 h-6 bg-green-200 rounded-full flex items-center justify-center mr-2'>
-                    <span className='text-green-700 text-xs font-bold'>ST</span>
+                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                    <Users className='h-4 w-4 text-[#F7B500]' />
                   </div>
-                  {t("marks.student")}
+                  Student
                 </label>
                 <select
-                  className='w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#004B87] focus:border-[#004B87] transition-colors'
+                  className='w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
                   value={selectedStudent || ""}
                   onChange={handleStudentChange}
                 >
-                  <option value=''>{t("marks.all_students")}</option>
+                  <option value=''>All Students</option>
                   {students.map((student) => (
                     <option key={student._id} value={student._id}>
                       {student.name} ({student.student_id_number})
@@ -1164,85 +1201,122 @@ const TeacherMarksManagement = () => {
                   ))}
                 </select>
               </div>
+              <div>
+                <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
+                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                    <Search className='h-4 w-4 text-[#1D3D6F]' />
+                  </div>
+                  Search Records
+                </label>
+                <div className='relative'>
+                  <input
+                    type='text'
+                    placeholder='Search by student name, ID, or course subject...'
+                    className='w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                  />
+                  <Search
+                    className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'
+                    size={18}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className='flex flex-col gap-3 w-full md:w-auto'>
-              <div className='relative'>
-                <input
-                  type='text'
-                  placeholder={t("marks.search_placeholder")}
-                  className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#004B87] focus:border-[#004B87] transition-colors'
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
-                <Search
-                  className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'
-                  size={18}
-                />
-              </div>
-
-              <div className='flex gap-2 justify-end'>
-                <button
-                  className='flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-sm'
-                  onClick={() => setIsImportModalOpen(true)}
-                >
-                  <Upload size={18} className='mr-2' />
-                  {t("marks.import")}
-                </button>
-                <button
-                  className='flex items-center px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors shadow-sm'
-                  onClick={() => {
-                    resetMarksForm();
-                    setIsAddMarksModalOpen(true);
-                  }}
-                >
-                  <Plus size={18} className='mr-2' />
-                  {t("marks.add_marks")}
-                </button>
-              </div>
+            {/* Action Buttons */}
+            <div className='flex flex-wrap gap-3 justify-end pt-4 border-t border-gray-100'>
+              <button
+                className='flex items-center px-4 py-2 bg-gradient-to-r from-[#F7B500] to-[#F7B500]/80 text-white rounded-lg hover:from-[#F7B500]/90 hover:to-[#F7B500]/70 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                onClick={() => setIsImportModalOpen(true)}
+              >
+                <Upload size={18} className='mr-2' />
+                Import Academic Data
+              </button>
+              <button
+                className='flex items-center px-4 py-2 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                onClick={() => {
+                  resetMarksForm();
+                  setIsAddMarksModalOpen(true);
+                }}
+              >
+                <Plus size={18} className='mr-2' />
+                Add New Academic Grades
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
+      {/* Main Content */}
+      <div className='bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden'>
         {/* Subject Management Section */}
         <div className='mb-6 border-t border-gray-200 pt-6'>
-          <div className='flex justify-between items-center mb-4'>
-            <h3 className='text-lg font-medium text-gray-800'>
-              {t("subjects.manage_subjects")}
-            </h3>
+          <div className='flex justify-between items-center mb-6'>
+            <div className='flex items-center space-x-3'>
+              <div className='p-2 bg-[#E8ECEF] rounded-lg'>
+                <BookOpen className='h-5 w-5 text-[#1D3D6F]' />
+              </div>
+              <div>
+                <h3 className='text-xl font-semibold bg-gradient-to-r from-[#000000] to-[#1D3D6F] bg-clip-text text-transparent'>
+                  Course Subject Management
+                </h3>
+                <p className='text-sm text-gray-600 mt-1'>
+                  Manage academic course subjects and instructor assignments
+                </p>
+              </div>
+            </div>
             <button
-              className='flex items-center px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
+              className='flex items-center px-6 py-3 bg-gradient-to-r from-[#2C4F85] to-[#1D3D6F] text-white rounded-lg hover:from-[#1D3D6F] hover:to-[#2C4F85] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
               onClick={() => {
                 resetSubjectForm();
                 setIsAddSubjectModalOpen(true);
               }}
             >
               <Plus size={18} className='mr-2' />
-              {t("subjects.add_subject")}
+              Add New Course Subject
             </button>
           </div>
 
-          <div className='overflow-x-auto rounded-lg shadow'>
+          <div className='overflow-x-auto rounded-lg shadow-lg border border-[#E8ECEF]'>
             <table className='min-w-full divide-y divide-gray-200'>
-              <thead className='bg-gradient-to-r from-[#004B87] to-[#0063B1]'>
+              <thead className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85]'>
                 <tr>
-                  <th className='px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider'>
-                    {t("subjects.code")}
+                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
+                    <div className='flex items-center space-x-2'>
+                      <BookOpen className='h-4 w-4' />
+                      <span>Course Code</span>
+                    </div>
                   </th>
-                  <th className='px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider'>
-                    {t("subjects.name")}
+                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
+                    <div className='flex items-center space-x-2'>
+                      <GraduationCap className='h-4 w-4' />
+                      <span>Course Subject Name</span>
+                    </div>
                   </th>
-                  <th className='px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider'>
-                    {t("subjects.semester")}
+                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
+                    <div className='flex items-center space-x-2'>
+                      <Calendar className='h-4 w-4' />
+                      <span>Academic Semester</span>
+                    </div>
                   </th>
-                  <th className='px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider'>
-                    {t("subjects.teacher")}
+                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
+                    <div className='flex items-center space-x-2'>
+                      <User className='h-4 w-4' />
+                      <span>Course Instructor</span>
+                    </div>
                   </th>
-                  <th className='px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider'>
-                    {t("subjects.credit_hours")}
+                  <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
+                    <div className='flex items-center justify-center space-x-2'>
+                      <Award className='h-4 w-4' />
+                      <span>Credit Hours</span>
+                    </div>
                   </th>
-                  <th className='px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider'>
-                    {t("subjects.actions")}
+                  <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
+                    <div className='flex items-center justify-center space-x-2'>
+                      <Edit className='h-4 w-4' />
+                      <span>Management Actions</span>
+                    </div>
                   </th>
                 </tr>
               </thead>
@@ -1269,50 +1343,65 @@ const TeacherMarksManagement = () => {
                   return (
                     <tr
                       key={subject._id}
-                      className={`hover:bg-blue-50 transition-colors ${
-                        index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      className={`hover:bg-[#E8ECEF]/30 transition-all duration-200 ${
+                        index % 2 === 0 ? "bg-white" : "bg-[#E8ECEF]/10"
                       }`}
                     >
-                      <td className='px-6 py-5 whitespace-nowrap'>
-                        <div className='text-sm font-medium bg-blue-50 text-blue-800 px-3 py-1 rounded-lg inline-block'>
-                          {subject.code}
+                      <td className='px-6 py-5'>
+                        <div className='flex items-center space-x-3'>
+                          <div className='p-2 bg-[#E8ECEF] rounded-lg'>
+                            <BookOpen className='h-4 w-4 text-[#1D3D6F]' />
+                          </div>
+                          <div className='text-sm font-semibold text-[#1D3D6F] bg-[#E8ECEF]/50 px-3 py-1 rounded-lg'>
+                            {subject.code}
+                          </div>
                         </div>
                       </td>
-                      <td className='px-6 py-5 whitespace-nowrap'>
-                        <div className='text-sm font-medium text-gray-900'>
+                      <td className='px-6 py-5'>
+                        <div className='text-sm font-semibold text-gray-900'>
                           {subject.name}
                         </div>
+                        <div className='text-xs text-gray-500 mt-1'>
+                          Academic Course Subject
+                        </div>
                       </td>
-                      <td className='px-6 py-5 whitespace-nowrap'>
-                        <div className='text-sm font-medium text-gray-700 bg-purple-50 px-3 py-1 rounded-lg inline-block'>
+                      <td className='px-6 py-5'>
+                        <div className='inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#2C4F85]/10 text-[#2C4F85]'>
+                          <Calendar className='h-3 w-3 mr-1' />
                           {subject.semester_id.name}
                         </div>
                       </td>
-                      <td className='px-6 py-5 whitespace-nowrap'>
-                        <div className='text-sm font-medium text-gray-700'>
-                          {teacherName}
+                      <td className='px-6 py-5'>
+                        <div className='flex items-center space-x-2'>
+                          <div className='p-1 bg-[#F7B500]/10 rounded-full'>
+                            <User className='h-3 w-3 text-[#F7B500]' />
+                          </div>
+                          <span className='text-sm font-medium text-gray-900'>
+                            {teacherName}
+                          </span>
                         </div>
                       </td>
-                      <td className='px-6 py-5 whitespace-nowrap'>
-                        <div className='text-sm font-medium text-center bg-green-50 rounded-full w-8 h-8 flex items-center justify-center mx-auto'>
+                      <td className='px-6 py-5 text-center'>
+                        <div className='inline-flex items-center justify-center w-12 h-12 bg-[#F7B500]/10 text-[#F7B500] rounded-full text-sm font-bold'>
+                          <Award className='h-4 w-4 mr-1' />
                           {subject.credit_hours}
                         </div>
                       </td>
-                      <td className='px-6 py-5 whitespace-nowrap text-center'>
-                        <div className='flex space-x-3 justify-center'>
+                      <td className='px-6 py-5'>
+                        <div className='flex justify-center space-x-3'>
                           <button
-                            className='text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-full hover:bg-blue-100 transition-colors'
+                            className='p-2 bg-[#2C4F85]/10 text-[#2C4F85] rounded-lg hover:bg-[#2C4F85]/20 transition-all duration-200 transform hover:scale-105'
                             onClick={() => openEditSubjectModal(subject)}
-                            title={t("subjects.edit")}
+                            title='Edit Course Subject'
                           >
-                            <Edit size={18} />
+                            <Edit size={16} />
                           </button>
                           <button
-                            className='text-red-600 hover:text-red-800 bg-red-50 p-2 rounded-full hover:bg-red-100 transition-colors'
+                            className='p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all duration-200 transform hover:scale-105'
                             onClick={() => handleDeleteSubject(subject._id)}
-                            title={t("subjects.delete")}
+                            title='Delete Course Subject'
                           >
-                            <Trash2 size={18} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -1324,195 +1413,247 @@ const TeacherMarksManagement = () => {
           </div>
         </div>
 
-        {/* Marks Table */}
-        <div className='border-t border-gray-200 pt-6'>
-          <h3 className='text-lg font-medium text-gray-800 mb-4'>
-            {t("marks.student_marks")}
-            {selectedSemesterName && (
-              <span className='ml-2 text-[#004B87]'>
-                - {selectedSemesterName}
-              </span>
-            )}
-          </h3>
+        {/* Academic Records Table */}
+        <div className='border-t border-[#E8ECEF] pt-8'>
+          <div className='flex items-center justify-between mb-6'>
+            <div className='flex items-center space-x-3'>
+              <div className='p-2 bg-[#E8ECEF] rounded-lg'>
+                <BarChart3 className='h-5 w-5 text-[#1D3D6F]' />
+              </div>
+              <div>
+                <h3 className='text-xl font-semibold bg-gradient-to-r from-[#000000] to-[#1D3D6F] bg-clip-text text-transparent'>
+                  Student Academic Records
+                  {selectedSemesterName && (
+                    <span className='ml-2 text-[#2C4F85] font-normal text-lg'>
+                      - {selectedSemesterName}
+                    </span>
+                  )}
+                </h3>
+                <p className='text-sm text-gray-600 mt-1'>
+                  Comprehensive academic performance tracking and grade
+                  management
+                </p>
+              </div>
+            </div>
+          </div>
           <div className='overflow-x-auto'>
             {filteredMarks.length === 0 ? (
-              <div className='p-8 text-center'>
-                <FileText size={48} className='mx-auto text-gray-300 mb-4' />
-                <h3 className='text-lg font-medium text-gray-800 mb-2'>
-                  {t("marks.no_marks_found")}
+              <div className='p-12 text-center bg-gradient-to-br from-[#E8ECEF]/20 to-white rounded-xl border border-[#E8ECEF]'>
+                <div className='w-24 h-24 bg-[#E8ECEF] rounded-full flex items-center justify-center mx-auto mb-6'>
+                  <FileText className='h-12 w-12 text-[#1D3D6F]' />
+                </div>
+                <h3 className='text-xl font-semibold text-gray-800 mb-3'>
+                  No Academic Records Found
                 </h3>
-                <p className='text-gray-600 mb-4'>
+                <p className='text-gray-600 mb-6 max-w-md mx-auto'>
                   {searchTerm
-                    ? t("marks.no_marks_match")
-                    : t("marks.no_marks_added")}
+                    ? "No academic records match your search criteria. Please try different keywords."
+                    : "No academic grades have been recorded for this semester and subject yet."}
                 </p>
                 <button
-                  className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
+                  className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2 mx-auto'
                   onClick={() => {
                     resetMarksForm();
                     setIsAddMarksModalOpen(true);
                   }}
                 >
-                  {t("marks.add_marks")}
+                  <Plus className='h-4 w-4' />
+                  <span>Add New Academic Grades</span>
                 </button>
               </div>
             ) : (
-              <table className='min-w-full divide-y divide-gray-200 rounded-lg shadow overflow-hidden'>
-                <thead className='bg-gradient-to-r from-[#004B87] to-[#0063B1]'>
-                  <tr>
-                    <th className='px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider'>
-                      {t("marks.student")}
-                    </th>
-                    <th className='px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider'>
-                      {t("marks.subject")}
-                    </th>
-                    <th className='px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider'>
-                      {t("marks.teacher")}
-                    </th>
-                    <th className='px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider'>
-                      {t("marks.semester")}
-                    </th>
-                    <th className='px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider'>
-                      {t("marks.midterm")}
-                    </th>
-                    <th className='px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider'>
-                      {t("marks.final")}
-                    </th>
-                    <th className='px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider'>
-                      {t("marks.assignment")}
-                    </th>
-                    <th className='px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider'>
-                      {t("marks.total")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className='bg-white divide-y divide-gray-200'>
-                  {filteredMarks.map((mark, index) => {
-                    const student = getStudentById(mark.student_id);
-                    const subject = getSubjectById(mark.subject_id);
+              <div className='bg-white rounded-xl shadow-lg border border-[#E8ECEF] overflow-hidden'>
+                <table className='min-w-full divide-y divide-gray-200'>
+                  <thead className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85]'>
+                    <tr>
+                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
+                        <div className='flex items-center space-x-2'>
+                          <Users className='h-4 w-4' />
+                          <span>Student Information</span>
+                        </div>
+                      </th>
+                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
+                        <div className='flex items-center space-x-2'>
+                          <BookOpen className='h-4 w-4' />
+                          <span>Course Subject</span>
+                        </div>
+                      </th>
+                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
+                        <div className='flex items-center space-x-2'>
+                          <User className='h-4 w-4' />
+                          <span>Course Instructor</span>
+                        </div>
+                      </th>
+                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
+                        <div className='flex items-center space-x-2'>
+                          <Calendar className='h-4 w-4' />
+                          <span>Academic Semester</span>
+                        </div>
+                      </th>
+                      <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
+                        Midterm Exam
+                      </th>
+                      <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
+                        Final Exam
+                      </th>
+                      <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
+                        Assignment
+                      </th>
+                      <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
+                        <div className='flex items-center justify-center space-x-2'>
+                          <Award className='h-4 w-4' />
+                          <span>Total Grade</span>
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className='bg-white divide-y divide-gray-200'>
+                    {filteredMarks.map((mark, index) => {
+                      const student = getStudentById(mark.student_id);
+                      const subject = getSubjectById(mark.subject_id);
 
-                    let teacherName = "Not Assigned";
-                    if (subject.teacher_id) {
-                      if (
-                        typeof subject.teacher_id === "object" &&
-                        subject.teacher_id.name
-                      ) {
-                        teacherName = subject.teacher_id.name;
-                      } else {
-                        const teacher = teachers.find(
-                          (t) => t._id === subject.teacher_id
-                        );
-                        if (teacher) {
-                          teacherName = teacher.name;
+                      let teacherName = "Not Assigned";
+                      if (subject.teacher_id) {
+                        if (
+                          typeof subject.teacher_id === "object" &&
+                          subject.teacher_id.name
+                        ) {
+                          teacherName = subject.teacher_id.name;
+                        } else {
+                          const teacher = teachers.find(
+                            (t) => t._id === subject.teacher_id
+                          );
+                          if (teacher) {
+                            teacherName = teacher.name;
+                          }
                         }
                       }
-                    }
 
-                    return (
-                      <tr
-                        key={index}
-                        className={`hover:bg-blue-50 transition-colors ${
-                          index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                        }`}
-                      >
-                        <td className='px-6 py-5 whitespace-nowrap'>
-                          <div className='flex items-center'>
-                            <div className='ml-0'>
-                              <div className='text-sm font-medium text-gray-900'>
-                                {student.name}
+                      return (
+                        <tr
+                          key={index}
+                          className={`hover:bg-[#E8ECEF]/30 transition-all duration-200 ${
+                            index % 2 === 0 ? "bg-white" : "bg-[#E8ECEF]/10"
+                          }`}
+                        >
+                          <td className='px-6 py-5'>
+                            <div className='flex items-center space-x-3'>
+                              <div className='p-2 bg-[#E8ECEF] rounded-lg'>
+                                <Users className='h-4 w-4 text-[#1D3D6F]' />
                               </div>
-                              <div className='text-xs text-gray-500 mt-1'>
-                                {student.student_id_number}
+                              <div>
+                                <div className='text-sm font-semibold text-gray-900'>
+                                  {student.name}
+                                </div>
+                                <div className='text-xs text-gray-500 mt-1 font-medium'>
+                                  ID: {student.student_id_number}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className='px-6 py-5 whitespace-nowrap'>
-                          <div className='text-sm font-medium text-gray-900'>
-                            {subject.name}
-                          </div>
-                          <div className='text-xs text-gray-500 mt-1'>
-                            {subject.code}
-                          </div>
-                        </td>
-                        <td className='px-6 py-5 whitespace-nowrap'>
-                          <div className='text-sm font-medium text-gray-700 bg-blue-50 px-3 py-1 rounded-lg inline-block'>
-                            {teacherName}
-                          </div>
-                        </td>
-                        <td className='px-6 py-5 whitespace-nowrap'>
-                          <div className='text-sm font-medium text-gray-700 bg-purple-50 px-3 py-1 rounded-lg inline-block'>
-                            {mark.semester_name}
-                          </div>
-                        </td>
-                        <td className='px-6 py-5 whitespace-nowrap'>
-                          <div className='text-sm text-center font-medium'>
-                            <span className='bg-blue-50 text-blue-800 px-3 py-1 rounded-lg'>
+                          </td>
+                          <td className='px-6 py-5'>
+                            <div className='flex items-center space-x-3'>
+                              <div className='p-2 bg-[#E8ECEF] rounded-lg'>
+                                <BookOpen className='h-4 w-4 text-[#1D3D6F]' />
+                              </div>
+                              <div>
+                                <div className='text-sm font-semibold text-gray-900'>
+                                  {subject.name}
+                                </div>
+                                <div className='text-xs text-gray-500 mt-1 font-medium'>
+                                  {subject.code}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className='px-6 py-5'>
+                            <div className='flex items-center space-x-2'>
+                              <div className='p-1 bg-[#F7B500]/10 rounded-full'>
+                                <User className='h-3 w-3 text-[#F7B500]' />
+                              </div>
+                              <span className='text-sm font-medium text-gray-900 bg-[#E8ECEF]/50 px-3 py-1 rounded-lg'>
+                                {teacherName}
+                              </span>
+                            </div>
+                          </td>
+                          <td className='px-6 py-5'>
+                            <div className='inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#2C4F85]/10 text-[#2C4F85]'>
+                              <Calendar className='h-3 w-3 mr-1' />
+                              {mark.semester_name}
+                            </div>
+                          </td>
+                          <td className='px-6 py-5 text-center'>
+                            <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#2C4F85]/10 text-[#2C4F85]'>
                               {mark.midterm}
                             </span>
-                          </div>
-                        </td>
-                        <td className='px-6 py-5 whitespace-nowrap'>
-                          <div className='text-sm text-center font-medium'>
-                            <span className='bg-purple-50 text-purple-800 px-3 py-1 rounded-lg'>
+                          </td>
+                          <td className='px-6 py-5 text-center'>
+                            <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#1D3D6F]/10 text-[#1D3D6F]'>
                               {mark.final}
                             </span>
-                          </div>
-                        </td>
-                        <td className='px-6 py-5 whitespace-nowrap'>
-                          <div className='text-sm text-center font-medium'>
-                            <span className='bg-green-50 text-green-800 px-3 py-1 rounded-lg'>
+                          </td>
+                          <td className='px-6 py-5 text-center'>
+                            <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#F7B500]/10 text-[#F7B500]'>
                               {mark.assignment}
                             </span>
-                          </div>
-                        </td>
-                        <td className='px-6 py-5 whitespace-nowrap'>
-                          <div className='text-sm font-bold text-center'>
-                            <span className='bg-gray-100 text-gray-800 px-4 py-2 rounded-lg'>
-                              {mark.total}
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </td>
+                          <td className='px-6 py-5 text-center'>
+                            <div className='flex items-center justify-center'>
+                              <span className='inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-[#E8ECEF] to-[#E8ECEF]/80 text-[#1D3D6F] border border-[#E8ECEF]'>
+                                <Award className='h-4 w-4 mr-2 text-[#F7B500]' />
+                                {mark.total}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Import Marks Modal */}
+      {/* Import Academic Data Modal */}
       <Modal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
-        title={t("marks.import_marks")}
+        title='Import Academic Data'
         size='lg'
       >
         <div className='space-y-6'>
-          <div className='bg-blue-50 p-4 rounded-lg'>
+          <div className='bg-gradient-to-r from-[#E8ECEF]/50 to-[#E8ECEF]/30 p-6 rounded-xl border border-[#E8ECEF]'>
             <div className='flex items-start'>
-              <AlertCircle size={20} className='text-blue-500 mr-2 mt-0.5' />
+              <div className='p-2 bg-[#1D3D6F]/10 rounded-lg mr-4'>
+                <AlertCircle className='h-5 w-5 text-[#1D3D6F]' />
+              </div>
               <div>
-                <h4 className='text-sm font-medium text-blue-800'>
-                  {t("marks.csv_import_instructions")}
+                <h4 className='text-lg font-semibold text-[#1D3D6F] mb-2'>
+                  CSV Import Instructions
                 </h4>
-                <p className='text-sm text-blue-600'>
-                  {t("marks.csv_upload_columns")}
+                <p className='text-sm text-gray-700 leading-relaxed'>
+                  Upload a CSV file containing student academic records.
+                  Required columns: student_id, subject_id, midterm, final,
+                  assignment, remarks. Ensure all data is properly formatted
+                  before importing.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className='border border-dashed border-gray-300 rounded-lg p-6'>
+          <div className='border-2 border-dashed border-[#E8ECEF] rounded-xl p-8 bg-gradient-to-br from-white to-[#E8ECEF]/20'>
             <div className='flex flex-col items-center justify-center'>
-              <Upload size={48} className='text-gray-400 mb-4' />
-              <h3 className='text-lg font-medium text-gray-800 mb-2'>
-                {t("marks.upload_csv_file")}
+              <div className='w-16 h-16 bg-[#E8ECEF] rounded-full flex items-center justify-center mb-4'>
+                <Upload className='h-8 w-8 text-[#1D3D6F]' />
+              </div>
+              <h3 className='text-xl font-semibold text-gray-800 mb-2'>
+                Upload Academic Data File (CSV)
               </h3>
-              <p className='text-gray-500 text-sm mb-4 text-center'>
-                {t("marks.drag_drop_csv")}
+              <p className='text-gray-600 text-sm mb-6 text-center max-w-md'>
+                Drag and drop your CSV file here, or click to browse and select
+                a file containing student academic records
               </p>
               <input
                 type='file'
@@ -1522,61 +1663,63 @@ const TeacherMarksManagement = () => {
                 ref={fileInputRef}
                 onChange={handleFileUpload}
               />
-              <button
-                className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
-                onClick={() => fileInputRef.current.click()}
-              >
-                {t("marks.select_file")}
-              </button>
-              <div className='mt-4 flex items-center'>
+              <div className='flex flex-col sm:flex-row gap-3'>
                 <button
-                  className='text-[#004B87] hover:underline text-sm flex items-center'
+                  className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2'
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <Upload className='h-4 w-4' />
+                  <span>Browse Files</span>
+                </button>
+                <button
+                  className='px-6 py-3 bg-gradient-to-r from-[#F7B500] to-[#F7B500]/80 text-white rounded-lg hover:from-[#F7B500]/90 hover:to-[#F7B500]/70 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2'
                   onClick={downloadCSVTemplate}
                 >
-                  <Download size={16} className='mr-1' />
-                  {t("marks.download_template")}
+                  <Download className='h-4 w-4' />
+                  <span>Download Template</span>
                 </button>
               </div>
             </div>
           </div>
 
           {csvData && (
-            <div>
-              <h4 className='text-md font-medium text-gray-700 mb-2'>
-                {t("marks.csv_preview")}
+            <div className='bg-[#E8ECEF]/30 rounded-xl p-6 border border-[#E8ECEF]'>
+              <h4 className='text-lg font-semibold text-[#1D3D6F] mb-3 flex items-center'>
+                <FileText className='h-5 w-5 mr-2' />
+                CSV Data Preview
               </h4>
-              <div className='bg-gray-50 p-4 rounded-lg overflow-auto max-h-40'>
-                <pre className='text-xs text-gray-600'>{csvData}</pre>
+              <div className='bg-white p-4 rounded-lg overflow-auto max-h-40 border border-gray-200'>
+                <pre className='text-xs text-gray-700 font-mono'>{csvData}</pre>
               </div>
             </div>
           )}
 
-          <div className='mt-6 flex justify-end space-x-3'>
+          <div className='mt-8 flex justify-end space-x-4'>
             <button
               type='button'
-              className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
+              className='px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium'
               onClick={() => setIsImportModalOpen(false)}
             >
-              {t("marks.cancel")}
+              Cancel Operation
             </button>
             <button
               type='button'
-              className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
+              className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed'
               onClick={handleImportCSV}
               disabled={!csvData}
             >
-              <Save size={18} className='inline mr-2' />
-              {t("marks.import_marks")}
+              <Save className='h-4 w-4' />
+              <span>Import Academic Records</span>
             </button>
           </div>
         </div>
       </Modal>
 
-      {/* Add Marks Modal */}
+      {/* Add Academic Grades Modal */}
       <Modal
         isOpen={isAddMarksModalOpen}
         onClose={() => setIsAddMarksModalOpen(false)}
-        title={t("marks.add_student_marks")}
+        title='Add New Academic Grades'
       >
         <form
           onSubmit={(e) => {
@@ -1585,9 +1728,27 @@ const TeacherMarksManagement = () => {
           }}
         >
           <div className='grid grid-cols-1 gap-6'>
+            {/* Header Section */}
+            <div className='bg-gradient-to-r from-[#E8ECEF]/50 to-[#E8ECEF]/30 p-6 rounded-xl border border-[#E8ECEF]'>
+              <div className='flex items-center space-x-3'>
+                <div className='p-2 bg-[#1D3D6F]/10 rounded-lg'>
+                  <GraduationCap className='h-5 w-5 text-[#1D3D6F]' />
+                </div>
+                <div>
+                  <h4 className='text-lg font-semibold text-[#1D3D6F]'>
+                    Academic Grade Entry
+                  </h4>
+                  <p className='text-sm text-gray-600 mt-1'>
+                    Enter comprehensive academic performance data for student
+                    evaluation
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <FormField
-                label={t("marks.student")}
+                label='Student Information'
                 name='student_id'
                 type='select'
                 value={marksFormData.student_id}
@@ -1599,7 +1760,7 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label={t("marks.subject")}
+                label='Course Subject'
                 name='subject_id'
                 type='select'
                 value={marksFormData.subject_id}
@@ -1616,17 +1777,16 @@ const TeacherMarksManagement = () => {
                   }))}
                 required
               />
-              {/* Add teacher field that shows the teacher name when a subject is selected */}
               <FormField
-                label={t("marks.teacher")}
+                label='Course Instructor'
                 name='teacher_name'
                 value={marksFormData.teacher_name}
                 readOnly={true}
-                placeholder='Teacher will be shown when subject is selected'
-                className='bg-gray-50'
+                placeholder='Instructor will be shown when subject is selected'
+                className='bg-[#E8ECEF]/30'
               />
               <FormField
-                label={t("marks.assignment_marks_max_10")}
+                label='Assignment Grade (Max: 20 points)'
                 name='assignment'
                 type='number'
                 value={marksFormData.assignment}
@@ -1636,7 +1796,7 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label={t("marks.midterm_marks_max_20")}
+                label='Midterm Examination (Max: 30 points)'
                 name='midterm'
                 type='number'
                 value={marksFormData.midterm}
@@ -1646,7 +1806,7 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label={t("marks.final_exam_marks_max_70")}
+                label='Final Examination (Max: 70 points)'
                 name='final'
                 type='number'
                 value={marksFormData.final}
@@ -1657,32 +1817,26 @@ const TeacherMarksManagement = () => {
               />
 
               <FormField
-                label={t("marks.remarks")}
+                label='Academic Remarks'
                 name='remarks'
                 value={marksFormData.remarks}
                 onChange={handleMarksInputChange}
-                placeholder='Optional remarks'
+                placeholder='Optional academic performance remarks'
               />
             </div>
 
-            <div className='bg-gray-50 p-4 rounded-lg'>
-              <h4 className='text-sm font-medium text-gray-700 mb-2'>
-                {t("marks.grade_preview")}
+            {/* Grade Preview Section */}
+            <div className='bg-gradient-to-r from-[#E8ECEF]/50 to-[#E8ECEF]/30 p-6 rounded-xl border border-[#E8ECEF]'>
+              <h4 className='text-lg font-semibold text-[#1D3D6F] mb-4 flex items-center'>
+                <Award className='h-5 w-5 mr-2' />
+                Academic Grade Preview
               </h4>
-              <div className='flex items-center'>
-                <div className='w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mr-4'>
+              <div className='flex items-center space-x-6'>
+                <div className='w-20 h-20 rounded-full bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] flex items-center justify-center shadow-lg'>
                   {marksFormData.midterm &&
                   marksFormData.final &&
                   marksFormData.assignment ? (
-                    <span
-                      className={`text-xl font-bold ${getGradeColor(
-                        calculateTotalAndGrade(
-                          marksFormData.midterm,
-                          marksFormData.final,
-                          marksFormData.assignment
-                        ).grade
-                      )}`}
-                    >
+                    <span className='text-2xl font-bold text-white'>
                       {
                         calculateTotalAndGrade(
                           marksFormData.midterm,
@@ -1692,14 +1846,14 @@ const TeacherMarksManagement = () => {
                       }
                     </span>
                   ) : (
-                    <span className='text-gray-400'>N/A</span>
+                    <span className='text-white/60 text-lg'>N/A</span>
                   )}
                 </div>
                 <div>
-                  <p className='text-sm text-gray-500'>
-                    {t("marks.total_marks")}
+                  <p className='text-sm text-gray-600 font-medium'>
+                    Total Academic Score
                   </p>
-                  <p className='text-2xl font-bold text-gray-800'>
+                  <p className='text-3xl font-bold bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] bg-clip-text text-transparent'>
                     {marksFormData.midterm &&
                     marksFormData.final &&
                     marksFormData.assignment
@@ -1709,37 +1863,43 @@ const TeacherMarksManagement = () => {
                           marksFormData.assignment
                         ).total
                       : "0"}
-                    <span className='text-sm text-gray-500 ml-1'>/120</span>
+                    <span className='text-lg text-gray-500 ml-1'>/120</span>
                   </p>
+                  <div className='mt-2 flex items-center'>
+                    <TrendingUp className='h-4 w-4 text-[#F7B500] mr-1' />
+                    <span className='text-xs text-gray-600'>
+                      Academic Performance Indicator
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className='mt-6 flex justify-end space-x-3'>
+            <div className='mt-8 flex justify-end space-x-4'>
               <button
                 type='button'
-                className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
+                className='px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium'
                 onClick={() => setIsAddMarksModalOpen(false)}
               >
-                {t("marks.cancel")}
+                Cancel Operation
               </button>
               <button
                 type='submit'
-                className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
+                className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2'
               >
-                <Save size={18} className='inline mr-2' />
-                {t("marks.save_marks")}
+                <Save className='h-4 w-4' />
+                <span>Save Academic Grades</span>
               </button>
             </div>
           </div>
         </form>
       </Modal>
 
-      {/* Add Subject Modal */}
+      {/* Add Course Subject Modal */}
       <Modal
         isOpen={isAddSubjectModalOpen}
         onClose={() => setIsAddSubjectModalOpen(false)}
-        title={t("subjects.add_subject")}
+        title='Add New Course Subject'
       >
         <form
           onSubmit={(e) => {
@@ -1750,7 +1910,7 @@ const TeacherMarksManagement = () => {
           <div className='grid grid-cols-1 gap-6'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <FormField
-                label={t("subjects.name")}
+                label='Course Subject Name'
                 name='name'
                 type='text'
                 value={subjectFormData.name}
@@ -1758,7 +1918,7 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label={t("subjects.code")}
+                label='Course Subject Code'
                 name='code'
                 type='text'
                 value={subjectFormData.code}
@@ -1766,7 +1926,7 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label={t("subjects.semester")}
+                label='Academic Semester'
                 name='semester_id'
                 type='select'
                 value={subjectFormData.semester_id}
@@ -1778,13 +1938,13 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label={t("subjects.teacher")}
+                label='Course Instructor'
                 name='teacher_id'
                 type='select'
                 value={subjectFormData.teacher_id}
                 onChange={handleSubjectInputChange}
                 options={[
-                  { value: "", label: "Select Teacher" },
+                  { value: "", label: "Select Course Instructor" },
                   ...teachers.map((teacher) => ({
                     value: teacher._id,
                     label: teacher.name,
@@ -1792,7 +1952,7 @@ const TeacherMarksManagement = () => {
                 ]}
               />
               <FormField
-                label={t("subjects.credit_hours")}
+                label='Credit Hours'
                 name='credit_hours'
                 type='number'
                 value={subjectFormData.credit_hours}
@@ -1803,31 +1963,31 @@ const TeacherMarksManagement = () => {
               />
             </div>
 
-            <div className='mt-6 flex justify-end space-x-3'>
+            <div className='mt-8 flex justify-end space-x-4'>
               <button
                 type='button'
-                className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
+                className='px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium'
                 onClick={() => setIsAddSubjectModalOpen(false)}
               >
-                {t("subjects.cancel")}
+                Cancel Operation
               </button>
               <button
                 type='submit'
-                className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
+                className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2'
               >
-                <Save size={18} className='inline mr-2' />
-                {t("subjects.save_subject")}
+                <Save className='h-4 w-4' />
+                <span>Save Course Subject</span>
               </button>
             </div>
           </div>
         </form>
       </Modal>
 
-      {/* Edit Subject Modal */}
+      {/* Edit Course Subject Modal */}
       <Modal
         isOpen={isEditSubjectModalOpen}
         onClose={() => setIsEditSubjectModalOpen(false)}
-        title={t("subjects.edit_subject")}
+        title='Edit Course Subject'
       >
         <form
           onSubmit={(e) => {
@@ -1838,7 +1998,7 @@ const TeacherMarksManagement = () => {
           <div className='grid grid-cols-1 gap-6'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <FormField
-                label={t("subjects.name")}
+                label='Course Subject Name'
                 name='name'
                 type='text'
                 value={subjectFormData.name}
@@ -1846,7 +2006,7 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label={t("subjects.code")}
+                label='Course Subject Code'
                 name='code'
                 type='text'
                 value={subjectFormData.code}
@@ -1854,7 +2014,7 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label={t("subjects.semester")}
+                label='Academic Semester'
                 name='semester_id'
                 type='select'
                 value={subjectFormData.semester_id}
@@ -1866,13 +2026,13 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label={t("subjects.teacher")}
+                label='Course Instructor'
                 name='teacher_id'
                 type='select'
                 value={subjectFormData.teacher_id}
                 onChange={handleSubjectInputChange}
                 options={[
-                  { value: "", label: "Select Teacher" },
+                  { value: "", label: "Select Course Instructor" },
                   ...teachers.map((teacher) => ({
                     value: teacher._id,
                     label: teacher.name,
@@ -1880,7 +2040,7 @@ const TeacherMarksManagement = () => {
                 ]}
               />
               <FormField
-                label={t("subjects.credit_hours")}
+                label='Credit Hours'
                 name='credit_hours'
                 type='number'
                 value={subjectFormData.credit_hours}
@@ -1891,20 +2051,20 @@ const TeacherMarksManagement = () => {
               />
             </div>
 
-            <div className='mt-6 flex justify-end space-x-3'>
+            <div className='mt-8 flex justify-end space-x-4'>
               <button
                 type='button'
-                className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
+                className='px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium'
                 onClick={() => setIsEditSubjectModalOpen(false)}
               >
-                {t("subjects.cancel")}
+                Cancel Operation
               </button>
               <button
                 type='submit'
-                className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
+                className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2'
               >
-                <Save size={18} className='inline mr-2' />
-                {t("subjects.update_subject")}
+                <Save className='h-4 w-4' />
+                <span>Update Course Subject</span>
               </button>
             </div>
           </div>

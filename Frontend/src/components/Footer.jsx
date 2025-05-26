@@ -65,7 +65,7 @@ const Footer = () => {
       {/* Subtle pattern overlay */}
       <div className='absolute inset-0 opacity-5'></div>
 
-      <div className='container mx-auto px-4 py-16 relative z-10'>
+      <div className='container mx-auto px-4 pt-16 pb-8 relative z-10'>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10'>
           {/* University Info */}
           <div className='space-y-6'>
@@ -268,8 +268,8 @@ const Footer = () => {
         </div>
 
         {/* Footer Bottom */}
-        <div className='mt-16 pt-8 border-t border-white/10'>
-          <div className='flex flex-col md:flex-row justify-between items-center'>
+        <div className='mt-12 pt-6 border-t border-white/10'>
+          <div className='flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0'>
             <p className='text-[#E8ECEF] text-sm text-center md:text-left'>
               &copy; {new Date().getFullYear()} {t("kandahar_university")}{" "}
               {t("faculty_of_economics")}. {t("All rights reserved")}
@@ -277,8 +277,8 @@ const Footer = () => {
 
             <div
               className={`flex ${
-                direction === "rtl" ? "space-x-reverse space-x-6" : "space-x-6"
-              } mt-4 md:mt-0`}
+                direction === "rtl" ? "space-x-reverse space-x-4" : "space-x-4"
+              }`}
             >
               <a
                 href='/privacy'

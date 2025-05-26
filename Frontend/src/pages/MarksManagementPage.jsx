@@ -5,7 +5,6 @@ import {
   BookOpen,
   GraduationCap,
   BarChart3,
-  Sparkles,
   Trophy,
   TrendingUp,
 } from "lucide-react";
@@ -122,68 +121,77 @@ const MarksManagementPage = () => {
       </div>
 
       <main className='flex-grow bg-gradient-to-br from-[#E8ECEF] to-white relative z-10'>
-        <div className='container mx-auto px-4 py-12'>
+        <div className='w-full'>
           {/* Header Section */}
-          <div className='text-center mb-12'>
-            <div className='relative inline-block'>
-              <div className='absolute inset-0 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] rounded-2xl blur-lg opacity-75 animate-pulse'></div>
-              <div className='relative bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] p-4 rounded-2xl inline-block'>
-                <BarChart3 className='h-12 w-12 text-white' />
+          <div className='bg-gradient-to-br from-[#1D3D6F] via-[#2C4F85] to-[#1D3D6F] text-white pt-24 pb-16 px-4'>
+            <div className='max-w-4xl mx-auto text-center'>
+              <div className='relative inline-block mb-6'>
+                <div className='absolute inset-0 bg-white/20 rounded-2xl blur-lg animate-pulse'></div>
+                <div className='relative bg-white/10 backdrop-blur-sm p-4 rounded-2xl inline-block border border-white/20'>
+                  <BarChart3 className='h-12 w-12 text-white' />
+                </div>
+              </div>
+              <h1 className='text-5xl font-bold mb-4 text-white'>
+                Academic Performance Hub
+              </h1>
+              <p className='text-white/90 text-xl max-w-3xl mx-auto leading-relaxed'>
+                Comprehensive academic records and grade management system for
+                students and faculty
+              </p>
+              <div className='mt-8 flex justify-center space-x-8'>
+                <div className='flex items-center space-x-2 text-white/80'>
+                  <div className='w-2 h-2 bg-[#F7B500] rounded-full animate-pulse'></div>
+                  <span className='text-sm font-medium'>Real-time Updates</span>
+                </div>
+                <div className='flex items-center space-x-2 text-white/80'>
+                  <div className='w-2 h-2 bg-[#F7B500] rounded-full animate-pulse delay-300'></div>
+                  <span className='text-sm font-medium'>Secure Access</span>
+                </div>
+                <div className='flex items-center space-x-2 text-white/80'>
+                  <div className='w-2 h-2 bg-[#F7B500] rounded-full animate-pulse delay-700'></div>
+                  <span className='text-sm font-medium'>
+                    Professional Reports
+                  </span>
+                </div>
               </div>
             </div>
-            <h1 className='text-4xl font-bold bg-gradient-to-r from-[#000000] via-[#1D3D6F] to-[#2C4F85] bg-clip-text text-transparent mt-6 mb-4'>
-              {t("academic_performance_hub")}
-            </h1>
-            <p className='text-[#1D3D6F] text-lg max-w-2xl mx-auto'>
-              {t("comprehensive_marks_management")}
-            </p>
           </div>
 
           {/* Main Content Container */}
-          <div className='relative max-w-6xl mx-auto'>
-            {/* Glass Morphism Container */}
-            <div className='absolute inset-0 bg-white/30 backdrop-blur-2xl rounded-3xl border border-white/20'></div>
-
-            <div className='relative bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-2xl rounded-3xl border border-white/20 overflow-hidden'>
+          <div className='relative w-full -mt-8'>
+            <div className='relative bg-white rounded-t-3xl shadow-2xl border-t border-gray-100 overflow-hidden min-h-screen'>
               {/* Decorative Elements */}
               <div className='absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#1D3D6F]/10 to-transparent rounded-full blur-3xl'></div>
               <div className='absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-[#F7B500]/10 to-transparent rounded-full blur-3xl'></div>
 
               {/* Tab Navigation for Admin */}
               {userRole === "admin" && availableTabs.length > 1 && (
-                <div className='relative border-b border-white/20 bg-gradient-to-r from-white/40 to-white/20 backdrop-blur-xl'>
-                  <div className='flex p-2'>
+                <div className='relative bg-gradient-to-r from-[#E8ECEF]/30 to-[#E8ECEF]/10 border-b border-[#E8ECEF]'>
+                  <div className='flex px-6 py-4'>
                     {availableTabs.map((tab) => (
                       <button
                         key={tab.id}
                         onClick={() => handleTabChange(tab.id)}
-                        className={`group relative flex-1 mx-2 rounded-2xl transition-all duration-500 transform ${
+                        className={`group relative flex-1 mx-2 rounded-xl transition-all duration-300 transform ${
                           activeTab === tab.id ? "scale-105" : "hover:scale-102"
                         }`}
                       >
                         {/* Tab Background */}
                         <div
-                          className={`absolute inset-0 rounded-2xl transition-all duration-500 ${
+                          className={`absolute inset-0 rounded-xl transition-all duration-300 ${
                             activeTab === tab.id
-                              ? `bg-gradient-to-r ${tab.gradient}`
-                              : "bg-white/20 hover:bg-white/30"
+                              ? `bg-gradient-to-r ${tab.gradient} shadow-lg`
+                              : "bg-white/60 hover:bg-white/80 border border-[#E8ECEF]"
                           }`}
                         ></div>
 
-                        {/* Glow Effect */}
-                        {activeTab === tab.id && (
-                          <div
-                            className={`absolute inset-0 bg-gradient-to-r ${tab.gradient} rounded-2xl blur-xl opacity-50 animate-pulse`}
-                          ></div>
-                        )}
-
                         {/* Tab Content */}
-                        <div className='relative px-8 py-6 flex items-center space-x-4'>
+                        <div className='relative px-6 py-4 flex items-center space-x-3'>
                           <div
-                            className={`relative p-3 rounded-xl transition-all duration-300 ${
+                            className={`relative p-2 rounded-lg transition-all duration-300 ${
                               activeTab === tab.id
                                 ? "bg-white/20"
-                                : `bg-gradient-to-br ${tab.iconBg} group-hover:bg-[#E8ECEF]`
+                                : "bg-[#E8ECEF]"
                             }`}
                           >
                             <div
@@ -199,7 +207,7 @@ const MarksManagementPage = () => {
 
                           <div className='text-left'>
                             <div
-                              className={`font-bold text-lg transition-colors duration-300 ${
+                              className={`font-bold text-base transition-colors duration-300 ${
                                 activeTab === tab.id
                                   ? "text-white"
                                   : "text-[#1D3D6F]"
@@ -208,7 +216,7 @@ const MarksManagementPage = () => {
                               {tab.label}
                             </div>
                             <div
-                              className={`text-sm transition-colors duration-300 ${
+                              className={`text-xs transition-colors duration-300 ${
                                 activeTab === tab.id
                                   ? "text-white/80"
                                   : "text-[#2C4F85]"
@@ -218,18 +226,13 @@ const MarksManagementPage = () => {
                             </div>
                           </div>
 
-                          {/* Sparkle Effect for Active Tab */}
+                          {/* Active Tab Indicator */}
                           {activeTab === tab.id && (
-                            <div className='absolute top-2 right-2'>
-                              <Sparkles className='h-5 w-5 text-[#F7B500] animate-pulse' />
+                            <div className='absolute top-1 right-1'>
+                              <div className='w-2 h-2 bg-[#F7B500] rounded-full animate-pulse'></div>
                             </div>
                           )}
                         </div>
-
-                        {/* Active Tab Indicator */}
-                        {activeTab === tab.id && (
-                          <div className='absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-[#F7B500] rounded-full' />
-                        )}
                       </button>
                     ))}
                   </div>
@@ -238,8 +241,8 @@ const MarksManagementPage = () => {
 
               {/* Single Role Header for Non-Admin Users */}
               {userRole !== "admin" && (
-                <div className='relative border-b border-white/20 bg-gradient-to-r from-white/40 to-white/20 backdrop-blur-xl'>
-                  <div className='p-6'>
+                <div className='relative bg-gradient-to-r from-[#E8ECEF]/30 to-[#E8ECEF]/10 border-b border-[#E8ECEF]'>
+                  <div className='px-6 py-8'>
                     {availableTabs.map((tab) => (
                       <div
                         key={tab.id}
@@ -247,7 +250,7 @@ const MarksManagementPage = () => {
                       >
                         <div className='flex items-center space-x-4'>
                           <div
-                            className={`p-4 rounded-xl bg-gradient-to-r ${tab.gradient}`}
+                            className={`p-3 rounded-xl bg-gradient-to-r ${tab.gradient} shadow-lg`}
                           >
                             <div className='text-white'>{tab.icon}</div>
                           </div>
@@ -255,7 +258,7 @@ const MarksManagementPage = () => {
                             <div className='font-bold text-xl text-[#1D3D6F]'>
                               {tab.label}
                             </div>
-                            <div className='text-[#2C4F85]'>
+                            <div className='text-[#2C4F85] text-sm'>
                               {tab.description}
                             </div>
                           </div>
@@ -267,7 +270,7 @@ const MarksManagementPage = () => {
               )}
 
               {/* Content Area */}
-              <div className='relative p-8'>
+              <div className='relative'>
                 <div className='transition-all duration-700 ease-out'>
                   {activeTab === "teacher" ? (
                     <div className='animate-slideInFromLeft'>

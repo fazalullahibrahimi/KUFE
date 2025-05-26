@@ -15,13 +15,13 @@ const translations = {
     // Marks Management Page
     academic_performance_hub: "Academic Performance Hub",
     comprehensive_marks_management:
-      "Comprehensive student marks and grade management system",
-    teacher_dashboard: "Teacher Dashboard",
-    student_portal_desc: "Student Portal",
-    manage_student_grades: "Manage student grades",
-    view_academic_performance: "View academic performance",
+      "Comprehensive academic records and grade management system for students and faculty",
+    teacher_dashboard: "Instructor Dashboard",
+    student_portal_desc: "Student Academic Portal",
+    manage_student_grades: "Manage and track student academic performance",
+    view_academic_performance: "Access your complete academic transcript",
     active_courses: "Active Courses",
-    avg_progress: "Avg Progress",
+    avg_progress: "Average Progress",
     top_performers: "Top Performers",
 
     // Common terms for marks management
@@ -49,24 +49,27 @@ const translations = {
     no_data: "No data available",
 
     // Marks Management
-    "marks.teacher_management": "Grade Management System",
-    "marks.semester": "Semester",
+    "marks.teacher_management": "Academic Grade Management System",
+    "marks.semester": "Academic Semester",
     "marks.all_semesters": "All Semesters",
-    "marks.subject": "Subject",
-    "marks.all_subjects": "All Subjects",
+    "marks.subject": "Course Subject",
+    "marks.all_subjects": "All Course Subjects",
     "marks.student": "Student",
     "marks.all_students": "All Students",
-    "marks.search_placeholder": "Search by student name, ID, or subject...",
-    "marks.import": "Import Data",
-    "marks.add_marks": "Add New Grades",
-    "marks.student_marks": "Student Grades",
-    "marks.no_marks_found": "No Grades Found",
-    "marks.no_marks_match": "No grades match your search criteria",
-    "marks.no_marks_added": "No grades have been added yet",
-    "marks.teacher": "Instructor",
-    "marks.midterm": "Midterm Exam",
-    "marks.final": "Final Exam",
-    "marks.assignment": "Assignment",
+    "marks.search_placeholder":
+      "Search by student name, ID, or course subject...",
+    "marks.import": "Import Academic Data",
+    "marks.add_marks": "Add New Academic Grades",
+    "marks.student_marks": "Student Academic Records",
+    "marks.no_marks_found": "No Academic Records Found",
+    "marks.no_marks_match":
+      "No academic records match your search criteria. Please try different keywords.",
+    "marks.no_marks_added":
+      "No academic grades have been recorded for this semester and subject yet.",
+    "marks.teacher": "Course Instructor",
+    "marks.midterm": "Midterm Examination",
+    "marks.final": "Final Examination",
+    "marks.assignment": "Course Assignment",
     "marks.total": "Total Score",
     "marks.import_marks": "Import Grade Data",
     "marks.csv_import_instructions": "CSV Import Guidelines",
@@ -86,40 +89,43 @@ const translations = {
       "Cannot delete course that has existing grade records",
 
     // Student Marks View
-    "marks.student_results": "Academic Transcript",
-    "marks.check_results": "View Your Grades",
-    "marks.enter_student_id": "Enter Student ID",
-    "marks.view_results": "View Academic Record",
-    "marks.please_enter_id": "Please enter a valid student ID",
-    "marks.cumulative_gpa": "Cumulative GPA",
-    "marks.academic_results": "Academic Performance",
-    "marks.select_semester": "Select Semester",
-    "marks.no_results": "No Records",
-    "marks.no_results_available": "No Academic Records Available",
-    "marks.no_results_for_semester": "No grades available for {{semester}}",
-    "marks.results": "Grade Report",
-    "marks.semester_gpa": "Semester GPA",
-    "marks.credit_hours": "Credit Hours",
+    "marks.student_results": "Official Academic Transcript",
+    "marks.check_results": "Access Your Academic Records",
+    "marks.enter_student_id": "Enter your Student ID",
+    "marks.view_results": "View Complete Academic Record",
+    "marks.please_enter_id":
+      "Please enter a valid student identification number",
+    "marks.cumulative_gpa": "Cumulative Grade Point Average",
+    "marks.academic_results": "Academic Performance Overview",
+    "marks.select_semester": "Select Academic Semester",
+    "marks.no_results": "No Records Available",
+    "marks.no_results_available": "No Academic Records Found",
+    "marks.no_results_for_semester":
+      "No academic grades are available for {{semester}}",
+    "marks.results": "Academic Grade Report",
+    "marks.semester_gpa": "Semester Grade Point Average",
+    "marks.credit_hours": "Course Credit Hours",
     "marks.enter_id_to_view":
-      "Enter your student ID to access your academic transcript",
+      "Please enter your student identification number to access your complete academic transcript and performance records",
 
     // Additional missing translation keys
-    "marks.management": "Grade Management",
-    "marks.teacher_view": "Teacher View",
-    "marks.student_view": "Student View",
-    "marks.upload_csv_file": "Upload CSV File",
+    "marks.management": "Academic Grade Management",
+    "marks.teacher_view": "Instructor Dashboard",
+    "marks.student_view": "Student Academic Portal",
+    "marks.upload_csv_file": "Upload Academic Data File (CSV)",
     "marks.drag_drop_csv":
-      "Drag and drop your CSV file here, or click to select",
-    "marks.select_file": "Select File",
-    "marks.cancel": "Cancel",
-    "marks.add_student_marks": "Add Student Grades",
-    "marks.please_enter_csv": "Please enter CSV data",
-    "marks.missing_headers": "Missing required headers",
-    "marks.skipping_row": "Skipping row",
-    "marks.invalid_ids": "Invalid student or subject ID",
-    "marks.no_valid_data": "No valid data to import",
-    "marks.successfully_imported": "Successfully imported",
-    "marks.entries": "entries",
+      "Drag and drop your CSV file here, or click to browse and select a file",
+    "marks.select_file": "Browse Files",
+    "marks.cancel": "Cancel Operation",
+    "marks.add_student_marks": "Add Student Academic Grades",
+    "marks.please_enter_csv": "Please provide valid CSV data for import",
+    "marks.missing_headers":
+      "Required column headers are missing from the CSV file",
+    "marks.skipping_row": "Skipping invalid row",
+    "marks.invalid_ids": "Invalid student identification or course subject ID",
+    "marks.no_valid_data": "No valid academic data found for import",
+    "marks.successfully_imported": "Successfully imported academic records:",
+    "marks.entries": "grade entries",
     "marks.error_parsing": "Error parsing CSV data",
     kandahar_university: "Kandahar University",
     faculty_of_economics: "Faculty of Economics",
@@ -368,15 +374,6 @@ const translations = {
     "View All Events": "View All Events",
     "Show Less Events": "Show Less Events",
 
-    // Programs.jsx
-    "Our Academic Programs": "Our Academic Programs",
-    "Loading academic programs...": "Loading academic programs...",
-    "Unable to Load Programs": "Unable to Load Programs",
-    "Reload Page": "Reload Page",
-    "No Programs Available": "No Programs Available",
-    "There are currently no academic programs listed. Please check back later.":
-      "There are currently no academic programs listed. Please check back later.",
-    "Learn More": "Learn More",
     "No academic programs are currently available.":
       "No academic programs are currently available.",
     "The academic programs resource could not be found. Please try again later.":
@@ -414,6 +411,168 @@ const translations = {
     "Our Distinguished Community": "Our Distinguished Community",
     "Meet the exceptional individuals who represent the highest standards of academic achievement and teaching excellence at our university.":
       "Meet the exceptional individuals who represent the highest standards of academic achievement and teaching excellence at our university.",
+
+    // AboutPage.jsx
+    "about.page_title": "About Us",
+    "about.hero_description":
+      "Learn about the Faculty of Economics at Kandahar University, our mission, vision, and commitment to academic excellence.",
+    "about.our_mission": "Our Mission",
+    "about.contact_us": "Contact Us",
+    "about.quick_facts": "Quick Facts",
+    "about.established": "Established",
+    "about.departments": "Departments",
+    "about.programs": "Programs",
+    "about.location": "Location",
+    "about.kandahar": "Kandahar",
+    "about.faculty_overview": "Faculty Overview",
+    "about.faculty_overview_text":
+      "The Faculty of Economics at Kandahar University is one of the leading educational institutions in Afghanistan dedicated to providing quality education in economics, finance, business management, and statistics. Established in 2002, our faculty has been committed to academic excellence and preparing students for successful careers in the economic and business sectors.",
+    "about.students": "Students",
+    "about.faculty": "Faculty",
+    "about.research_papers": "Research Papers",
+    "about.mission_vision_values": "Mission, Vision & Values",
+    "about.guiding_principles":
+      "Our guiding principles shape our approach to education, research, and community engagement.",
+    "about.mission_text":
+      "To provide high-quality education in economics and business disciplines, conduct impactful research, and contribute to the economic development of Afghanistan through knowledge creation and dissemination.",
+    "about.our_vision": "Our Vision",
+    "about.vision_text":
+      "To be recognized as a center of excellence in economics education and research in Afghanistan and the region, producing graduates who are innovative, ethical, and capable of addressing complex economic challenges.",
+    "about.our_values": "Our Values",
+    "about.academic_excellence": "Academic Excellence",
+    "about.academic_excellence_text":
+      "We are committed to maintaining high standards in teaching, learning, and research.",
+    "about.integrity": "Integrity",
+    "about.integrity_text":
+      "We uphold ethical principles and promote honesty and transparency in all our activities.",
+    "about.innovation": "Innovation",
+    "about.innovation_text":
+      "We encourage creative thinking and innovative approaches to economic challenges.",
+    "about.inclusivity": "Inclusivity",
+    "about.inclusivity_text":
+      "We value diversity and provide equal opportunities for all students and staff.",
+    "about.deans_message": "Dean's Message",
+    "about.dean_name": "Dr. Ahmad Ahmadi",
+    "about.dean_title": "Dean, Faculty of Economics",
+    "about.dean_welcome":
+      "Welcome to the Faculty of Economics at Kandahar University. Our faculty is dedicated to providing a stimulating learning environment where students can develop their knowledge and skills in economics and business disciplines. We are committed to academic excellence, innovative research, and community engagement.",
+    "about.dean_goal":
+      "Our goal is to prepare our graduates to become future leaders who can contribute to the economic development of Afghanistan. I invite you to explore our programs and join our academic community.",
+    "about.read_full_message": "Read Full Message",
+    "about.our_departments": "Our Departments",
+    "about.departments_description":
+      "Explore our specialized departments offering comprehensive education in various fields of economics and business.",
+    "about.four_year_program": "4-Year Program",
+    "about.fall_spring_intake": "Fall & Spring Intake",
+    "about.learn_more": "Learn more",
+    "about.no_departments": "No departments found.",
+    "about.our_history": "Our History",
+    "about.history_description":
+      "Tracing our journey from establishment to becoming a leading institution in economics education.",
+    "about.history_text1":
+      "The Faculty of Economics at Kandahar University was established in 2002 as part of the university's expansion efforts. Starting with just two departments and a handful of students, the faculty has grown significantly over the years.",
+    "about.history_text2":
+      "In 2010, we introduced our first Master's program, and by 2015, we had expanded to four specialized departments. Throughout our history, we have remained committed to providing quality education and contributing to Afghanistan's economic development through research and community engagement.",
+    "about.contact_help":
+      "Have questions or need more information? We're here to help.",
+    "about.get_in_touch": "Get In Touch",
+    "about.university_address":
+      "Kandahar University, Faculty of Economics, Kandahar, Afghanistan",
+    "about.visit_us": "Visit Us",
+    "about.office_hours": "Office Hours",
+    "about.saturday_thursday": "Saturday - Thursday",
+    "about.friday": "Friday",
+    "about.closed": "Closed",
+    "about.ready_begin": "Ready to Begin Your",
+    "about.academic_journey": "Academic Journey",
+    "about.cta_description":
+      "Take the next step in your academic career. Apply now to join our programs at the Faculty of Economics and be part of a community dedicated to excellence and innovation.",
+    "about.apply_now": "Apply Now",
+    "about.request_information": "Request Information",
+
+    // Department Modal
+    "about.department_overview": "Department Overview",
+    "about.mission": "Mission",
+    "about.vision": "Vision",
+    "about.values": "Values",
+    "about.mission_not_available": "Mission statement not available",
+    "about.vision_not_available": "Vision statement not available",
+    "about.values_not_available": "Values statement not available",
+    "about.program_duration": "Program Duration",
+    "about.four_year_bachelor": "4-Year Bachelor's Degree Program",
+    "about.intake_periods": "Intake Periods",
+    "about.fall_spring_semesters": "Fall & Spring Semesters",
+    "about.faculty_members": "Faculty Members",
+    "about.experienced_professors": "Experienced Professors & Lecturers",
+    "about.degree_type": "Degree Type",
+    "about.bachelor_science": "Bachelor of Science (B.S.)",
+    "about.career_opportunities": "Career Opportunities",
+    "about.key_features": "Key Features",
+    "about.comprehensive_curriculum": "Comprehensive Curriculum",
+    "about.modern_curriculum":
+      "Modern curriculum designed to meet industry standards",
+    "about.expert_faculty": "Expert Faculty",
+    "about.learn_from_experts":
+      "Learn from experienced professors and industry professionals",
+    "about.research_opportunities": "Research Opportunities",
+    "about.cutting_edge_research":
+      "Engage in cutting-edge research projects and publications",
+
+    // Career Opportunities
+    "about.government_analyst": "Government Economic Analyst",
+    "about.financial_consultant": "Financial Consultant",
+    "about.business_manager": "Business Development Manager",
+    "about.research_analyst": "Research Analyst",
+    "about.banking_professional": "Banking Professional",
+    "about.investment_advisor": "Investment Advisor",
+    "about.policy_researcher": "Policy Researcher",
+    "about.finance_specialist": "Corporate Finance Specialist",
+
+    // ContactPage.jsx
+    "contact.faculty_of_economics": "Faculty of Economics",
+    "contact.get_in_touch": "Get in Touch",
+    "contact.hero_description":
+      "We're here to answer your questions about the Faculty of Economics at Kandahar University. Reach out to us for information about programs, admissions, or general inquiries.",
+    "contact.send_message": "Send a Message",
+    "contact.view_on_map": "View on Map",
+    "contact.send_us_message": "Send us a message",
+    "contact.error": "Error",
+    "contact.error_description":
+      "Please try again or contact support if the issue persists.",
+    "contact.retry_departments": "Retry Loading Departments",
+    "contact.thank_you": "Thank you! Your message has been sent successfully.",
+    "contact.response_message": "We'll get back to you as soon as possible.",
+    "contact.full_name": "Full Name",
+    "contact.email_address": "Email Address",
+    "contact.subject": "Subject",
+    "contact.department": "Department",
+    "contact.select_department": "Select Department",
+    "contact.selected": "Selected",
+    "contact.your_message": "Your Message",
+    "contact.sending": "Sending...",
+    "contact.send_message_btn": "Send Message",
+    "contact.contact_information": "Contact Information",
+    "contact.our_location": "Our Location",
+    "contact.university_address":
+      "Kandahar University, Faculty of Economics, Kandahar, Afghanistan",
+    "contact.phone_number": "Phone Number",
+    "contact.phone_hours": "Monday to Thursday, 8am to 4pm",
+    "contact.email_address_label": "Email Address",
+    "contact.email_response": "We'll respond as soon as possible",
+    "contact.office_hours": "Office Hours",
+    "contact.monday_thursday": "Monday - Thursday: 8:00 AM - 4:00 PM",
+    "contact.friday": "Friday: Closed",
+    "contact.saturday_sunday": "Saturday - Sunday: 8:00 AM - 12:00 PM",
+    "contact.follow_us": "Follow Us",
+    "contact.find_us_map": "Find Us on the Map",
+    "contact.map_description":
+      "Visit the Faculty of Economics at Kandahar University. We're located in the heart of Kandahar city.",
+
+    // Form placeholders
+    "contact.placeholder_name": "Enter your full name",
+    "contact.placeholder_email": "Enter your email address",
+    "contact.placeholder_subject": "Enter message subject",
+    "contact.placeholder_message": "Write your message here...",
   },
   dr: {
     // Dari translations
@@ -819,6 +978,167 @@ const translations = {
     "Privacy Policy": "سیاست حفظ حریم خصوصی",
     "Terms of Use": "شرایط استفاده",
     "Back to top": "بازگشت به بالا",
+
+    // AboutPage.jsx
+    "about.page_title": "درباره ما",
+    "about.hero_description":
+      "درباره پوهنځی اقتصاد پوهنتون کندهار، ماموریت، چشم‌انداز و تعهد ما به تعالی آکادمیک بیاموزید.",
+    "about.our_mission": "ماموریت ما",
+    "about.contact_us": "تماس با ما",
+    "about.quick_facts": "حقایق سریع",
+    "about.established": "تأسیس شده",
+    "about.departments": "بخش‌ها",
+    "about.programs": "برنامه‌ها",
+    "about.location": "موقعیت",
+    "about.kandahar": "کندهار",
+    "about.faculty_overview": "نمای کلی پوهنځی",
+    "about.faculty_overview_text":
+      "پوهنځی اقتصاد پوهنتون کندهار یکی از موسسات آموزشی پیشرو در افغانستان است که به ارائه آموزش با کیفیت در رشته‌های اقتصاد، مالی، مدیریت کسب‌وکار و آمار اختصاص دارد. این پوهنځی که در سال ۲۰۰۲ تأسیس شد، متعهد به تعالی آکادمیک و آماده‌سازی دانشجویان برای موفقیت در بخش‌های اقتصادی و تجاری است.",
+    "about.students": "دانشجویان",
+    "about.faculty": "اعضای هیئت علمی",
+    "about.research_papers": "مقالات تحقیقاتی",
+    "about.mission_vision_values": "ماموریت، چشم‌انداز و ارزش‌ها",
+    "about.guiding_principles":
+      "اصول راهنمای ما رویکرد ما را در آموزش، تحقیق و مشارکت اجتماعی شکل می‌دهد.",
+    "about.mission_text":
+      "ارائه آموزش با کیفیت بالا در رشته‌های اقتصاد و کسب‌وکار، انجام تحقیقات تأثیرگذار و کمک به توسعه اقتصادی افغانستان از طریق خلق و انتشار دانش.",
+    "about.our_vision": "چشم‌انداز ما",
+    "about.vision_text":
+      "به عنوان مرکز تعالی در آموزش و تحقیقات اقتصادی در افغانستان و منطقه شناخته شدن و تربیت فارغ‌التحصیلانی که نوآور، اخلاقی و قادر به مواجهه با چالش‌های پیچیده اقتصادی باشند.",
+    "about.our_values": "ارزش‌های ما",
+    "about.academic_excellence": "تعالی آکادمیک",
+    "about.academic_excellence_text":
+      "ما متعهد به حفظ استانداردهای بالا در تدریس، یادگیری و تحقیق هستیم.",
+    "about.integrity": "صداقت",
+    "about.integrity_text":
+      "ما اصول اخلاقی را حمایت می‌کنیم و صداقت و شفافیت را در تمام فعالیت‌هایمان ترویج می‌دهیم.",
+    "about.innovation": "نوآوری",
+    "about.innovation_text":
+      "ما تفکر خلاق و رویکردهای نوآورانه به چالش‌های اقتصادی را تشویق می‌کنیم.",
+    "about.inclusivity": "فراگیری",
+    "about.inclusivity_text":
+      "ما تنوع را ارزش می‌گذاریم و فرصت‌های برابر برای همه دانشجویان و کارکنان فراهم می‌کنیم.",
+    "about.deans_message": "پیام رئیس پوهنځی",
+    "about.dean_name": "دکتور احمد احمدی",
+    "about.dean_title": "رئیس پوهنځی اقتصاد",
+    "about.dean_welcome":
+      "به پوهنځی اقتصاد پوهنتون کندهار خوش آمدید. پوهنځی ما متعهد به فراهم کردن محیط یادگیری محرک است که در آن دانشجویان می‌توانند دانش و مهارت‌های خود را در رشته‌های اقتصاد و کسب‌وکار توسعه دهند. ما متعهد به تعالی آکادمیک، تحقیقات نوآورانه و مشارکت اجتماعی هستیم.",
+    "about.dean_goal":
+      "هدف ما آماده کردن فارغ‌التحصیلان ما برای تبدیل شدن به رهبران آینده است که بتوانند به توسعه اقتصادی افغانستان کمک کنند. من شما را دعوت می‌کنم تا برنامه‌های ما را کاوش کنید و به جامعه آکادمیک ما بپیوندید.",
+    "about.read_full_message": "پیام کامل را بخوانید",
+    "about.our_departments": "بخش‌های ما",
+    "about.departments_description":
+      "بخش‌های تخصصی ما را کاوش کنید که آموزش جامع در زمینه‌های مختلف اقتصاد و کسب‌وکار ارائه می‌دهند.",
+    "about.four_year_program": "برنامه ۴ ساله",
+    "about.fall_spring_intake": "پذیرش پاییز و بهار",
+    "about.learn_more": "بیشتر بیاموزید",
+    "about.no_departments": "هیچ بخشی یافت نشد.",
+    "about.our_history": "تاریخ ما",
+    "about.history_description":
+      "سفر ما را از تأسیس تا تبدیل شدن به موسسه پیشرو در آموزش اقتصاد دنبال کنید.",
+    "about.history_text1":
+      "پوهنځی اقتصاد پوهنتون کندهار در سال ۲۰۰۲ به عنوان بخشی از تلاش‌های توسعه پوهنتون تأسیس شد. با شروع تنها دو بخش و تعداد کمی دانشجو، پوهنځی در طول سال‌ها به طور قابل توجهی رشد کرده است.",
+    "about.history_text2":
+      "در سال ۲۰۱۰، ما اولین برنامه کارشناسی ارشد خود را معرفی کردیم و تا سال ۲۰۱۵، به چهار بخش تخصصی گسترش یافتیم. در طول تاریخ خود، ما متعهد به ارائه آموزش با کیفیت و کمک به توسعه اقتصادی افغانستان از طریق تحقیق و مشارکت اجتماعی باقی مانده‌ایم.",
+    "about.contact_help":
+      "سوالی دارید یا به اطلاعات بیشتری نیاز دارید؟ ما اینجا هستیم تا کمک کنیم.",
+    "about.get_in_touch": "با ما در تماس باشید",
+    "about.university_address":
+      "پوهنتون کندهار، پوهنځی اقتصاد، کندهار، افغانستان",
+    "about.visit_us": "از ما دیدن کنید",
+    "about.office_hours": "ساعات کاری",
+    "about.saturday_thursday": "شنبه - پنج‌شنبه",
+    "about.friday": "جمعه",
+    "about.closed": "تعطیل",
+    "about.ready_begin": "آماده شروع",
+    "about.academic_journey": "سفر آکادمیک خود",
+    "about.cta_description":
+      "گام بعدی در مسیر آکادمیک خود را بردارید. اکنون برای پیوستن به برنامه‌های ما در پوهنځی اقتصاد درخواست دهید و بخشی از جامعه‌ای باشید که به تعالی و نوآوری متعهد است.",
+    "about.apply_now": "اکنون درخواست دهید",
+    "about.request_information": "درخواست اطلاعات",
+
+    // Department Modal
+    "about.department_overview": "نمای کلی بخش",
+    "about.mission": "ماموریت",
+    "about.vision": "چشم‌انداز",
+    "about.values": "ارزش‌ها",
+    "about.mission_not_available": "بیانیه ماموریت در دسترس نیست",
+    "about.vision_not_available": "بیانیه چشم‌انداز در دسترس نیست",
+    "about.values_not_available": "بیانیه ارزش‌ها در دسترس نیست",
+    "about.program_duration": "مدت برنامه",
+    "about.four_year_bachelor": "برنامه کارشناسی ۴ ساله",
+    "about.intake_periods": "دوره‌های پذیرش",
+    "about.fall_spring_semesters": "نیمسال‌های پاییز و بهار",
+    "about.faculty_members": "اعضای هیئت علمی",
+    "about.experienced_professors": "استادان و مدرسان با تجربه",
+    "about.degree_type": "نوع مدرک",
+    "about.bachelor_science": "کارشناسی علوم (B.S.)",
+    "about.career_opportunities": "فرصت‌های شغلی",
+    "about.key_features": "ویژگی‌های کلیدی",
+    "about.comprehensive_curriculum": "برنامه درسی جامع",
+    "about.modern_curriculum":
+      "برنامه درسی مدرن طراحی شده برای تطبیق با استانداردهای صنعت",
+    "about.expert_faculty": "هیئت علمی متخصص",
+    "about.learn_from_experts": "از استادان با تجربه و متخصصان صنعت یاد بگیرید",
+    "about.research_opportunities": "فرصت‌های تحقیقاتی",
+    "about.cutting_edge_research":
+      "در پروژه‌های تحقیقاتی پیشرفته و انتشارات شرکت کنید",
+
+    // Career Opportunities
+    "about.government_analyst": "تحلیلگر اقتصادی دولتی",
+    "about.financial_consultant": "مشاور مالی",
+    "about.business_manager": "مدیر توسعه کسب‌وکار",
+    "about.research_analyst": "تحلیلگر تحقیقات",
+    "about.banking_professional": "متخصص بانکداری",
+    "about.investment_advisor": "مشاور سرمایه‌گذاری",
+    "about.policy_researcher": "محقق سیاست",
+    "about.finance_specialist": "متخصص مالی شرکتی",
+
+    // ContactPage.jsx
+    "contact.faculty_of_economics": "پوهنځی اقتصاد",
+    "contact.get_in_touch": "با ما در تماس باشید",
+    "contact.hero_description":
+      "ما اینجا هستیم تا به سوالات شما در مورد پوهنځی اقتصاد پوهنتون کندهار پاسخ دهیم. برای اطلاعات در مورد برنامه‌ها، پذیرش یا سوالات عمومی با ما تماس بگیرید.",
+    "contact.send_message": "پیام ارسال کنید",
+    "contact.view_on_map": "در نقشه مشاهده کنید",
+    "contact.send_us_message": "برای ما پیام بفرستید",
+    "contact.error": "خطا",
+    "contact.error_description":
+      "لطفاً دوباره تلاش کنید یا در صورت ادامه مشکل با پشتیبانی تماس بگیرید.",
+    "contact.retry_departments": "تلاش مجدد برای بارگذاری بخش‌ها",
+    "contact.thank_you": "متشکریم! پیام شما با موفقیت ارسال شد.",
+    "contact.response_message": "ما در اسرع وقت به شما پاسخ خواهیم داد.",
+    "contact.full_name": "نام کامل",
+    "contact.email_address": "آدرس ایمیل",
+    "contact.subject": "موضوع",
+    "contact.department": "بخش",
+    "contact.select_department": "بخش را انتخاب کنید",
+    "contact.selected": "انتخاب شده",
+    "contact.your_message": "پیام شما",
+    "contact.sending": "در حال ارسال...",
+    "contact.send_message_btn": "ارسال پیام",
+    "contact.contact_information": "اطلاعات تماس",
+    "contact.our_location": "موقعیت ما",
+    "contact.university_address":
+      "پوهنتون کندهار، پوهنځی اقتصاد، کندهار، افغانستان",
+    "contact.phone_number": "شماره تلفن",
+    "contact.phone_hours": "دوشنبه تا پنج‌شنبه، ۸ صبح تا ۴ عصر",
+    "contact.email_address_label": "آدرس ایمیل",
+    "contact.email_response": "ما در اسرع وقت پاسخ خواهیم داد",
+    "contact.office_hours": "ساعات کاری",
+    "contact.monday_thursday": "دوشنبه - پنج‌شنبه: ۸:۰۰ صبح - ۴:۰۰ عصر",
+    "contact.friday": "جمعه: تعطیل",
+    "contact.saturday_sunday": "شنبه - یکشنبه: ۸:۰۰ صبح - ۱۲:۰۰ ظهر",
+    "contact.follow_us": "ما را دنبال کنید",
+    "contact.find_us_map": "ما را در نقشه پیدا کنید",
+    "contact.map_description":
+      "از پوهنځی اقتصاد پوهنتون کندهار دیدن کنید. ما در قلب شهر کندهار قرار داریم.",
+
+    // Form placeholders
+    "contact.placeholder_name": "نام کامل خود را وارد کنید",
+    "contact.placeholder_email": "آدرس ایمیل خود را وارد کنید",
+    "contact.placeholder_subject": "موضوع پیام را وارد کنید",
+    "contact.placeholder_message": "پیام خود را اینجا بنویسید...",
   },
   ps: {
     // Pashto translations
@@ -1234,6 +1554,168 @@ const translations = {
     "Privacy Policy Footer": "د محرمیت تګلاره",
     "Terms of Use": "د کارولو شرایط",
     "Back to top": "بیرته پورته",
+
+    // AboutPage.jsx
+    "about.page_title": "زموږ په اړه",
+    "about.hero_description":
+      "د کندهار پوهنتون د اقتصاد پوهنځي، زموږ ماموریت، لیدلوري او د اکاډمیک غوره والي سره زموږ ژمنې په اړه زده کړئ.",
+    "about.our_mission": "زموږ ماموریت",
+    "about.contact_us": "موږ سره اړیکه",
+    "about.quick_facts": "چټک حقایق",
+    "about.established": "تاسیس شوی",
+    "about.departments": "څانګې",
+    "about.programs": "پروګرامونه",
+    "about.location": "موقعیت",
+    "about.kandahar": "کندهار",
+    "about.faculty_overview": "د پوهنځي عمومي کتنه",
+    "about.faculty_overview_text":
+      "د کندهار پوهنتون د اقتصاد پوهنځی په افغانستان کې یو له مخکښو تعلیمي موسسو څخه دی چې د اقتصاد، مالي چارو، د سوداګرۍ مدیریت او احصایې په برخه کې د کیفیت لرونکو زده کړو چمتو کولو ته وقف شوی دی. دا پوهنځی چې په ۲۰۰۲ کې تاسیس شوی، د اکاډمیک غوره والي او د زده کوونکو د اقتصادي او سوداګریزو برخو کې د بریالیتوب لپاره چمتو کولو ته ژمن دی.",
+    "about.students": "زده کوونکي",
+    "about.faculty": "د پوهنځي غړي",
+    "about.research_papers": "څیړنیز مقالې",
+    "about.mission_vision_values": "ماموریت، لیدلوري او ارزښتونه",
+    "about.guiding_principles":
+      "زموږ لارښود اصول زموږ د تعلیم، څیړنې او ټولنیز ګډون کې زموږ چلند ته بڼه ورکوي.",
+    "about.mission_text":
+      "د اقتصاد او سوداګرۍ په برخو کې د لوړ کیفیت تعلیم چمتو کول، د اغیزمنو څیړنو ترسره کول، او د پوهې د رامینځته کولو او خپرولو له لارې د افغانستان اقتصادي پرمختګ ته مرسته کول.",
+    "about.our_vision": "زموږ لیدلوري",
+    "about.vision_text":
+      "په افغانستان او سیمه کې د اقتصادي تعلیم او څیړنو د غوره والي د مرکز په توګه پیژندل کیدل، او د هغو فارغانو روزنه چې نوښتګر، اخلاقي او د پیچلو اقتصادي ننګونو سره د مخامخ کیدو وړتیا ولري.",
+    "about.our_values": "زموږ ارزښتونه",
+    "about.academic_excellence": "اکاډمیک غوره والی",
+    "about.academic_excellence_text":
+      "موږ د تدریس، زده کړې او څیړنې کې د لوړو معیارونو ساتلو ته ژمن یو.",
+    "about.integrity": "صداقت",
+    "about.integrity_text":
+      "موږ اخلاقي اصول ملاتړ کوو او په خپلو ټولو فعالیتونو کې صداقت او روڼتیا هڅوو.",
+    "about.innovation": "نوښت",
+    "about.innovation_text":
+      "موږ د اقتصادي ننګونو لپاره د خلاقو فکرونو او نوښتګرو چلندونو هڅونه کوو.",
+    "about.inclusivity": "ټول شمولیت",
+    "about.inclusivity_text":
+      "موږ تنوع ته ارزښت ورکوو او د ټولو زده کوونکو او کارکوونکو لپاره مساوي فرصتونه چمتو کوو.",
+    "about.deans_message": "د ډین پیغام",
+    "about.dean_name": "ډاکټر احمد احمدي",
+    "about.dean_title": "د اقتصاد پوهنځي ډین",
+    "about.dean_welcome":
+      "د کندهار پوهنتون د اقتصاد پوهنځي ته ښه راغلاست. زموږ پوهنځی د هغه هڅونکي زده کړې چاپیریال چمتو کولو ته ژمن دی چیرې چې زده کوونکي کولی شي د اقتصاد او سوداګرۍ په برخو کې خپلې پوهې او مهارتونه وده ورکړي. موږ د اکاډمیک غوره والي، نوښتګرو څیړنو او ټولنیز ګډون ته ژمن یو.",
+    "about.dean_goal":
+      "زموږ هدف دا دی چې زموږ فارغان د راتلونکي مشرانو کیدو لپاره چمتو کړو چې کولی شي د افغانستان اقتصادي پرمختګ ته مرسته وکړي. زه تاسو ته بلنه ورکوم چې زموږ پروګرامونه وپلټئ او زموږ د اکاډمیک ټولنې سره یوځای شئ.",
+    "about.read_full_message": "بشپړ پیغام ولولئ",
+    "about.our_departments": "زموږ څانګې",
+    "about.departments_description":
+      "زموږ ځانګړي څانګې وپلټئ چې د اقتصاد او سوداګرۍ په مختلفو برخو کې جامع تعلیم وړاندې کوي.",
+    "about.four_year_program": "۴ کلنی پروګرام",
+    "about.fall_spring_intake": "د مني او پسرلي شاملیدل",
+    "about.learn_more": "نور زده کړئ",
+    "about.no_departments": "هیڅ څانګه ونه موندل شوه.",
+    "about.our_history": "زموږ تاریخ",
+    "about.history_description":
+      "زموږ سفر د تاسیس څخه د اقتصادي تعلیم کې د مخکښې موسسې کیدو پورې تعقیب کړئ.",
+    "about.history_text1":
+      "د کندهار پوهنتون د اقتصاد پوهنځی په ۲۰۰۲ کې د پوهنتون د پراختیا د هڅو د یوې برخې په توګه تاسیس شو. د یوازې دوو څانګو او یو څو زده کوونکو سره پیل کولو سره، پوهنځی د کلونو په اوږدو کې د پام وړ وده کړې ده.",
+    "about.history_text2":
+      "په ۲۰۱۰ کې، موږ زموږ لومړی ماسټر پروګرام معرفي کړ، او تر ۲۰۱۵ پورې، موږ څلورو ځانګړو څانګو ته پراخ شو. د خپل تاریخ په اوږدو کې، موږ د کیفیت لرونکو زده کړو چمتو کولو او د څیړنې او ټولنیز ګډون له لارې د افغانستان اقتصادي پرمختګ ته د مرستې کولو ته ژمن پاتې شوي یو.",
+    "about.contact_help":
+      "پوښتنې لرئ یا نورو معلوماتو ته اړتیا لرئ؟ موږ دلته یو چې مرسته وکړو.",
+    "about.get_in_touch": "موږ سره اړیکه ونیسئ",
+    "about.university_address":
+      "د کندهار پوهنتون، د اقتصاد پوهنځی، کندهار، افغانستان",
+    "about.visit_us": "موږ ته راشئ",
+    "about.office_hours": "د دفتر ساعتونه",
+    "about.saturday_thursday": "شنبه - پنجشنبه",
+    "about.friday": "جمعه",
+    "about.closed": "تړل شوی",
+    "about.ready_begin": "د پیل کولو ته چمتو یاست",
+    "about.academic_journey": "ستاسو اکاډمیک سفر",
+    "about.cta_description":
+      "په خپل اکاډمیک مسیر کې بل ګام واخلئ. د اقتصاد پوهنځي کې زموږ پروګرامونو ته د ګډون لپاره اوس غوښتنه وکړئ او د یوې داسې ټولنې برخه شئ چې غوره والي او نوښت ته ژمن دی.",
+    "about.apply_now": "اوس غوښتنه وکړئ",
+    "about.request_information": "د معلوماتو غوښتنه وکړئ",
+
+    // Department Modal
+    "about.department_overview": "د څانګې عمومي کتنه",
+    "about.mission": "ماموریت",
+    "about.vision": "لیدلوري",
+    "about.values": "ارزښتونه",
+    "about.mission_not_available": "د ماموریت بیان شتون نلري",
+    "about.vision_not_available": "د لیدلوري بیان شتون نلري",
+    "about.values_not_available": "د ارزښتونو بیان شتون نلري",
+    "about.program_duration": "د پروګرام موده",
+    "about.four_year_bachelor": "۴ کلنی د لیسانس پروګرام",
+    "about.intake_periods": "د شاملیدو دورې",
+    "about.fall_spring_semesters": "د مني او پسرلي سمسټرونه",
+    "about.faculty_members": "د پوهنځي غړي",
+    "about.experienced_professors": "تجربه لرونکي استادان او ښوونکي",
+    "about.degree_type": "د سند ډول",
+    "about.bachelor_science": "د ساینس لیسانس (B.S.)",
+    "about.career_opportunities": "د کار فرصتونه",
+    "about.key_features": "کلیدي ځانګړتیاوې",
+    "about.comprehensive_curriculum": "جامع نصاب",
+    "about.modern_curriculum": "د صنعت د معیارونو سره سم ډیزاین شوی عصري نصاب",
+    "about.expert_faculty": "متخصص پوهنځی",
+    "about.learn_from_experts":
+      "له تجربه لرونکو استادانو او د صنعت متخصصانو څخه زده کړئ",
+    "about.research_opportunities": "د څیړنې فرصتونه",
+    "about.cutting_edge_research":
+      "په پرمختللو څیړنیزو پروژو او خپرونو کې برخه واخلئ",
+
+    // Career Opportunities
+    "about.government_analyst": "د دولت اقتصادي شنونکی",
+    "about.financial_consultant": "مالي مشاور",
+    "about.business_manager": "د سوداګرۍ پراختیا مدیر",
+    "about.research_analyst": "د څیړنې شنونکی",
+    "about.banking_professional": "د بانکدارۍ متخصص",
+    "about.investment_advisor": "د پانګونې مشاور",
+    "about.policy_researcher": "د پالیسۍ څیړونکی",
+    "about.finance_specialist": "د شرکت مالي متخصص",
+
+    // ContactPage.jsx
+    "contact.faculty_of_economics": "د اقتصاد پوهنځی",
+    "contact.get_in_touch": "موږ سره اړیکه ونیسئ",
+    "contact.hero_description":
+      "موږ دلته یو چې د کندهار پوهنتون د اقتصاد پوهنځي په اړه ستاسو پوښتنو ته ځواب ورکړو. د پروګرامونو، شاملیدو یا عمومي پوښتنو لپاره له موږ سره اړیکه ونیسئ.",
+    "contact.send_message": "پیغام واستوئ",
+    "contact.view_on_map": "په نقشه کې وګورئ",
+    "contact.send_us_message": "موږ ته پیغام واستوئ",
+    "contact.error": "تېروتنه",
+    "contact.error_description":
+      "مهرباني وکړئ بیا هڅه وکړئ یا که ستونزه دوام ولري د ملاتړ سره اړیکه ونیسئ.",
+    "contact.retry_departments": "د څانګو د بارولو بیا هڅه",
+    "contact.thank_you": "ډېر مننه! ستاسو پیغام په بریالیتوب سره واستول شو.",
+    "contact.response_message": "موږ به ژر تر ژره تاسو ته ځواب ورکړو.",
+    "contact.full_name": "بشپړ نوم",
+    "contact.email_address": "د ایمیل پته",
+    "contact.subject": "موضوع",
+    "contact.department": "څانګه",
+    "contact.select_department": "څانګه وټاکئ",
+    "contact.selected": "ټاکل شوی",
+    "contact.your_message": "ستاسو پیغام",
+    "contact.sending": "استولو کې...",
+    "contact.send_message_btn": "پیغام واستوئ",
+    "contact.contact_information": "د اړیکې معلومات",
+    "contact.our_location": "زموږ موقعیت",
+    "contact.university_address":
+      "د کندهار پوهنتون، د اقتصاد پوهنځی، کندهار، افغانستان",
+    "contact.phone_number": "د تلیفون شمیره",
+    "contact.phone_hours":
+      "دوشنبه څخه پنجشنبه پورې، د ۸ بجو سهار څخه ۴ بجو ماښام پورې",
+    "contact.email_address_label": "د ایمیل پته",
+    "contact.email_response": "موږ به ژر تر ژره ځواب ورکړو",
+    "contact.office_hours": "د دفتر ساعتونه",
+    "contact.monday_thursday": "دوشنبه - پنجشنبه: ۸:۰۰ سهار - ۴:۰۰ ماښام",
+    "contact.friday": "جمعه: تړل شوی",
+    "contact.saturday_sunday": "شنبه - یکشنبه: ۸:۰۰ سهار - ۱۲:۰۰ غرمه",
+    "contact.follow_us": "موږ تعقیب کړئ",
+    "contact.find_us_map": "موږ په نقشه کې ومومئ",
+    "contact.map_description":
+      "د کندهار پوهنتون د اقتصاد پوهنځي څخه لیدنه وکړئ. موږ د کندهار ښار په زړه کې موقعیت لرو.",
+
+    // Form placeholders
+    "contact.placeholder_name": "خپل بشپړ نوم دننه کړئ",
+    "contact.placeholder_email": "د خپل ایمیل پته دننه کړئ",
+    "contact.placeholder_subject": "د پیغام موضوع دننه کړئ",
+    "contact.placeholder_message": "خپل پیغام دلته ولیکئ...",
   },
 };
 
