@@ -27,9 +27,17 @@ const getSubjects = async (req, res) => {
         select: '_id name'  // select only the teacher's _id and name
       });
 
-    res.status(200).json({ subjects });
+    res.status(200).json({
+      status: "success",
+      message: "Subjects retrieved successfully",
+      data: { subjects }
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching subjects', details: error.message });
+    res.status(500).json({
+      status: "error",
+      message: "Error fetching subjects",
+      error: error.message
+    });
   }
 };
 

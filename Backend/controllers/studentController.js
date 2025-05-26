@@ -622,6 +622,71 @@ const getTopStudents = asyncHandler(async (req, res) => {
     .json(apiResponse.success("Top students retrieved successfully", topStudents));
 });
 
+// @desc    Get complete academic record by student ID number (Simple Test Version)
+// @route   GET /api/students/academic-record/:studentIdNumber
+// @access  Private/Admin/Faculty/Student
+const getCompleteAcademicRecord = asyncHandler(async (req, res) => {
+  const { studentIdNumber } = req.params;
+
+  console.log(`=== DEBUG: Academic Record Request ===`);
+  console.log(`Requested Student ID: "${studentIdNumber}"`);
+  console.log(`Student ID Type: ${typeof studentIdNumber}`);
+  console.log(`Student ID Length: ${studentIdNumber.length}`);
+
+  // Let's also check all students in the database to see what IDs exist
+  const allStudents = await Student.find({}, 'student_id_number name').limit(10);
+  console.log(`All students in database:`, allStudents.map(s => ({ id: s.student_id_number, name: s.name })));
+
+  // Find student by student_id_number (first without populate to check if student exists)
+  let student = await Student.findOne({ student_id_number: studentIdNumber });
+
+  if (!student) {
+    console.log(`Student not found with exact ID: "${studentIdNumber}"`);
+
+    // Let's try a case-insensitive search
+    student = await Student.findOne({
+      student_id_number: { $regex: new RegExp(`^${studentIdNumber}$`, 'i') }
+    });
+
+    if (student) {
+      console.log(`Found student with case-insensitive search: ${student.name}`);
+    } else {
+      console.log(`Student not found even with case-insensitive search`);
+      return res.status(404).json(
+        apiResponse.error(`Student not found with ID number: ${studentIdNumber}`, 404)
+      );
+    }
+  }
+
+  console.log(`Student found: ${student.name}`);
+
+  // For now, let's just return a simple response to test if the student is found
+  res.status(200).json(
+    apiResponse.success("Student found successfully", {
+      student: {
+        _id: student._id,
+        name: student.name,
+        student_id_number: student.student_id_number,
+        email: student.email,
+        phone: student.phone,
+        department: student.department_id,
+        enrollment_year: student.enrollment_year,
+        status: student.status,
+        profile_image: student.profile_image,
+        marks: student.marks
+      },
+      academicSummary: {
+        totalCredits: 0,
+        completedSubjects: student.marks ? student.marks.length : 0,
+        overallCGPA: 0,
+        academicStatus: "Test Mode"
+      },
+      semesterRecords: {},
+      lastUpdated: student.updatedAt
+    })
+  );
+});
+
 module.exports = {
   getStudents,
   getStudent,
@@ -639,5 +704,6 @@ module.exports = {
   getStudentCountByDepartment,
   getStudentCountByYear,
   getStudentCountByCity,
+  getCompleteAcademicRecord,
 };
 

@@ -16,6 +16,7 @@ const {
   getStudentCountByDepartment,
   getStudentCountByYear,
   getStudentCountByCity,
+  getCompleteAcademicRecord,
 } = require("../controllers/studentController");
 
 const { authMiddleware } = require("../middleware/authMiddleware");
@@ -31,6 +32,7 @@ router.get("/studentcount", getStudentCount);
 router.get("/count-by-department", getStudentCountByDepartment);
 router.get("/count-by-year", getStudentCountByYear);
 router.get("/count-by-city", getStudentCountByCity);
+router.get("/academic-record/:studentIdNumber", getCompleteAcademicRecord);
 router.get("/", getStudents);
 
 // Apply auth middleware for protected routes
@@ -62,3 +64,6 @@ router.get("/:id/marks", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER])
 router.delete("/:id/marks", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), deleteMarks);
 
 module.exports = router;
+
+
+

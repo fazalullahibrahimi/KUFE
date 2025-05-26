@@ -16,9 +16,17 @@ const createSemester = async (req, res) => {
 const getSemesters = async (req, res) => {
   try {
     const semesters = await Semester.find();
-    res.status(200).json({ semesters });
+    res.status(200).json({
+      status: "success",
+      message: "Semesters retrieved successfully",
+      data: { semesters }
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching semesters', details: error.message });
+    res.status(500).json({
+      status: "error",
+      message: "Error fetching semesters",
+      error: error.message
+    });
   }
 };
 

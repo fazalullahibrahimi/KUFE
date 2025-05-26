@@ -11,245 +11,242 @@ import {
   FileText,
   Star,
   BarChart3,
+
+  AlertCircle,
+  Loader,
 } from "lucide-react";
 import { useLanguage } from "../../contexts/LanguageContext";
+import axios from "axios";
+import API_URL from "../../config/api";
 
 const StudentMarksView = () => {
   const { t, isRTL } = useLanguage();
 
-  // Sample data for semesters
-  const semesters = [
-    { id: 1, name: "Semester 1" },
-    { id: 2, name: "Semester 2" },
-    { id: 3, name: "Semester 3" },
-    { id: 4, name: "Semester 4" },
-    { id: 5, name: "Semester 5" },
-    { id: 6, name: "Semester 6" },
-    { id: 7, name: "Semester 7" },
-    { id: 8, name: "Semester 8" },
-  ];
-
-  const subjects = [
-    {
-      id: 1,
-      name: "Introduction to Economics",
-      code: "ECO101",
-      semester_id: 1,
-      credit_hours: 3,
-    },
-    {
-      id: 2,
-      name: "Principles of Microeconomics",
-      code: "ECO102",
-      semester_id: 1,
-      credit_hours: 3,
-    },
-    {
-      id: 3,
-      name: "Mathematics for Economics",
-      code: "MATH101",
-      semester_id: 1,
-      credit_hours: 4,
-    },
-    {
-      id: 4,
-      name: "Academic Writing",
-      code: "ENG101",
-      semester_id: 1,
-      credit_hours: 2,
-    },
-    {
-      id: 5,
-      name: "Macroeconomics",
-      code: "ECO201",
-      semester_id: 2,
-      credit_hours: 3,
-    },
-    {
-      id: 6,
-      name: "Statistics for Economics",
-      code: "STAT201",
-      semester_id: 2,
-      credit_hours: 4,
-    },
-    {
-      id: 7,
-      name: "Economic History",
-      code: "ECO202",
-      semester_id: 2,
-      credit_hours: 3,
-    },
-    {
-      id: 8,
-      name: "Financial Accounting",
-      code: "ACC201",
-      semester_id: 2,
-      credit_hours: 3,
-    },
-  ];
-
-  const students = [
-    {
-      id: "CS20230",
-      name: "Zahra Ahmadi",
-      department_id: "60a1c2b3d4e5f6a7b8c9d0e1",
-      department_name: "Economics",
-      enrollment_year: 2023,
-    },
-    {
-      id: "CS20231",
-      name: "Ahmad Rahimi",
-      department_id: "60a1c2b3d4e5f6a7b8c9d0e1",
-      department_name: "Economics",
-      enrollment_year: 2023,
-    },
-    {
-      id: "CS20232",
-      name: "Fatima Noori",
-      department_id: "60a1c2b3d4e5f6a7b8c9d0e1",
-      department_name: "Economics",
-      enrollment_year: 2023,
-    },
-    {
-      id: "CS20233",
-      name: "Mohammed Karimi",
-      department_id: "60a1c2b3d4e5f6a7b8c9d0e1",
-      department_name: "Economics",
-      enrollment_year: 2023,
-    },
-    {
-      id: "CS20234",
-      name: "Sarah Johnson",
-      department_id: "60a1c2b3d4e5f6a7b8c9d0e1",
-      department_name: "Economics",
-      enrollment_year: 2023,
-    },
-  ];
-
-  // Sample marks data
-  const studentMarks = [
-    {
-      id: 1,
-      student_id: "CS20230",
-      subject_id: 1,
-      semester_id: 1,
-      midterm_marks: 18,
-      final_marks: 65,
-      assignment_marks: 9,
-      total_marks: 92,
-      grade: "A",
-      academic_year: "2023-2024",
-    },
-    {
-      id: 2,
-      student_id: "CS20230",
-      subject_id: 2,
-      semester_id: 1,
-      midterm_marks: 15,
-      final_marks: 58,
-      assignment_marks: 8,
-      total_marks: 81,
-      grade: "B+",
-      academic_year: "2023-2024",
-    },
-    {
-      id: 3,
-      student_id: "CS20230",
-      subject_id: 3,
-      semester_id: 1,
-      midterm_marks: 17,
-      final_marks: 62,
-      assignment_marks: 9,
-      total_marks: 88,
-      grade: "A-",
-      academic_year: "2023-2024",
-    },
-    {
-      id: 4,
-      student_id: "CS20230",
-      subject_id: 4,
-      semester_id: 1,
-      midterm_marks: 19,
-      final_marks: 68,
-      assignment_marks: 10,
-      total_marks: 97,
-      grade: "A+",
-      academic_year: "2023-2024",
-    },
-    {
-      id: 9,
-      student_id: "CS20230",
-      subject_id: 5,
-      semester_id: 2,
-      midterm_marks: 17,
-      final_marks: 63,
-      assignment_marks: 9,
-      total_marks: 89,
-      grade: "A-",
-      academic_year: "2023-2024",
-    },
-    {
-      id: 10,
-      student_id: "CS20230",
-      subject_id: 6,
-      semester_id: 2,
-      midterm_marks: 16,
-      final_marks: 61,
-      assignment_marks: 8,
-      total_marks: 85,
-      grade: "B+",
-      academic_year: "2023-2024",
-    },
-  ];
-
-  // State for UI
-  const [selectedSemester, setSelectedSemester] = useState(1);
+  // State management
   const [studentSearchId, setStudentSearchId] = useState("");
-  const [studentFound, setStudentFound] = useState(null);
-  const [studentResults, setStudentResults] = useState([]);
+  const [academicRecord, setAcademicRecord] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [selectedSemester, setSelectedSemester] = useState(null);
+  const [semesters, setSemesters] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
 
-  // Find student by ID for student view
+  // Fetch semesters, subjects, and departments data on component mount
   useEffect(() => {
-    if (studentSearchId) {
-      const found = students.find((s) => s.id === studentSearchId);
-      setStudentFound(found || null);
+    const fetchRequiredData = async () => {
+      try {
+        console.log("Fetching required data...");
+        const [semestersResponse, subjectsResponse, departmentsResponse] = await Promise.all([
+          axios.get(`${API_URL}/semesters`),
+          axios.get(`${API_URL}/subjects`),
+          axios.get(`${API_URL}/departments`)
+        ]);
 
-      if (found) {
-        const results = studentMarks.filter(
-          (mark) => mark.student_id === studentSearchId
-        );
-        setStudentResults(results);
-      } else {
-        setStudentResults([]);
+        console.log("Semesters response:", semestersResponse.data);
+        console.log("Subjects response:", subjectsResponse.data);
+        console.log("Departments response:", departmentsResponse.data);
+
+        // Handle different response structures
+        if (semestersResponse.data.status === "success") {
+          const semestersData = semestersResponse.data.data.semesters || semestersResponse.data.data || [];
+          setSemesters(semestersData);
+          console.log("Semesters set:", semestersData);
+        } else {
+          console.error("Semesters API failed:", semestersResponse.data);
+        }
+
+        if (subjectsResponse.data.status === "success") {
+          const subjectsData = subjectsResponse.data.data.subjects || subjectsResponse.data.data || [];
+          setSubjects(subjectsData);
+          console.log("Subjects set:", subjectsData);
+        } else {
+          console.error("Subjects API failed:", subjectsResponse.data);
+        }
+
+        if (departmentsResponse.data.status === "success") {
+          const departmentsData = departmentsResponse.data.data.departments || departmentsResponse.data.data || [];
+          setDepartments(departmentsData);
+          console.log("Departments set:", departmentsData);
+        } else {
+          console.error("Departments API failed:", departmentsResponse.data);
+        }
+      } catch (error) {
+        console.error("Error fetching required data:", error);
+      } finally {
+        setDataLoading(false);
       }
-    } else {
-      setStudentFound(null);
-      setStudentResults([]);
+    };
+
+    fetchRequiredData();
+  }, []);
+
+  // Helper function to process marks data into semester records
+  const processMarksIntoSemesters = (marks, semestersData, subjectsData) => {
+    console.log("Processing marks:", marks);
+    console.log("Available semesters:", semestersData);
+    console.log("Available subjects:", subjectsData);
+
+    const semesterRecords = {};
+
+    marks.forEach((mark, index) => {
+      console.log(`Processing mark ${index}:`, mark);
+
+      // Find semester and subject details
+      const semester = semestersData.find(sem => sem._id === mark.semester_id);
+      const subject = subjectsData.find(sub => sub._id === mark.subject_id);
+
+      console.log(`Found semester for ${mark.semester_id}:`, semester);
+      console.log(`Found subject for ${mark.subject_id}:`, subject);
+
+      const semesterName = semester ? semester.name : `Unknown Semester (${mark.semester_id})`;
+
+      if (!semesterRecords[semesterName]) {
+        semesterRecords[semesterName] = {
+          subjects: [],
+          semesterGPA: "0.0" // Will be calculated if needed
+        };
+      }
+
+      // Add subject with mark details - use credit_hours from subject model
+      const subjectInfo = subject ? {
+        name: subject.name,
+        code: subject.code,
+        credits: subject.credit_hours || 3
+      } : {
+        name: "Unknown Subject",
+        code: "N/A",
+        credits: 3
+      };
+
+      semesterRecords[semesterName].subjects.push({
+        ...mark,
+        subject: subjectInfo,
+        credits: subjectInfo.credits
+      });
+    });
+
+    // Calculate semester GPAs (simplified calculation)
+    Object.keys(semesterRecords).forEach(semesterName => {
+      const subjects = semesterRecords[semesterName].subjects;
+      if (subjects.length > 0) {
+        const totalPoints = subjects.reduce((sum, subject) => {
+          const gradePoints = getGradePoints(subject.grade);
+          return sum + (gradePoints * (subject.credits || 3));
+        }, 0);
+        const totalCredits = subjects.reduce((sum, subject) => sum + (subject.credits || 3), 0);
+        const gpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+        semesterRecords[semesterName].semesterGPA = gpa;
+      }
+    });
+
+    console.log("Final semester records:", semesterRecords);
+    return semesterRecords;
+  };
+
+  // Helper function to convert grade to grade points
+  const getGradePoints = (grade) => {
+    const gradeMap = {
+      'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+      'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+      'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+      'D+': 1.3, 'D': 1.0, 'D-': 0.7,
+      'F': 0.0
+    };
+    return gradeMap[grade] || 0.0;
+  };
+
+  // API function to fetch academic record
+  const fetchAcademicRecord = async (studentIdNumber) => {
+    const trimmedId = studentIdNumber.trim();
+    if (!trimmedId) {
+      setError("Please enter a valid student ID number");
+      return;
     }
-  }, [studentSearchId]);
+
+    // Check if required data is available
+    if (semesters.length === 0 || subjects.length === 0 || departments.length === 0) {
+      setError("Loading required data... Please try again in a moment.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setAcademicRecord(null);
+
+    try {
+      console.log(`Making API call to: ${API_URL}/students/academic-record/${trimmedId}`);
+      console.log("Available data for processing:");
+      console.log("Semesters:", semesters.length);
+      console.log("Subjects:", subjects.length);
+      console.log("Departments:", departments.length);
+
+      const response = await axios.get(
+        `${API_URL}/students/academic-record/${trimmedId}`
+      );
+
+      // Fix: Check for response.data.status === "success" instead of response.data.success
+      if (response.data.status === "success") {
+        const rawData = response.data.data;
+        console.log("Raw student data:", rawData);
+
+        // Process marks into semester records
+        const semesterRecords = processMarksIntoSemesters(
+          rawData.student.marks || [],
+          semesters,
+          subjects
+        );
+
+        // Find department information
+        const department = departments.find(dept => dept._id === rawData.student.department);
+        console.log("Found department:", department);
+
+        // Create the processed academic record
+        const processedRecord = {
+          ...rawData,
+          student: {
+            ...rawData.student,
+            department: department || { name: "Unknown Department" }
+          },
+          semesterRecords: semesterRecords
+        };
+
+        console.log("Processed record:", processedRecord);
+        setAcademicRecord(processedRecord);
+
+        // Set the first semester as selected by default
+        const semesterKeys = Object.keys(semesterRecords);
+        if (semesterKeys.length > 0) {
+          setSelectedSemester(semesterKeys[0]);
+        }
+      } else {
+        setError("Failed to fetch academic record");
+      }
+    } catch (error) {
+      console.error("Error fetching academic record:", error);
+      if (error.response?.status === 404) {
+        setError(`Student not found with ID: ${trimmedId}`);
+      } else if (error.code === 'ERR_NETWORK') {
+        setError("Cannot connect to server. Please make sure the backend server is running.");
+      } else {
+        setError("Failed to fetch academic record. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleStudentIdSearch = (e) => {
     setStudentSearchId(e.target.value);
+    setError(""); // Clear any previous errors
   };
 
-  // Helper functions
-  const getSubjectById = (id) => {
-    return (
-      subjects.find((subject) => subject.id === id) || {
-        name: "Unknown Subject",
-        code: "N/A",
-      }
-    );
+  const handleViewAcademicRecord = () => {
+    fetchAcademicRecord(studentSearchId);
   };
 
-  const getSemesterById = (id) => {
-    return (
-      semesters.find((semester) => semester.id === id) || {
-        name: "Unknown Semester",
-      }
-    );
-  };
-
+  // Helper function to get grade color
   const getGradeColor = (grade) => {
     if (grade === "A+" || grade === "A" || grade === "A-")
       return "text-green-600";
@@ -259,52 +256,6 @@ const StudentMarksView = () => {
       return "text-yellow-600";
     if (grade === "D") return "text-orange-600";
     return "text-red-600";
-  };
-
-  const calculateGPA = (results) => {
-    if (!results || results.length === 0) return 0;
-
-    const gradePoints = {
-      "A+": 4.0,
-      A: 4.0,
-      "A-": 3.7,
-      "B+": 3.3,
-      B: 3.0,
-      "B-": 2.7,
-      "C+": 2.3,
-      C: 2.0,
-      "C-": 1.7,
-      D: 1.0,
-      F: 0.0,
-    };
-
-    let totalPoints = 0;
-    let totalCredits = 0;
-
-    results.forEach((result) => {
-      const subject = getSubjectById(result.subject_id);
-      const credits = subject.credit_hours || 0;
-      const points = gradePoints[result.grade] || 0;
-
-      totalPoints += points * credits;
-      totalCredits += credits;
-    });
-
-    return totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : 0;
-  };
-
-  const calculateSemesterGPA = (studentId, semesterId) => {
-    const semesterResults = studentMarks.filter(
-      (mark) => mark.student_id === studentId && mark.semester_id === semesterId
-    );
-    return calculateGPA(semesterResults);
-  };
-
-  const calculateCGPA = (studentId) => {
-    const allResults = studentMarks.filter(
-      (mark) => mark.student_id === studentId
-    );
-    return calculateGPA(allResults);
   };
 
   return (
@@ -356,25 +307,39 @@ const StudentMarksView = () => {
                 />
               </div>
               <button
-                className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2'
-                onClick={() => {
-                  // This is just for UI demonstration, in a real app this would validate the ID
-                  if (!studentSearchId) {
-                    alert("Please enter a valid student identification number");
-                  }
-                }}
+                className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                onClick={handleViewAcademicRecord}
+                disabled={loading || !studentSearchId.trim() || dataLoading}
               >
-                <Search className='h-4 w-4' />
-                <span>View Complete Academic Record</span>
+                {loading || dataLoading ? (
+                  <Loader className='h-4 w-4 animate-spin' />
+                ) : (
+                  <Search className='h-4 w-4' />
+                )}
+                <span>
+                  {dataLoading
+                    ? "Loading System Data..."
+                    : loading
+                    ? "Loading..."
+                    : "View Complete Academic Record"}
+                </span>
               </button>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Error Display */}
+      {error && (
+        <div className='bg-red-50 border border-red-200 rounded-xl p-4 flex items-center space-x-3'>
+          <AlertCircle className='h-5 w-5 text-red-500 flex-shrink-0' />
+          <p className='text-red-700 font-medium'>{error}</p>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className='bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden'>
-        {studentFound ? (
+        {academicRecord ? (
           <div className='p-8'>
             {/* Student Profile Header */}
             <div className='relative bg-gradient-to-br from-[#E8ECEF]/50 via-[#E8ECEF]/30 to-white rounded-2xl p-8 mb-8 border border-[#E8ECEF]/50 overflow-hidden'>
@@ -386,7 +351,7 @@ const StudentMarksView = () => {
                 <div className='flex items-center space-x-6'>
                   <div className='relative'>
                     <div className='w-20 h-20 bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg'>
-                      {studentFound.name.charAt(0)}
+                      {academicRecord.student.name.charAt(0)}
                     </div>
                     <div className='absolute -bottom-2 -right-2 w-8 h-8 bg-[#F7B500] rounded-full flex items-center justify-center border-4 border-white'>
                       <Award className='h-4 w-4 text-white' />
@@ -394,7 +359,7 @@ const StudentMarksView = () => {
                   </div>
                   <div>
                     <h3 className='text-3xl font-bold bg-gradient-to-r from-[#000000] via-[#1D3D6F] to-[#2C4F85] bg-clip-text text-transparent mb-3'>
-                      {studentFound.name}
+                      {academicRecord.student.name}
                     </h3>
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                       <div className='flex items-center space-x-3'>
@@ -406,7 +371,7 @@ const StudentMarksView = () => {
                             Student ID
                           </p>
                           <p className='text-sm font-semibold text-gray-800'>
-                            {studentFound.id}
+                            {academicRecord.student.student_id_number}
                           </p>
                         </div>
                       </div>
@@ -419,7 +384,7 @@ const StudentMarksView = () => {
                             Department
                           </p>
                           <p className='text-sm font-semibold text-gray-800'>
-                            {studentFound.department_name}
+                            {academicRecord.student.department?.name || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -432,7 +397,7 @@ const StudentMarksView = () => {
                             Enrollment Year
                           </p>
                           <p className='text-sm font-semibold text-gray-800'>
-                            {studentFound.enrollment_year}
+                            {academicRecord.student.enrollment_year}
                           </p>
                         </div>
                       </div>
@@ -452,12 +417,12 @@ const StudentMarksView = () => {
                       Cumulative Grade Point Average
                     </p>
                     <p className='text-4xl font-bold bg-gradient-to-r from-[#1D3D6F] via-[#2C4F85] to-[#F7B500] bg-clip-text text-transparent'>
-                      {calculateCGPA(studentFound.id)}
+                      {academicRecord.academicSummary.overallCGPA}
                     </p>
                     <div className='mt-2 flex items-center justify-center'>
                       <TrendingUp className='h-4 w-4 text-[#F7B500] mr-1' />
                       <span className='text-xs text-[#1D3D6F] font-medium'>
-                        Excellent Academic Performance
+                        {academicRecord.academicSummary.academicStatus}
                       </span>
                     </div>
                   </div>
@@ -487,15 +452,9 @@ const StudentMarksView = () => {
                   </h4>
                 </div>
                 <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
-                  {semesters.map((semester) => {
-                    const semesterResults = studentResults.filter(
-                      (result) => result.semester_id === semester.id
-                    );
-                    const hasResults = semesterResults.length > 0;
-
-                    const semesterGPA = hasResults
-                      ? calculateSemesterGPA(studentFound.id, semester.id)
-                      : null;
+                  {Object.entries(academicRecord.semesterRecords).map(([semesterKey, semesterData]) => {
+                    const hasResults = semesterData.subjects.length > 0;
+                    const semesterGPA = semesterData.semesterGPA;
 
                     let gpaColor = "text-[#F7B500]";
                     let gpaBg = "bg-[#F7B500]/10";
@@ -515,24 +474,24 @@ const StudentMarksView = () => {
 
                     return (
                       <button
-                        key={semester.id}
+                        key={semesterKey}
                         className={`relative group rounded-xl transition-all duration-300 transform hover:scale-105 ${
                           !hasResults
                             ? "opacity-50 cursor-not-allowed"
                             : "hover:shadow-lg"
                         } ${
-                          selectedSemester === semester.id
+                          selectedSemester === semesterKey
                             ? "ring-2 ring-[#1D3D6F] ring-offset-2 shadow-lg scale-105"
                             : ""
                         }`}
                         onClick={() =>
-                          hasResults && setSelectedSemester(semester.id)
+                          hasResults && setSelectedSemester(semesterKey)
                         }
                         disabled={!hasResults}
                       >
                         <div
                           className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                            selectedSemester === semester.id
+                            selectedSemester === semesterKey
                               ? "bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] text-white border-[#1D3D6F]"
                               : hasResults
                               ? `bg-white ${borderColor} hover:bg-[#E8ECEF]/30`
@@ -541,13 +500,13 @@ const StudentMarksView = () => {
                         >
                           <div className='text-center space-y-2'>
                             <div className='font-semibold text-sm'>
-                              {semester.name}
+                              {semesterKey}
                             </div>
 
                             {hasResults && (
                               <div
                                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                  selectedSemester === semester.id
+                                  selectedSemester === semesterKey
                                     ? "bg-white/20 text-white"
                                     : `${gpaBg} ${gpaColor}`
                                 }`}
@@ -565,7 +524,7 @@ const StudentMarksView = () => {
                           </div>
                         </div>
 
-                        {selectedSemester === semester.id && (
+                        {selectedSemester === semesterKey && (
                           <div className='absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-[#F7B500] rounded-full'></div>
                         )}
                       </button>
@@ -576,20 +535,17 @@ const StudentMarksView = () => {
 
               {/* Semester Results */}
               <div className='bg-white rounded-xl border border-gray-100 overflow-hidden'>
-                {studentResults.filter(
-                  (result) => result.semester_id === selectedSemester
-                ).length === 0 ? (
+                {!selectedSemester || !academicRecord.semesterRecords[selectedSemester] ||
+                 academicRecord.semesterRecords[selectedSemester].subjects.length === 0 ? (
                   <div className='p-12 text-center'>
                     <div className='w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6'>
                       <Calendar className='h-12 w-12 text-gray-400' />
                     </div>
                     <h3 className='text-xl font-semibold text-gray-800 mb-3'>
-                      {t("marks.no_results_available")}
+                      No Results Available
                     </h3>
                     <p className='text-gray-600 max-w-md mx-auto'>
-                      {t("marks.no_results_for_semester", {
-                        semester: getSemesterById(selectedSemester).name,
-                      })}
+                      No academic records found for the selected semester.
                     </p>
                   </div>
                 ) : (
@@ -603,8 +559,7 @@ const StudentMarksView = () => {
                           </div>
                           <div>
                             <h4 className='text-lg font-semibold text-gray-800'>
-                              {getSemesterById(selectedSemester).name} Academic
-                              Grade Report
+                              {selectedSemester} Academic Grade Report
                             </h4>
                             <p className='text-sm text-gray-600'>
                               Complete academic performance overview
@@ -618,28 +573,15 @@ const StudentMarksView = () => {
                             </p>
                             <div
                               className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
-                                Number.parseFloat(
-                                  calculateSemesterGPA(
-                                    studentFound.id,
-                                    selectedSemester
-                                  )
-                                ) >= 3.0
+                                Number.parseFloat(academicRecord.semesterRecords[selectedSemester].semesterGPA) >= 3.0
                                   ? "bg-[#F7B500]/20 text-[#F7B500]"
-                                  : Number.parseFloat(
-                                      calculateSemesterGPA(
-                                        studentFound.id,
-                                        selectedSemester
-                                      )
-                                    ) >= 2.0
+                                  : Number.parseFloat(academicRecord.semesterRecords[selectedSemester].semesterGPA) >= 2.0
                                   ? "bg-[#2C4F85]/20 text-[#2C4F85]"
                                   : "bg-[#F7B500]/20 text-[#F7B500]"
                               }`}
                             >
                               <Star className='h-3 w-3 mr-1' />
-                              {calculateSemesterGPA(
-                                studentFound.id,
-                                selectedSemester
-                              )}
+                              {academicRecord.semesterRecords[selectedSemester].semesterGPA}
                             </div>
                           </div>
                         </div>
@@ -678,16 +620,10 @@ const StudentMarksView = () => {
                           </tr>
                         </thead>
                         <tbody className='bg-white divide-y divide-gray-100'>
-                          {studentResults
-                            .filter(
-                              (result) =>
-                                result.semester_id === selectedSemester
-                            )
-                            .map((result, index) => {
-                              const subject = getSubjectById(result.subject_id);
+                          {academicRecord.semesterRecords[selectedSemester].subjects.map((subjectData, index) => {
                               return (
                                 <tr
-                                  key={result.id}
+                                  key={index}
                                   className={`hover:bg-blue-50/50 transition-all duration-200 ${
                                     index % 2 === 0
                                       ? "bg-white"
@@ -701,39 +637,42 @@ const StudentMarksView = () => {
                                       </div>
                                       <div>
                                         <div className='text-sm font-semibold text-gray-900'>
-                                          {subject.name}
+                                          {subjectData.subject?.name || "Unknown Subject"}
                                         </div>
                                         <div className='text-xs text-gray-500 mt-1 font-medium'>
-                                          {subject.code}
+                                          {subjectData.subject?.code || "N/A"}
                                         </div>
                                       </div>
                                     </div>
                                   </td>
                                   <td className='px-6 py-5 text-center'>
                                     <div className='inline-flex items-center justify-center w-10 h-10 bg-[#E8ECEF] text-[#1D3D6F] rounded-full text-sm font-bold'>
-                                      {subject.credit_hours}
+                                      {subjectData.credits || 3}
                                     </div>
                                   </td>
                                   <td className='px-6 py-5 text-center'>
                                     <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#2C4F85]/10 text-[#2C4F85]'>
-                                      {result.midterm_marks}
+                                      {subjectData.midterm}
                                     </span>
                                   </td>
                                   <td className='px-6 py-5 text-center'>
                                     <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#1D3D6F]/10 text-[#1D3D6F]'>
-                                      {result.final_marks}
+                                      {subjectData.final}
                                     </span>
                                   </td>
                                   <td className='px-6 py-5 text-center'>
                                     <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#F7B500]/10 text-[#F7B500]'>
-                                      {result.assignment_marks}
+                                      {subjectData.assignment}
                                     </span>
                                   </td>
                                   <td className='px-6 py-5 text-center'>
-                                    <div className='flex items-center justify-center'>
+                                    <div className='flex items-center justify-center space-x-2'>
                                       <span className='inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-[#E8ECEF] to-[#E8ECEF]/80 text-[#1D3D6F] border border-[#E8ECEF]'>
                                         <Award className='h-4 w-4 mr-2 text-[#F7B500]' />
-                                        {result.total_marks}
+                                        {subjectData.total}
+                                      </span>
+                                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${getGradeColor(subjectData.grade)} bg-gray-100`}>
+                                        {subjectData.grade}
                                       </span>
                                     </div>
                                   </td>
