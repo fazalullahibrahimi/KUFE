@@ -147,43 +147,26 @@ const Navbar = () => {
                 </Link>
               </li>
             )}
+
+            {/* Quality Assurance Button - Only visible to students */}
+            {isStudent && (
+              <li>
+                <Link
+                  to='/quality-assurance'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+                    location.pathname === "/quality-assurance"
+                      ? "bg-[#F7B500] text-[#004B87] font-medium"
+                      : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
+                  }`}
+                  title='Share your opinion with Quality Assurance'
+                >
+                  <MessageSquare size={16} />
+                  <span>QA Feedback</span>
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
-          {/* Teacher Marks Button - Only visible to teachers */}
-          {isTeacher && (
-            <li>
-              <Link
-                to='/teachermarks'
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
-                  location.pathname === "/teachermarks"
-                    ? "bg-[#F7B500] text-[#004B87] font-medium"
-                    : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
-                }`}
-              >
-                <BookOpen size={16} />
-                <span>Upload Marks</span>
-              </Link>
-            </li>
-          )}
-
-          {/* Quality Assurance Button - Only visible to students */}
-          {isStudent && (
-            <li>
-              <Link
-                to='/quality-assurance'
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
-                  location.pathname === "/quality-assurance"
-                    ? "bg-[#F7B500] text-[#004B87] font-medium"
-                    : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
-                }`}
-                title="Share your opinion with Quality Assurance"
-              >
-                <MessageSquare size={16} />
-                <span>QA Feedback</span>
-              </Link>
-            </li>
-          )}
-        </ul>
 
         <div className='flex items-center space-x-3'>
           {/* Language Switcher */}
