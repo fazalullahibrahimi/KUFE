@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   MapPin,
   Phone,
@@ -9,43 +9,22 @@ import {
   Linkedin,
   Youtube,
   ChevronUp,
-  ExternalLink,
   Calendar,
   BookOpen,
   Users,
   GraduationCap,
   Award,
   FileText,
-  Send,
+  MessageSquare,
 } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useAuth } from "../contexts/AuthContext";
+import { useRoleAccess } from "../hooks/useAuthGuard";
 
 const Footer = () => {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const { t, language, direction } = useLanguage();
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-
-    // Simple email validation
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError(t("Email_Error"));
-      return;
-    }
-
-    // Here you would typically send this to your API
-    console.log("Subscribing email:", email);
-    setSubscribed(true);
-    setEmailError("");
-    setEmail("");
-
-    // Reset subscription message after 5 seconds
-    setTimeout(() => {
-      setSubscribed(false);
-    }, 5000);
-  };
+  const { t, direction } = useLanguage();
+  const { isAuthenticated } = useAuth();
+  const { isStudent, isAdmin } = useRoleAccess();
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -130,14 +109,19 @@ const Footer = () => {
                   icon: GraduationCap,
                 },
                 { name: t("Research"), href: "/research", icon: FileText },
-                { name: t("Events"), href: "/events", icon: Calendar },
-                { name: t("Faculty"), href: "/faculty", icon: Award },
+                { name: t("News"), href: "/anounce", icon: Calendar },
+                { name: t("Courses"), href: "/courses", icon: Award },
                 { name: t("Contact"), href: "/contact", icon: Mail },
-                {
-                  name: t("Student Portal"),
-                  href: "/portal",
-                  icon: ExternalLink,
-                },
+                // QA Feedback - Only show for authenticated students (not admin)
+                ...(isAuthenticated && isStudent() && !isAdmin()
+                  ? [
+                      {
+                        name: "QA Feedback",
+                        href: "/quality-assurance",
+                        icon: MessageSquare,
+                      },
+                    ]
+                  : []),
               ].map((link, i) => (
                 <a
                   key={i}
@@ -156,6 +140,50 @@ const Footer = () => {
                   </span>
                 </a>
               ))}
+            </div>
+          </div>
+
+          {/* Academic Programs */}
+          <div className='space-y-6'>
+            <div
+              className={`flex items-center ${
+                direction === "rtl" ? "space-x-reverse space-x-2" : "space-x-2"
+              }`}
+            >
+              <div className='h-1 w-6 bg-[#F7B500] rounded-full'></div>
+              <h3 className='text-xl font-bold text-white'>
+                Academic Programs
+              </h3>
+            </div>
+
+            <div className='space-y-4 text-[#E8ECEF]'>
+              <div className='flex items-center group hover:text-[#F7B500] transition-colors'>
+                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500]/30 transition-colors'>
+                  <GraduationCap className='h-3 w-3 text-[#F7B500]' />
+                </div>
+                <span className='text-sm'>Bachelor's Degree</span>
+              </div>
+
+              <div className='flex items-center group hover:text-[#F7B500] transition-colors'>
+                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500]/30 transition-colors'>
+                  <Award className='h-3 w-3 text-[#F7B500]' />
+                </div>
+                <span className='text-sm'>Master's Degree</span>
+              </div>
+
+              <div className='flex items-center group hover:text-[#F7B500] transition-colors'>
+                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500]/30 transition-colors'>
+                  <FileText className='h-3 w-3 text-[#F7B500]' />
+                </div>
+                <span className='text-sm'>Research Programs</span>
+              </div>
+
+              <div className='flex items-center group hover:text-[#F7B500] transition-colors'>
+                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500]/30 transition-colors'>
+                  <Users className='h-3 w-3 text-[#F7B500]' />
+                </div>
+                <span className='text-sm'>Professional Development</span>
+              </div>
             </div>
           </div>
 
@@ -208,62 +236,6 @@ const Footer = () => {
                 </a>
               </li>
             </ul>
-          </div>
-
-          {/* Newsletter */}
-          <div className='space-y-6'>
-            <div
-              className={`flex items-center ${
-                direction === "rtl" ? "space-x-reverse space-x-2" : "space-x-2"
-              }`}
-            >
-              <div className='h-1 w-6 bg-[#F7B500] rounded-full'></div>
-              <h3 className='text-xl font-bold text-white'>
-                {t("Newsletter")}
-              </h3>
-            </div>
-
-            <p className='text-[#E8ECEF]'>{t("Newsletter_Description")}</p>
-
-            <form onSubmit={handleSubscribe} className='relative'>
-              <div className='relative bg-white/10 backdrop-blur-sm rounded-lg p-1 overflow-hidden'>
-                <input
-                  type='email'
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (emailError) setEmailError("");
-                  }}
-                  placeholder={t("Your email address")}
-                  className='w-full bg-transparent border-0 text-white px-4 py-3 focus:outline-none focus:ring-0 placeholder-white/50'
-                  aria-label='Email for newsletter'
-                />
-                <button
-                  type='submit'
-                  className={`absolute ${
-                    direction === "rtl" ? "left-1" : "right-1"
-                  } top-1 bottom-1 bg-[#F7B500] text-[#1D3D6F] px-4 rounded-md font-medium flex items-center justify-center hover:bg-[#F4B400] transition-colors`}
-                  aria-label='Subscribe'
-                >
-                  <Send
-                    className={`h-4 w-4 ${
-                      direction === "rtl" ? "ml-1" : "mr-1"
-                    }`}
-                  />
-                  <span>{t("Subscribe")}</span>
-                </button>
-              </div>
-
-              {emailError && (
-                <p className='text-red-300 text-sm mt-2'>{emailError}</p>
-              )}
-
-              {subscribed && (
-                <p className='text-green-300 text-sm mt-2'>
-                  {t("Subscribe_Thanks")}
-                </p>
-              )}
-            </form>
           </div>
         </div>
 

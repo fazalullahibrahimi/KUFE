@@ -115,8 +115,8 @@ export const LanguageProvider = ({ children }) => {
     }
   };
 
-  // Translation function - Enhanced to handle both translation sources
-  const t = (key) => {
+  // Translation function - Enhanced to handle both translation sources and placeholders
+  const t = (key, params = {}) => {
     // Safety check - if key is undefined or null, return empty string
     if (!key) return "";
 
@@ -128,14 +128,13 @@ export const LanguageProvider = ({ children }) => {
 
     // First, always check the main translations object
     const currentTranslations = translations[language];
+    let translatedText = "";
 
     // Check if key exists directly in the translations
     if (currentTranslations[key]) {
-      return currentTranslations[key];
-    }
-
-    // For nested keys with dot notation, split and navigate
-    if (key && typeof key === "string" && key.includes(".")) {
+      translatedText = currentTranslations[key];
+    } else if (key && typeof key === "string" && key.includes(".")) {
+      // For nested keys with dot notation, split and navigate
       const keyParts = key.split(".");
       let value = currentTranslations;
 
@@ -149,30 +148,46 @@ export const LanguageProvider = ({ children }) => {
       }
 
       if (value !== null && typeof value === "string") {
-        return value;
+        translatedText = value;
       }
     }
 
     // Additional fallback for Pashto language
-    if (language === "ps") {
+    if (!translatedText && language === "ps") {
       // Check if key exists directly in psTranslations nested objects
       for (const section in psTranslations) {
         if (psTranslations[section]?.[key]) {
-          return psTranslations[section][key];
+          translatedText = psTranslations[section][key];
+          break;
         }
       }
-    } else if (language === "dr") {
+    } else if (!translatedText && language === "dr") {
       // Additional fallback for Dari language
       if (drTranslations.dr?.[key]) {
-        return drTranslations.dr[key];
+        translatedText = drTranslations.dr[key];
       }
     }
 
-    // Return the key itself if no translation found
-    console.warn(
-      `Translation not found for key: "${key}" in language: "${language}"`
-    );
-    return key;
+    // If still no translation found, use the key itself
+    if (!translatedText) {
+      console.warn(
+        `Translation not found for key: "${key}" in language: "${language}"`
+      );
+      translatedText = key;
+    }
+
+    // Handle placeholder replacement
+    if (params && typeof params === "object") {
+      Object.keys(params).forEach((paramKey) => {
+        const placeholder = `{${paramKey}}`;
+        translatedText = translatedText.replace(
+          new RegExp(placeholder, "g"),
+          params[paramKey]
+        );
+      });
+    }
+
+    return translatedText;
   };
 
   const value = {

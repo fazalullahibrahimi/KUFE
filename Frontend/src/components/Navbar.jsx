@@ -1,6 +1,5 @@
-import React from "react";
-import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   Menu,
@@ -8,24 +7,27 @@ import {
   Globe,
   ChevronRight,
   BookOpen,
-  MessageSquare,
+  LogOut,
+  User,
 } from "lucide-react";
 import Logo from "/KufeLogo.jpeg";
 import { useLanguage } from "../contexts/LanguageContext";
-import { getCurrentUser } from "../utils/helpers";
+import { useAuth } from "../contexts/AuthContext";
+import { useRoleAccess } from "../hooks/useAuthGuard";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
+  const { isAuthenticated, user, logout } = useAuth();
+  const { isStudent, isTeacher, isAdmin } = useRoleAccess();
+
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const langMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
-
-  // Get current user to check role
-  const currentUser = getCurrentUser();
-  const isStudent = currentUser?.role === "student";
-  const isTeacher = currentUser?.role === "teacher";
+  const userMenuRef = useRef(null);
 
   // Navigation items with translations
   const navItems = [
@@ -45,11 +47,24 @@ const Navbar = () => {
     { code: "ps", name: "پښتو", flag: "🇦🇫" },
   ];
 
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (langMenuRef.current && !langMenuRef.current.contains(event.target)) {
         setIsLangMenuOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
       }
       if (
         mobileMenuRef.current &&
@@ -114,8 +129,8 @@ const Navbar = () => {
               </li>
             ))}
 
-            {/* Student Marks Button - Only visible to students */}
-            {isStudent && (
+            {/* Student Marks Button - Only visible to students (not admin) */}
+            {isStudent() && !isAdmin() && (
               <li>
                 <Link
                   to='/studentmarks'
@@ -131,8 +146,8 @@ const Navbar = () => {
               </li>
             )}
 
-            {/* Teacher Marks Button - Only visible to teachers */}
-            {isTeacher && (
+            {/* Teacher Marks Button - Only visible to teachers (not admin) */}
+            {isTeacher() && !isAdmin() && (
               <li>
                 <Link
                   to='/teachermarks'
@@ -147,38 +162,110 @@ const Navbar = () => {
                 </Link>
               </li>
             )}
-
-            {/* Quality Assurance Button - Only visible to students */}
-            {isStudent && (
-              <li>
-                <Link
-                  to='/quality-assurance'
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
-                    location.pathname === "/quality-assurance"
-                      ? "bg-[#F7B500] text-[#004B87] font-medium"
-                      : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
-                  }`}
-                  title='Share your opinion with Quality Assurance'
-                >
-                  <MessageSquare size={16} />
-                  <span>QA Feedback</span>
-                </Link>
-              </li>
-            )}
           </ul>
         </div>
 
-        <div className='flex items-center space-x-3'>
+        <div className='flex items-center space-x-4'>
+          {/* Authentication Section */}
+          {isAuthenticated ? (
+            <div className='hidden md:flex items-center space-x-3'>
+              {/* User Info */}
+              <div className='relative' ref={userMenuRef}>
+                <button
+                  className='flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg transition-all duration-200'
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  aria-expanded={isUserMenuOpen}
+                  aria-label='User menu'
+                >
+                  <div className='w-8 h-8 bg-[#F7B500] rounded-full flex items-center justify-center'>
+                    <User className='h-4 w-4 text-[#1D3D6F]' />
+                  </div>
+                  <span className='text-sm font-medium'>
+                    {user?.fullName?.split(" ")[0] || "User"}
+                  </span>
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform ${
+                      isUserMenuOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {isUserMenuOpen && (
+                  <div className='absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-100'>
+                    <div className='px-4 py-3 border-b border-gray-100'>
+                      <p className='text-sm font-semibold text-gray-900'>
+                        {user?.fullName}
+                      </p>
+                      <p className='text-xs text-gray-500'>{user?.email}</p>
+                      <span className='inline-block mt-1 px-2 py-1 text-xs font-medium bg-[#1D3D6F] text-white rounded-full capitalize'>
+                        {user?.role}
+                      </span>
+                    </div>
+
+                    {isAdmin() && (
+                      <Link
+                        to='/dashboardv1'
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className='flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors'
+                      >
+                        <BookOpen className='h-4 w-4 mr-3 text-[#1D3D6F]' />
+                        Admin Dashboard
+                      </Link>
+                    )}
+
+                    <Link
+                      to='/profile'
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className='flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors'
+                    >
+                      <User className='h-4 w-4 mr-3 text-[#1D3D6F]' />
+                      My Profile
+                    </Link>
+
+                    <hr className='my-1' />
+
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className='flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors'
+                    >
+                      <LogOut className='h-4 w-4 mr-3' />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className='hidden md:flex items-center space-x-3'>
+              <Link
+                to='/login'
+                className='flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-200'
+              >
+                <User className='h-4 w-4' />
+                <span className='text-sm font-medium'>Sign In</span>
+              </Link>
+              <Link
+                to='/registration'
+                className='flex items-center space-x-2 bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] px-4 py-2 rounded-lg font-medium transition-all duration-200'
+              >
+                <span className='text-sm'>Register</span>
+              </Link>
+            </div>
+          )}
+
           {/* Language Switcher */}
           <div className='relative' ref={langMenuRef}>
             <button
-              className='flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-md transition-colors'
+              className='flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg transition-all duration-200'
               onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
               aria-expanded={isLangMenuOpen}
               aria-label='Select language'
             >
               <Globe className='h-4 w-4' />
-              <span className='hidden sm:inline'>
+              <span className='hidden sm:inline text-sm'>
                 {languages.find((lang) => lang.code === language)?.name ||
                   "English"}
               </span>
@@ -190,21 +277,21 @@ const Navbar = () => {
             </button>
 
             {isLangMenuOpen && (
-              <div className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 animate-fadeIn'>
+              <div className='absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-100'>
                 {languages.map((lang) => (
                   <button
                     key={lang.code}
                     onClick={() => changeLanguage(lang.code)}
-                    className={`flex items-center w-full text-left px-4 py-2 text-sm ${
+                    className={`flex items-center w-full text-left px-4 py-2 text-sm transition-colors ${
                       language === lang.code
-                        ? "bg-gray-100 text-[#1D3D6F] font-medium"
-                        : "text-gray-700 hover:bg-gray-100"
+                        ? "bg-[#1D3D6F] text-white font-medium"
+                        : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     <span className='mr-3 text-lg'>{lang.flag}</span>
                     <span>{lang.name}</span>
                     {language === lang.code && (
-                      <span className='ml-auto text-[#004B87] font-bold'>
+                      <span className='ml-auto text-[#F7B500] font-bold'>
                         ✓
                       </span>
                     )}
@@ -216,7 +303,7 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className='md:hidden flex items-center justify-center text-white'
+            className='md:hidden flex items-center justify-center text-white mobile-menu-button p-2 rounded-lg hover:bg-white/10 transition-colors'
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-expanded={isMobileMenuOpen}
             aria-label='Toggle menu'
@@ -254,8 +341,8 @@ const Navbar = () => {
               </li>
             ))}
 
-            {/* Student Marks Button - Only visible to students in mobile menu */}
-            {isStudent && (
+            {/* Student Marks Button - Only visible to students (not admin) in mobile menu */}
+            {isStudent() && !isAdmin() && (
               <li>
                 <Link
                   to='/studentmarks'
@@ -275,8 +362,8 @@ const Navbar = () => {
               </li>
             )}
 
-            {/* Teacher Marks Button - Only visible to teachers in mobile menu */}
-            {isTeacher && (
+            {/* Teacher Marks Button - Only visible to teachers (not admin) in mobile menu */}
+            {isTeacher() && !isAdmin() && (
               <li>
                 <Link
                   to='/teachermarks'
@@ -295,28 +382,80 @@ const Navbar = () => {
                 </Link>
               </li>
             )}
-
-            {/* Quality Assurance Button - Only visible to students in mobile menu */}
-            {isStudent && (
-              <li>
-                <Link
-                  to='/quality-assurance'
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex justify-between items-center px-6 py-3 hover:bg-gray-50 ${
-                    location.pathname === "/quality-assurance"
-                      ? "bg-blue-50 text-[#004B87] font-medium"
-                      : "text-gray-700"
-                  }`}
-                >
-                  <div className='flex items-center gap-2'>
-                    <MessageSquare size={18} />
-                    <span>QA Feedback</span>
-                  </div>
-                  <ChevronRight className='h-4 w-4' />
-                </Link>
-              </li>
-            )}
           </ul>
+
+          {/* Authentication Section in Mobile Menu */}
+          {isAuthenticated ? (
+            <div className='border-b border-gray-200 px-6 py-4 bg-gray-50'>
+              <div className='flex items-center space-x-3 mb-4'>
+                <div className='w-10 h-10 bg-[#F7B500] rounded-full flex items-center justify-center'>
+                  <User className='h-5 w-5 text-[#1D3D6F]' />
+                </div>
+                <div className='flex-1'>
+                  <p className='text-sm font-semibold text-gray-900'>
+                    {user?.fullName}
+                  </p>
+                  <p className='text-xs text-gray-500'>{user?.email}</p>
+                  <span className='inline-block mt-1 px-2 py-1 text-xs font-medium bg-[#1D3D6F] text-white rounded-full capitalize'>
+                    {user?.role}
+                  </span>
+                </div>
+              </div>
+
+              <div className='space-y-1'>
+                {isAdmin() && (
+                  <Link
+                    to='/dashboardv1'
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className='flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors'
+                  >
+                    <BookOpen className='h-4 w-4 mr-3 text-[#1D3D6F]' />
+                    Admin Dashboard
+                  </Link>
+                )}
+
+                <Link
+                  to='/profile'
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className='flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors'
+                >
+                  <User className='h-4 w-4 mr-3 text-[#1D3D6F]' />
+                  My Profile
+                </Link>
+
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className='flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors'
+                >
+                  <LogOut className='h-4 w-4 mr-3' />
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className='border-b border-gray-200 px-6 py-4 bg-gray-50'>
+              <div className='space-y-3'>
+                <Link
+                  to='/login'
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className='flex items-center justify-center w-full bg-[#1D3D6F] text-white py-3 px-4 rounded-lg font-medium hover:bg-[#2C4F85] transition-colors'
+                >
+                  <User className='h-4 w-4 mr-2' />
+                  Sign In
+                </Link>
+                <Link
+                  to='/registration'
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className='flex items-center justify-center w-full border-2 border-[#1D3D6F] text-[#1D3D6F] py-3 px-4 rounded-lg font-medium hover:bg-[#1D3D6F] hover:text-white transition-colors'
+                >
+                  Register
+                </Link>
+              </div>
+            </div>
+          )}
 
           <div className='px-6 py-4'>
             <p className='text-sm text-gray-500 mb-2'>Select Language</p>
