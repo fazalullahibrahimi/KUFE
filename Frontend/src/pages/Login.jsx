@@ -1,9 +1,15 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Kandahar_Economic from "../../public/Kandahar_Economic.jpg";
-import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 
 function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isLoginLoading, error, clearError } = useAuth();
+  const { redirectIfAuthenticated } = useAuthGuard();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -11,9 +17,10 @@ function Login() {
   });
 
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
-  const [loginError, setLoginError] = useState(null);
+
+  // Redirect if already authenticated
+  redirectIfAuthenticated();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -57,38 +64,27 @@ function Login() {
       return;
     }
 
-    setIsSubmitting(true);
-    setLoginError(null);
-
     try {
-      const response = await axios.post(
-        `${
-          import.meta.env.VITE_API_URL || "http://127.0.0.1:4400/api/v1"
-        }/user/login`,
-        {
-          email: formData.email,
-          password: formData.password,
-        }
-      );
+      const result = await login({
+        email: formData.email,
+        password: formData.password,
+      });
 
-      if (response.data.success) {
+      if (result.success) {
         setLoginSuccess(true);
-        localStorage.setItem("token", response.data.user.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
 
-        const userRole = response.data.user.role;
-        const redirectPath = userRole === "admin" ? "/dashboardv1" : "/";
+        // Get redirect path from location state or default based on role
+        const from = location.state?.from;
+        const userRole = result.user.role;
+        const defaultPath = userRole === "admin" ? "/dashboardv1" : "/";
+        const redirectPath = from || defaultPath;
 
         setTimeout(() => {
-          window.location.href = redirectPath;
-        }, 3000);
+          navigate(redirectPath, { replace: true });
+        }, 1500);
       }
     } catch (error) {
-      setLoginError(
-        error.response ? error.response.data.message : "Something went wrong"
-      );
-    } finally {
-      setIsSubmitting(false);
+      console.error("Login error:", error);
     }
   };
 
@@ -365,7 +361,7 @@ function Login() {
             </div>
           )}
 
-          {loginError && (
+          {error && (
             <div
               className='p-4 mb-6 flex items-center text-sm rounded-lg'
               style={{
@@ -387,7 +383,7 @@ function Login() {
                 <line x1='12' y1='8' x2='12' y2='12'></line>
                 <line x1='12' y1='16' x2='12.01' y2='16'></line>
               </svg>
-              <span>{loginError}</span>
+              <span>{error}</span>
             </div>
           )}
 
@@ -550,7 +546,7 @@ function Login() {
 
             <button
               type='submit'
-              disabled={isSubmitting}
+              disabled={isLoginLoading}
               className='w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white transition-colors disabled:opacity-50'
               style={{
                 backgroundColor: "#004B87",
@@ -558,7 +554,7 @@ function Login() {
                 fontWeight: "600",
               }}
             >
-              {isSubmitting ? (
+              {isLoginLoading ? (
                 <>
                   <svg
                     className='animate-spin -ml-1 mr-2 h-4 w-4 text-white'

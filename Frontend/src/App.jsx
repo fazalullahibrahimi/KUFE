@@ -1,10 +1,18 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import Home from "./pages/Home"; // Make sure this file exists
+// Authentication
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute, {
+  AdminRoute,
+  StudentRoute,
+  CommitteeRoute,
+  TeacherOrAdminRoute,
+} from "./components/auth/ProtectedRoute";
 
-import About from "./pages/AboutPage.jsx"; // Example additional route
-
+// Pages
+import Home from "./pages/Home";
+import About from "./pages/AboutPage.jsx";
 import Login from "./pages/Login";
 import AcademicPage from "./pages/AcademicPage";
 import Registration from "./pages/Registration";
@@ -27,47 +35,138 @@ import AdminResearchView from "./pages/AdminResearchView";
 import MarksManagementPage from "./pages/MarksManagementPage.jsx";
 import CommitteeMemberManagement from "./components/DataManagement/CommitteeMemberManagement.jsx";
 import QualityAssurancePage from "./pages/QualityAssurancePage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/academics' element={<AcademicPage />} />
-        <Route path='/research' element={<ResearchPage />} />
-        <Route path='/registration' element={<Registration />} />
-        <Route path='/forgotPassword' element={<ForgatPassword />} />
-        <Route path='/resetPassword/:token' element={<ResetPassword />} />
-        <Route path='/courses' element={<CoursesPage />} />
-        <Route path='/contact' element={<ContactPage />} />
-        <Route path='/anounce' element={<AnnouncementsEventsPage />} />
-        <Route path='/dashboard' element={<Dashboard />} />
-        <Route path='/dashboardv1' element={<Dashboardv1 />} />
-        <Route path='/dashboardv1' element={<Dashboardv1 />} />
-        <Route path='/facultydirectory' element={<FacultyDirectory />} />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Public Routes */}
+          <Route path='/' element={<Home />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/academics' element={<AcademicPage />} />
+          <Route path='/research' element={<ResearchPage />} />
+          <Route path='/courses' element={<CoursesPage />} />
+          <Route path='/contact' element={<ContactPage />} />
+          <Route path='/anounce' element={<AnnouncementsEventsPage />} />
+          <Route path='/announcements' element={<AnnouncementsEventsPage />} />
+          <Route path='/facultydirectory' element={<FacultyDirectory />} />
 
-        {/* New email verification routes */}
-        <Route path='/verify-email' element={<VerifyEmail />} />
-        <Route path='/verification-success' element={<VerificationSuccess />} />
-        <Route path='/resend-verification' element={<ResendVerification />} />
-        <Route
-          path='/studentSubmissin'
-          element={<StudentResearchSubmission />}
-        />
-        <Route
-          path='/submit-research'
-          element={<StudentResearchSubmitForm />}
-        />
-        <Route path='/studentmarks' element={<MarksManagementPage />} />
-        <Route path='/teachermarks' element={<MarksManagementPage />} />
-        <Route path='/committe' element={<CommitteeMemberManagement />} />
-        <Route path='/committee-research' element={<CommitteeResearchView />} />
-        <Route path='/admin-research' element={<AdminResearchView />} />
-        <Route path='/quality-assurance' element={<QualityAssurancePage />} />
-      </Routes>
-    </Router>
+          {/* Authentication Routes (redirect if already authenticated) */}
+          <Route path='/login' element={<Login />} />
+          <Route path='/registration' element={<Registration />} />
+          <Route path='/forgotPassword' element={<ForgatPassword />} />
+          <Route path='/resetPassword/:token' element={<ResetPassword />} />
+
+          {/* Email Verification Routes */}
+          <Route path='/verify-email' element={<VerifyEmail />} />
+          <Route
+            path='/verification-success'
+            element={<VerificationSuccess />}
+          />
+          <Route path='/resend-verification' element={<ResendVerification />} />
+
+          {/* Protected Profile Route - Available to all authenticated users */}
+          <Route
+            path='/profile'
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Routes - Admin Only */}
+          <Route
+            path='/dashboardv1'
+            element={
+              <AdminRoute>
+                <Dashboardv1 />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/dashboard'
+            element={
+              <AdminRoute>
+                <Dashboard />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/committe'
+            element={
+              <AdminRoute>
+                <CommitteeMemberManagement />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/admin-research'
+            element={
+              <AdminRoute>
+                <AdminResearchView />
+              </AdminRoute>
+            }
+          />
+
+          {/* Protected Routes - Student Only */}
+          <Route
+            path='/studentmarks'
+            element={
+              <StudentRoute>
+                <MarksManagementPage />
+              </StudentRoute>
+            }
+          />
+          <Route
+            path='/studentSubmissin'
+            element={
+              <StudentRoute>
+                <StudentResearchSubmission />
+              </StudentRoute>
+            }
+          />
+          <Route
+            path='/submit-research'
+            element={
+              <StudentRoute>
+                <StudentResearchSubmitForm />
+              </StudentRoute>
+            }
+          />
+          <Route
+            path='/quality-assurance'
+            element={
+              <StudentRoute>
+                <QualityAssurancePage />
+              </StudentRoute>
+            }
+          />
+
+          {/* Protected Routes - Teacher/Admin Only */}
+          <Route
+            path='/teachermarks'
+            element={
+              <TeacherOrAdminRoute>
+                <MarksManagementPage />
+              </TeacherOrAdminRoute>
+            }
+          />
+
+          {/* Protected Routes - Committee/Admin Only */}
+          <Route
+            path='/committee-research'
+            element={
+              <CommitteeRoute>
+                <CommitteeResearchView />
+              </CommitteeRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
