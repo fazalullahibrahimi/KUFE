@@ -22,7 +22,7 @@ import ResearchPage from "./pages/ResearchPage.jsx";
 import CoursesPage from "./pages/CoursesPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 import AnnouncementsEventsPage from "./pages/AnnouncementsEventsPage.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
+
 import Dashboardv1 from "./pages/Dashboardv1.jsx";
 import VerifyEmail from "./pages/VerifyEmail.jsx";
 import VerificationSuccess from "./pages/VerificationSuccess.jsx";
@@ -86,14 +86,7 @@ function App() {
               </AdminRoute>
             }
           />
-          <Route
-            path='/dashboard'
-            element={
-              <AdminRoute>
-                <Dashboard />
-              </AdminRoute>
-            }
-          />
+
           <Route
             path='/committe'
             element={
