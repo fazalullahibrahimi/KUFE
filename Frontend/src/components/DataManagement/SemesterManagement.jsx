@@ -117,7 +117,7 @@ const SemesterManagement = () => {
 
   return (
     <div className="relative">
-      <div className={`space-y-6 transition-all duration-300 ${showModal ? 'filter brightness-75 pointer-events-none' : ''}`}>
+      <div className={`space-y-6 transition-all duration-300 ${showModal ? 'filter blur-sm brightness-90 pointer-events-none' : ''}`}>
         {/* Header */}
         <div className="relative overflow-hidden bg-gradient-to-br from-white via-[#E8ECEF]/30 to-[#E8ECEF]/50 rounded-2xl border border-[#E8ECEF]/50 shadow-lg">
         <div className="absolute inset-0 bg-gradient-to-br from-[#1D3D6F]/5 via-transparent to-[#2C4F85]/5"></div>
@@ -270,7 +270,7 @@ const SemesterManagement = () => {
 
       {/* Modal for Add/Edit Semester */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+        <div className="fixed inset-0 bg-white/20 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
