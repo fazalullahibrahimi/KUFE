@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import ImageBackGround from "../../public/Hero_BackGroundImage.jpg";
+import ImageBackGround from "../../public/image.jpg";
 import { useLanguage } from "../contexts/LanguageContext";
 import { FaChalkboardTeacher, FaBook, FaSpinner, FaUserGraduate } from "react-icons/fa";
 

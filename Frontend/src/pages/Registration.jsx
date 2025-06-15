@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import Kandahar_Economic from "../../public/Kandahar_Economic.jpg";
+import Kandahar_Economic from "../../public/image_for_home2.jpg";
 
 function Registration() {
   const navigate = useNavigate();

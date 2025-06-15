@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import Kandahar_Economic from "../../public/Kandahar_Economic.jpg";
+import Kandahar_Economic from "../../public/image_for_login.jpg";
 import { useAuth } from "../contexts/AuthContext";
 import { useAuthGuard } from "../hooks/useAuthGuard";
 
