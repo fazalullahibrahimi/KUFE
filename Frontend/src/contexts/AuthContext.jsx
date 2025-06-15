@@ -140,6 +140,14 @@ export const AuthProvider = ({ children }) => {
           const isValid = await authService.verifyToken(token);
 
           if (isValid) {
+            // Ensure user image is properly set
+            if (!user.image || user.image === "default-user.jpg") {
+              user.image = "default-user.jpg";
+            }
+
+            // Set the full image URL
+            user.imageUrl = `http://localhost:4400/public/img/users/${user.image}`;
+
             dispatch({
               type: AUTH_ACTIONS.SET_USER,
               payload: { user, token },
@@ -173,6 +181,14 @@ export const AuthProvider = ({ children }) => {
 
       if (response.success) {
         const { user, token } = response.data;
+
+        // Ensure user image is properly set
+        if (!user.image || user.image === "default-user.jpg") {
+          user.image = "default-user.jpg";
+        }
+
+        // Set the full image URL
+        user.imageUrl = `http://localhost:4400/public/img/users/${user.image}`;
 
         // Store in localStorage
         localStorage.setItem("token", token);
@@ -281,6 +297,21 @@ export const AuthProvider = ({ children }) => {
     );
   };
 
+  // Update user data
+  const updateUser = (userData) => {
+    // Add the full image URL
+    userData.imageUrl = `http://localhost:4400/public/img/users/${userData.image}`;
+    
+    // Update localStorage
+    localStorage.setItem('user', JSON.stringify(userData));
+    
+    // Update state
+    dispatch({
+      type: AUTH_ACTIONS.SET_USER,
+      payload: { user: userData, token: state.token },
+    });
+  };
+
   const value = {
     // State
     ...state,
@@ -290,6 +321,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     clearError,
+    updateUser,
 
     // Utilities
     hasRole,

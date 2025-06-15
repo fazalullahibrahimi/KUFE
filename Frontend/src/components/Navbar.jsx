@@ -177,8 +177,20 @@ const Navbar = () => {
                   aria-expanded={isUserMenuOpen}
                   aria-label='User menu'
                 >
-                  <div className='w-8 h-8 bg-[#F7B500] rounded-full flex items-center justify-center'>
-                    <User className='h-4 w-4 text-[#1D3D6F]' />
+                  <div className='w-8 h-8 bg-[#F7B500] rounded-full overflow-hidden flex items-center justify-center'>
+                    {user?.image && user.image !== "default-user.jpg" ? (
+                      <img
+                        src={`http://localhost:4400/public/img/users/${user.image}`}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error("Image load error:", e);
+                          e.target.src = "/default-user.jpg";
+                        }}
+                      />
+                    ) : (
+                      <User className='h-4 w-4 text-[#1D3D6F]' />
+                    )}
                   </div>
                   <span className='text-sm font-medium'>
                     {user?.fullName?.split(" ")[0] || "User"}
@@ -193,13 +205,32 @@ const Navbar = () => {
                 {isUserMenuOpen && (
                   <div className='absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-100'>
                     <div className='px-4 py-3 border-b border-gray-100'>
-                      <p className='text-sm font-semibold text-gray-900'>
-                        {user?.fullName}
-                      </p>
-                      <p className='text-xs text-gray-500'>{user?.email}</p>
-                      <span className='inline-block mt-1 px-2 py-1 text-xs font-medium bg-[#1D3D6F] text-white rounded-full capitalize'>
-                        {user?.role}
-                      </span>
+                      <div className="flex items-center space-x-3">
+                        <div className='w-12 h-12 bg-[#F7B500] rounded-full overflow-hidden flex items-center justify-center'>
+                          {user?.image && user.image !== "default-user.jpg" ? (
+                            <img
+                              src={`http://localhost:4400/public/img/users/${user.image}`}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                console.error("Image load error:", e);
+                                e.target.src = "/default-user.jpg";
+                              }}
+                            />
+                          ) : (
+                            <User className='h-6 w-6 text-[#1D3D6F]' />
+                          )}
+                        </div>
+                        <div>
+                          <p className='text-sm font-semibold text-gray-900'>
+                            {user?.fullName}
+                          </p>
+                          <p className='text-xs text-gray-500'>{user?.email}</p>
+                          <span className='inline-block mt-1 px-2 py-1 text-xs font-medium bg-[#1D3D6F] text-white rounded-full capitalize'>
+                            {user?.role}
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
                     {isAdmin() && (

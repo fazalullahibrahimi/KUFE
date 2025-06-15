@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 // Authentication
 import { AuthProvider } from "./contexts/AuthContext";
@@ -41,6 +42,28 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: "#1D3D6F",
+              color: "#fff",
+            },
+            success: {
+              duration: 3000,
+              theme: {
+                primary: "#4aed88",
+              },
+            },
+            error: {
+              duration: 4000,
+              theme: {
+                primary: "#ff4b4b",
+              },
+            },
+          }}
+        />
         <Routes>
           {/* Public Routes */}
           <Route path='/' element={<Home />} />

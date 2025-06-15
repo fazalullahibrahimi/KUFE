@@ -605,19 +605,34 @@ const updateUserById = asyncHandler(async (req, res) => {
 // Update current user profile
 const updateProfileValidationSchema = Joi.object({
   fullName: Joi.string()
-    .min(4) // At least 4 characters long
+    .min(4)
     .optional()
     .messages({
       "string.base": `"fullName" should be a type of 'text'`,
       "string.min": `"fullName" should have a minimum length of {#limit}`,
     }),
 
+  FullName: Joi.string()
+    .min(4)
+    .optional()
+    .messages({
+      "string.base": `"FullName" should be a type of 'text'`,
+      "string.min": `"FullName" should have a minimum length of {#limit}`,
+    }),
+
   email: Joi.string()
-    .email() // Valid email format
+    .email()
     .optional()
     .messages({
       "string.base": `"email" should be a type of 'text'`,
       "string.email": `"email" must be a valid email`,
+    }),
+
+  image: Joi.string()
+    .optional()
+    .allow(null)
+    .messages({
+      "string.base": `"image" should be a type of 'text'`,
     }),
 });
 
@@ -631,26 +646,37 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
   if (error) {
     return res.status(400).send({
       success: false,
-      message: error.details[0].message, // Return the first validation error message
+      message: error.details[0].message,
     });
   }
 
-  const { fullName, email } = req.body;
+  const { fullName, FullName, email } = req.body;
 
   const user = await User.findById(_id);
 
   if (user) {
-    user.fullName = fullName || user.fullName;
+    // Use either fullName or FullName, whichever is provided
+    user.fullName = fullName || FullName || user.fullName;
     user.email = email || user.email;
+    
+    // Update image if a new one was uploaded
+    if (req.file) {
+      user.image = req.file.filename;
+    }
 
     const updatedUser = await user.save();
 
     res.json({
       success: true,
-      _id: updatedUser._id,
-      fullName: updatedUser.fullName,
-      email: updatedUser.email,
-      role: updatedUser.role,
+      data: {
+        user: {
+          _id: updatedUser._id,
+          fullName: updatedUser.fullName,
+          email: updatedUser.email,
+          image: updatedUser.image,
+          role: updatedUser.role,
+        }
+      }
     });
   } else {
     return res.status(404).json({
