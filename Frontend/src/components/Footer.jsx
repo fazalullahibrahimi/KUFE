@@ -112,11 +112,11 @@ const Footer = () => {
                 { name: t("News"), href: "/anounce", icon: Calendar },
                 { name: t("Courses"), href: "/courses", icon: Award },
                 { name: t("Contact"), href: "/contact", icon: Mail },
-                // QA Feedback - Only show for authenticated students (not admin)
+                // Quality Assurance - Only show for authenticated students (not admin)
                 ...(isAuthenticated && isStudent() && !isAdmin()
                   ? [
                       {
-                        name: "QA Feedback",
+                        name: "Quality Assurance",
                         href: "/quality-assurance",
                         icon: MessageSquare,
                       },
