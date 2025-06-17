@@ -281,27 +281,15 @@ const DashboardHome = () => {
         yAlign: 'bottom',
         callbacks: {
           title: function(context) {
-            return `📚 ${context[0].label} Department`;
+            return `${context[0].label}`;
           },
           label: function(context) {
-            return `👥 ${context.parsed.y.toLocaleString()} Students Enrolled`;
+            return `${context.parsed.y.toLocaleString()} Students`;
           },
           afterLabel: function(context) {
             const total = context.dataset.data.reduce((a, b) => a + b, 0);
             const percentage = ((context.parsed.y / total) * 100).toFixed(1);
-            const rank = context.dataset.data
-              .map((value, index) => ({ value, index }))
-              .sort((a, b) => b.value - a.value)
-              .findIndex(item => item.index === context.dataIndex) + 1;
-
-            return [
-              `📊 ${percentage}% of total students`,
-              `🏆 Rank #${rank} among all departments`,
-              `📈 ${context.parsed.y > total/context.dataset.data.length ? 'Above' : 'Below'} average enrollment`
-            ];
-          },
-          footer: function(context) {
-            return `💡 Click to view detailed department info`;
+            return `${percentage}%`;
           }
         }
       }
@@ -464,31 +452,12 @@ const DashboardHome = () => {
         caretPadding: 8,
         callbacks: {
           title: function(context) {
-            return `🏙️ ${context[0].label} City`;
+            return `${context[0].label}`;
           },
           label: function(context) {
             const total = context.dataset.data.reduce((a, b) => a + b, 0);
             const percentage = ((context.parsed / total) * 100).toFixed(1);
-            const rank = context.dataset.data
-              .map((value, index) => ({ value, index }))
-              .sort((a, b) => b.value - a.value)
-              .findIndex(item => item.index === context.dataIndex) + 1;
-
-            return [
-              `👥 ${context.parsed.toLocaleString()} Students`,
-              `📊 ${percentage}% of total enrollment`,
-              `🏆 #${rank} most popular city`
-            ];
-          },
-          afterLabel: function(context) {
-            const isTopCity = context.dataIndex === 0;
-            const citySize = context.parsed > 100 ? 'Major' : context.parsed > 50 ? 'Medium' : 'Small';
-
-            return [
-              `📍 ${citySize} student population`,
-              isTopCity ? '⭐ Top recruiting city' : '🌟 Important student source',
-              '💡 Click for geographic details'
-            ];
+            return `${context.parsed.toLocaleString()} Students (${percentage}%)`;
           }
         }
       }
@@ -568,42 +537,28 @@ const DashboardHome = () => {
         caretPadding: 8,
         callbacks: {
           title: function(context) {
-            return `📅 Academic Year ${context[0].label}`;
+            return `Year ${context[0].label}`;
           },
           label: function(context) {
-            return `🎓 ${context.parsed.y.toLocaleString()} New Students Enrolled`;
+            return `${context.parsed.y.toLocaleString()} Students`;
           },
           afterLabel: function(context) {
             const currentYear = context.parsed.y;
             const allYears = context.chart.data.datasets[0].data;
             const yearIndex = context.dataIndex;
 
-            // Calculate trend
-            let trend = '';
             if (yearIndex > 0) {
               const previousYear = allYears[yearIndex - 1];
               const change = currentYear - previousYear;
               const changePercent = ((change / previousYear) * 100).toFixed(1);
 
               if (change > 0) {
-                trend = `📈 +${change} students (+${changePercent}%) from previous year`;
+                return `+${changePercent}%`;
               } else if (change < 0) {
-                trend = `📉 ${change} students (${changePercent}%) from previous year`;
-              } else {
-                trend = `➡️ Same as previous year`;
+                return `${changePercent}%`;
               }
             }
-
-            // Calculate average
-            const average = (allYears.reduce((a, b) => a + b, 0) / allYears.length).toFixed(0);
-            const vsAverage = currentYear > average ? 'Above' : currentYear < average ? 'Below' : 'Equal to';
-
-            return [
-              trend,
-              `📊 ${vsAverage} average enrollment (${average})`,
-              `🏆 ${yearIndex === allYears.indexOf(Math.max(...allYears)) ? 'Peak enrollment year' : 'Historical data point'}`,
-              '💡 Click for detailed year analysis'
-            ].filter(Boolean);
+            return '';
           }
         }
       }

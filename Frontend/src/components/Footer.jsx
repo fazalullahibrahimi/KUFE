@@ -157,32 +157,32 @@ const Footer = () => {
             </div>
 
             <div className='space-y-4 text-[#E8ECEF]'>
-              <div className='flex items-center group hover:text-[#F7B500] transition-colors'>
-                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500]/30 transition-colors'>
-                  <GraduationCap className='h-3 w-3 text-[#F7B500]' />
+              <div className='flex items-center group hover:text-[#F7B500] transition-all duration-300 cursor-pointer hover:bg-white/5 rounded-lg p-2 -m-2'>
+                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500] group-hover:scale-110 transition-all duration-300'>
+                  <GraduationCap className='h-3 w-3 text-[#F7B500] group-hover:text-[#1D3D6F]' />
                 </div>
-                <span className='text-sm'>Bachelor's Degree</span>
+                <span className='text-sm group-hover:font-medium transition-all duration-300'>Bachelor's Degree</span>
               </div>
 
-              <div className='flex items-center group hover:text-[#F7B500] transition-colors'>
-                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500]/30 transition-colors'>
-                  <Award className='h-3 w-3 text-[#F7B500]' />
+              <div className='flex items-center group hover:text-[#F7B500] transition-all duration-300 cursor-pointer hover:bg-white/5 rounded-lg p-2 -m-2'>
+                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500] group-hover:scale-110 transition-all duration-300'>
+                  <Award className='h-3 w-3 text-[#F7B500] group-hover:text-[#1D3D6F]' />
                 </div>
-                <span className='text-sm'>Master's Degree</span>
+                <span className='text-sm group-hover:font-medium transition-all duration-300'>Master's Degree</span>
               </div>
 
-              <div className='flex items-center group hover:text-[#F7B500] transition-colors'>
-                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500]/30 transition-colors'>
-                  <FileText className='h-3 w-3 text-[#F7B500]' />
+              <div className='flex items-center group hover:text-[#F7B500] transition-all duration-300 cursor-pointer hover:bg-white/5 rounded-lg p-2 -m-2'>
+                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500] group-hover:scale-110 transition-all duration-300'>
+                  <FileText className='h-3 w-3 text-[#F7B500] group-hover:text-[#1D3D6F]' />
                 </div>
-                <span className='text-sm'>Research Programs</span>
+                <span className='text-sm group-hover:font-medium transition-all duration-300'>Research Programs</span>
               </div>
 
-              <div className='flex items-center group hover:text-[#F7B500] transition-colors'>
-                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500]/30 transition-colors'>
-                  <Users className='h-3 w-3 text-[#F7B500]' />
+              <div className='flex items-center group hover:text-[#F7B500] transition-all duration-300 cursor-pointer hover:bg-white/5 rounded-lg p-2 -m-2'>
+                <div className='bg-[#F7B500]/20 h-6 w-6 rounded-full flex items-center justify-center mr-3 group-hover:bg-[#F7B500] group-hover:scale-110 transition-all duration-300'>
+                  <Users className='h-3 w-3 text-[#F7B500] group-hover:text-[#1D3D6F]' />
                 </div>
-                <span className='text-sm'>Professional Development</span>
+                <span className='text-sm group-hover:font-medium transition-all duration-300'>Professional Development</span>
               </div>
             </div>
           </div>

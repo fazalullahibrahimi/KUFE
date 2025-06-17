@@ -19,18 +19,54 @@ const ProfilePage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
+  // Helper function to get user image URL
+  const getUserImageUrl = () => {
+    // Priority 1: Newly selected image preview (blob URL)
+    if (imagePreview && imagePreview.startsWith('blob:')) {
+      console.log('Using blob preview:', imagePreview);
+      return imagePreview;
+    }
+
+    // Priority 2: Existing image preview (http URL)
+    if (imagePreview && imagePreview.startsWith('http')) {
+      console.log('Using http preview:', imagePreview);
+      return imagePreview;
+    }
+
+    // Priority 3: User image from user object
+    if (user?.image && user.image !== 'default-user.jpg' && user.image.trim() !== '') {
+      const imageUrl = `http://localhost:4400/public/img/users/${user.image}`;
+      console.log('Using user image URL:', imageUrl);
+      return imageUrl;
+    }
+
+    console.log('No image available, user data:', user);
+    return null;
+  };
+
   useEffect(() => {
     if (user) {
+      console.log('User data in ProfilePage:', user);
+
       setFormData({
         fullName: user.fullName || "",
         email: user.email || "",
       });
-      
-      // Use the imageUrl from the user object
-      if (user.imageUrl) {
-        setImagePreview(user.imageUrl);
+
+      // Force image preview update
+      if (user.image && user.image !== 'default-user.jpg' && user.image.trim() !== '') {
+        const imageUrl = `http://localhost:4400/public/img/users/${user.image}`;
+        console.log('Setting image URL:', imageUrl);
+        setImagePreview(imageUrl);
+
+        // Preload the image to ensure it's available
+        const img = new Image();
+        img.onload = () => console.log('Image preloaded successfully:', imageUrl);
+        img.onerror = () => console.error('Failed to preload image:', imageUrl);
+        img.src = imageUrl;
       } else {
-        setImagePreview("/default-user.jpg");
+        console.log('No valid user image, setting preview to null');
+        setImagePreview(null);
       }
     }
   }, [user]);
@@ -81,7 +117,7 @@ const ProfilePage = () => {
         }
       );
 
-      if (response.data.success) {
+      if (response.data.status === 'success') {
         // Update the user data in AuthContext with the new data
         const updatedUserData = {
           ...user,
@@ -89,20 +125,23 @@ const ProfilePage = () => {
           email: response.data.data.user.email,
           image: response.data.data.user.image,
           role: response.data.data.user.role,
-          imageUrl: `http://localhost:4400/public/img/users/${response.data.data.user.image}`
         };
-        
+
         // Update the user data in context and localStorage
         updateUser(updatedUserData);
-        
+
         // Update the form data state
         setFormData({
           fullName: response.data.data.user.fullName,
           email: response.data.data.user.email
         });
 
-        // Update image preview
-        setImagePreview(updatedUserData.imageUrl);
+        // Update image preview with new image URL
+        if (response.data.data.user.image && response.data.data.user.image !== 'default-user.jpg') {
+          setImagePreview(`http://localhost:4400/public/img/users/${response.data.data.user.image}`);
+        } else {
+          setImagePreview(null);
+        }
 
         alert("Profile updated successfully");
         setIsEditing(false);
@@ -121,7 +160,14 @@ const ProfilePage = () => {
       fullName: user.fullName || "",
       email: user.email || "",
     });
-    setImagePreview(user.imageUrl || "/default-user.jpg");
+
+    // Reset image preview to original user image
+    if (user.image && user.image !== 'default-user.jpg') {
+      setImagePreview(`http://localhost:4400/public/img/users/${user.image}`);
+    } else {
+      setImagePreview(null);
+    }
+
     setSelectedImage(null);
     setIsEditing(false);
   };
@@ -159,28 +205,36 @@ const ProfilePage = () => {
                 <div className="flex items-center space-x-6">
                   {/* Profile Picture */}
                   <div className="relative">
-                    <div className="w-24 h-24 bg-[#1D3D6F] rounded-full overflow-hidden">
-                      <img
-                        src={imagePreview || user?.imageUrl || "/default-user.jpg"}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          console.error("Image load error:", e);
-                          e.target.src = "/default-user.jpg";
-                        }}
-                      />
-                    </div>
-                    {isEditing && (
-                      <label className="absolute bottom-0 right-0 w-8 h-8 bg-[#F7B500] rounded-full flex items-center justify-center hover:bg-[#F7B500]/90 transition-colors cursor-pointer">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className="hidden"
+                    <div className="w-24 h-24 bg-[#1D3D6F] rounded-full flex items-center justify-center overflow-hidden">
+                      {getUserImageUrl() ? (
+                        <img
+                          src={getUserImageUrl()}
+                          alt={user?.fullName || 'Profile'}
+                          className="w-full h-full object-cover"
+                          onLoad={() => console.log('Image loaded successfully')}
+                          onError={(e) => {
+                            console.error("Image load error for URL:", e.target.src);
+                            e.target.style.display = 'none';
+                            const fallbackDiv = e.target.parentElement.querySelector('.fallback-icon');
+                            if (fallbackDiv) {
+                              fallbackDiv.style.display = 'flex';
+                            }
+                          }}
                         />
-                        <Camera className="h-4 w-4 text-[#1D3D6F]" />
-                      </label>
-                    )}
+                      ) : null}
+                      <div className={`fallback-icon w-full h-full flex items-center justify-center ${getUserImageUrl() ? 'hidden' : 'flex'}`}>
+                        <User className="h-12 w-12 text-white" />
+                      </div>
+                    </div>
+                    <label className="absolute bottom-0 right-0 w-8 h-8 bg-[#F7B500] rounded-full flex items-center justify-center hover:bg-[#F7B500]/90 transition-colors cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                      <Camera className="h-4 w-4 text-[#1D3D6F]" />
+                    </label>
                   </div>
 
                   {/* User Info */}
