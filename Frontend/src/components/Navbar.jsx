@@ -50,8 +50,13 @@ const Navbar = () => {
   // Handle logout
   const handleLogout = async () => {
     try {
+      // Set flag to indicate user manually logged out
+      sessionStorage.setItem('wasLoggedOut', 'true');
       await logout();
-      navigate("/");
+      // Clear any stored navigation state
+      sessionStorage.removeItem('redirectPath');
+      // Navigate to home page and replace history
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Logout error:", error);
     }

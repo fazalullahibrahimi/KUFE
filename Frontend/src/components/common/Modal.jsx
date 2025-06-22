@@ -19,7 +19,7 @@ const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+    <div className='fixed inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div
         className={`w-full ${getModalWidth()} mx-4 sm:mx-6 rounded-2xl bg-white shadow-xl overflow-hidden animate-fadeIn`}
       >

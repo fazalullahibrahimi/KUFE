@@ -10,6 +10,7 @@ function VerifyEmail() {
 
   // Get email from location state or localStorage
   const email = location.state?.email || localStorage.getItem("pendingVerificationEmail")
+  const fromLogin = location.state?.fromLogin || false
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [loading, setLoading] = useState(false)
@@ -108,7 +109,15 @@ function VerifyEmail() {
 
       // Redirect after a short delay
       setTimeout(() => {
-        navigate("/verification-success")
+        if (fromLogin) {
+          navigate("/login", {
+            state: {
+              message: "Email verified successfully! You can now log in."
+            }
+          })
+        } else {
+          navigate("/verification-success")
+        }
       }, 1500)
     } catch (err) {
       setError(err.response?.data?.message || "Verification failed. Please try again.")
@@ -122,7 +131,7 @@ function VerifyEmail() {
     setError(null)
 
     try {
-      await axios.post("http://localhost:4400/api/users/resend-verification-otp", { email })
+      await axios.post("http://localhost:4400/api/v1/user/resend-verification-otp", { email })
       setSuccess("OTP has been resent to your email")
       setCountdown(600) // Reset countdown to 10 minutes
       setTimeout(() => setSuccess(false), 3000)
@@ -156,6 +165,12 @@ function VerifyEmail() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800">Verify Your Email</h1>
+            {fromLogin && (
+              <div className="p-3 mb-4 text-sm text-blue-800 bg-blue-100 rounded-lg">
+                <p className="font-medium">Email verification required</p>
+                <p>Please verify your email address to complete the login process.</p>
+              </div>
+            )}
             <p className="text-gray-600 mt-2">
               We've sent a verification code to <span className="font-medium">{email}</span>
             </p>

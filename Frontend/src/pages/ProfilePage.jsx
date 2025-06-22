@@ -13,7 +13,6 @@ const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -23,51 +22,27 @@ const ProfilePage = () => {
   const getUserImageUrl = () => {
     // Priority 1: Newly selected image preview (blob URL)
     if (imagePreview && imagePreview.startsWith('blob:')) {
-      console.log('Using blob preview:', imagePreview);
       return imagePreview;
     }
 
-    // Priority 2: Existing image preview (http URL)
-    if (imagePreview && imagePreview.startsWith('http')) {
-      console.log('Using http preview:', imagePreview);
-      return imagePreview;
-    }
-
-    // Priority 3: User image from user object
+    // Priority 2: User image from user object
     if (user?.image && user.image !== 'default-user.jpg' && user.image.trim() !== '') {
       const imageUrl = `http://localhost:4400/public/img/users/${user.image}`;
-      console.log('Using user image URL:', imageUrl);
       return imageUrl;
     }
 
-    console.log('No image available, user data:', user);
     return null;
   };
 
   useEffect(() => {
     if (user) {
-      console.log('User data in ProfilePage:', user);
-
       setFormData({
         fullName: user.fullName || "",
-        email: user.email || "",
       });
 
-      // Force image preview update
-      if (user.image && user.image !== 'default-user.jpg' && user.image.trim() !== '') {
-        const imageUrl = `http://localhost:4400/public/img/users/${user.image}`;
-        console.log('Setting image URL:', imageUrl);
-        setImagePreview(imageUrl);
-
-        // Preload the image to ensure it's available
-        const img = new Image();
-        img.onload = () => console.log('Image preloaded successfully:', imageUrl);
-        img.onerror = () => console.error('Failed to preload image:', imageUrl);
-        img.src = imageUrl;
-      } else {
-        console.log('No valid user image, setting preview to null');
-        setImagePreview(null);
-      }
+      // Reset image preview when user changes
+      setImagePreview(null);
+      setSelectedImage(null);
     }
   }, [user]);
 
@@ -92,7 +67,6 @@ const ProfilePage = () => {
       }
       setSelectedImage(file);
       const previewUrl = URL.createObjectURL(file);
-      console.log("Setting preview URL:", previewUrl); // Debug log
       setImagePreview(previewUrl);
     }
   };
@@ -117,7 +91,7 @@ const ProfilePage = () => {
         }
       );
 
-      if (response.data.status === 'success') {
+      if (response.data.success === true || response.data.status === 'success') {
         // Update the user data in AuthContext with the new data
         const updatedUserData = {
           ...user,
@@ -133,15 +107,10 @@ const ProfilePage = () => {
         // Update the form data state
         setFormData({
           fullName: response.data.data.user.fullName,
-          email: response.data.data.user.email
         });
 
-        // Update image preview with new image URL
-        if (response.data.data.user.image && response.data.data.user.image !== 'default-user.jpg') {
-          setImagePreview(`http://localhost:4400/public/img/users/${response.data.data.user.image}`);
-        } else {
-          setImagePreview(null);
-        }
+        // Clear image preview to show the new uploaded image
+        setImagePreview(null);
 
         alert("Profile updated successfully");
         setIsEditing(false);
@@ -158,15 +127,10 @@ const ProfilePage = () => {
   const handleCancel = () => {
     setFormData({
       fullName: user.fullName || "",
-      email: user.email || "",
     });
 
-    // Reset image preview to original user image
-    if (user.image && user.image !== 'default-user.jpg') {
-      setImagePreview(`http://localhost:4400/public/img/users/${user.image}`);
-    } else {
-      setImagePreview(null);
-    }
+    // Reset image preview
+    setImagePreview(null);
 
     setSelectedImage(null);
     setIsEditing(false);
@@ -211,9 +175,7 @@ const ProfilePage = () => {
                           src={getUserImageUrl()}
                           alt={user?.fullName || 'Profile'}
                           className="w-full h-full object-cover"
-                          onLoad={() => console.log('Image loaded successfully')}
                           onError={(e) => {
-                            console.error("Image load error for URL:", e.target.src);
                             e.target.style.display = 'none';
                             const fallbackDiv = e.target.parentElement.querySelector('.fallback-icon');
                             if (fallbackDiv) {
@@ -315,15 +277,20 @@ const ProfilePage = () => {
                   )}
                 </div>
 
+                {/* Role */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Role
+                  </label>
+                  <p className="text-gray-900 py-2 capitalize">{user.role}</p>
+                </div>
+
                 {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Email Address
                   </label>
                   <p className="text-gray-900 py-2">{user.email}</p>
-                  <p className="text-xs text-gray-500">
-                    Email cannot be changed
-                  </p>
                 </div>
               </div>
             </div>

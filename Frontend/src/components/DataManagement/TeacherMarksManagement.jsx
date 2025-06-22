@@ -16,7 +16,6 @@ import {
   BarChart3,
   Filter,
   Calendar,
-  User,
   Award,
   TrendingUp,
   CheckCircle,
@@ -26,8 +25,43 @@ import Modal from "../common/Modal";
 import FormField from "../common/FormField";
 import { useLanguage } from "../../contexts/LanguageContext";
 
+// Simple error boundary component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('TeacherMarksManagement Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 text-center bg-red-50 border border-red-200 rounded-lg">
+          <h2 className="text-lg font-semibold text-red-800 mb-2">Something went wrong</h2>
+          <p className="text-red-600">Please refresh the page and try again.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Refresh Page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 const TeacherMarksManagement = () => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   // State for data from API
   const [semesters, setSemesters] = useState([]);
@@ -48,16 +82,26 @@ const TeacherMarksManagement = () => {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedStudent, setSelectedStudent] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isAddMarksModalOpen, setIsAddMarksModalOpen] = useState(false);
-  const [isAddSubjectModalOpen, setIsAddSubjectModalOpen] = useState(false);
-  const [isEditSubjectModalOpen, setIsEditSubjectModalOpen] = useState(false);
+  const [isEditMarksModalOpen, setIsEditMarksModalOpen] = useState(false);
+  const [editingMark, setEditingMark] = useState(null);
   const [filteredMarks, setFilteredMarks] = useState([]);
-  const [academicYear, setAcademicYear] = useState("2023-2024");
   const [csvData, setCsvData] = useState("");
   const fileInputRef = useRef(null);
-  const [editingSubject, setEditingSubject] = useState(null);
+
+  // Notification state
+  const [notification, setNotification] = useState(null);
+
+  // Notification helper functions
+  const showNotification = (message, type = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
+  const showSuccess = (message) => showNotification(message, 'success');
+  const showError = (message) => showNotification(message, 'error');
+  const showWarning = (message) => showNotification(message, 'warning');
 
   // Form data for adding marks
   const [marksFormData, setMarksFormData] = useState({
@@ -72,14 +116,7 @@ const TeacherMarksManagement = () => {
     remarks: "",
   });
 
-  // Form data for adding/editing subjects
-  const [subjectFormData, setSubjectFormData] = useState({
-    name: "",
-    code: "",
-    semester_id: "",
-    credit_hours: 3,
-    teacher_id: "", // Added teacher_id field
-  });
+
 
   // Get auth token from local storage
   const getAuthToken = () => {
@@ -109,19 +146,13 @@ const TeacherMarksManagement = () => {
           headers: createHeaders(),
         });
         const data = await response.json();
-        console.log("Teachers API Response:", data);
 
         if (data.status === "success" && data.data && data.data.teachers) {
           setTeachers(data.data.teachers);
         } else {
-          console.error(
-            "Unexpected API response structure for teachers:",
-            data
-          );
           setTeachers([]);
         }
       } catch (error) {
-        console.error("Error fetching teachers:", error);
         setTeachers([]);
       } finally {
         setIsLoading((prev) => ({ ...prev, teachers: false }));
@@ -140,16 +171,13 @@ const TeacherMarksManagement = () => {
           headers: createHeaders(),
         });
         const data = await response.json();
-        console.log("Students API Response:", data);
 
         if (data.status === "success" && data.data && data.data.students) {
           setStudents(data.data.students);
         } else {
-          console.error("Unexpected API response structure:", data);
           setStudents([]);
         }
       } catch (error) {
-        console.error("Error fetching students:", error);
         setStudents([]);
       } finally {
         setIsLoading((prev) => ({ ...prev, students: false }));
@@ -158,6 +186,8 @@ const TeacherMarksManagement = () => {
 
     fetchStudents();
   }, []);
+
+
 
   // Fetch subjects from API
   useEffect(() => {
@@ -168,46 +198,26 @@ const TeacherMarksManagement = () => {
           headers: createHeaders(),
         });
         const data = await response.json();
-        console.log("Subjects API Response:", data);
 
-        if (data.subjects && Array.isArray(data.subjects)) {
-          // Enrich subjects with teacher names
-          const enrichedSubjects = data.subjects.map((subject) => {
-            // Format semester_id if needed
-            const formattedSubject = {
+        // Handle the actual API response structure: { status, message, data: { subjects: [...] } }
+        if (data.status === "success" && data.data && data.data.subjects && Array.isArray(data.data.subjects)) {
+          // The API already provides populated semester and teacher data
+          const enrichedSubjects = data.data.subjects.map((subject) => {
+            return {
               ...subject,
-              semester_id:
-                typeof subject.semester_id === "object"
-                  ? subject.semester_id
-                  : {
-                      _id: subject.semester_id,
-                      name:
-                        getSemesterById(subject.semester_id)?.name ||
-                        "Unknown Semester",
-                    },
+              // Extract semester name from populated semester_id object
+              semester_name: subject.semester_id?.name || "Unknown Semester",
+              // Extract teacher name from populated teacher_id?.name || "No Teacher Assigned",
+              // Ensure we have the actual IDs for filtering
+              semester_id_string: typeof subject.semester_id === 'object' ? subject.semester_id._id : subject.semester_id,
+              teacher_id_string: typeof subject.teacher_id === 'object' ? subject.teacher_id._id : subject.teacher_id,
             };
-
-            // Add teacher name if teacher_id exists
-            if (subject.teacher_id) {
-              const teacher = teachers.find(
-                (t) => t._id === subject.teacher_id
-              );
-              if (teacher) {
-                formattedSubject.teacher_name = teacher.name;
-              }
-            }
-
-            return formattedSubject;
           });
-
           setSubjects(enrichedSubjects);
-          console.log("Enriched subjects:", enrichedSubjects);
         } else {
-          console.error("Unexpected API response structure:", data);
           setSubjects([]);
         }
       } catch (error) {
-        console.error("Error fetching subjects:", error);
         setSubjects([]);
       } finally {
         setIsLoading((prev) => ({ ...prev, subjects: false }));
@@ -215,7 +225,7 @@ const TeacherMarksManagement = () => {
     };
 
     fetchSubjects();
-  }, [teachers]); // Add teachers as dependency to ensure subjects are enriched after teachers are loaded
+  }, [teachers, semesters]); // Add semesters as dependency to ensure subjects are enriched after semesters are loaded
 
   // Fetch semesters from API
   useEffect(() => {
@@ -229,28 +239,21 @@ const TeacherMarksManagement = () => {
           }
         );
         const data = await response.json();
-        console.log("Semesters API Response:", data);
 
-        if (data.semesters && Array.isArray(data.semesters)) {
-          setSemesters(data.semesters);
+        if (data.status === "success" && data.data && data.data.semesters && Array.isArray(data.data.semesters)) {
+          setSemesters(data.data.semesters);
           // Set the first semester as default if available
-          if (data.semesters.length > 0) {
+          if (data.data.semesters.length > 0) {
             // Don't auto-select a semester
             setMarksFormData((prev) => ({
               ...prev,
-              semester_id: data.semesters[0]._id,
-            }));
-            setSubjectFormData((prev) => ({
-              ...prev,
-              semester_id: data.semesters[0]._id,
+              semester_id: data.data.semesters[0]._id,
             }));
           }
         } else {
-          console.error("Unexpected API response structure:", data);
           setSemesters([]);
         }
       } catch (error) {
-        console.error("Error fetching semesters:", error);
         setSemesters([]);
       } finally {
         setIsLoading((prev) => ({ ...prev, semesters: false }));
@@ -262,86 +265,127 @@ const TeacherMarksManagement = () => {
 
   // Extract marks from students data and enrich with semester and teacher information
   useEffect(() => {
-    if (students.length > 0 && semesters.length > 0 && subjects.length > 0) {
+    // Check if we're still loading basic data
+    if (isLoading.students || isLoading.subjects || isLoading.semesters || isLoading.teachers) {
+      return;
+    }
+
+    // Set marks loading to true when processing starts
+    setIsLoading((prev) => ({ ...prev, marks: true }));
+
+    try {
       const allMarks = [];
-      students.forEach((student) => {
+
+      if (students.length > 0 && subjects.length > 0) {
+        students.forEach((student) => {
+          // Add null safety check for student
+          if (!student || !student._id || !student.name) {
+            return;
+          }
+
         if (student.marks && Array.isArray(student.marks)) {
           student.marks.forEach((mark) => {
-            // Find the subject for this mark to get its semester and teacher
-            const subject = subjects.find((sub) => sub._id === mark.subject_id);
-
-            // Get semester ID either from the subject or directly from the mark
-            let semesterId =
-              typeof mark.semester_id === "object"
-                ? mark.semester_id._id
-                : mark.semester_id;
-            let semesterName = "Unknown Semester";
-            let teacherId = null;
-            let teacherName = "Unknown Teacher";
-
-            // If we found the subject, use its semester information
-            if (subject) {
-              // Handle both string and object semester_id formats in subjects
-              const subjectSemesterId =
-                typeof subject.semester_id === "object"
-                  ? subject.semester_id._id
-                  : subject.semester_id;
-
-              semesterId = subjectSemesterId;
-
-              // Get the semester name from the subject's semester
-              const semester = semesters.find(
-                (sem) => sem._id === subjectSemesterId
-              );
-              if (semester) {
-                semesterName = semester.name;
-              } else if (
-                typeof subject.semester_id === "object" &&
-                subject.semester_id.name
-              ) {
-                semesterName = subject.semester_id.name;
+            try {
+              // Add null safety check for mark
+              if (!mark || !mark.subject_id) {
+                return;
               }
 
-              // Get teacher information if available
-              if (subject.teacher_id) {
-                teacherId = subject.teacher_id;
-                const teacher = teachers.find((t) => t._id === teacherId);
-                if (teacher) {
-                  teacherName = teacher.name;
+
+              // The subject_id in marks is already populated by the backend
+              // Check if it's already populated (object) or just an ID (string)
+              let subject = null;
+
+              if (typeof mark.subject_id === 'object' && mark.subject_id !== null) {
+                // Already populated by backend
+                subject = mark.subject_id;
+              } else {
+                // Not populated, find from subjects array
+                subject = subjects.find((sub) => {
+                  if (!sub || !sub._id) return false;
+                  return sub._id.toString() === mark.subject_id.toString();
+                });
+              }
+
+              // Get semester information - check if already populated
+              let semesterId = mark.semester_id;
+              let semesterName = "Unknown Semester";
+
+              if (semesterId && typeof semesterId === "object" && semesterId._id) {
+                // Already populated by backend
+                semesterName = String(semesterId.name || "Unknown Semester");
+                semesterId = semesterId._id;
+              } else if (typeof semesterId === "string" && semesterId) {
+                // Find semester by ID
+                const semester = semesters.find((sem) => sem && sem._id === semesterId);
+                if (semester) {
+                  semesterName = String(semester.name || "Unknown Semester");
                 }
               }
-            } else {
-              // Fallback to using mark's semester_id
-              const semester = semesters.find((sem) => sem._id === semesterId);
-              if (semester) {
-                semesterName = semester.name;
-              }
-            }
 
-            // Enrich mark with student, semester, and teacher information
-            allMarks.push({
-              ...mark,
-              student_id: student._id,
-              student_name: student.name,
-              // Normalize semester_id to ensure consistent format
-              semester_id: semesterId,
-              // Add semester name for display
-              semester_name: semesterName,
-              // Add teacher information
-              teacher_id: teacherId,
-              teacher_name: teacherName,
-            });
+              // Get teacher information - check if already populated
+              let teacherId = mark.teacher_id;
+              let teacherName = "Unknown Teacher";
+
+              if (teacherId && typeof teacherId === "object" && teacherId._id) {
+                // Already populated by backend
+                teacherName = String(teacherId.name || "Unknown Teacher");
+                teacherId = teacherId._id;
+              } else if (typeof teacherId === "string" && teacherId) {
+                // Find teacher by ID
+                const teacher = teachers.find((t) => t && t._id === teacherId);
+                if (teacher) {
+                  teacherName = String(teacher.name || "Unknown Teacher");
+                }
+              }
+
+              // Extract subject information safely
+              let subjectName = "Unknown Subject";
+              let subjectCode = "N/A";
+
+              if (subject) {
+                // Safely extract subject name and code, ensuring they are strings
+                subjectName = String(subject.name || "Unknown Subject");
+                subjectCode = String(subject.code || "N/A");
+              }
+
+              // Create enriched mark object with safe string conversions
+              const enrichedMark = {
+                ...mark,
+                // Use the actual subject ID (string) for filtering purposes
+                subject_id: typeof mark.subject_id === 'object' ? mark.subject_id._id : mark.subject_id,
+                student_id: String(student._id || ''),
+                student_name: String(student.name || 'Unknown Student'),
+                semester_id: String(semesterId || ''),
+                semester_name: String(semesterName || 'Unknown Semester'),
+                teacher_id: String(teacherId || ''),
+                teacher_name: String(teacherName || 'Unknown Teacher'),
+                // Add subject name to the mark for better display
+                subject_name: String(subjectName || 'Unknown Subject'),
+                subject_code: String(subjectCode || 'N/A'),
+                // Ensure numeric values
+                midterm: Number(mark.midterm) || 0,
+                final: Number(mark.final) || 0,
+                assignment: Number(mark.assignment) || 0,
+                total: Number(mark.total) || 0,
+              };
+
+
+              allMarks.push(enrichedMark);
+            } catch (error) {
+              // Silently continue processing other marks
+            }
           });
         }
       });
+      }
 
-      console.log(
-        "Extracted marks:",
-        allMarks.length,
-        "Sample mark:",
-        allMarks.length > 0 ? allMarks[0] : null
-      );
       setStudentMarks(allMarks);
+    } catch (error) {
+      setStudentMarks([]);
+    } finally {
+      // Always set marks loading to false when processing is complete
+      setIsLoading((prev) => ({ ...prev, marks: false }));
     }
   }, [students, semesters, subjects, teachers]);
 
@@ -349,15 +393,8 @@ const TeacherMarksManagement = () => {
   useEffect(() => {
     let result = [...studentMarks];
 
-    console.log("Filtering marks with:", {
-      selectedSemester,
-      totalMarks: studentMarks.length,
-      sampleMark: studentMarks.length > 0 ? studentMarks[0] : null,
-    });
-
     // Filter by semester
     if (selectedSemester) {
-      console.log("Filtering by semester:", selectedSemester);
       result = result.filter((mark) => {
         // Handle different semester_id formats
         const markSemesterId =
@@ -365,14 +402,8 @@ const TeacherMarksManagement = () => {
             ? mark.semester_id._id
             : mark.semester_id;
 
-        console.log(
-          `Mark semester_id: ${markSemesterId}, Selected: ${selectedSemester}, Match: ${
-            markSemesterId === selectedSemester
-          }`
-        );
         return markSemesterId === selectedSemester;
       });
-      console.log("After semester filter, marks count:", result.length);
     }
 
     // Filter by subject
@@ -390,17 +421,16 @@ const TeacherMarksManagement = () => {
       const term = searchTerm.toLowerCase();
       result = result.filter((mark) => {
         const student = students.find((s) => s._id === mark.student_id);
-        const subject = subjects.find((s) => s._id === mark.subject_id);
+        // Use enriched subject data from the mark instead of looking up
         return (
           student?.name?.toLowerCase().includes(term) ||
           student?.student_id_number?.toLowerCase().includes(term) ||
-          subject?.name?.toLowerCase().includes(term) ||
-          subject?.code?.toLowerCase().includes(term)
+          mark.subject_name?.toLowerCase().includes(term) ||
+          mark.subject_code?.toLowerCase().includes(term)
         );
       });
     }
 
-    console.log("Final filtered marks count:", result.length);
     setFilteredMarks(result);
   }, [
     studentMarks,
@@ -417,47 +447,53 @@ const TeacherMarksManagement = () => {
     const { name, value } = e.target;
 
     // If subject is changing, update teacher_id, teacher_name, and semester_id based on the selected subject
-    if (name === "subject_id" && value) {
-      const selectedSubject = subjects.find((s) => s._id === value);
-      if (selectedSubject) {
-        // Get semester_id from the subject
-        const subjectSemesterId =
-          typeof selectedSubject.semester_id === "object"
-            ? selectedSubject.semester_id._id
-            : selectedSubject.semester_id;
+    if (name === "subject_id") {
+      if (value) {
+        const selectedSubject = subjects.find((s) => s._id === value);
+        if (selectedSubject) {
+          // Get semester_id from the subject
+          const subjectSemesterId =
+            typeof selectedSubject.semester_id === "object"
+              ? selectedSubject.semester_id._id
+              : selectedSubject.semester_id;
 
-        // Handle teacher_id which can be an object with _id and name properties
-        let teacherId = "";
-        let teacherName = "Not Assigned";
+          // Handle teacher_id which can be an object with _id and name properties
+          let teacherId = "";
+          let teacherName = "Not Assigned";
 
-        if (selectedSubject.teacher_id) {
-          if (typeof selectedSubject.teacher_id === "object") {
-            // If teacher_id is an object with _id and name
-            teacherId = selectedSubject.teacher_id._id;
-            teacherName = selectedSubject.teacher_id.name;
-          } else {
-            // If teacher_id is just an ID string
-            teacherId = selectedSubject.teacher_id;
-            const teacher = teachers.find((t) => t._id === teacherId);
-            if (teacher) {
-              teacherName = teacher.name;
+          if (selectedSubject.teacher_id) {
+            if (typeof selectedSubject.teacher_id === "object") {
+              // If teacher_id is an object with _id and name
+              teacherId = selectedSubject.teacher_id._id;
+              teacherName = selectedSubject.teacher_id.name;
+            } else {
+              // If teacher_id is just an ID string
+              teacherId = selectedSubject.teacher_id;
+              const teacher = teachers.find((t) => t._id === teacherId);
+              if (teacher) {
+                teacherName = teacher.name;
+              }
             }
           }
+
+
+
+          setMarksFormData({
+            ...marksFormData,
+            [name]: value,
+            semester_id: subjectSemesterId,
+            teacher_id: teacherId,
+            teacher_name: teacherName,
+          });
+          return;
         }
-
-        console.log("Setting teacher info from subject:", {
-          subject: selectedSubject.name,
-          teacher_id: teacherId,
-          teacher_name: teacherName,
-          semester_id: subjectSemesterId,
-        });
-
+      } else {
+        // If no subject is selected, clear teacher info
         setMarksFormData({
           ...marksFormData,
           [name]: value,
-          semester_id: subjectSemesterId,
-          teacher_id: teacherId,
-          teacher_name: teacherName,
+          teacher_id: "",
+          teacher_name: "",
         });
         return;
       }
@@ -472,13 +508,7 @@ const TeacherMarksManagement = () => {
     });
   };
 
-  const handleSubjectInputChange = (e) => {
-    const { name, value } = e.target;
-    setSubjectFormData({
-      ...subjectFormData,
-      [name]: name === "credit_hours" ? Number(value) : value,
-    });
-  };
+
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -486,7 +516,6 @@ const TeacherMarksManagement = () => {
 
   const handleSemesterChange = (e) => {
     const semesterId = e.target.value;
-    console.log("Semester changed to:", semesterId);
 
     setSelectedSemester(semesterId);
     setSelectedSubject(""); // Reset subject selection when semester changes
@@ -500,17 +529,7 @@ const TeacherMarksManagement = () => {
       teacher_name: "", // Reset teacher_name when semester changes
     }));
 
-    setSubjectFormData((prev) => ({
-      ...prev,
-      semester_id: semesterId,
-    }));
 
-    // Log the current state for debugging
-    console.log("Current semester state:", {
-      selectedSemester: semesterId,
-      marksFormData: semesterId,
-      subjectFormData: semesterId,
-    });
   };
 
   const handleSubjectChange = (e) => {
@@ -519,10 +538,6 @@ const TeacherMarksManagement = () => {
 
   const handleStudentChange = (e) => {
     setSelectedStudent(e.target.value);
-  };
-
-  const handleAcademicYearChange = (e) => {
-    setAcademicYear(e.target.value);
   };
 
   // Calculate total marks and grade
@@ -550,12 +565,12 @@ const TeacherMarksManagement = () => {
     try {
       // Validate required fields
       if (!marksFormData.student_id) {
-        alert("Please select a student");
+        showError("Please select a student");
         return;
       }
 
       if (!marksFormData.subject_id) {
-        alert("Please select a subject");
+        showError("Please select a subject");
         return;
       }
 
@@ -620,8 +635,6 @@ const TeacherMarksManagement = () => {
         remarks: marksFormData.remarks || "No remarks",
       };
 
-      console.log("Sending mark data:", markData);
-
       const response = await fetch(
         `http://localhost:4400/api/v1/students/${marksFormData.student_id}/marks`,
         {
@@ -632,7 +645,6 @@ const TeacherMarksManagement = () => {
       );
 
       const data = await response.json();
-      console.log("Add marks response:", data);
 
       if (data.status === "success") {
         // Refresh students data to get updated marks
@@ -654,13 +666,11 @@ const TeacherMarksManagement = () => {
 
         setIsAddMarksModalOpen(false);
         resetMarksForm();
-        alert("Marks added successfully!");
+        alert(data.message || "Marks added successfully!");
       } else {
-        console.error("Error adding marks:", data);
         alert(`Failed to add marks: ${data.message || "Please try again."}`);
       }
     } catch (error) {
-      console.error("Error adding marks:", error);
       alert("Failed to add marks. Please try again.");
     }
   };
@@ -682,100 +692,86 @@ const TeacherMarksManagement = () => {
     });
   };
 
-  // CRUD operations for subjects
-  const handleAddSubject = async () => {
+  // Update marks function
+  const handleUpdateMarks = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:4400/api/v1/subjects/", {
-        method: "POST",
-        headers: createHeaders(),
-        body: JSON.stringify(subjectFormData),
-      });
+      if (!editingMark) return;
 
-      const data = await response.json();
-      console.log("Add subject response:", data);
+      const { total, grade } = calculateTotalAndGrade(
+        marksFormData.midterm,
+        marksFormData.final,
+        marksFormData.assignment
+      );
 
-      // Check for success message instead of status
-      if (data.message === "Subject created successfully!" || data.subject) {
-        // Refresh the subjects list to get the updated data with proper structure
-        const refreshResponse = await fetch(
-          "http://127.0.0.1:4400/api/v1/subjects/",
-          {
-            headers: createHeaders(),
-          }
-        );
-        const refreshData = await refreshResponse.json();
+      const markData = {
+        subject_id: marksFormData.subject_id,
+        semester_id: marksFormData.semester_id,
+        teacher_id: marksFormData.teacher_id,
+        assignment: Number(marksFormData.assignment) || 0,
+        midterm: Number(marksFormData.midterm) || 0,
+        final: Number(marksFormData.final) || 0,
+        total,
+        grade,
+        remarks: marksFormData.remarks || "No remarks",
+      };
 
-        if (refreshData.subjects) {
-          setSubjects(refreshData.subjects);
-        }
-
-        setIsAddSubjectModalOpen(false);
-        resetSubjectForm();
-        alert("Subject added successfully!");
-      } else {
-        console.error("Error adding subject:", data);
-        alert("Failed to add subject. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error adding subject:", error);
-      alert("Failed to add subject. Please try again.");
-    }
-  };
-
-  const handleEditSubject = async () => {
-    try {
       const response = await fetch(
-        `http://127.0.0.1:4400/api/v1/subjects/${editingSubject._id}`,
+        `http://localhost:4400/api/v1/students/${editingMark.student_id}/marks/${editingMark.markIndex}`,
         {
           method: "PATCH",
           headers: createHeaders(),
-          body: JSON.stringify(subjectFormData),
+          body: JSON.stringify(markData),
         }
       );
 
       const data = await response.json();
-      console.log("Edit subject response:", data);
 
-      // Check for success message instead of status
-      if ((data.message && data.message.includes("success")) || data.subject) {
-        // Refresh the subjects list to get the updated data with proper structure
+      if (data.status === "success") {
+        // Refresh students data to get updated marks
         const refreshResponse = await fetch(
-          "http://127.0.0.1:4400/api/v1/subjects/",
+          "http://localhost:4400/api/v1/students/",
           {
             headers: createHeaders(),
           }
         );
         const refreshData = await refreshResponse.json();
 
-        if (refreshData.subjects) {
-          setSubjects(refreshData.subjects);
+        if (
+          refreshData.status === "success" &&
+          refreshData.data &&
+          refreshData.data.students
+        ) {
+          setStudents(refreshData.data.students);
         }
 
-        setIsEditSubjectModalOpen(false);
-        resetSubjectForm();
-        alert("Subject updated successfully!");
+        setIsEditMarksModalOpen(false);
+        setEditingMark(null);
+        resetMarksForm();
+        alert("Marks updated successfully!");
       } else {
-        console.error("Error updating subject:", data);
-        alert("Failed to update subject. Please try again.");
+        alert(`Failed to update marks: ${data.message || "Please try again."}`);
       }
     } catch (error) {
-      console.error("Error updating subject:", error);
-      alert("Failed to update subject. Please try again.");
+      alert("Failed to update marks. Please try again.");
     }
   };
 
-  const handleDeleteSubject = async (subjectId) => {
-    // Check if subject is used in any marks
-    const isUsed = studentMarks.some((mark) => mark.subject_id === subjectId);
-
-    if (isUsed) {
-      alert(t("subjects.cannot_delete_used"));
+  // Delete marks function
+  const handleDeleteMarks = async (mark) => {
+    if (!window.confirm("Are you sure you want to delete this mark record?")) {
       return;
     }
 
     try {
+      const actualMarkIndex = findMarkIndexInStudent(mark.student_id, mark);
+
+      if (actualMarkIndex === -1) {
+        showError("Error: Could not find the mark record to delete. Please refresh the page and try again.");
+        return;
+      }
+
       const response = await fetch(
-        `http://127.0.0.1:4400/api/v1/subjects/${subjectId}`,
+        `http://localhost:4400/api/v1/students/${mark.student_id}/marks/${actualMarkIndex}`,
         {
           method: "DELETE",
           headers: createHeaders(),
@@ -783,64 +779,67 @@ const TeacherMarksManagement = () => {
       );
 
       const data = await response.json();
-      console.log("Delete subject response:", data);
 
-      // Check for success message instead of status
-      if (
-        (data.message && data.message.includes("success")) ||
-        data.status === "success"
-      ) {
-        // Remove the subject from our subjects array
-        const updatedSubjects = subjects.filter(
-          (subject) => subject._id !== subjectId
+      if (data.status === "success") {
+        // Refresh students data to get updated marks
+        const refreshResponse = await fetch(
+          "http://localhost:4400/api/v1/students/",
+          {
+            headers: createHeaders(),
+          }
         );
-        setSubjects(updatedSubjects);
+        const refreshData = await refreshResponse.json();
 
-        alert("Subject deleted successfully!");
+        if (
+          refreshData.status === "success" &&
+          refreshData.data &&
+          refreshData.data.students
+        ) {
+          setStudents(refreshData.data.students);
+        }
+
+        showSuccess("Marks deleted successfully!");
       } else {
-        console.error("Error deleting subject:", data);
-        alert("Failed to delete subject. Please try again.");
+        showError(`Failed to delete marks: ${data.message || "Please try again."}`);
       }
     } catch (error) {
-      console.error("Error deleting subject:", error);
-      alert("Failed to delete subject. Please try again.");
+      showError("Failed to delete marks. Please try again.");
     }
   };
 
-  const resetSubjectForm = () => {
-    setSubjectFormData({
-      name: "",
-      code: "",
-      semester_id:
-        selectedSemester || (semesters.length > 0 ? semesters[0]._id : ""),
-      credit_hours: 3,
-      teacher_id: "", // Reset teacher_id
-    });
-    setEditingSubject(null);
-  };
+  // Open edit marks modal
+  const openEditMarksModal = (mark) => {
+    const student = getStudentById(mark.student_id);
+    const actualMarkIndex = findMarkIndexInStudent(mark.student_id, mark);
 
-  const openEditSubjectModal = (subject) => {
-    setEditingSubject(subject);
-
-    // Handle teacher_id which can be an object
-    let teacherId = "";
-    if (subject.teacher_id) {
-      teacherId =
-        typeof subject.teacher_id === "object"
-          ? subject.teacher_id._id
-          : subject.teacher_id;
+    if (actualMarkIndex === -1) {
+      showError("Error: Could not find the mark record to edit. Please refresh the page and try again.");
+      return;
     }
 
-    setSubjectFormData({
-      name: subject.name,
-      code: subject.code,
-      semester_id: subject.semester_id._id,
-      credit_hours: subject.credit_hours,
-      teacher_id: teacherId,
+    setEditingMark({
+      ...mark,
+      markIndex: actualMarkIndex,
+      student_name: student.name,
     });
 
-    setIsEditSubjectModalOpen(true);
+    // Populate form with existing mark data
+    setMarksFormData({
+      student_id: mark.student_id,
+      subject_id: typeof mark.subject_id === 'object' ? mark.subject_id._id : mark.subject_id,
+      semester_id: typeof mark.semester_id === 'object' ? mark.semester_id._id : mark.semester_id,
+      teacher_id: typeof mark.teacher_id === 'object' ? mark.teacher_id._id : mark.teacher_id,
+      teacher_name: typeof mark.teacher_id === 'object' ? mark.teacher_id.name : mark.teacher_name,
+      midterm: mark.midterm || "",
+      final: mark.final || "",
+      assignment: mark.assignment || "",
+      remarks: mark.remarks || "",
+    });
+
+    setIsEditMarksModalOpen(true);
   };
+
+
 
   // Update the handleImportCSV function to ensure teacher_id is included
   const handleImportCSV = () => {
@@ -889,17 +888,11 @@ const TeacherMarksManagement = () => {
         const subject = subjects.find((s) => s._id === rowData.subject_id);
 
         if (!studentExists || !subject) {
-          console.warn(
-            `${t("marks.skipping_row")} ${i}: ${t("marks.invalid_ids")}`
-          );
           continue;
         }
 
         // Check if subject has a teacher assigned
         if (!subject.teacher_id) {
-          console.warn(
-            `${t("marks.skipping_row")} ${i}: Subject has no assigned teacher`
-          );
           continue;
         }
 
@@ -924,8 +917,6 @@ const TeacherMarksManagement = () => {
           grade,
           remarks: rowData.remarks || "Imported from CSV",
         };
-
-        console.log(`Row ${i} mark data:`, markData);
 
         // Add to import promises
         importPromises.push(
@@ -966,12 +957,10 @@ const TeacherMarksManagement = () => {
             )}`
           );
         })
-        .catch((error) => {
-          console.error("Error importing marks:", error);
+        .catch(() => {
           alert("Failed to import some marks. Please try again.");
         });
-    } catch (error) {
-      console.error("Error parsing CSV:", error);
+    } catch {
       alert(t("marks.error_parsing"));
     }
   };
@@ -1015,11 +1004,6 @@ const TeacherMarksManagement = () => {
   };
 
   // Helper functions
-  const getSubjectById = (id) => {
-    const subject = subjects.find((subject) => subject._id === id);
-    return subject || { name: "Unknown Subject", code: "N/A" };
-  };
-
   const getStudentById = (id) => {
     return (
       students.find((student) => student._id === id) || {
@@ -1029,51 +1013,37 @@ const TeacherMarksManagement = () => {
     );
   };
 
-  const getTeacherById = (id) => {
-    if (!id) return { name: "Unknown Teacher" };
-
-    // If id is already an object with name property
-    if (typeof id === "object" && id.name) {
-      return { name: id.name };
-    }
-
-    // Otherwise, look up the teacher by ID
-    return (
-      teachers.find((teacher) => teacher._id === id) || {
-        name: "Unknown Teacher",
-      }
-    );
-  };
-
-  const getSemesterById = (id) => {
-    if (!id) return { name: "Unknown Semester" };
-    return (
-      semesters.find((semester) => semester._id === id) || {
-        name: "Unknown Semester",
-      }
-    );
-  };
-
   const getSemesterNameById = (id) => {
-    if (!id) return "Unknown Semester";
     const semester = semesters.find((semester) => semester._id === id);
     return semester ? semester.name : "Unknown Semester";
   };
 
-  const getGradeColor = (grade) => {
-    if (grade === "A") return "text-green-600";
-    if (grade === "B") return "text-blue-600";
-    if (grade === "C") return "text-yellow-600";
-    if (grade === "D") return "text-orange-600";
-    return "text-red-600";
+  // Helper function to find the actual mark index in student's marks array
+  const findMarkIndexInStudent = (studentId, mark) => {
+    const student = students.find(s => s._id === studentId);
+    if (!student || !student.marks) return -1;
+
+    // Find the mark by comparing multiple fields to ensure we get the right one
+    return student.marks.findIndex(m => {
+      const subjectIdMatch = (typeof m.subject_id === 'object' ? m.subject_id._id : m.subject_id) ===
+                            (typeof mark.subject_id === 'object' ? mark.subject_id._id : mark.subject_id);
+      const semesterIdMatch = (typeof m.semester_id === 'object' ? m.semester_id._id : m.semester_id) ===
+                             (typeof mark.semester_id === 'object' ? mark.semester_id._id : mark.semester_id);
+      const scoresMatch = m.midterm === mark.midterm && m.final === mark.final && m.assignment === mark.assignment;
+
+      return subjectIdMatch && semesterIdMatch && scoresMatch;
+    });
   };
+
+
 
   // Loading state
   if (
     isLoading.semesters ||
     isLoading.subjects ||
     isLoading.students ||
-    isLoading.teachers
+    isLoading.teachers ||
+    isLoading.marks
   ) {
     return (
       <div className='flex justify-center items-center h-64'>
@@ -1091,7 +1061,8 @@ const TeacherMarksManagement = () => {
     : "";
 
   return (
-    <div className='w-full min-h-screen space-y-6'>
+    <ErrorBoundary>
+      <div className='w-full min-h-screen space-y-6'>
       {/* Header Section */}
       <div className='relative overflow-hidden bg-gradient-to-br from-white via-[#E8ECEF]/30 to-[#E8ECEF]/50 rounded-2xl border border-[#E8ECEF]/50 shadow-lg'>
         {/* Background Pattern */}
@@ -1146,7 +1117,7 @@ const TeacherMarksManagement = () => {
                   <option value=''>All Semesters</option>
                   {semesters.map((semester) => (
                     <option key={semester._id} value={semester._id}>
-                      {semester.name}
+                      {String(semester.name || 'Unnamed Semester')}
                     </option>
                   ))}
                 </select>
@@ -1167,16 +1138,12 @@ const TeacherMarksManagement = () => {
                   {subjects
                     .filter((subject) => {
                       if (!selectedSemester) return true;
-                      // Handle both string and object semester_id formats
-                      const subjectSemesterId =
-                        typeof subject.semester_id === "object"
-                          ? subject.semester_id._id
-                          : subject.semester_id;
-                      return subjectSemesterId === selectedSemester;
+                      // Use the extracted semester ID string for filtering
+                      return subject.semester_id_string === selectedSemester;
                     })
                     .map((subject) => (
                       <option key={subject._id} value={subject._id}>
-                        {subject.code} - {subject.name}
+                        {String(subject.code || 'N/A')} - {String(subject.name || 'Unnamed Subject')}
                       </option>
                     ))}
                 </select>
@@ -1196,7 +1163,7 @@ const TeacherMarksManagement = () => {
                   <option value=''>All Students</option>
                   {students.map((student) => (
                     <option key={student._id} value={student._id}>
-                      {student.name} ({student.student_id_number})
+                      {String(student.name || 'Unnamed Student')} ({String(student.student_id_number || 'N/A')})
                     </option>
                   ))}
                 </select>
@@ -1248,170 +1215,11 @@ const TeacherMarksManagement = () => {
         </div>
       </div>
 
+
+
       {/* Main Content */}
       <div className='bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden'>
-        {/* Subject Management Section */}
-        <div className='mb-6 border-t border-gray-200 pt-6'>
-          <div className='flex justify-between items-center mb-6'>
-            <div className='flex items-center space-x-3'>
-              <div className='p-2 bg-[#E8ECEF] rounded-lg'>
-                <BookOpen className='h-5 w-5 text-[#1D3D6F]' />
-              </div>
-              <div>
-                <h3 className='text-xl font-semibold bg-gradient-to-r from-[#000000] to-[#1D3D6F] bg-clip-text text-transparent'>
-                  Course Subject Management
-                </h3>
-                <p className='text-sm text-gray-600 mt-1'>
-                  Manage academic course subjects and instructor assignments
-                </p>
-              </div>
-            </div>
-            <button
-              className='flex items-center px-6 py-3 bg-gradient-to-r from-[#2C4F85] to-[#1D3D6F] text-white rounded-lg hover:from-[#1D3D6F] hover:to-[#2C4F85] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
-              onClick={() => {
-                resetSubjectForm();
-                setIsAddSubjectModalOpen(true);
-              }}
-            >
-              <Plus size={18} className='mr-2' />
-              Add New Course Subject
-            </button>
-          </div>
 
-          <div className='overflow-x-auto rounded-lg shadow-lg border border-[#E8ECEF]'>
-            <table className='min-w-full divide-y divide-gray-200'>
-              <thead className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85]'>
-                <tr>
-                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center space-x-2'>
-                      <BookOpen className='h-4 w-4' />
-                      <span>Course Code</span>
-                    </div>
-                  </th>
-                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center space-x-2'>
-                      <GraduationCap className='h-4 w-4' />
-                      <span>Course Subject Name</span>
-                    </div>
-                  </th>
-                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center space-x-2'>
-                      <Calendar className='h-4 w-4' />
-                      <span>Academic Semester</span>
-                    </div>
-                  </th>
-                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center space-x-2'>
-                      <User className='h-4 w-4' />
-                      <span>Course Instructor</span>
-                    </div>
-                  </th>
-                  <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center justify-center space-x-2'>
-                      <Award className='h-4 w-4' />
-                      <span>Credit Hours</span>
-                    </div>
-                  </th>
-                  <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center justify-center space-x-2'>
-                      <Edit className='h-4 w-4' />
-                      <span>Management Actions</span>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className='bg-white divide-y divide-gray-200'>
-                {subjects.map((subject, index) => {
-                  let teacherName = "Not Assigned";
-
-                  if (subject.teacher_id) {
-                    if (
-                      typeof subject.teacher_id === "object" &&
-                      subject.teacher_id.name
-                    ) {
-                      teacherName = subject.teacher_id.name;
-                    } else {
-                      const teacher = teachers.find(
-                        (t) => t._id === subject.teacher_id
-                      );
-                      if (teacher) {
-                        teacherName = teacher.name;
-                      }
-                    }
-                  }
-
-                  return (
-                    <tr
-                      key={subject._id}
-                      className={`hover:bg-[#E8ECEF]/30 transition-all duration-200 ${
-                        index % 2 === 0 ? "bg-white" : "bg-[#E8ECEF]/10"
-                      }`}
-                    >
-                      <td className='px-6 py-5'>
-                        <div className='flex items-center space-x-3'>
-                          <div className='p-2 bg-[#E8ECEF] rounded-lg'>
-                            <BookOpen className='h-4 w-4 text-[#1D3D6F]' />
-                          </div>
-                          <div className='text-sm font-semibold text-[#1D3D6F] bg-[#E8ECEF]/50 px-3 py-1 rounded-lg'>
-                            {subject.code}
-                          </div>
-                        </div>
-                      </td>
-                      <td className='px-6 py-5'>
-                        <div className='text-sm font-semibold text-gray-900'>
-                          {subject.name}
-                        </div>
-                        <div className='text-xs text-gray-500 mt-1'>
-                          Academic Course Subject
-                        </div>
-                      </td>
-                      <td className='px-6 py-5'>
-                        <div className='inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#2C4F85]/10 text-[#2C4F85]'>
-                          <Calendar className='h-3 w-3 mr-1' />
-                          {subject.semester_id.name}
-                        </div>
-                      </td>
-                      <td className='px-6 py-5'>
-                        <div className='flex items-center space-x-2'>
-                          <div className='p-1 bg-[#F7B500]/10 rounded-full'>
-                            <User className='h-3 w-3 text-[#F7B500]' />
-                          </div>
-                          <span className='text-sm font-medium text-gray-900'>
-                            {teacherName}
-                          </span>
-                        </div>
-                      </td>
-                      <td className='px-6 py-5 text-center'>
-                        <div className='inline-flex items-center justify-center w-12 h-12 bg-[#F7B500]/10 text-[#F7B500] rounded-full text-sm font-bold'>
-                          <Award className='h-4 w-4 mr-1' />
-                          {subject.credit_hours}
-                        </div>
-                      </td>
-                      <td className='px-6 py-5'>
-                        <div className='flex justify-center space-x-3'>
-                          <button
-                            className='p-2 bg-[#2C4F85]/10 text-[#2C4F85] rounded-lg hover:bg-[#2C4F85]/20 transition-all duration-200 transform hover:scale-105'
-                            onClick={() => openEditSubjectModal(subject)}
-                            title='Edit Course Subject'
-                          >
-                            <Edit size={16} />
-                          </button>
-                          <button
-                            className='p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all duration-200 transform hover:scale-105'
-                            onClick={() => handleDeleteSubject(subject._id)}
-                            title='Delete Course Subject'
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
 
         {/* Academic Records Table */}
         <div className='border-t border-[#E8ECEF] pt-8'>
@@ -1480,12 +1288,6 @@ const TeacherMarksManagement = () => {
                       </th>
                       <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
                         <div className='flex items-center space-x-2'>
-                          <User className='h-4 w-4' />
-                          <span>Course Instructor</span>
-                        </div>
-                      </th>
-                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                        <div className='flex items-center space-x-2'>
                           <Calendar className='h-4 w-4' />
                           <span>Academic Semester</span>
                         </div>
@@ -1505,33 +1307,30 @@ const TeacherMarksManagement = () => {
                           <span>Total Grade</span>
                         </div>
                       </th>
+                      <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className='bg-white divide-y divide-gray-200'>
                     {filteredMarks.map((mark, index) => {
                       const student = getStudentById(mark.student_id);
-                      const subject = getSubjectById(mark.subject_id);
+                      // Use the enriched subject data from the mark object with fallbacks
+                      const subjectName = String(mark.subject_name || `Subject ${mark.subject_id || 'Unknown'}`);
+                      const subjectCode = String(mark.subject_code || "N/A");
 
-                      let teacherName = "Not Assigned";
-                      if (subject.teacher_id) {
-                        if (
-                          typeof subject.teacher_id === "object" &&
-                          subject.teacher_id.name
-                        ) {
-                          teacherName = subject.teacher_id.name;
-                        } else {
-                          const teacher = teachers.find(
-                            (t) => t._id === subject.teacher_id
-                          );
-                          if (teacher) {
-                            teacherName = teacher.name;
-                          }
-                        }
-                      }
+                      // Ensure all values are properly converted to strings/numbers
+                      const studentName = String(student?.name || 'Unknown Student');
+                      const studentIdNumber = String(student?.student_id_number || 'N/A');
+                      const semesterName = String(mark.semester_name || 'Unknown Semester');
+                      const midterm = Number(mark.midterm) || 0;
+                      const final = Number(mark.final) || 0;
+                      const assignment = Number(mark.assignment) || 0;
+                      const total = Number(mark.total) || 0;
 
                       return (
                         <tr
-                          key={index}
+                          key={`mark-${mark._id || index}`}
                           className={`hover:bg-[#E8ECEF]/30 transition-all duration-200 ${
                             index % 2 === 0 ? "bg-white" : "bg-[#E8ECEF]/10"
                           }`}
@@ -1543,10 +1342,10 @@ const TeacherMarksManagement = () => {
                               </div>
                               <div>
                                 <div className='text-sm font-semibold text-gray-900'>
-                                  {student.name}
+                                  {studentName}
                                 </div>
                                 <div className='text-xs text-gray-500 mt-1 font-medium'>
-                                  ID: {student.student_id_number}
+                                  ID: {studentIdNumber}
                                 </div>
                               </div>
                             </div>
@@ -1558,51 +1357,61 @@ const TeacherMarksManagement = () => {
                               </div>
                               <div>
                                 <div className='text-sm font-semibold text-gray-900'>
-                                  {subject.name}
+                                  {subjectName}
                                 </div>
                                 <div className='text-xs text-gray-500 mt-1 font-medium'>
-                                  {subject.code}
+                                  {subjectCode}
                                 </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className='px-6 py-5'>
-                            <div className='flex items-center space-x-2'>
-                              <div className='p-1 bg-[#F7B500]/10 rounded-full'>
-                                <User className='h-3 w-3 text-[#F7B500]' />
-                              </div>
-                              <span className='text-sm font-medium text-gray-900 bg-[#E8ECEF]/50 px-3 py-1 rounded-lg'>
-                                {teacherName}
-                              </span>
                             </div>
                           </td>
                           <td className='px-6 py-5'>
                             <div className='inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#2C4F85]/10 text-[#2C4F85]'>
                               <Calendar className='h-3 w-3 mr-1' />
-                              {mark.semester_name}
+                              {semesterName}
                             </div>
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#2C4F85]/10 text-[#2C4F85]'>
-                              {mark.midterm}
+                              {midterm}
                             </span>
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#1D3D6F]/10 text-[#1D3D6F]'>
-                              {mark.final}
+                              {final}
                             </span>
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#F7B500]/10 text-[#F7B500]'>
-                              {mark.assignment}
+                              {assignment}
                             </span>
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <div className='flex items-center justify-center'>
                               <span className='inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-[#E8ECEF] to-[#E8ECEF]/80 text-[#1D3D6F] border border-[#E8ECEF]'>
                                 <Award className='h-4 w-4 mr-2 text-[#F7B500]' />
-                                {mark.total}
+                                {total}
                               </span>
+                            </div>
+                          </td>
+                          <td className='px-6 py-5 text-center'>
+                            <div className='flex items-center justify-center space-x-2'>
+                              <button
+                                onClick={() => openEditMarksModal(mark)}
+                                className='inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200'
+                                title='Edit marks'
+                              >
+                                <Edit className='h-4 w-4 mr-1' />
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteMarks(mark)}
+                                className='inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-700 transition-colors duration-200'
+                                title='Delete marks'
+                              >
+                                <Trash2 className='h-4 w-4 mr-1' />
+                                Delete
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -1754,8 +1563,8 @@ const TeacherMarksManagement = () => {
                 value={marksFormData.student_id}
                 onChange={handleMarksInputChange}
                 options={students.map((student) => ({
-                  value: student._id,
-                  label: `${student.name} (${student.student_id_number})`,
+                  value: String(student._id || ''),
+                  label: `${String(student.name || 'Unnamed Student')} (${String(student.student_id_number || 'N/A')})`,
                 }))}
                 required
               />
@@ -1765,16 +1574,21 @@ const TeacherMarksManagement = () => {
                 type='select'
                 value={marksFormData.subject_id}
                 onChange={handleMarksInputChange}
-                options={subjects
-                  .filter(
-                    (subject) =>
-                      !selectedSemester ||
-                      subject.semester_id._id === selectedSemester
-                  )
-                  .map((subject) => ({
-                    value: subject._id,
-                    label: `${subject.code} - ${subject.name}`,
-                  }))}
+                options={[
+                  { value: "", label: "Select Course Subject" },
+                  ...subjects
+                    .filter(
+                      (subject) => {
+                        if (!selectedSemester) return true;
+                        // Use the extracted semester ID string for filtering
+                        return subject.semester_id_string === selectedSemester;
+                      }
+                    )
+                    .map((subject) => ({
+                      value: String(subject._id || ''),
+                      label: `${String(subject.code || 'N/A')} - ${String(subject.name || 'Unnamed Subject')}`,
+                    }))
+                ]}
                 required
               />
               <FormField
@@ -1895,182 +1709,161 @@ const TeacherMarksManagement = () => {
         </form>
       </Modal>
 
-      {/* Add Course Subject Modal */}
+      {/* Edit Marks Modal */}
       <Modal
-        isOpen={isAddSubjectModalOpen}
-        onClose={() => setIsAddSubjectModalOpen(false)}
-        title='Add New Course Subject'
+        isOpen={isEditMarksModalOpen}
+        onClose={() => {
+          setIsEditMarksModalOpen(false);
+          setEditingMark(null);
+          resetMarksForm();
+        }}
+        title={`Edit Marks - ${editingMark?.student_name || 'Student'}`}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleAddSubject();
-          }}
-        >
-          <div className='grid grid-cols-1 gap-6'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <FormField
-                label='Course Subject Name'
-                name='name'
-                type='text'
-                value={subjectFormData.name}
-                onChange={handleSubjectInputChange}
-                required
-              />
-              <FormField
-                label='Course Subject Code'
-                name='code'
-                type='text'
-                value={subjectFormData.code}
-                onChange={handleSubjectInputChange}
-                required
-              />
-              <FormField
-                label='Academic Semester'
-                name='semester_id'
-                type='select'
-                value={subjectFormData.semester_id}
-                onChange={handleSubjectInputChange}
-                options={semesters.map((semester) => ({
-                  value: semester._id,
-                  label: semester.name,
-                }))}
-                required
-              />
-              <FormField
-                label='Course Instructor'
-                name='teacher_id'
-                type='select'
-                value={subjectFormData.teacher_id}
-                onChange={handleSubjectInputChange}
-                options={[
-                  { value: "", label: "Select Course Instructor" },
-                  ...teachers.map((teacher) => ({
-                    value: teacher._id,
-                    label: teacher.name,
-                  })),
-                ]}
-              />
-              <FormField
-                label='Credit Hours'
-                name='credit_hours'
-                type='number'
-                value={subjectFormData.credit_hours}
-                onChange={handleSubjectInputChange}
-                min='1'
-                max='6'
-                required
-              />
-            </div>
+        <div className='space-y-6'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <FormField
+              label={t("marks.student")}
+              type='select'
+              name='student_id'
+              value={marksFormData.student_id}
+              onChange={handleMarksInputChange}
+              options={students.map((student) => ({
+                value: String(student._id || ''),
+                label: `${String(student.name || 'Unnamed Student')} (${String(student.student_id_number || 'N/A')})`,
+              }))}
+              disabled={true} // Disable student selection when editing
+            />
 
-            <div className='mt-8 flex justify-end space-x-4'>
+            <FormField
+              label={t("marks.subject")}
+              type='select'
+              name='subject_id'
+              value={marksFormData.subject_id}
+              onChange={handleMarksInputChange}
+              options={[
+                { value: "", label: t("marks.select_subject") },
+                ...subjects
+                  .filter(
+                    (subject) => {
+                      if (!selectedSemester) return true;
+                      return subject.semester_id_string === selectedSemester;
+                    }
+                  )
+                  .map((subject) => ({
+                    value: String(subject._id || ''),
+                    label: `${String(subject.code || 'N/A')} - ${String(subject.name || 'Unnamed Subject')}`,
+                  }))
+              ]}
+            />
+          </div>
+
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+            <FormField
+              label={t("marks.midterm")}
+              type='number'
+              name='midterm'
+              value={marksFormData.midterm}
+              onChange={handleMarksInputChange}
+              min='0'
+              max='100'
+            />
+
+            <FormField
+              label={t("marks.final")}
+              type='number'
+              name='final'
+              value={marksFormData.final}
+              onChange={handleMarksInputChange}
+              min='0'
+              max='100'
+            />
+
+            <FormField
+              label={t("marks.assignment")}
+              type='number'
+              name='assignment'
+              value={marksFormData.assignment}
+              onChange={handleMarksInputChange}
+              min='0'
+              max='100'
+            />
+          </div>
+
+          <FormField
+            label={t("marks.remarks")}
+            type='textarea'
+            name='remarks'
+            value={marksFormData.remarks}
+            onChange={handleMarksInputChange}
+            rows={3}
+          />
+
+          <div className='flex justify-end space-x-4 pt-6 border-t border-gray-200'>
+            <button
+              type='button'
+              onClick={() => {
+                setIsEditMarksModalOpen(false);
+                setEditingMark(null);
+                resetMarksForm();
+              }}
+              className='px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#004B87] transition-colors duration-200'
+            >
+              {t("common.cancel")}
+            </button>
+            <button
+              type='button'
+              onClick={handleUpdateMarks}
+              className='px-6 py-3 text-sm font-medium text-white bg-[#004B87] border border-transparent rounded-lg hover:bg-[#003d6b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#004B87] transition-colors duration-200'
+            >
+              <Save className='h-4 w-4 mr-2 inline' />
+              {t("common.update")}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Notification Component */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 max-w-md w-full bg-white rounded-lg shadow-lg border-l-4 ${
+          notification.type === 'success' ? 'border-green-500' :
+          notification.type === 'error' ? 'border-red-500' :
+          notification.type === 'warning' ? 'border-yellow-500' : 'border-blue-500'
+        } p-4 transition-all duration-300 transform translate-x-0`}>
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              {notification.type === 'success' && <CheckCircle className="h-5 w-5 text-green-500" />}
+              {notification.type === 'error' && <XCircle className="h-5 w-5 text-red-500" />}
+              {notification.type === 'warning' && <AlertCircle className="h-5 w-5 text-yellow-500" />}
+              {notification.type === 'info' && <AlertCircle className="h-5 w-5 text-blue-500" />}
+            </div>
+            <div className="ml-3 w-0 flex-1">
+              <p className={`text-sm font-medium ${
+                notification.type === 'success' ? 'text-green-800' :
+                notification.type === 'error' ? 'text-red-800' :
+                notification.type === 'warning' ? 'text-yellow-800' : 'text-blue-800'
+              }`}>
+                {notification.message}
+              </p>
+            </div>
+            <div className="ml-4 flex-shrink-0 flex">
               <button
-                type='button'
-                className='px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium'
-                onClick={() => setIsAddSubjectModalOpen(false)}
+                className={`rounded-md inline-flex ${
+                  notification.type === 'success' ? 'text-green-400 hover:text-green-500' :
+                  notification.type === 'error' ? 'text-red-400 hover:text-red-500' :
+                  notification.type === 'warning' ? 'text-yellow-400 hover:text-yellow-500' : 'text-blue-400 hover:text-blue-500'
+                } focus:outline-none focus:ring-2 focus:ring-offset-2`}
+                onClick={() => setNotification(null)}
               >
-                Cancel Operation
-              </button>
-              <button
-                type='submit'
-                className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2'
-              >
-                <Save className='h-4 w-4' />
-                <span>Save Course Subject</span>
+                <span className="sr-only">Close</span>
+                <XCircle className="h-5 w-5" />
               </button>
             </div>
           </div>
-        </form>
-      </Modal>
+        </div>
+      )}
 
-      {/* Edit Course Subject Modal */}
-      <Modal
-        isOpen={isEditSubjectModalOpen}
-        onClose={() => setIsEditSubjectModalOpen(false)}
-        title='Edit Course Subject'
-      >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleEditSubject();
-          }}
-        >
-          <div className='grid grid-cols-1 gap-6'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <FormField
-                label='Course Subject Name'
-                name='name'
-                type='text'
-                value={subjectFormData.name}
-                onChange={handleSubjectInputChange}
-                required
-              />
-              <FormField
-                label='Course Subject Code'
-                name='code'
-                type='text'
-                value={subjectFormData.code}
-                onChange={handleSubjectInputChange}
-                required
-              />
-              <FormField
-                label='Academic Semester'
-                name='semester_id'
-                type='select'
-                value={subjectFormData.semester_id}
-                onChange={handleSubjectInputChange}
-                options={semesters.map((semester) => ({
-                  value: semester._id,
-                  label: semester.name,
-                }))}
-                required
-              />
-              <FormField
-                label='Course Instructor'
-                name='teacher_id'
-                type='select'
-                value={subjectFormData.teacher_id}
-                onChange={handleSubjectInputChange}
-                options={[
-                  { value: "", label: "Select Course Instructor" },
-                  ...teachers.map((teacher) => ({
-                    value: teacher._id,
-                    label: teacher.name,
-                  })),
-                ]}
-              />
-              <FormField
-                label='Credit Hours'
-                name='credit_hours'
-                type='number'
-                value={subjectFormData.credit_hours}
-                onChange={handleSubjectInputChange}
-                min='1'
-                max='6'
-                required
-              />
-            </div>
-
-            <div className='mt-8 flex justify-end space-x-4'>
-              <button
-                type='button'
-                className='px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium'
-                onClick={() => setIsEditSubjectModalOpen(false)}
-              >
-                Cancel Operation
-              </button>
-              <button
-                type='submit'
-                className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2'
-              >
-                <Save className='h-4 w-4' />
-                <span>Update Course Subject</span>
-              </button>
-            </div>
-          </div>
-        </form>
-      </Modal>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 };
 

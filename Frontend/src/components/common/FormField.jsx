@@ -26,7 +26,10 @@ const FormField = ({
             }`}
             required={required}
           >
-            <option value="">Select {label}</option>
+            {/* Only add default option if no custom options with empty value exist */}
+            {options && !options.some(option => option.value === "") && (
+              <option value="">Select {label}</option>
+            )}
             {options &&
               options.map((option, index) => (
                 <option key={index} value={option.value}>

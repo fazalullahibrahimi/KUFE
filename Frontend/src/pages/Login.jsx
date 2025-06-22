@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import Kandahar_Economic from "../../public/image_for_login.jpg";
 import { useAuth } from "../contexts/AuthContext";
 import { useAuthGuard } from "../hooks/useAuthGuard";
 
 function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoginLoading, error, clearError } = useAuth();
+  const { login, isLoginLoading, error } = useAuth();
   const { redirectIfAuthenticated } = useAuthGuard();
 
   const [formData, setFormData] = useState({
@@ -18,6 +17,22 @@ function Login() {
 
   const [errors, setErrors] = useState({});
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [currentImage, setCurrentImage] = useState("/image_for_login.jpg");
+  const [verificationMessage, setVerificationMessage] = useState("");
+
+  // Handle image load error
+  const handleImageError = () => {
+    setCurrentImage("/Kandahar_Economic.jpg");
+  };
+
+  // Check for verification success message
+  React.useEffect(() => {
+    if (location.state?.message) {
+      setVerificationMessage(location.state.message);
+      // Clear the message after showing it
+      setTimeout(() => setVerificationMessage(""), 5000);
+    }
+  }, [location.state]);
 
   // Redirect if already authenticated
   redirectIfAuthenticated();
@@ -74,10 +89,18 @@ function Login() {
         setLoginSuccess(true);
 
         // Get redirect path from location state or default based on role
+        // Only redirect to previous page if user was redirected due to auth requirements
+        // Don't redirect to previous page if user manually logged out
         const from = location.state?.from;
         const userRole = result.user.role;
         const defaultPath = userRole === "admin" ? "/dashboardv1" : "/";
-        const redirectPath = from || defaultPath;
+
+        // Check if this is a fresh login (not after logout)
+        const wasLoggedOut = sessionStorage.getItem('wasLoggedOut');
+        const redirectPath = (from && !wasLoggedOut) ? from : defaultPath;
+
+        // Clear the logout flag
+        sessionStorage.removeItem('wasLoggedOut');
 
         setTimeout(() => {
           navigate(redirectPath, { replace: true });
@@ -85,6 +108,21 @@ function Login() {
       }
     } catch (error) {
       console.error("Login error:", error);
+
+      // Check if the error is due to email verification requirement
+      if (error.response?.status === 403 &&
+          error.response?.data?.needsVerification &&
+          error.response?.data?.message?.includes("Please verify your email")) {
+
+        // Store the email for verification process
+        localStorage.setItem("pendingVerificationEmail", formData.email);
+
+        // Redirect to resend verification page
+        navigate("/resend-verification", {
+          state: { email: formData.email, fromLogin: true }
+        });
+        return;
+      }
     }
   };
 
@@ -106,17 +144,20 @@ function Login() {
     >
       {/* Left Panel - University Info */}
       <div className='md:w-1/2 relative overflow-hidden'>
+        {/* Background Image with Error Handling */}
+        <img
+          src={currentImage}
+          alt="Kandahar University"
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={handleImageError}
+          style={{ zIndex: 1 }}
+        />
         <div
-          className='absolute inset-0 bg-cover bg-center'
-          style={{ backgroundImage: `url(${Kandahar_Economic})` }}
-        >
-          <div
-            className='absolute inset-0'
-            style={{ backgroundColor: "rgba(0, 75, 135, 0.85)" }}
-          ></div>
-        </div>
+          className='absolute inset-0'
+          style={{ backgroundColor: "rgba(0, 75, 135, 0.85)", zIndex: 2 }}
+        ></div>
 
-        <div className='relative h-full flex flex-col justify-between p-8 md:p-12 text-white'>
+        <div className='relative h-full flex flex-col justify-between p-8 md:p-12 text-white' style={{ zIndex: 3 }}>
           <div className='mb-auto pt-8'>
             <div className='flex items-center mb-10'>
               <div
@@ -335,6 +376,31 @@ function Login() {
               Access your KUFE account
             </p>
           </div>
+
+          {verificationMessage && (
+            <div
+              className='p-4 mb-6 flex items-center text-sm rounded-lg'
+              style={{
+                backgroundColor: "rgba(0, 128, 0, 0.1)",
+                color: "#006400",
+              }}
+            >
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                className='h-5 w-5 mr-2 flex-shrink-0'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              >
+                <path d='M22 11.08V12a10 10 0 1 1-5.93-9.14'></path>
+                <polyline points='22 4 12 14.01 9 11.01'></polyline>
+              </svg>
+              <span>{verificationMessage}</span>
+            </div>
+          )}
 
           {loginSuccess && (
             <div

@@ -59,9 +59,9 @@ router.delete("/:id", authorize(roles.ADMIN), deleteStudent);
 
 // Student Marks routes (admin only)
 router.post("/:id/marks", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), createMarks);
-router.patch("/:id/marks", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), updateMarks);
-router.get("/:id/marks", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), getMarksById);
-router.delete("/:id/marks", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), deleteMarks);
+router.patch("/:studentId/marks/:markIndex", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), updateMarks);
+router.get("/:studentId/marks/:markIndex", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), getMarksById);
+router.delete("/:studentId/marks/:markIndex", requireRoles([roles.ADMIN,roles.STUDENT,roles.TEACHER]), deleteMarks);
 
 module.exports = router;
 

@@ -14,12 +14,30 @@ import {
   Layers,
   User,
   ClipboardCheck,
+  Library,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import FacultyDirectoryManagement from "./DataManagement/FacultyDirectoryManagement";
 // import Logo from "../../pub";
 const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      // Set flag to indicate user manually logged out
+      sessionStorage.setItem('wasLoggedOut', 'true');
+      await logout();
+      // Clear any stored navigation state
+      sessionStorage.removeItem('redirectPath');
+      // Navigate to home page and replace history
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
   // Menu items configuration
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: <Home size={20} /> },
@@ -27,13 +45,8 @@ const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
     { id: "departments", label: "Departments", icon: <Layers size={20} /> },
     { id: "students", label: "Students", icon: <GraduationCap size={20} /> },
     { id: "courses", label: "Courses", icon: <BookOpen size={20} /> },
+    { id: "subjects", label: "Subjects", icon: <Library size={20} /> },
     { id: "semesters", label: "Semesters", icon: <Calendar size={20} /> },
-    {
-      id: "marks",
-      label: "Marks Management",
-      icon: <FileText size={20} />,
-      href: "/teachermarks",
-    },
     { id: "research", label: "Research", icon: <FileText size={20} /> },
     { id: "events", label: "Events", icon: <Calendar size={20} /> },
     { id: "news", label: "News", icon: <Newspaper size={20} /> },
@@ -101,7 +114,10 @@ const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
       </div>
 
       <div className='p-4 border-t border-opacity-10 border-white'>
-        <div className='flex items-center px-4 py-3 hover:bg-white hover:bg-opacity-10 cursor-pointer'>
+        <div
+          className='flex items-center px-4 py-3 hover:bg-white hover:bg-opacity-10 cursor-pointer hover:text-red-400 transition-colors'
+          onClick={handleLogout}
+        >
           <LogOut size={20} />
           <span className={`ml-3 ${!isSidebarOpen && "hidden"}`}>Logout</span>
         </div>

@@ -11,6 +11,7 @@ import FormField from "../common/FormField";
 
 const StudentManagement = () => {
   const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -19,6 +20,15 @@ const StudentManagement = () => {
   const [currentStudent, setCurrentStudent] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
+
+  // Filter states
+  const [filters, setFilters] = useState({
+    email: "",
+    phone: "",
+    department: "",
+    enrollmentYear: "",
+    status: "",
+  });
   const [formData, setFormData] = useState({
     name: "",
     department_id: "",
@@ -61,6 +71,74 @@ const StudentManagement = () => {
     fetchDepartments();
   }, []);
 
+  // Filter students when students or filters change
+  useEffect(() => {
+    filterStudents();
+  }, [students, filters]);
+
+  // Filter function
+  const filterStudents = () => {
+    let filtered = [...students];
+
+    // Filter by email
+    if (filters.email) {
+      filtered = filtered.filter(student =>
+        student.email.toLowerCase().includes(filters.email.toLowerCase())
+      );
+    }
+
+    // Filter by phone
+    if (filters.phone) {
+      filtered = filtered.filter(student =>
+        student.phone.includes(filters.phone)
+      );
+    }
+
+    // Filter by department
+    if (filters.department) {
+      filtered = filtered.filter(student => {
+        const deptName = getDepartmentNameById(student.department_id);
+        return deptName.toLowerCase().includes(filters.department.toLowerCase());
+      });
+    }
+
+    // Filter by enrollment year
+    if (filters.enrollmentYear) {
+      filtered = filtered.filter(student =>
+        student.enrollment_year.toString() === filters.enrollmentYear
+      );
+    }
+
+    // Filter by status
+    if (filters.status) {
+      filtered = filtered.filter(student =>
+        student.status === filters.status
+      );
+    }
+
+    setFilteredStudents(filtered);
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({
+      email: "",
+      phone: "",
+      department: "",
+      enrollmentYear: "",
+      status: "",
+    });
+  };
+
   // Fetch students from API
   const fetchStudents = async () => {
     try {
@@ -83,11 +161,13 @@ const StudentManagement = () => {
       }
 
       if (result.status === "success") {
-        setStudents(result.data.students || []);
+        const studentsData = result.data.students || [];
+        setStudents(studentsData);
+        setFilteredStudents(studentsData);
       } else {
         console.error("Failed to fetch students:", result.message);
         // Set sample data if API fails
-        setStudents([
+        const sampleData = [
           {
             _id: "1",
             name: "Zahra Ahmadi",
@@ -124,7 +204,9 @@ const StudentManagement = () => {
             status: "active",
             profile_image: "ahmad-profile.jpg",
           },
-        ]);
+        ];
+        setStudents(sampleData);
+        setFilteredStudents(sampleData);
       }
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -801,10 +883,117 @@ const StudentManagement = () => {
         </div>
       )}
 
+      {/* Filter Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Filter Students</h3>
+          <button
+            onClick={clearFilters}
+            className="text-sm text-gray-500 hover:text-gray-700 underline"
+          >
+            Clear All Filters
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* Email Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="text"
+              name="email"
+              value={filters.email}
+              onChange={handleFilterChange}
+              placeholder="Search by email..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004B87] focus:border-transparent text-sm"
+            />
+          </div>
+
+          {/* Phone Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone
+            </label>
+            <input
+              type="text"
+              name="phone"
+              value={filters.phone}
+              onChange={handleFilterChange}
+              placeholder="Search by phone..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004B87] focus:border-transparent text-sm"
+            />
+          </div>
+
+          {/* Department Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Department
+            </label>
+            <input
+              type="text"
+              name="department"
+              value={filters.department}
+              onChange={handleFilterChange}
+              placeholder="Search by department..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004B87] focus:border-transparent text-sm"
+            />
+          </div>
+
+          {/* Enrollment Year Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Enrollment Year
+            </label>
+            <select
+              name="enrollmentYear"
+              value={filters.enrollmentYear}
+              onChange={handleFilterChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004B87] focus:border-transparent text-sm"
+            >
+              <option value="">All Years</option>
+              {[...new Set(students.map(s => s.enrollment_year))].sort((a, b) => b - a).map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              name="status"
+              value={filters.status}
+              onChange={handleFilterChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004B87] focus:border-transparent text-sm"
+            >
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="graduated">Graduated</option>
+              <option value="suspended">Suspended</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Filter Results Summary */}
+        <div className="mt-4 text-sm text-gray-600">
+          Showing {filteredStudents.length} of {students.length} students
+          {(filters.email || filters.phone || filters.department || filters.enrollmentYear || filters.status) && (
+            <span className="ml-2 text-[#004B87] font-medium">
+              (filtered)
+            </span>
+          )}
+        </div>
+      </div>
+
       {/* Student Table */}
       <Table
         columns={columns}
-        data={students}
+        data={filteredStudents}
         actions={true}
         onView={openViewModal}
         onEdit={openEditModal}

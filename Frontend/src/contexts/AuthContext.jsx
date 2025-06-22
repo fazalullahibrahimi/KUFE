@@ -210,7 +210,9 @@ export const AuthProvider = ({ children }) => {
         type: AUTH_ACTIONS.LOGIN_FAILURE,
         payload: errorMessage,
       });
-      return { success: false, error: errorMessage };
+
+      // Re-throw the error so the Login component can handle specific cases
+      throw error;
     }
   };
 

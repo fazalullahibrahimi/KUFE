@@ -73,7 +73,10 @@ const getStudents = asyncHandler(async (req, res) => {
 
   query = query.skip(startIndex).limit(limit);
 
-  query = query.populate("department_id", "name");
+  query = query.populate("department_id", "name")
+    .populate("marks.subject_id", "name code")
+    .populate("marks.semester_id", "name")
+    .populate("marks.teacher_id", "name");
 
   const students = await query;
 
@@ -93,7 +96,10 @@ const getStudents = asyncHandler(async (req, res) => {
 // @access  Private/Admin/Faculty
 const getStudent = asyncHandler(async (req, res) => {
   const student = await Student.findById(req.params.id)
-    .populate("department_id", "name");
+    .populate("department_id", "name")
+    .populate("marks.subject_id", "name code")
+    .populate("marks.semester_id", "name")
+    .populate("marks.teacher_id", "name");
 
   if (!student) {
     return res.status(404).json(apiResponse.error(`Student not found with id of ${req.params.id}`, 404));

@@ -1,24 +1,31 @@
 import React from "react"
-
 import { useState, useEffect } from "react"
 import axios from "axios"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import Kandahar_Economic from "../../public/Kandahar_Economic.jpg"
 
 function ResendVerification() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
 
-  // Try to get email from localStorage if available
+  // Check if coming from login
+  const fromLogin = location.state?.fromLogin || false
+
+  // Try to get email from localStorage or location state
   useEffect(() => {
+    const locationEmail = location.state?.email
     const storedEmail = localStorage.getItem("pendingVerificationEmail")
-    if (storedEmail) {
+
+    if (locationEmail) {
+      setEmail(locationEmail)
+    } else if (storedEmail) {
       setEmail(storedEmail)
     }
-  }, [])
+  }, [location.state])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -44,9 +51,15 @@ function ResendVerification() {
 
       // Navigate to verification page after a short delay
       setTimeout(() => {
-        navigate("/verify-email", {
-          state: { email },
-        })
+        if (fromLogin) {
+          navigate("/verify-email", {
+            state: { email, fromLogin: true },
+          })
+        } else {
+          navigate("/verify-email", {
+            state: { email },
+          })
+        }
       }, 2000)
     } catch (err) {
       setError(err.response?.data?.message || "Failed to send verification email. Please try again.")
@@ -78,6 +91,12 @@ function ResendVerification() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800">Email Verification</h1>
+            {fromLogin && (
+              <div className="p-3 mb-4 text-sm text-blue-800 bg-blue-100 rounded-lg">
+                <p className="font-medium">Email verification required</p>
+                <p>Please verify your email address to complete the login process.</p>
+              </div>
+            )}
             <p className="text-gray-600 mt-2">Please confirm your email address to receive a verification code</p>
           </div>
 
