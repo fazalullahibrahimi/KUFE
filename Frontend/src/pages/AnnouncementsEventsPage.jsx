@@ -35,6 +35,7 @@ import {
 } from "../components/ui/Tabs";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useLanguage } from "../contexts/LanguageContext";
 
 // Animation helper hook
 const useElementOnScreen = (options) => {
@@ -61,6 +62,7 @@ const useElementOnScreen = (options) => {
 };
 
 function AnnouncementsEventsPage() {
+  const { t, isRTL } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
@@ -161,53 +163,58 @@ function AnnouncementsEventsPage() {
     news: null,
   });
 
-  // Static text content
+  // Translated content
   const content = {
-    title: "News & Events",
-    subtitle:
-      "Stay updated with the latest news and upcoming events from the Faculty of Economics",
-    search: "Search announcements and events...",
-    filter: "Filter by category",
+    title: t("News & Events"),
+    subtitle: t("Stay updated with the latest news and upcoming events from the Faculty of Economics"),
+    search: t("Search announcements and events..."),
+    filter: t("Filter by category"),
     categories: {
-      all: "All Categories",
-      academic: "Academic",
-      admission: "Admission",
-      conference: "Conference",
-      workshop: "Workshop",
-      seminar: "Seminar",
-      cultural: "Cultural",
-      research: "Research",
+      all: t("All Categories"),
+      academic: t("Academic"),
+      admission: t("Admission"),
+      conference: t("Conference"),
+      workshop: t("Workshop"),
+      seminar: t("Seminar"),
+      cultural: t("Cultural"),
+      research: t("Research"),
     },
     featured: {
-      title: "Featured Announcements",
-      viewAll: "View All Announcements",
+      title: t("Featured Announcements"),
+      viewAll: t("View All Announcements"),
     },
     upcoming: {
-      title: "Upcoming Events",
-      viewAll: "View All Events",
-      today: "Today",
-      tomorrow: "Tomorrow",
-      register: "Register",
-      moreInfo: "More Info",
+      title: t("Upcoming Events"),
+      viewAll: t("View All Events"),
+      today: t("Today"),
+      tomorrow: t("Tomorrow"),
+      register: t("Register"),
+      moreInfo: t("More Info"),
     },
     news: {
-      title: "Latest News",
-      viewAll: "View All News",
-      readMore: "Read More",
+      title: t("Latest News"),
+      viewAll: t("View All News"),
+      readMore: t("Read More"),
     },
     tabs: {
-      all: "All",
-      announcements: "Announcements",
-      events: "Events",
-      news: "News",
+      all: t("All"),
+      announcements: t("Announcements"),
+      events: t("Events"),
+      news: t("News"),
     },
     archive: {
       title: "Archive",
       viewMore: "View More",
     },
-    noResults: "No results found for your search criteria.",
-    loading: "Loading data...",
-    error: "Error loading data. Please try again later.",
+    noResults: t("No results found for your search criteria."),
+    loading: t("Loading..."),
+    error: t("Error loading content"),
+    tryAgain: t("Try again"),
+    browseContent: t("Browse Content"),
+    filterContent: t("Filter content by type or use the search above"),
+    importantAnnouncements: t("Important announcements from the faculty"),
+    joinUpcomingEvents: t("Join our upcoming events and activities"),
+    recentUpdates: t("Recent updates and achievements"),
   };
 
   // Filter functions
@@ -283,9 +290,16 @@ function AnnouncementsEventsPage() {
 
   // Error component
   const ErrorComponent = () => (
-    <div className='flex items-center justify-center py-12'>
-      <AlertCircle className='h-8 w-8 text-red-500' />
-      <span className='ml-2 text-red-600'>{content.error}</span>
+    <div className='flex flex-col items-center justify-center py-12'>
+      <AlertCircle className='h-8 w-8 text-red-500 mb-2' />
+      <span className='text-red-600 mb-4'>{content.error}</span>
+      <Button
+        variant="outline"
+        onClick={() => window.location.reload()}
+        className="text-red-600 border-red-600 hover:bg-red-50"
+      >
+        {content.tryAgain}
+      </Button>
     </div>
   );
 
@@ -327,7 +341,7 @@ function AnnouncementsEventsPage() {
             <div className='max-w-4xl text-left'>
               <div className='inline-flex items-center px-3 py-1 rounded-full bg-[#F7B500]/20 text-[#F7B500] text-sm font-medium mb-6'>
                 <span className='mr-2'>•</span>
-                <span>Faculty of Economics</span>
+                <span>{t("faculty_of_economics")}</span>
               </div>
               <h1 className='text-4xl md:text-6xl font-bold tracking-tight mb-4 text-white'>
                 {content.title}
@@ -342,14 +356,14 @@ function AnnouncementsEventsPage() {
                   className='inline-flex items-center px-6 py-3 bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-medium rounded-lg shadow-lg hover:shadow-[#F7B500]/30 transition-all duration-300'
                 >
                   <Megaphone className='h-5 w-5 mr-2' />
-                  View Announcements
+                  {content.featured.viewAll}
                 </a>
                 <a
                   href='#events'
                   className='inline-flex items-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm font-medium rounded-lg transition-all duration-300'
                 >
                   <CalendarIcon className='h-5 w-5 mr-2' />
-                  Browse Events
+                  {content.upcoming.viewAll}
                 </a>
               </div>
             </div>
@@ -455,7 +469,7 @@ function AnnouncementsEventsPage() {
               </div>
               <div>
                 <p className='text-sm text-[#64748B] font-medium'>
-                  Total Announcements
+                  {content.tabs.announcements}
                 </p>
                 <p className='text-2xl font-bold text-[#1D3D6F]'>
                   {announcements.length}
@@ -468,7 +482,7 @@ function AnnouncementsEventsPage() {
               </div>
               <div>
                 <p className='text-sm text-[#64748B] font-medium'>
-                  Upcoming Events
+                  {content.upcoming.title}
                 </p>
                 <p className='text-2xl font-bold text-[#1D3D6F]'>
                   {events.length}
@@ -481,7 +495,7 @@ function AnnouncementsEventsPage() {
               </div>
               <div>
                 <p className='text-sm text-[#64748B] font-medium'>
-                  Latest News
+                  {content.news.title}
                 </p>
                 <p className='text-2xl font-bold text-[#1D3D6F]'>
                   {news.length}
@@ -562,9 +576,9 @@ function AnnouncementsEventsPage() {
                     }`}
                     style={{ transitionDelay: "0.3s" }}
                   >
-                    <div className='flex justify-between items-center mb-6'>
-                      <div className='flex items-center'>
-                        <div className='bg-[#F7B500]/20 p-2 rounded-lg mr-3'>
+                    <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={`bg-[#F7B500]/20 p-2 rounded-lg ${isRTL ? 'ml-3' : 'mr-3'}`}>
                           <Bell className='h-6 w-6 text-[#F7B500]' />
                         </div>
                         <div>
@@ -572,7 +586,7 @@ function AnnouncementsEventsPage() {
                             {content.featured.title}
                           </h2>
                           <p className='text-[#64748B] text-sm'>
-                            Important announcements from the faculty
+                            {content.importantAnnouncements}
                           </p>
                         </div>
                       </div>
@@ -660,9 +674,9 @@ function AnnouncementsEventsPage() {
                     }`}
                     style={{ transitionDelay: "0.5s" }}
                   >
-                    <div className='flex justify-between items-center mb-6'>
-                      <div className='flex items-center'>
-                        <div className='bg-[#1D3D6F]/10 p-2 rounded-lg mr-3'>
+                    <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={`bg-[#1D3D6F]/10 p-2 rounded-lg ${isRTL ? 'ml-3' : 'mr-3'}`}>
                           <CalendarIcon className='h-6 w-6 text-[#1D3D6F]' />
                         </div>
                         <div>
@@ -670,7 +684,7 @@ function AnnouncementsEventsPage() {
                             {content.upcoming.title}
                           </h2>
                           <p className='text-[#64748B] text-sm'>
-                            Join our upcoming events and activities
+                            {content.joinUpcomingEvents}
                           </p>
                         </div>
                       </div>
@@ -783,9 +797,9 @@ function AnnouncementsEventsPage() {
                   }`}
                   style={{ transitionDelay: "0.7s" }}
                 >
-                  <div className='flex justify-between items-center mb-6'>
-                    <div className='flex items-center'>
-                      <div className='bg-[#F7B500]/20 p-2 rounded-lg mr-3'>
+                  <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className={`bg-[#F7B500]/20 p-2 rounded-lg ${isRTL ? 'ml-3' : 'mr-3'}`}>
                         <Newspaper className='h-6 w-6 text-[#F7B500]' />
                       </div>
                       <div>
@@ -793,7 +807,7 @@ function AnnouncementsEventsPage() {
                           {content.news.title}
                         </h2>
                         <p className='text-[#64748B] text-sm'>
-                          Recent updates and achievements
+                          {content.recentUpdates}
                         </p>
                       </div>
                     </div>
@@ -864,74 +878,7 @@ function AnnouncementsEventsPage() {
                 </section>
               )}
 
-              {/* Quick Links Section */}
-              <section className='mb-16 bg-[#F7FAFC] rounded-2xl p-8 border border-[#E8ECEF]'>
-                <h2 className='text-2xl font-bold text-[#1D3D6F] mb-6'>
-                  Quick Links
-                </h2>
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                  <div className='bg-white rounded-xl p-6 shadow-sm border border-[#E8ECEF] hover:shadow-md transition-all duration-300 transform hover:-translate-y-1'>
-                    <div className='flex items-center mb-4'>
-                      <div className='bg-[#1D3D6F]/10 p-3 rounded-lg mr-3'>
-                        <BookOpen className='h-6 w-6 text-[#1D3D6F]' />
-                      </div>
-                      <h3 className='text-lg font-semibold text-[#1D3D6F]'>
-                        Academic Calendar
-                      </h3>
-                    </div>
-                    <p className='text-[#64748B] mb-4'>
-                      View important academic dates and deadlines
-                    </p>
-                    <Button
-                      variant='link'
-                      className='text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1'
-                    >
-                      View Calendar
-                      <ExternalLink className='h-4 w-4' />
-                    </Button>
-                  </div>
-                  <div className='bg-white rounded-xl p-6 shadow-sm border border-[#E8ECEF] hover:shadow-md transition-all duration-300 transform hover:-translate-y-1'>
-                    <div className='flex items-center mb-4'>
-                      <div className='bg-[#1D3D6F]/10 p-3 rounded-lg mr-3'>
-                        <Users className='h-6 w-6 text-[#1D3D6F]' />
-                      </div>
-                      <h3 className='text-lg font-semibold text-[#1D3D6F]'>
-                        Student Portal
-                      </h3>
-                    </div>
-                    <p className='text-[#64748B] mb-4'>
-                      Access your student account and resources
-                    </p>
-                    <Button
-                      variant='link'
-                      className='text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1'
-                    >
-                      Access Portal
-                      <ExternalLink className='h-4 w-4' />
-                    </Button>
-                  </div>
-                  <div className='bg-white rounded-xl p-6 shadow-sm border border-[#E8ECEF] hover:shadow-md transition-all duration-300 transform hover:-translate-y-1'>
-                    <div className='flex items-center mb-4'>
-                      <div className='bg-[#1D3D6F]/10 p-3 rounded-lg mr-3'>
-                        <Newspaper className='h-6 w-6 text-[#1D3D6F]' />
-                      </div>
-                      <h3 className='text-lg font-semibold text-[#1D3D6F]'>
-                        Newsletter
-                      </h3>
-                    </div>
-                    <p className='text-[#64748B] mb-4'>
-                      Subscribe to our monthly newsletter
-                    </p>
-                    <Button
-                      variant='link'
-                      className='text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1'
-                    >
-                      Subscribe
-                      <ExternalLink className='h-4 w-4' />
-                    </Button>
-                  </div>
-                </div>
-              </section>
+
             </TabsContent>
 
             {/* Individual Tabs */}
@@ -939,8 +886,10 @@ function AnnouncementsEventsPage() {
               {loading.announcements && <LoadingComponent />}
               {error.announcements && <ErrorComponent />}
               {!loading.announcements && !error.announcements && (
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                  {filteredAnnouncements.map((announcement) => (
+                <>
+                  {filteredAnnouncements.length > 0 ? (
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                      {filteredAnnouncements.map((announcement) => (
                     <Card
                       key={announcement.id}
                       className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden'
@@ -967,15 +916,30 @@ function AnnouncementsEventsPage() {
                         </p>
                         <Button
                           variant='link'
-                          className='text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1'
+                          className={`text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}
                         >
-                          Read More
-                          <ArrowRight className='h-4 w-4' />
+                          {content.news.readMore}
+                          <ArrowRight className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
                         </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    </div>
+                  ) : (
+                    <div className='flex flex-col items-center justify-center py-16'>
+                      <Megaphone className='h-16 w-16 text-[#64748B] mb-4' />
+                      <h3 className='text-xl font-semibold text-[#1D3D6F] mb-2'>
+                        {t("No announcements found")}
+                      </h3>
+                      <p className='text-[#64748B] text-center max-w-md'>
+                        {content.noResults}
+                      </p>
+                      <p className='text-[#64748B] text-center max-w-md mt-2'>
+                        {t("Try adjusting your search or filter criteria")}
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
 
@@ -983,8 +947,10 @@ function AnnouncementsEventsPage() {
               {loading.events && <LoadingComponent />}
               {error.events && <ErrorComponent />}
               {!loading.events && !error.events && (
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                  {filteredEvents.map((event) => (
+                <>
+                  {filteredEvents.length > 0 ? (
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                      {filteredEvents.map((event) => (
                     <Card
                       key={event.id}
                       className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden'
@@ -1018,27 +984,42 @@ function AnnouncementsEventsPage() {
                             {event.description}
                           </p>
                           <div className='space-y-2 mb-4'>
-                            <div className='flex items-center text-sm text-[#64748B]'>
-                              <CalendarIcon className='h-4 w-4 mr-2 text-[#1D3D6F]' />
+                            <div className={`flex items-center text-sm text-[#64748B] ${isRTL ? 'flex-row-reverse' : ''}`}>
+                              <CalendarIcon className={`h-4 w-4 text-[#1D3D6F] ${isRTL ? 'ml-2' : 'mr-2'}`} />
                               <span>{formatDate(event.date)}</span>
                             </div>
-                            <div className='flex items-center text-sm text-[#64748B]'>
-                              <Clock className='h-4 w-4 mr-2 text-[#1D3D6F]' />
+                            <div className={`flex items-center text-sm text-[#64748B] ${isRTL ? 'flex-row-reverse' : ''}`}>
+                              <Clock className={`h-4 w-4 text-[#1D3D6F] ${isRTL ? 'ml-2' : 'mr-2'}`} />
                               <span>{event.time}</span>
                             </div>
-                            <div className='flex items-center text-sm text-[#64748B]'>
-                              <MapPin className='h-4 w-4 mr-2 text-[#1D3D6F]' />
+                            <div className={`flex items-center text-sm text-[#64748B] ${isRTL ? 'flex-row-reverse' : ''}`}>
+                              <MapPin className={`h-4 w-4 text-[#1D3D6F] ${isRTL ? 'ml-2' : 'mr-2'}`} />
                               <span>{event.location}</span>
                             </div>
                           </div>
                           <Button className='w-full bg-[#1D3D6F] hover:bg-[#2C4F85] text-white'>
-                            Register Now
+                            {content.upcoming.register}
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    </div>
+                  ) : (
+                    <div className='flex flex-col items-center justify-center py-16'>
+                      <CalendarIcon className='h-16 w-16 text-[#64748B] mb-4' />
+                      <h3 className='text-xl font-semibold text-[#1D3D6F] mb-2'>
+                        {t("No events found")}
+                      </h3>
+                      <p className='text-[#64748B] text-center max-w-md'>
+                        {content.noResults}
+                      </p>
+                      <p className='text-[#64748B] text-center max-w-md mt-2'>
+                        {t("Try adjusting your search or filter criteria")}
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
 
@@ -1046,8 +1027,10 @@ function AnnouncementsEventsPage() {
               {loading.news && <LoadingComponent />}
               {error.news && <ErrorComponent />}
               {!loading.news && !error.news && (
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                  {filteredNews.map((item) => (
+                <>
+                  {filteredNews.length > 0 ? (
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                      {filteredNews.map((item) => (
                     <Card
                       key={item.id}
                       className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden'
@@ -1074,16 +1057,31 @@ function AnnouncementsEventsPage() {
                           <p className='text-[#334155] mb-4'>{item.summary}</p>
                           <Button
                             variant='link'
-                            className='text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1'
+                            className={`text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}
                           >
-                            Read More
-                            <ArrowRight className='h-4 w-4' />
+                            {content.news.readMore}
+                            <ArrowRight className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    </div>
+                  ) : (
+                    <div className='flex flex-col items-center justify-center py-16'>
+                      <Newspaper className='h-16 w-16 text-[#64748B] mb-4' />
+                      <h3 className='text-xl font-semibold text-[#1D3D6F] mb-2'>
+                        {t("No news found")}
+                      </h3>
+                      <p className='text-[#64748B] text-center max-w-md'>
+                        {content.noResults}
+                      </p>
+                      <p className='text-[#64748B] text-center max-w-md mt-2'>
+                        {t("Try adjusting your search or filter criteria")}
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
           </Tabs>
