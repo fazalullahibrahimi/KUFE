@@ -20,7 +20,7 @@ import axios from "axios";
 import API_URL from "../../config/api";
 
 const StudentMarksView = () => {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
 
   // State management
   const [studentSearchId, setStudentSearchId] = useState("");
@@ -259,34 +259,40 @@ const StudentMarksView = () => {
   };
 
   return (
-    <div className='space-y-8'>
+    <div
+      className={`space-y-8 ${isRTL ? 'rtl' : 'ltr'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+      style={{
+        direction: isRTL ? 'rtl' : 'ltr',
+        textAlign: isRTL ? 'right' : 'left'
+      }}
+    >
       {/* Header Section */}
       <div className='relative overflow-hidden bg-gradient-to-br from-white via-[#E8ECEF]/30 to-[#E8ECEF]/50 rounded-2xl border border-[#E8ECEF]/50 shadow-lg'>
         {/* Background Pattern */}
         <div className='absolute inset-0 bg-gradient-to-br from-[#1D3D6F]/5 via-transparent to-[#2C4F85]/5'></div>
-        <div className='absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#F7B500]/10 to-transparent rounded-full blur-3xl'></div>
-        <div className='absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[#2C4F85]/10 to-transparent rounded-full blur-2xl'></div>
+        <div className={`absolute top-0 w-64 h-64 bg-gradient-to-bl from-[#F7B500]/10 to-transparent rounded-full blur-3xl ${isRTL ? 'left-0' : 'right-0'}`}></div>
+        <div className={`absolute bottom-0 w-48 h-48 bg-gradient-to-tr from-[#2C4F85]/10 to-transparent rounded-full blur-2xl ${isRTL ? 'right-0' : 'left-0'}`}></div>
 
         <div className='relative p-8'>
-          <div className='flex items-center justify-between mb-6'>
-            <div className='flex items-center space-x-4'>
+          <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
               <div className='p-3 bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] rounded-xl shadow-lg'>
                 <GraduationCap className='h-8 w-8 text-white' />
               </div>
               <div>
                 <h2 className='text-2xl font-bold bg-gradient-to-r from-[#000000] via-[#1D3D6F] to-[#2C4F85] bg-clip-text text-transparent'>
-                  Access Your Academic Records
+                  {t("accessYourAcademicRecords")}
                 </h2>
                 <p className='text-gray-600 mt-1'>
-                  Please enter your student identification number to access your
-                  complete academic transcript and performance records
+                  {t("enterStudentIdToAccess")}
                 </p>
               </div>
             </div>
-            <div className='hidden md:flex items-center space-x-2 text-[#1D3D6F]'>
+            <div className={`hidden md:flex items-center text-[#1D3D6F] ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
               <FileText className='h-5 w-5' />
               <span className='text-sm font-medium'>
-                Official Academic Transcript
+                {t("officialAcademicTranscript")}
               </span>
             </div>
           </div>
@@ -295,19 +301,20 @@ const StudentMarksView = () => {
           <div className='bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-white/50 shadow-sm'>
             <div className='flex flex-col md:flex-row gap-4'>
               <div className='relative flex-grow'>
-                <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                <div className={`absolute inset-y-0 pl-3 flex items-center pointer-events-none ${isRTL ? 'right-0' : 'left-0'}`}>
                   <Search className='h-5 w-5 text-gray-400' />
                 </div>
                 <input
                   type='text'
-                  placeholder='Enter your Student ID'
-                  className='w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200 bg-white/90'
+                  placeholder={t("enterYourStudentId")}
+                  className={`w-full py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200 bg-white/90 ${isRTL ? 'pr-10 pl-4 text-right' : 'pl-10 pr-4 text-left'}`}
                   value={studentSearchId}
                   onChange={handleStudentIdSearch}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 />
               </div>
               <button
-                className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                className={`px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}
                 onClick={handleViewAcademicRecord}
                 disabled={loading || !studentSearchId.trim() || dataLoading}
               >
@@ -318,10 +325,10 @@ const StudentMarksView = () => {
                 )}
                 <span>
                   {dataLoading
-                    ? "Loading System Data..."
+                    ? t("loadingSystemData")
                     : loading
-                    ? "Loading..."
-                    : "View Complete Academic Record"}
+                    ? t("loading")
+                    : t("viewCompleteAcademicRecord")}
                 </span>
               </button>
             </div>
@@ -331,7 +338,7 @@ const StudentMarksView = () => {
 
       {/* Error Display */}
       {error && (
-        <div className='bg-red-50 border border-red-200 rounded-xl p-4 flex items-center space-x-3'>
+        <div className={`bg-red-50 border border-red-200 rounded-xl p-4 flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
           <AlertCircle className='h-5 w-5 text-red-500 flex-shrink-0' />
           <p className='text-red-700 font-medium'>{error}</p>
         </div>
@@ -344,16 +351,16 @@ const StudentMarksView = () => {
             {/* Student Profile Header */}
             <div className='relative bg-gradient-to-br from-[#E8ECEF]/50 via-[#E8ECEF]/30 to-white rounded-2xl p-8 mb-8 border border-[#E8ECEF]/50 overflow-hidden'>
               {/* Background decoration */}
-              <div className='absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#F7B500]/20 to-transparent rounded-full blur-2xl'></div>
-              <div className='absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-[#2C4F85]/20 to-transparent rounded-full blur-xl'></div>
+              <div className={`absolute top-0 w-32 h-32 bg-gradient-to-bl from-[#F7B500]/20 to-transparent rounded-full blur-2xl ${isRTL ? 'left-0' : 'right-0'}`}></div>
+              <div className={`absolute bottom-0 w-24 h-24 bg-gradient-to-tr from-[#2C4F85]/20 to-transparent rounded-full blur-xl ${isRTL ? 'right-0' : 'left-0'}`}></div>
 
-              <div className='relative flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6'>
-                <div className='flex items-center space-x-6'>
+              <div className={`relative flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 ${isRTL ? 'lg:flex-row-reverse' : ''}`}>
+                <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'}`}>
                   <div className='relative'>
                     <div className='w-20 h-20 bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg'>
                       {academicRecord.student.name.charAt(0)}
                     </div>
-                    <div className='absolute -bottom-2 -right-2 w-8 h-8 bg-[#F7B500] rounded-full flex items-center justify-center border-4 border-white'>
+                    <div className={`absolute -bottom-2 w-8 h-8 bg-[#F7B500] rounded-full flex items-center justify-center border-4 border-white ${isRTL ? '-left-2' : '-right-2'}`}>
                       <Award className='h-4 w-4 text-white' />
                     </div>
                   </div>
@@ -362,39 +369,39 @@ const StudentMarksView = () => {
                       {academicRecord.student.name}
                     </h3>
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                      <div className='flex items-center space-x-3'>
+                      <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
                         <div className='p-2 bg-[#E8ECEF] rounded-lg'>
                           <User className='h-4 w-4 text-[#1D3D6F]' />
                         </div>
                         <div>
                           <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>
-                            Student ID
+                            {t("studentId")}
                           </p>
                           <p className='text-sm font-semibold text-gray-800'>
                             {academicRecord.student.student_id_number}
                           </p>
                         </div>
                       </div>
-                      <div className='flex items-center space-x-3'>
+                      <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
                         <div className='p-2 bg-[#E8ECEF] rounded-lg'>
                           <BookOpen className='h-4 w-4 text-[#2C4F85]' />
                         </div>
                         <div>
                           <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>
-                            Department
+                            {t("department")}
                           </p>
                           <p className='text-sm font-semibold text-gray-800'>
                             {academicRecord.student.department?.name || "N/A"}
                           </p>
                         </div>
                       </div>
-                      <div className='flex items-center space-x-3'>
+                      <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
                         <div className='p-2 bg-[#E8ECEF] rounded-lg'>
                           <Calendar className='h-4 w-4 text-[#F7B500]' />
                         </div>
                         <div>
                           <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>
-                            Enrollment Year
+                            {t("enrollmentYear")}
                           </p>
                           <p className='text-sm font-semibold text-gray-800'>
                             {academicRecord.student.enrollment_year}
@@ -414,13 +421,13 @@ const StudentMarksView = () => {
                       </div>
                     </div>
                     <p className='text-xs text-gray-500 mb-2 uppercase tracking-wider font-medium'>
-                      Cumulative Grade Point Average
+                      {t("cumulativeGradePointAverage")}
                     </p>
                     <p className='text-4xl font-bold bg-gradient-to-r from-[#1D3D6F] via-[#2C4F85] to-[#F7B500] bg-clip-text text-transparent'>
                       {academicRecord.academicSummary.overallCGPA}
                     </p>
-                    <div className='mt-2 flex items-center justify-center'>
-                      <TrendingUp className='h-4 w-4 text-[#F7B500] mr-1' />
+                    <div className={`mt-2 flex items-center justify-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <TrendingUp className={`h-4 w-4 text-[#F7B500] ${isRTL ? 'ml-1' : 'mr-1'}`} />
                       <span className='text-xs text-[#1D3D6F] font-medium'>
                         {academicRecord.academicSummary.academicStatus}
                       </span>
@@ -432,23 +439,23 @@ const StudentMarksView = () => {
 
             {/* Academic Results Section */}
             <div className='space-y-6'>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center space-x-3'>
+              <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
                   <div className='p-2 bg-[#E8ECEF] rounded-lg'>
                     <BarChart3 className='h-5 w-5 text-[#1D3D6F]' />
                   </div>
                   <h3 className='text-xl font-semibold bg-gradient-to-r from-[#000000] to-[#1D3D6F] bg-clip-text text-transparent'>
-                    Academic Performance Overview
+                    {t("academicPerformanceOverview")}
                   </h3>
                 </div>
               </div>
 
               {/* Semester Selection */}
               <div className='bg-[#E8ECEF]/30 rounded-xl p-6 border border-[#E8ECEF]'>
-                <div className='flex items-center space-x-2 mb-4'>
+                <div className={`flex items-center mb-4 ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                   <Calendar className='h-5 w-5 text-[#1D3D6F]' />
                   <h4 className='text-lg font-medium text-gray-800'>
-                    Select Academic Semester
+                    {t("selectAcademicSemester")}
                   </h4>
                 </div>
                 <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
@@ -518,7 +525,7 @@ const StudentMarksView = () => {
 
                             {!hasResults && (
                               <div className='text-xs text-gray-400'>
-                                No Records Available
+                                {t("noRecordsAvailable")}
                               </div>
                             )}
                           </div>
@@ -542,34 +549,34 @@ const StudentMarksView = () => {
                       <Calendar className='h-12 w-12 text-gray-400' />
                     </div>
                     <h3 className='text-xl font-semibold text-gray-800 mb-3'>
-                      No Results Available
+                      {t("noResultsAvailable")}
                     </h3>
                     <p className='text-gray-600 max-w-md mx-auto'>
-                      No academic records found for the selected semester.
+                      {t("noAcademicRecordsFoundForSemester")}
                     </p>
                   </div>
                 ) : (
                   <>
                     {/* Results Header */}
                     <div className='bg-gradient-to-r from-[#E8ECEF]/50 to-[#E8ECEF]/30 px-6 py-4 border-b border-[#E8ECEF]'>
-                      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
-                        <div className='flex items-center space-x-3'>
+                      <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+                        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
                           <div className='p-2 bg-[#E8ECEF] rounded-lg'>
                             <FileText className='h-5 w-5 text-[#1D3D6F]' />
                           </div>
                           <div>
                             <h4 className='text-lg font-semibold text-gray-800'>
-                              {selectedSemester} Academic Grade Report
+                              {selectedSemester} {t("semesterAcademicGradeReport")}
                             </h4>
                             <p className='text-sm text-gray-600'>
-                              Complete academic performance overview
+                              {t("completeAcademicPerformanceOverview")}
                             </p>
                           </div>
                         </div>
-                        <div className='flex items-center space-x-4'>
-                          <div className='text-right'>
+                        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+                          <div className={isRTL ? 'text-left' : 'text-right'}>
                             <p className='text-xs text-gray-500 uppercase tracking-wide font-medium'>
-                              Semester Grade Point Average
+                              {t("semesterGradePointAverage")}
                             </p>
                             <div
                               className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
@@ -578,9 +585,9 @@ const StudentMarksView = () => {
                                   : Number.parseFloat(academicRecord.semesterRecords[selectedSemester].semesterGPA) >= 2.0
                                   ? "bg-[#2C4F85]/20 text-[#2C4F85]"
                                   : "bg-[#F7B500]/20 text-[#F7B500]"
-                              }`}
+                              } ${isRTL ? 'flex-row-reverse' : ''}`}
                             >
-                              <Star className='h-3 w-3 mr-1' />
+                              <Star className={`h-3 w-3 ${isRTL ? 'ml-1' : 'mr-1'}`} />
                               {academicRecord.semesterRecords[selectedSemester].semesterGPA}
                             </div>
                           </div>
@@ -593,28 +600,28 @@ const StudentMarksView = () => {
                       <table className='min-w-full divide-y divide-gray-200'>
                         <thead className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85]'>
                           <tr>
-                            <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                              <div className='flex items-center space-x-2'>
+                            <th className={`px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                              <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                                 <BookOpen className='h-4 w-4' />
-                                <span>Course Subject</span>
+                                <span>{t("courseSubject")}</span>
                               </div>
                             </th>
                             <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                              Course Credit Hours
+                              {t("courseCreditHours")}
                             </th>
                             <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                              Midterm Examination
+                              {t("midtermExamination")}
                             </th>
                             <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                              Final Examination
+                              {t("finalExamination")}
                             </th>
                             <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                              Course Assignment
+                              {t("courseAssignment")}
                             </th>
                             <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                              <div className='flex items-center justify-center space-x-2'>
+                              <div className={`flex items-center justify-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                                 <Award className='h-4 w-4' />
-                                <span>Total Grade</span>
+                                <span>{t("totalGrade")}</span>
                               </div>
                             </th>
                           </tr>
@@ -631,13 +638,13 @@ const StudentMarksView = () => {
                                   }`}
                                 >
                                   <td className='px-6 py-5'>
-                                    <div className='flex items-center space-x-3'>
+                                    <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
                                       <div className='p-2 bg-[#E8ECEF] rounded-lg'>
                                         <BookOpen className='h-4 w-4 text-[#1D3D6F]' />
                                       </div>
                                       <div>
                                         <div className='text-sm font-semibold text-gray-900'>
-                                          {subjectData.subject?.name || "Unknown Subject"}
+                                          {subjectData.subject?.name || t("unknownSubject")}
                                         </div>
                                         <div className='text-xs text-gray-500 mt-1 font-medium'>
                                           {subjectData.subject?.code || "N/A"}
@@ -693,16 +700,15 @@ const StudentMarksView = () => {
               <User className='h-16 w-16 text-[#1D3D6F]' />
             </div>
             <h3 className='text-2xl font-semibold text-gray-800 mb-4'>
-              Enter your Student ID
+              {t("enterStudentId")}
             </h3>
             <p className='text-gray-600 max-w-md mx-auto text-lg leading-relaxed'>
-              Please enter your student identification number to access your
-              complete academic transcript and performance records
+              {t("enterStudentIdToAccess")}
             </p>
-            <div className='mt-8 flex items-center justify-center space-x-2 text-[#1D3D6F]'>
+            <div className={`mt-8 flex items-center justify-center text-[#1D3D6F] ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
               <Search className='h-5 w-5' />
               <span className='text-sm font-medium'>
-                Ready to Access Academic Records
+                {t("readyToAccessAcademicRecords")}
               </span>
             </div>
           </div>

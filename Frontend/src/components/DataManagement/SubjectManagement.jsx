@@ -11,22 +11,32 @@ import {
   Calendar,
   User,
   Award,
+  TrendingUp,
+  Activity,
+  Eye,
+  Target,
+  Building2,
+  Users,
+  Layers
 } from "lucide-react";
+import Table from "../common/Table";
 import Modal from "../common/Modal";
 import FormField from "../common/FormField";
 import { useLanguage } from "../../contexts/LanguageContext";
 
 const SubjectManagement = () => {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
 
   // State for data from API
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [isLoading, setIsLoading] = useState({
     semesters: true,
     subjects: true,
     teachers: true,
+    departments: true,
   });
 
   // State for UI
@@ -91,6 +101,37 @@ const SubjectManagement = () => {
     };
 
     fetchTeachers();
+  }, []);
+
+  // Fetch departments from API
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        setIsLoading((prev) => ({ ...prev, departments: true }));
+        const response = await fetch("http://127.0.0.1:4400/api/v1/departments/", {
+          headers: createHeaders(),
+        });
+        const data = await response.json();
+        console.log("Departments API Response:", data);
+
+        if (data.status === "success" && data.data && data.data.departments) {
+          setDepartments(data.data.departments);
+        } else {
+          console.error(
+            "Unexpected API response structure for departments:",
+            data
+          );
+          setDepartments([]);
+        }
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+        setDepartments([]);
+      } finally {
+        setIsLoading((prev) => ({ ...prev, departments: false }));
+      }
+    };
+
+    fetchDepartments();
   }, []);
 
   // Fetch semesters from API
@@ -365,7 +406,8 @@ const SubjectManagement = () => {
   if (
     isLoading.semesters ||
     isLoading.subjects ||
-    isLoading.teachers
+    isLoading.teachers ||
+    isLoading.departments
   ) {
     return (
       <div className='flex justify-center items-center h-64'>
@@ -378,210 +420,239 @@ const SubjectManagement = () => {
   }
 
   return (
-    <div className={`w-full min-h-screen space-y-6 ${isRTL ? "rtl" : "ltr"}`}>
-      {/* Header Section */}
-      <div className='relative overflow-hidden bg-gradient-to-br from-white via-[#E8ECEF]/30 to-[#E8ECEF]/50 rounded-2xl border border-[#E8ECEF]/50 shadow-lg'>
-        {/* Background Pattern */}
-        <div className='absolute inset-0 bg-gradient-to-br from-[#1D3D6F]/5 via-transparent to-[#2C4F85]/5'></div>
-        <div className='absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#F7B500]/10 to-transparent rounded-full blur-3xl'></div>
-        <div className='absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[#2C4F85]/10 to-transparent rounded-full blur-2xl'></div>
+    <div className="space-y-8">
+      {/* Enhanced Header Section */}
+      <div className="relative bg-gradient-to-br from-[#004B87] via-[#1D3D6F] to-[#2C4F85] rounded-3xl p-8 text-white overflow-hidden shadow-2xl">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#F4B400] rounded-full -translate-y-48 translate-x-48 animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#16A085] rounded-full translate-y-32 -translate-x-32 animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16 animate-ping delay-2000"></div>
+        </div>
 
-        <div className='relative p-8'>
-          <div className='flex items-center justify-between mb-6'>
-            <div className='flex items-center space-x-4'>
-              <div className='p-3 bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] rounded-xl shadow-lg'>
-                <BookOpen className='h-8 w-8 text-white' />
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div className="mb-6 md:mb-0">
+            <div className="flex items-center mb-4">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl border border-white/30 mr-4">
+                <BookOpen className="h-8 w-8 text-[#F4B400]" />
               </div>
               <div>
-                <h2 className='text-2xl font-bold bg-gradient-to-r from-[#000000] via-[#1D3D6F] to-[#2C4F85] bg-clip-text text-transparent'>
-                  Course Subject Management System
-                </h2>
-                <p className='text-gray-600 mt-1'>
-                  Comprehensive course subject management and instructor assignment system
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
+                  {t("subjectManagement")}
+                </h1>
+                <p className="text-white/90 text-lg">
+                  {t("manageAcademicCourseSubjects")}
                 </p>
               </div>
             </div>
-            <div className='hidden md:flex items-center space-x-2 text-[#1D3D6F]'>
-              <BarChart3 className='h-5 w-5' />
-              <span className='text-sm font-medium'>Admin Dashboard</span>
+            <div className="flex items-center text-white/70">
+              <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
+              <span className="text-sm">
+                {t("manageAcademicCourseSubjects")} • {subjects.length} {t("subjects")}
+              </span>
             </div>
           </div>
 
-          {/* Action Button */}
-          <div className='flex justify-end'>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="text-right mb-3 sm:mb-0">
+              <div className="text-2xl font-bold text-[#F4B400]">
+                {subjects.length}
+              </div>
+              <div className="text-white/60 text-sm">
+                {t("totalSubjects")}
+              </div>
+            </div>
             <button
-              className='flex items-center px-6 py-3 bg-gradient-to-r from-[#2C4F85] to-[#1D3D6F] text-white rounded-lg hover:from-[#1D3D6F] hover:to-[#2C4F85] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+              className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
               onClick={() => {
                 resetSubjectForm();
                 setIsAddSubjectModalOpen(true);
               }}
+              disabled={isLoading.subjects}
             >
-              <Plus size={18} className='mr-2' />
-              Add New Course Subject
+              <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
+              <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
+                {t("addNewSubject")}
+              </span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className='bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden'>
-        {/* Subject Management Section */}
-        <div className='p-6'>
-          <div className='flex items-center space-x-3 mb-6'>
-            <div className='p-2 bg-[#E8ECEF] rounded-lg'>
-              <BookOpen className='h-5 w-5 text-[#1D3D6F]' />
-            </div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Subjects Card */}
+        <div className="group bg-gradient-to-br from-[#3B82F6] to-[#1D4ED8] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
             <div>
-              <h3 className='text-xl font-semibold bg-gradient-to-r from-[#000000] to-[#1D3D6F] bg-clip-text text-transparent'>
-                Course Subject Directory
-              </h3>
-              <p className='text-sm text-gray-600 mt-1'>
-                Manage academic course subjects and instructor assignments
-              </p>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <BookOpen className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold">{t("totalSubjects")}</h3>
+              </div>
+              <p className="text-3xl font-bold">{subjects.length}</p>
+              <p className="text-white/80 text-sm mt-1">{t("academicCourseSubject")}</p>
             </div>
           </div>
+        </div>
 
-          <div className='overflow-x-auto rounded-lg shadow-lg border border-[#E8ECEF]'>
-            <table className='min-w-full divide-y divide-gray-200'>
-              <thead className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85]'>
-                <tr>
-                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center space-x-2'>
-                      <BookOpen className='h-4 w-4' />
-                      <span>Course Code</span>
-                    </div>
-                  </th>
-                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center space-x-2'>
-                      <GraduationCap className='h-4 w-4' />
-                      <span>Course Subject Name</span>
-                    </div>
-                  </th>
-                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center space-x-2'>
-                      <Calendar className='h-4 w-4' />
-                      <span>Academic Semester</span>
-                    </div>
-                  </th>
-                  <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center space-x-2'>
-                      <User className='h-4 w-4' />
-                      <span>Course Instructor</span>
-                    </div>
-                  </th>
-                  <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center justify-center space-x-2'>
-                      <Award className='h-4 w-4' />
-                      <span>Credit Hours</span>
-                    </div>
-                  </th>
-                  <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                    <div className='flex items-center justify-center space-x-2'>
-                      <Edit className='h-4 w-4' />
-                      <span>Management Actions</span>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className='bg-white divide-y divide-gray-200'>
-                {subjects.map((subject, index) => {
-                  let teacherName = "Not Assigned";
+        {/* Active Subjects Card */}
+        <div className="group bg-gradient-to-br from-[#10B981] to-[#059669] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <Activity className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold">{t("activeSubjects")}</h3>
+              </div>
+              <p className="text-3xl font-bold">{subjects.filter(s => s.teacher_id).length}</p>
+              <p className="text-white/80 text-sm mt-1">{t("courseInstructor")}</p>
+            </div>
+          </div>
+        </div>
 
-                  if (subject.teacher_id) {
-                    if (
-                      typeof subject.teacher_id === "object" &&
-                      subject.teacher_id.name
-                    ) {
-                      teacherName = subject.teacher_id.name;
-                    } else {
-                      const teacher = teachers.find(
-                        (t) => t._id === subject.teacher_id
-                      );
-                      if (teacher) {
-                        teacherName = teacher.name;
-                      }
-                    }
-                  }
+        {/* Departments Card */}
+        <div className="group bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <Building2 className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold">{t("subjectsByDepartment")}</h3>
+              </div>
+              <p className="text-3xl font-bold">{departments.length}</p>
+              <p className="text-white/80 text-sm mt-1">{t("departments")}</p>
+            </div>
+          </div>
+        </div>
 
-                  return (
-                    <tr
-                      key={subject._id}
-                      className={`hover:bg-[#E8ECEF]/30 transition-all duration-200 ${
-                        index % 2 === 0 ? "bg-white" : "bg-[#E8ECEF]/10"
-                      }`}
-                    >
-                      <td className='px-6 py-5'>
-                        <div className='flex items-center space-x-3'>
-                          <div className='p-2 bg-[#E8ECEF] rounded-lg'>
-                            <BookOpen className='h-4 w-4 text-[#1D3D6F]' />
-                          </div>
-                          <div className='text-sm font-semibold text-[#1D3D6F] bg-[#E8ECEF]/50 px-3 py-1 rounded-lg'>
-                            {subject.code}
-                          </div>
-                        </div>
-                      </td>
-                      <td className='px-6 py-5'>
-                        <div className='text-sm font-semibold text-gray-900'>
-                          {subject.name}
-                        </div>
-                        <div className='text-xs text-gray-500 mt-1'>
-                          Academic Course Subject
-                        </div>
-                      </td>
-                      <td className='px-6 py-5'>
-                        <div className='inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#2C4F85]/10 text-[#2C4F85]'>
-                          <Calendar className='h-3 w-3 mr-1' />
-                          {subject.semester_id.name}
-                        </div>
-                      </td>
-                      <td className='px-6 py-5'>
-                        <div className='flex items-center space-x-2'>
-                          <div className='p-1 bg-[#F7B500]/10 rounded-full'>
-                            <User className='h-3 w-3 text-[#F7B500]' />
-                          </div>
-                          <span className='text-sm font-medium text-gray-900'>
-                            {teacherName}
-                          </span>
-                        </div>
-                      </td>
-                      <td className='px-6 py-5 text-center'>
-                        <div className='inline-flex items-center justify-center w-12 h-12 bg-[#F7B500]/10 text-[#F7B500] rounded-full text-sm font-bold'>
-                          <Award className='h-4 w-4 mr-1' />
-                          {subject.credit_hours}
-                        </div>
-                      </td>
-                      <td className='px-6 py-5'>
-                        <div className='flex justify-center space-x-3'>
-                          <button
-                            className='p-2 bg-[#2C4F85]/10 text-[#2C4F85] rounded-lg hover:bg-[#2C4F85]/20 transition-all duration-200 transform hover:scale-105'
-                            onClick={() => openEditSubjectModal(subject)}
-                            title='Edit Course Subject'
-                          >
-                            <Edit size={16} />
-                          </button>
-                          <button
-                            className='p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all duration-200 transform hover:scale-105'
-                            onClick={() => handleDeleteSubject(subject._id)}
-                            title='Delete Course Subject'
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        {/* Semesters Card */}
+        <div className="group bg-gradient-to-br from-[#F59E0B] to-[#D97706] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-white rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold">{t("academicSemester")}</h3>
+              </div>
+              <p className="text-3xl font-bold">{semesters.length}</p>
+              <p className="text-white/80 text-sm mt-1">{t("semesters")}</p>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Loading indicator */}
+      {isLoading.subjects && (
+        <div className="text-center py-4">
+          <p className="text-gray-600">{t("loading")}</p>
+        </div>
+      )}
+
+      {/* Subject Table */}
+      <Table
+        columns={[
+          {
+            header: t("subjectCode"),
+            accessor: "code",
+            render: (row) => (
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-blue-100 flex items-center justify-center rounded-md mr-3">
+                  <BookOpen size={16} className="text-blue-600" />
+                </div>
+                <div>
+                  <div className="font-medium text-gray-900">{row.code}</div>
+                  <div className="text-sm text-gray-500">{t("academicCourseSubject")}</div>
+                </div>
+              </div>
+            )
+          },
+          {
+            header: t("subjectName"),
+            accessor: "name",
+            render: (row) => (
+              <div>
+                <div className="font-medium text-gray-900">{row.name}</div>
+                <div className="text-sm text-gray-500">{t("courseSubjectName")}</div>
+              </div>
+            )
+          },
+          {
+            header: t("semester"),
+            accessor: "semester_id",
+            render: (row) => (
+              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                <Calendar className="h-3 w-3 mr-1" />
+                {row.semester_id?.name || t("notAssigned")}
+              </div>
+            )
+          },
+          {
+            header: t("teacher"),
+            accessor: "teacher_id",
+            render: (row) => {
+              let teacherName = t("notAssigned");
+              if (row.teacher_id) {
+                if (typeof row.teacher_id === "object" && row.teacher_id.name) {
+                  teacherName = row.teacher_id.name;
+                } else {
+                  const teacher = teachers.find(t => t._id === row.teacher_id);
+                  if (teacher) teacherName = teacher.name;
+                }
+              }
+              return (
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-yellow-100 flex items-center justify-center rounded-full mr-2">
+                    <User size={14} className="text-yellow-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">{teacherName}</span>
+                </div>
+              );
+            }
+          },
+          {
+            header: t("creditHours"),
+            accessor: "credit_hours",
+            render: (row) => (
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-yellow-100 text-yellow-800 rounded-full text-sm font-bold">
+                <Award className="h-4 w-4 mr-1" />
+                {row.credit_hours}
+              </div>
+            )
+          }
+        ]}
+        data={subjects}
+        actions={true}
+        onEdit={(subject) => openEditSubjectModal(subject)}
+        onDelete={(subject) => handleDeleteSubject(subject._id)}
+      />
+
 
       {/* Add Course Subject Modal */}
       <Modal
         isOpen={isAddSubjectModalOpen}
         onClose={() => setIsAddSubjectModalOpen(false)}
-        title='Add New Course Subject'
+        title={t("addNewSubject")}
       >
         <form
           onSubmit={(e) => {
@@ -598,10 +669,10 @@ const SubjectManagement = () => {
                 </div>
                 <div>
                   <h4 className='text-lg font-semibold text-[#1D3D6F]'>
-                    Course Subject Information
+                    {t("courseSubjectInformation")}
                   </h4>
                   <p className='text-sm text-gray-600 mt-1'>
-                    Enter comprehensive course subject details and instructor assignment
+                    {t("enterCourseSubjectDetails")}
                   </p>
                 </div>
               </div>
@@ -609,31 +680,31 @@ const SubjectManagement = () => {
 
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <FormField
-                label='Course Subject Name'
+                label={t("courseSubjectName")}
                 name='name'
                 type='text'
                 value={subjectFormData.name}
                 onChange={handleSubjectInputChange}
                 required
-                placeholder='Enter course subject name'
+                placeholder={t("enterCourseSubjectName")}
               />
               <FormField
-                label='Course Subject Code'
+                label={t("courseSubjectCode")}
                 name='code'
                 type='text'
                 value={subjectFormData.code}
                 onChange={handleSubjectInputChange}
                 required
-                placeholder='Enter course code (e.g., CS101)'
+                placeholder={t("enterCourseCode")}
               />
               <FormField
-                label='Academic Semester'
+                label={t("academicSemester")}
                 name='semester_id'
                 type='select'
                 value={subjectFormData.semester_id}
                 onChange={handleSubjectInputChange}
                 options={[
-                  { value: "", label: "Select Academic Semester" },
+                  { value: "", label: t("selectAcademicSemester") },
                   ...semesters.map((semester) => ({
                     value: semester._id,
                     label: semester.name,
@@ -642,13 +713,13 @@ const SubjectManagement = () => {
                 required
               />
               <FormField
-                label='Course Instructor'
+                label={t("courseInstructor")}
                 name='teacher_id'
                 type='select'
                 value={subjectFormData.teacher_id}
                 onChange={handleSubjectInputChange}
                 options={[
-                  { value: "", label: "Select Course Instructor" },
+                  { value: "", label: t("selectCourseInstructor") },
                   ...teachers.map((teacher) => ({
                     value: teacher._id,
                     label: teacher.name,
@@ -656,7 +727,7 @@ const SubjectManagement = () => {
                 ]}
               />
               <FormField
-                label='Credit Hours'
+                label={t("creditHours")}
                 name='credit_hours'
                 type='number'
                 value={subjectFormData.credit_hours}
@@ -673,14 +744,14 @@ const SubjectManagement = () => {
                 className='px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium'
                 onClick={() => setIsAddSubjectModalOpen(false)}
               >
-                Cancel Operation
+                {t("cancelOperation")}
               </button>
               <button
                 type='submit'
                 className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2'
               >
                 <Save className='h-4 w-4' />
-                <span>Save Course Subject</span>
+                <span>{t("saveCourseSubject")}</span>
               </button>
             </div>
           </div>
@@ -691,7 +762,7 @@ const SubjectManagement = () => {
       <Modal
         isOpen={isEditSubjectModalOpen}
         onClose={() => setIsEditSubjectModalOpen(false)}
-        title='Edit Course Subject'
+        title={t("editCourseSubject")}
       >
         <form
           onSubmit={(e) => {
@@ -708,10 +779,10 @@ const SubjectManagement = () => {
                 </div>
                 <div>
                   <h4 className='text-lg font-semibold text-[#1D3D6F]'>
-                    Update Course Subject Information
+                    {t("updateCourseSubjectInfo")}
                   </h4>
                   <p className='text-sm text-gray-600 mt-1'>
-                    Modify course subject details and instructor assignment
+                    {t("modifyCourseSubjectDetails")}
                   </p>
                 </div>
               </div>
@@ -719,31 +790,31 @@ const SubjectManagement = () => {
 
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <FormField
-                label='Course Subject Name'
+                label={t("courseSubjectName")}
                 name='name'
                 type='text'
                 value={subjectFormData.name}
                 onChange={handleSubjectInputChange}
                 required
-                placeholder='Enter course subject name'
+                placeholder={t("enterCourseSubjectName")}
               />
               <FormField
-                label='Course Subject Code'
+                label={t("courseSubjectCode")}
                 name='code'
                 type='text'
                 value={subjectFormData.code}
                 onChange={handleSubjectInputChange}
                 required
-                placeholder='Enter course code (e.g., CS101)'
+                placeholder={t("enterCourseCode")}
               />
               <FormField
-                label='Academic Semester'
+                label={t("academicSemester")}
                 name='semester_id'
                 type='select'
                 value={subjectFormData.semester_id}
                 onChange={handleSubjectInputChange}
                 options={[
-                  { value: "", label: "Select Academic Semester" },
+                  { value: "", label: t("selectAcademicSemester") },
                   ...semesters.map((semester) => ({
                     value: semester._id,
                     label: semester.name,
@@ -752,13 +823,13 @@ const SubjectManagement = () => {
                 required
               />
               <FormField
-                label='Course Instructor'
+                label={t("courseInstructor")}
                 name='teacher_id'
                 type='select'
                 value={subjectFormData.teacher_id}
                 onChange={handleSubjectInputChange}
                 options={[
-                  { value: "", label: "Select Course Instructor" },
+                  { value: "", label: t("selectCourseInstructor") },
                   ...teachers.map((teacher) => ({
                     value: teacher._id,
                     label: teacher.name,
@@ -766,7 +837,7 @@ const SubjectManagement = () => {
                 ]}
               />
               <FormField
-                label='Credit Hours'
+                label={t("creditHours")}
                 name='credit_hours'
                 type='number'
                 value={subjectFormData.credit_hours}
@@ -783,14 +854,14 @@ const SubjectManagement = () => {
                 className='px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium'
                 onClick={() => setIsEditSubjectModalOpen(false)}
               >
-                Cancel Operation
+                {t("cancelOperation")}
               </button>
               <button
                 type='submit'
                 className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2'
               >
                 <Save className='h-4 w-4' />
-                <span>Update Course Subject</span>
+                <span>{t("updateCourseSubject")}</span>
               </button>
             </div>
           </div>

@@ -382,9 +382,55 @@ function AboutPage() {
             <h2 className='text-3xl md:text-4xl font-bold mb-6 text-[#1D3D6F]'>
               {t("about.faculty_overview")}
             </h2>
-            <p className='text-gray-600 text-lg leading-relaxed'>
+            <p className='text-gray-600 text-lg leading-relaxed mb-8'>
               {t("about.faculty_overview_text")}
             </p>
+          </div>
+
+          {/* Faculty Introduction Section */}
+          <div className='max-w-6xl mx-auto mt-16'>
+            <div
+              className={`bg-white rounded-2xl overflow-hidden shadow-xl transition-all duration-1000 ease-out ${
+                visibleSections.overview
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-8"
+              }`}
+            >
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                {/* Faculty Building Image */}
+                <div className='relative overflow-hidden'>
+                  <div className='aspect-[4/3] bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] flex items-center justify-center'>
+                    <div className='text-center text-white p-8'>
+                      <div className='w-24 h-24 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center'>
+                        <BookOpen className='h-12 w-12' />
+                      </div>
+                      <h3 className='text-xl font-bold mb-2'>{t("about.building_facilities")}</h3>
+                      <p className='text-white/90 text-sm'>{t("about.building_text")}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Faculty Introduction Content */}
+                <div className='p-8'>
+                  <h3 className='text-2xl font-bold mb-4 text-[#1D3D6F]'>
+                    {t("about.faculty_introduction")}
+                  </h3>
+                  <p className='text-gray-600 leading-relaxed mb-6'>
+                    {t("about.faculty_intro_text")}
+                  </p>
+
+                  <div className='space-y-4'>
+                    <div className='flex items-start'>
+                      <Calendar className='h-5 w-5 text-[#F7B500] mr-3 mt-1' />
+                      <div>
+                        <h4 className='font-semibold text-[#1D3D6F] mb-1'>{t("about.establishment_history")}</h4>
+                        <p className='text-gray-600 text-sm'>{t("about.establishment_text")}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -478,17 +524,17 @@ function AboutPage() {
             </p>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
             {[
               {
-                title: t("about.our_mission"),
+                title: t("about.mission_statement"),
                 icon: <BookOpen className='h-8 w-8 text-[#F7B500]' />,
-                content: t("about.mission_text"),
+                content: t("about.mission_detailed"),
               },
               {
-                title: t("about.our_vision"),
+                title: t("about.vision_statement"),
                 icon: <Award className='h-8 w-8 text-[#F7B500]' />,
-                content: t("about.vision_text"),
+                content: t("about.vision_detailed"),
               },
               {
                 title: t("about.our_values"),
@@ -523,6 +569,26 @@ function AboutPage() {
                             {value.description}
                           </span>
                         </div>
+                      </li>
+                    ))}
+                  </ul>
+                ),
+              },
+              {
+                title: t("about.objectives_title"),
+                icon: <Calendar className='h-8 w-8 text-[#F7B500]' />,
+                content: (
+                  <ul className='space-y-3'>
+                    {[
+                      t("about.objective_1"),
+                      t("about.objective_2"),
+                      t("about.objective_3"),
+                      t("about.objective_4"),
+                      t("about.objective_5"),
+                    ].map((objective, index) => (
+                      <li key={index} className='flex items-start'>
+                        <ChevronRight className='h-4 w-4 text-[#F7B500] mt-1 mr-2 flex-shrink-0' />
+                        <span className='text-gray-600 text-sm'>{objective}</span>
                       </li>
                     ))}
                   </ul>
@@ -602,10 +668,7 @@ function AboutPage() {
                 <p className='text-gray-600 leading-relaxed mb-6 text-lg'>
                   {t("about.dean_goal")}
                 </p>
-                <button className='bg-[#1D3D6F] hover:bg-[#2C4F85] text-white rounded-lg px-6 py-3 flex items-center transition-all duration-300 transform hover:scale-105'>
-                  {t("about.read_full_message")}
-                  <ArrowRight className='ml-2 h-4 w-4' />
-                </button>
+
               </div>
             </div>
           </div>
@@ -876,70 +939,7 @@ function AboutPage() {
           </div>
         </section>
 
-        {/* Call to Action */}
-        <section className='py-16 mt-20'>
-          <div className='relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#1D3D6F] to-[#004B87] shadow-xl'>
-            {/* Decorative elements */}
-            <div className='absolute top-0 right-0 w-64 h-64 bg-[#F7B500] rounded-full mix-blend-overlay filter blur-3xl opacity-20 transform translate-x-1/3 -translate-y-1/3'></div>
-            <div className='absolute bottom-0 left-0 w-64 h-64 bg-[#F7B500] rounded-full mix-blend-overlay filter blur-3xl opacity-10 transform -translate-x-1/3 translate-y-1/3'></div>
 
-            <div className='relative z-10 p-8 md:p-12 lg:p-16'>
-              <div className='flex flex-col md:flex-row md:items-center justify-between gap-10'>
-                <div className='max-w-2xl'>
-                  <h2 className='text-3xl md:text-4xl font-bold mb-4 text-white'>
-                    {t("about.ready_begin")}{" "}
-                    <span className='text-[#F7B500]'>
-                      {t("about.academic_journey")}
-                    </span>
-                    ?
-                  </h2>
-                  <p className='text-white/90 text-lg leading-relaxed mb-8'>
-                    {t("about.cta_description")}
-                  </p>
-                  <div className='flex flex-wrap gap-4'>
-                    <a
-                      href='#'
-                      className='px-8 py-4 bg-[#F7B500] text-[#1D3D6F] font-bold rounded-lg hover:bg-[#F7B500]/90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center'
-                    >
-                      {t("about.apply_now")}
-                      <ArrowRight className='ml-2 h-5 w-5' />
-                    </a>
-                    <a
-                      href='#'
-                      className='px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/20 transition border border-white/20 flex items-center'
-                    >
-                      {t("about.request_information")}
-                      <ExternalLink className='ml-2 h-4 w-4' />
-                    </a>
-                  </div>
-                </div>
-
-                <div className='hidden lg:block'>
-                  <div className='relative'>
-                    <div className='absolute inset-0 bg-white/5 backdrop-blur-sm rounded-xl transform rotate-6 scale-95'></div>
-                    <div className='relative bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20'>
-                      <div className='flex items-center mb-4'>
-                        <div className='w-2 h-2 rounded-full bg-red-400 mr-1.5'></div>
-                        <div className='w-2 h-2 rounded-full bg-yellow-400 mr-1.5'></div>
-                        <div className='w-2 h-2 rounded-full bg-green-400'></div>
-                      </div>
-                      <div className='space-y-3'>
-                        <div className='h-4 bg-white/20 rounded w-3/4'></div>
-                        <div className='h-4 bg-white/20 rounded'></div>
-                        <div className='h-4 bg-white/20 rounded w-5/6'></div>
-                        <div className='h-4 bg-white/20 rounded w-2/3'></div>
-                      </div>
-                      <div className='mt-6 flex justify-between'>
-                        <div className='h-8 w-24 bg-[#F7B500] rounded'></div>
-                        <div className='h-8 w-24 bg-white/20 rounded'></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
 
       {/* Department Modal */}

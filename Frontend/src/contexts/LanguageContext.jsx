@@ -103,8 +103,12 @@ export const LanguageProvider = ({ children }) => {
       // Add or remove RTL class on body
       if (languageMetadata[langCode].dir === "rtl") {
         document.body.classList.add("rtl");
+        document.documentElement.classList.add("rtl");
+        console.log("RTL classes added to body and html");
       } else {
         document.body.classList.remove("rtl");
+        document.documentElement.classList.remove("rtl");
+        console.log("RTL classes removed from body and html");
       }
 
       // Debug

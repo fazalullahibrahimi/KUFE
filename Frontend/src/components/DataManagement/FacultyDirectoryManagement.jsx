@@ -8,8 +8,12 @@ import {
 import Table from "../common/Table"
 import Modal from "../common/Modal"
 import FormField from "../common/FormField"
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const FacultyDirectoryManagement = () => {
+  const { language, t } = useLanguage();
+  const isRTL = language === 'ps' || language === 'dr';
+
   const [facultyMembers, setFacultyMembers] = useState([])
   const [departments, setDepartments] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -135,7 +139,7 @@ const FacultyDirectoryManagement = () => {
   // Table columns configuration for management view
   const columns = [
     {
-      header: "Faculty Member",
+      header: t("facultyName"),
       accessor: "name",
       render: (row) => (
         <div className="flex items-center">
@@ -166,11 +170,11 @@ const FacultyDirectoryManagement = () => {
       ),
     },
     {
-      header: "Department",
+      header: t("department"),
       accessor: "department_name",
     },
     {
-      header: "Contact",
+      header: t("contactInformation"),
       accessor: "contact_info",
       render: (row) => (
         <div>
@@ -180,7 +184,7 @@ const FacultyDirectoryManagement = () => {
       ),
     },
     {
-      header: "Featured",
+      header: t("featuredFaculty"),
       accessor: "featured",
       render: (row) => (
         <span
@@ -188,12 +192,12 @@ const FacultyDirectoryManagement = () => {
             row.featured ? "bg-yellow-100 text-yellow-800" : "bg-gray-100 text-gray-800"
           }`}
         >
-          {row.featured ? "Featured" : "Standard"}
+          {row.featured ? t("featuredFaculty") : t("standard")}
         </span>
       ),
     },
     {
-      header: "Status",
+      header: t("status"),
       accessor: "status",
       render: (row) => (
         <span
@@ -201,7 +205,7 @@ const FacultyDirectoryManagement = () => {
             row.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
           }`}
         >
-          {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+          {t(row.status)}
         </span>
       ),
     },
@@ -697,21 +701,21 @@ const FacultyDirectoryManagement = () => {
                   </div>
                   <div>
                     <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-                      Faculty Directory Management
+                      {t("facultyDirectoryManagement")}
                     </h1>
-                    <p className="text-white/90 text-lg">Manage and showcase your academic faculty members</p>
+                    <p className="text-white/90 text-lg">{t("manageFacultyMembers")}</p>
                   </div>
                 </div>
                 <div className="flex items-center text-white/70">
                   <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-                  <span className="text-sm">Complete faculty management system • {facultyMembers.length} total members</span>
+                  <span className="text-sm">{t("facultyManagement")} • {facultyMembers.length} {t("totalFaculty")}</span>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="text-right mb-3 sm:mb-0">
                   <div className="text-2xl font-bold text-[#F4B400]">{facultyMembers.length}</div>
-                  <div className="text-white/60 text-sm">Total Faculty</div>
+                  <div className="text-white/60 text-sm">{t("totalFaculty")}</div>
                 </div>
                 <button
                   className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
@@ -722,7 +726,7 @@ const FacultyDirectoryManagement = () => {
                 >
                   <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
                   <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
-                    Add New Faculty Member
+                    {t("addFacultyMember")}
                   </span>
                 </button>
               </div>
@@ -743,12 +747,12 @@ const FacultyDirectoryManagement = () => {
                     <div className="bg-white/20 p-2 rounded-lg mr-3">
                       <Users className="h-6 w-6 text-white" />
                     </div>
-                    <p className="text-white/80 text-sm font-medium">Total Faculty</p>
+                    <p className="text-white/80 text-sm font-medium">{t("totalFaculty")}</p>
                   </div>
                   <p className="text-3xl font-bold text-white">{facultyMembers.length}</p>
                   <div className="flex items-center mt-2">
                     <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
-                    <span className="text-green-300 text-xs">+12% this year</span>
+                    <span className="text-green-300 text-xs">{t("thisYear")}</span>
                   </div>
                 </div>
                 <div className="bg-white/10 p-3 rounded-full">
@@ -769,12 +773,12 @@ const FacultyDirectoryManagement = () => {
                     <div className="bg-white/20 p-2 rounded-lg mr-3">
                       <Star className="h-6 w-6 text-white" />
                     </div>
-                    <p className="text-white/80 text-sm font-medium">Featured Faculty</p>
+                    <p className="text-white/80 text-sm font-medium">{t("featuredFaculty")}</p>
                   </div>
                   <p className="text-3xl font-bold text-white">{facultyMembers.filter((member) => member.featured).length}</p>
                   <div className="flex items-center mt-2">
                     <Award className="h-4 w-4 text-white/70 mr-1" />
-                    <span className="text-white/70 text-xs">Top performers</span>
+                    <span className="text-white/70 text-xs">{t("topPerformers")}</span>
                   </div>
                 </div>
                 <div className="bg-white/10 p-3 rounded-full">
@@ -795,12 +799,12 @@ const FacultyDirectoryManagement = () => {
                     <div className="bg-white/20 p-2 rounded-lg mr-3">
                       <UserCheck className="h-6 w-6 text-white" />
                     </div>
-                    <p className="text-white/80 text-sm font-medium">Active Faculty</p>
+                    <p className="text-white/80 text-sm font-medium">{t("activeFaculty")}</p>
                   </div>
                   <p className="text-3xl font-bold text-white">{facultyMembers.filter((member) => member.status === "active").length}</p>
                   <div className="flex items-center mt-2">
                     <Activity className="h-4 w-4 text-green-200 mr-1" />
-                    <span className="text-green-200 text-xs">Currently teaching</span>
+                    <span className="text-green-200 text-xs">{t("currentlyTeaching")}</span>
                   </div>
                 </div>
                 <div className="bg-white/10 p-3 rounded-full">
@@ -821,12 +825,12 @@ const FacultyDirectoryManagement = () => {
                     <div className="bg-white/20 p-2 rounded-lg mr-3">
                       <Building2 className="h-6 w-6 text-white" />
                     </div>
-                    <p className="text-white/80 text-sm font-medium">Departments</p>
+                    <p className="text-white/80 text-sm font-medium">{t("facultyByDepartment")}</p>
                   </div>
                   <p className="text-3xl font-bold text-white">{new Set(facultyMembers.map((member) => member.department_name)).size}</p>
                   <div className="flex items-center mt-2">
                     <GraduationCap className="h-4 w-4 text-purple-200 mr-1" />
-                    <span className="text-purple-200 text-xs">Academic units</span>
+                    <span className="text-purple-200 text-xs">{t("academicUnits")}</span>
                   </div>
                 </div>
                 <div className="bg-white/10 p-3 rounded-full">
@@ -845,7 +849,7 @@ const FacultyDirectoryManagement = () => {
                   <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
                     <GraduationCap className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800">By Position</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">{t("facultyByPosition")}</h3>
                 </div>
                 <Eye className="h-5 w-5 text-gray-400" />
               </div>
@@ -878,25 +882,25 @@ const FacultyDirectoryManagement = () => {
                   <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
                     <Mail className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800">Contact Info</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">{t("contactInformation")}</h3>
                 </div>
                 <Phone className="h-5 w-5 text-gray-400" />
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">With Email</span>
+                  <span className="text-sm text-gray-600">{t("withEmail")}</span>
                   <span className="text-lg font-bold text-[#06B6D4]">
                     {facultyMembers.filter(m => m.contact_info?.email).length}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">With Phone</span>
+                  <span className="text-sm text-gray-600">{t("withPhone")}</span>
                   <span className="text-lg font-bold text-[#06B6D4]">
                     {facultyMembers.filter(m => m.contact_info?.phone).length}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">With Office</span>
+                  <span className="text-sm text-gray-600">{t("withOffice")}</span>
                   <span className="text-lg font-bold text-[#06B6D4]">
                     {facultyMembers.filter(m => m.contact_info?.office).length}
                   </span>
@@ -911,25 +915,25 @@ const FacultyDirectoryManagement = () => {
                   <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
                     <BookOpen className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800">Research</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">{t("researchInterests")}</h3>
                 </div>
                 <Activity className="h-5 w-5 text-gray-400" />
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">With Research Interests</span>
+                  <span className="text-sm text-gray-600">{t("withResearchInterests")}</span>
                   <span className="text-lg font-bold text-[#F59E0B]">
                     {facultyMembers.filter(m => m.profile?.research_interests?.length > 0).length}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">With Publications</span>
+                  <span className="text-sm text-gray-600">{t("withPublications")}</span>
                   <span className="text-lg font-bold text-[#F59E0B]">
                     {facultyMembers.filter(m => m.profile?.publications?.length > 0).length}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Total Interests</span>
+                  <span className="text-sm text-gray-600">{t("totalInterests")}</span>
                   <span className="text-lg font-bold text-[#F59E0B]">
                     {facultyMembers.reduce((total, m) => total + (m.profile?.research_interests?.length || 0), 0)}
                   </span>
@@ -941,7 +945,7 @@ const FacultyDirectoryManagement = () => {
           {/* Faculty Table */}
           {isLoading ? (
             <div className="bg-white p-8 rounded-lg shadow text-center">
-              <p>Loading faculty members...</p>
+              <p>{t("loadingFacultyMembers")}</p>
             </div>
           ) : facultyMembers.length > 0 ? (
             <Table
@@ -954,7 +958,7 @@ const FacultyDirectoryManagement = () => {
             />
           ) : (
             <div className="bg-white p-8 rounded-lg shadow text-center">
-              <p>No faculty members found. Add your first faculty member.</p>
+              <p>{t("noFacultyMembersFound")}. {t("addFirstFacultyMember")}.</p>
             </div>
           )}
         </>

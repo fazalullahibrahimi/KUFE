@@ -11,6 +11,7 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const Joi = require("joi");
+const NotificationService = require("../services/notificationService");
 
 // Multer and image processing setup remains the same
 // Configure Multer Storage in memory
@@ -106,6 +107,17 @@ const registerUser = asyncHandler(async (req, res) => {
     });
   }
 
+  // Check if trying to create admin account when one already exists
+  if (role === "admin") {
+    const existingAdmin = await User.findOne({ role: "admin" });
+    if (existingAdmin) {
+      return res.status(403).send({
+        success: false,
+        message: "Admin account already exists. Only one admin account is allowed for system security.",
+      });
+    }
+  }
+
   const newUser = new User({
     fullName,
     email,
@@ -139,6 +151,14 @@ const registerUser = asyncHandler(async (req, res) => {
     // Send verification email with OTP
     try {
       await new Email(newUser, verificationURL).sendVerificationOTP(otp);
+
+      // Create notification for admins about new user registration
+      try {
+        await NotificationService.notifyUserRegistration(newUser);
+      } catch (notificationError) {
+        console.error('Error creating registration notification:', notificationError);
+        // Don't fail the registration if notification fails
+      }
 
       res.status(201).json({
         success: true,
@@ -263,6 +283,7 @@ const loginUser = asyncHandler(async (req, res) => {
         fullName: existingUser.fullName,
         email: existingUser.email,
         role: existingUser.role,
+        image: existingUser.image,
         token,
         committeeId: committeeId,
         department_id: departmentId,
@@ -324,6 +345,19 @@ const verifyEmailWithOTP = asyncHandler(async (req, res) => {
   user.verifyEmailTokenExpires = undefined;
   await user.save({ validateBeforeSave: false });
 
+  // Create notification for admins about email verification
+  try {
+    await NotificationService.notifyAllAdmins({
+      title: 'User Email Verified',
+      message: `${user.fullName} has successfully verified their email address`,
+      type: 'user_registration',
+      priority: 'low',
+      data: { userId: user._id, action: 'email_verified' }
+    });
+  } catch (notificationError) {
+    console.error('Error creating verification notification:', notificationError);
+  }
+
   res.status(200).json({
     success: true,
     message: "Email verified successfully! You can now login.",
@@ -371,6 +405,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
       fullName: user.fullName,
       email: user.email,
       role: user.role,
+      image: user.image,
       token: authToken,
     },
   });
@@ -727,6 +762,16 @@ const deleteUserByID = asyncHandler(async (req, res, next) => {
   }
 });
 
+// Check if admin exists (public endpoint for registration form)
+const checkAdminExists = asyncHandler(async (req, res) => {
+  const adminExists = await User.findOne({ role: "admin" });
+
+  res.status(200).json({
+    success: true,
+    adminExists: !!adminExists,
+  });
+});
+
 const updatePassword = asyncHandler(async (req, res, next) => {
   const { _id } = req.user; // User's ID from authentication middleware
   validateMongoDBId(_id);
@@ -883,4 +928,5 @@ module.exports = {
   verifyEmailWithOTP,
   verifyEmail,
   resendVerificationOTP,
+  checkAdminExists,
 };

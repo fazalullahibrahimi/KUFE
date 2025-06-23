@@ -14,9 +14,11 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { useLanguage } from "../../contexts/LanguageContext";
 import Footer from "../Footer";
 
 export default function CourseDetail({ course, onBackClick }) {
+  const { t, isRTL } = useLanguage();
   const [activeTab, setActiveTab] = useState("overview");
   const [showPrerequisites, setShowPrerequisites] = useState(false);
 
@@ -30,7 +32,7 @@ export default function CourseDetail({ course, onBackClick }) {
             className='flex items-center text-[#004B87] hover:text-[#003a6a] transition-colors font-[Roboto]'
           >
             <ArrowLeft size={20} className='mr-2' />
-            Back to Courses
+            {t("course.back_to_courses")}
           </button>
         </div>
 
@@ -50,7 +52,7 @@ export default function CourseDetail({ course, onBackClick }) {
                   {course.code}
                 </span>
                 <span className='bg-[#004B87] text-white px-3 py-1 text-sm font-semibold rounded'>
-                  {course.credits} Credits
+                  {course.credits} {t("course.credits")}
                 </span>
               </div>
               <h1 className='text-2xl md:text-3xl font-bold font-[Poppins]'>
@@ -71,7 +73,7 @@ export default function CourseDetail({ course, onBackClick }) {
               }`}
               onClick={() => setActiveTab("overview")}
             >
-              Overview
+              {t("course.overview")}
             </button>
             <button
               className={`px-4 py-3 font-medium text-sm font-[Roboto] whitespace-nowrap ${
@@ -81,7 +83,7 @@ export default function CourseDetail({ course, onBackClick }) {
               }`}
               onClick={() => setActiveTab("materials")}
             >
-              Course Materials
+              {t("course.materials")}
             </button>
             <button
               className={`px-4 py-3 font-medium text-sm font-[Roboto] whitespace-nowrap ${
@@ -91,7 +93,7 @@ export default function CourseDetail({ course, onBackClick }) {
               }`}
               onClick={() => setActiveTab("schedule")}
             >
-              Schedule & Location
+              {t("course.schedule_location")}
             </button>
           </div>
         </div>
@@ -103,7 +105,7 @@ export default function CourseDetail({ course, onBackClick }) {
             <div className='grid md:grid-cols-3 gap-6'>
               <div className='md:col-span-2'>
                 <h2 className='text-xl font-semibold mb-4 font-[Poppins] text-[#333333]'>
-                  Course Description
+                  {t("course.course_description")}
                 </h2>
                 <p className='text-gray-700 mb-6 font-[Roboto] leading-relaxed'>
                   {course.description}
@@ -115,7 +117,7 @@ export default function CourseDetail({ course, onBackClick }) {
                     onClick={() => setShowPrerequisites(!showPrerequisites)}
                   >
                     <h3 className='text-lg font-medium font-[Poppins] text-[#333333]'>
-                      Prerequisites
+                      {t("course.prerequisites")}
                     </h3>
                     {showPrerequisites ? (
                       <ChevronUp size={20} className='text-gray-500' />
@@ -137,7 +139,7 @@ export default function CourseDetail({ course, onBackClick }) {
                         </ul>
                       ) : (
                         <p className='text-gray-700 font-[Roboto]'>
-                          No prerequisites required.
+                          {t("course.no_prerequisites")}
                         </p>
                       )}
                     </div>
@@ -147,7 +149,7 @@ export default function CourseDetail({ course, onBackClick }) {
 
               <div className='bg-gray-50 p-4 rounded-lg h-fit'>
                 <h3 className='text-lg font-semibold mb-4 font-[Poppins] text-[#333333]'>
-                  Course Information
+                  {t("course.course_information")}
                 </h3>
 
                 <div className='space-y-4'>
@@ -158,7 +160,7 @@ export default function CourseDetail({ course, onBackClick }) {
                     />
                     <div>
                       <p className='text-sm text-gray-500 font-[Roboto]'>
-                        Instructor
+                        {t("course.instructor")}
                       </p>
                       <p className='font-medium text-[#333333] font-[Roboto]'>
                         {course.instructor}
@@ -173,7 +175,7 @@ export default function CourseDetail({ course, onBackClick }) {
                     />
                     <div>
                       <p className='text-sm text-gray-500 font-[Roboto]'>
-                        Department
+                        {t("course.department")}
                       </p>
                       <p className='font-medium text-[#333333] font-[Roboto]'>
                         {course.department_id.name}
@@ -188,7 +190,7 @@ export default function CourseDetail({ course, onBackClick }) {
                     />
                     <div>
                       <p className='text-sm text-gray-500 font-[Roboto]'>
-                        Semester
+                        {t("course.semester")}
                       </p>
                       <p className='font-medium text-[#333333] font-[Roboto]'>
                         {course.semester}
@@ -203,7 +205,7 @@ export default function CourseDetail({ course, onBackClick }) {
                     />
                     <div>
                       <p className='text-sm text-gray-500 font-[Roboto]'>
-                        Schedule
+                        {t("course.schedule")}
                       </p>
                       <p className='font-medium text-[#333333] font-[Roboto]'>
                         {course.schedule}
@@ -218,7 +220,7 @@ export default function CourseDetail({ course, onBackClick }) {
                     />
                     <div>
                       <p className='text-sm text-gray-500 font-[Roboto]'>
-                        Location
+                        {t("course.location")}
                       </p>
                       <p className='font-medium text-[#333333] font-[Roboto]'>
                         {course.location}
@@ -228,7 +230,7 @@ export default function CourseDetail({ course, onBackClick }) {
                 </div>
 
                 <button className='mt-6 w-full bg-[#004B87] text-white py-2 rounded-md hover:bg-[#003a6a] transition-colors font-[Roboto]'>
-                  Register for Course
+                  {t("course.register_for_course")}
                 </button>
               </div>
             </div>
@@ -250,25 +252,25 @@ export default function CourseDetail({ course, onBackClick }) {
                           scope='col'
                           className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-[Roboto]'
                         >
-                          Name
+                          {t("course.name")}
                         </th>
                         <th
                           scope='col'
                           className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-[Roboto]'
                         >
-                          Type
+                          {t("course.type")}
                         </th>
                         <th
                           scope='col'
                           className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-[Roboto]'
                         >
-                          Size
+                          {t("course.size")}
                         </th>
                         <th
                           scope='col'
                           className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider font-[Roboto]'
                         >
-                          Action
+                          {t("course.action")}
                         </th>
                       </tr>
                     </thead>
@@ -297,7 +299,7 @@ export default function CourseDetail({ course, onBackClick }) {
                           <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
                             <button className='text-[#004B87] hover:text-[#003a6a] flex items-center justify-end w-full'>
                               <Download size={16} className='mr-1' />
-                              Download
+                              {t("course.download")}
                             </button>
                           </td>
                         </tr>
@@ -309,10 +311,10 @@ export default function CourseDetail({ course, onBackClick }) {
                 <div className='text-center py-8 bg-gray-50 rounded-lg'>
                   <FileText size={48} className='mx-auto text-gray-400 mb-2' />
                   <h3 className='text-lg font-medium mb-1 font-[Poppins] text-[#333333]'>
-                    No materials available
+                    {t("course.no_materials_available")}
                   </h3>
                   <p className='text-gray-500 font-[Roboto]'>
-                    Course materials will be uploaded soon.
+                    {t("course.no_materials_available_desc")}
                   </p>
                 </div>
               )}
@@ -323,13 +325,13 @@ export default function CourseDetail({ course, onBackClick }) {
           {activeTab === "schedule" && (
             <div>
               <h2 className='text-xl font-semibold mb-4 font-[Poppins] text-[#333333]'>
-                Schedule & Location
+                {t("course.schedule_location")}
               </h2>
 
               <div className='grid md:grid-cols-2 gap-6'>
                 <div className='bg-gray-50 p-4 rounded-lg'>
                   <h3 className='text-lg font-medium mb-3 font-[Poppins] text-[#333333]'>
-                    Class Schedule
+                    {t("course.class_schedule")}
                   </h3>
                   <div className='flex items-start mb-4'>
                     <Clock
@@ -344,7 +346,7 @@ export default function CourseDetail({ course, onBackClick }) {
                   </div>
 
                   <h3 className='text-lg font-medium mb-3 font-[Poppins] text-[#333333] mt-6'>
-                    Location
+                    {t("course.location")}
                   </h3>
                   <div className='flex items-start'>
                     <MapPin
@@ -362,14 +364,14 @@ export default function CourseDetail({ course, onBackClick }) {
                 <div className='bg-white border border-gray-200 rounded-lg overflow-hidden'>
                   <div className='p-4 bg-[#004B87] text-white'>
                     <h3 className='font-medium font-[Poppins]'>
-                      Academic Calendar
+                      {t("course.academic_calendar")}
                     </h3>
                   </div>
                   <div className='p-4'>
                     <div className='space-y-3'>
                       <div className='flex justify-between pb-2 border-b border-gray-100'>
                         <span className='text-gray-700 font-[Roboto]'>
-                          First Day of Classes
+                          {t("course.first_day_classes")}
                         </span>
                         <span className='font-medium text-[#333333] font-[Roboto]'>
                           Sep 1, 2023
@@ -377,7 +379,7 @@ export default function CourseDetail({ course, onBackClick }) {
                       </div>
                       <div className='flex justify-between pb-2 border-b border-gray-100'>
                         <span className='text-gray-700 font-[Roboto]'>
-                          Last Day to Add/Drop
+                          {t("course.last_day_add_drop")}
                         </span>
                         <span className='font-medium text-[#333333] font-[Roboto]'>
                           Sep 15, 2023
@@ -385,7 +387,7 @@ export default function CourseDetail({ course, onBackClick }) {
                       </div>
                       <div className='flex justify-between pb-2 border-b border-gray-100'>
                         <span className='text-gray-700 font-[Roboto]'>
-                          Midterm Exams
+                          {t("course.midterm_exams")}
                         </span>
                         <span className='font-medium text-[#333333] font-[Roboto]'>
                           Oct 20-27, 2023
@@ -393,7 +395,7 @@ export default function CourseDetail({ course, onBackClick }) {
                       </div>
                       <div className='flex justify-between pb-2 border-b border-gray-100'>
                         <span className='text-gray-700 font-[Roboto]'>
-                          Last Day of Classes
+                          {t("course.last_day_classes")}
                         </span>
                         <span className='font-medium text-[#333333] font-[Roboto]'>
                           Dec 15, 2023
@@ -401,7 +403,7 @@ export default function CourseDetail({ course, onBackClick }) {
                       </div>
                       <div className='flex justify-between'>
                         <span className='text-gray-700 font-[Roboto]'>
-                          Final Exams
+                          {t("course.final_exams")}
                         </span>
                         <span className='font-medium text-[#333333] font-[Roboto]'>
                           Dec 18-22, 2023

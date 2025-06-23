@@ -8,8 +8,12 @@ import {
 import Table from "../common/Table"
 import Modal from "../common/Modal"
 import FormField from "../common/FormField"
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const NewsManagement = () => {
+  const { language, t } = useLanguage();
+  const isRTL = language === 'ps' || language === 'dr';
+
   const [news, setNews] = useState([])
   const [faculties, setFaculties] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -105,7 +109,7 @@ const NewsManagement = () => {
   // Table columns configuration
   const columns = [
     {
-      header: "Title",
+      header: t("newsTitle"),
       accessor: "title",
       render: (row) => (
         <div className="flex items-center">
@@ -114,18 +118,18 @@ const NewsManagement = () => {
           </div>
           <div>
             <p className="font-medium text-gray-800">{row.title}</p>
-            <p className="text-xs text-gray-500">{row.category}</p>
+            <p className="text-xs text-gray-500">{t(row.category)}</p>
           </div>
         </div>
       ),
     },
     {
-      header: "Publish Date",
+      header: t("publishDate"),
       accessor: "publish_date",
       render: (row) => formatDate(row.publish_date),
     },
     {
-      header: "Category",
+      header: t("newsCategory"),
       accessor: "category",
       render: (row) => (
         <span
@@ -141,12 +145,12 @@ const NewsManagement = () => {
                     : "bg-gray-100 text-gray-800"
           }`}
         >
-          {row.category.charAt(0).toUpperCase() + row.category.slice(1)}
+          {t(row.category)}
         </span>
       ),
     },
     {
-      header: "Image",
+      header: t("newsImage"),
       accessor: "image",
       render: (row) => (
         <div className="flex items-center">
@@ -295,7 +299,7 @@ const NewsManagement = () => {
   }
 
   const handleDeleteNews = async (item) => {
-    if (window.confirm(`Are you sure you want to delete "${item.title}"?`)) {
+    if (window.confirm(t('confirmDeleteNews'))) {
       try {
         const response = await fetch(`http://127.0.0.1:4400/api/v1/news/${item._id}`, {
           method: "DELETE",
@@ -412,21 +416,21 @@ const NewsManagement = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-                  News Management
+                  {t("newsManagement")}
                 </h1>
-                <p className="text-white/90 text-lg">Manage university news and announcements</p>
+                <p className="text-white/90 text-lg">{t("manageNews")}</p>
               </div>
             </div>
             <div className="flex items-center text-white/70">
               <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm">News publishing • {news.length} articles</span>
+              <span className="text-sm">{t("newsPublishing")} • {news.length} {t("totalArticles")}</span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="text-right mb-3 sm:mb-0">
               <div className="text-2xl font-bold text-[#F4B400]">{news.length}</div>
-              <div className="text-white/60 text-sm">Total Articles</div>
+              <div className="text-white/60 text-sm">{t("totalArticles")}</div>
             </div>
             <button
               className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
@@ -437,7 +441,7 @@ const NewsManagement = () => {
             >
               <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
               <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
-                Add News Article
+                {t("addNewsArticle")}
               </span>
             </button>
           </div>
@@ -458,12 +462,12 @@ const NewsManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Newspaper className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Articles</p>
+                <p className="text-white/80 text-sm font-medium">{t("totalArticles")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{news.length}</p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
-                <span className="text-green-300 text-xs">+22% this month</span>
+                <span className="text-green-300 text-xs">{t("thisMonth")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -484,12 +488,12 @@ const NewsManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Clock className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Last 7 Days</p>
+                <p className="text-white/80 text-sm font-medium">{t("recentNews")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{news.filter((item) => new Date(item.publish_date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length}</p>
               <div className="flex items-center mt-2">
                 <Star className="h-4 w-4 text-white/70 mr-1" />
-                <span className="text-white/70 text-xs">Recent activity</span>
+                <span className="text-white/70 text-xs">{t("recentNews")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -510,12 +514,12 @@ const NewsManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <CheckCircle className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Categories</p>
+                <p className="text-white/80 text-sm font-medium">{t("newsByCategory")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{new Set(news.map((item) => item.category)).size}</p>
               <div className="flex items-center mt-2">
                 <Target className="h-4 w-4 text-green-200 mr-1" />
-                <span className="text-green-200 text-xs">Content types</span>
+                <span className="text-green-200 text-xs">{t("diverseFields")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -536,12 +540,12 @@ const NewsManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Eye className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Published</p>
+                <p className="text-white/80 text-sm font-medium">{t("publishedNews")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{news.filter(item => new Date(item.publish_date) <= new Date()).length}</p>
               <div className="flex items-center mt-2">
                 <Activity className="h-4 w-4 text-purple-200 mr-1" />
-                <span className="text-purple-200 text-xs">Live articles</span>
+                <span className="text-purple-200 text-xs">{t("newsArchive")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -560,7 +564,7 @@ const NewsManagement = () => {
               <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
                 <BarChart3 className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Category Distribution</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("newsByCategory")}</h3>
             </div>
             <Eye className="h-5 w-5 text-gray-400" />
           </div>
@@ -570,7 +574,7 @@ const NewsManagement = () => {
               const percentage = news.length > 0 ? ((count / news.length) * 100).toFixed(1) : 0;
               return (
                 <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 capitalize">{category}</span>
+                  <span className="text-sm text-gray-600 capitalize">{t(category)}</span>
                   <div className="flex items-center">
                     <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                       <div
@@ -593,19 +597,19 @@ const NewsManagement = () => {
               <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
                 <Calendar className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Publishing Timeline</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("newsPublishing")}</h3>
             </div>
             <Clock className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">This Week</span>
+              <span className="text-sm text-gray-600">{t("thisWeek")}</span>
               <span className="text-lg font-bold text-[#06B6D4]">
                 {news.filter(n => new Date(n.publish_date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">This Month</span>
+              <span className="text-sm text-gray-600">{t("thisMonth")}</span>
               <span className="text-lg font-bold text-[#06B6D4]">
                 {news.filter(n => {
                   const publishDate = new Date(n.publish_date);
@@ -615,7 +619,7 @@ const NewsManagement = () => {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Scheduled</span>
+              <span className="text-sm text-gray-600">{t("featuredNews")}</span>
               <span className="text-lg font-bold text-[#06B6D4]">
                 {news.filter(n => new Date(n.publish_date) > new Date()).length}
               </span>
@@ -630,25 +634,25 @@ const NewsManagement = () => {
               <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
                 <Settings className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Content Metrics</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("contentMetrics")}</h3>
             </div>
             <Activity className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">With Images</span>
+              <span className="text-sm text-gray-600">{t("withImages")}</span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {news.filter(n => n.image).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total Categories</span>
+              <span className="text-sm text-gray-600">{t("totalCategories")}</span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {new Set(news.map(n => n.category)).size}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Avg per Month</span>
+              <span className="text-sm text-gray-600">{t("avgPerMonth")}</span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {news.length > 0 ? Math.round(news.length / Math.max(1, new Set(news.map(n => new Date(n.publish_date).getMonth())).size)) : 0}
               </span>
@@ -660,7 +664,7 @@ const NewsManagement = () => {
       {/* News Table */}
       {isLoading ? (
         <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p>Loading news articles...</p>
+          <p>{t("loadingNews")}</p>
         </div>
       ) : news.length > 0 ? (
         <Table
@@ -673,12 +677,12 @@ const NewsManagement = () => {
         />
       ) : (
         <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p>No news articles found. Add your first news article.</p>
+          <p>{t("noNewsFound")}. {t("addFirstNews")}.</p>
         </div>
       )}
 
       {/* Add News Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add News Article">
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={t("addNewsArticle")}>
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -686,9 +690,9 @@ const NewsManagement = () => {
           }}
         >
           <div className="grid grid-cols-1 gap-4">
-            <FormField label="Title" name="title" value={formData.title} onChange={handleInputChange} required />
+            <FormField label={t("newsTitle")} name="title" value={formData.title} onChange={handleInputChange} required />
             <FormField
-              label="Content"
+              label={t("newsContent")}
               name="content"
               type="textarea"
               value={formData.content}
@@ -697,7 +701,7 @@ const NewsManagement = () => {
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Publish Date"
+                label={t("publishDate")}
                 name="publish_date"
                 type="datetime-local"
                 value={formData.publish_date ? formatDateForInput(formData.publish_date) : ""}
@@ -705,22 +709,22 @@ const NewsManagement = () => {
                 required
               />
               <FormField
-                label="Category"
+                label={t("newsCategory")}
                 name="category"
                 type="select"
                 value={formData.category}
                 onChange={handleInputChange}
                 options={[
-                  { value: "academic", label: "Academic" },
+                  { value: "academic", label: t("academic") },
                   { value: "events", label: "Events" },
-                  { value: "announcements", label: "Announcements" },
+                  { value: "announcements", label: t("announcements") },
                   { value: "research", label: "Research" },
-                  { value: "other", label: "Other" },
+                  { value: "other", label: t("other") },
                 ]}
                 required
               />
               <FormField
-                label="Faculty"
+                label={t("newsFaculty")}
                 name="faculty_id"
                 type="select"
                 value={formData.faculty_id}
@@ -735,7 +739,7 @@ const NewsManagement = () => {
 
             {/* Image Upload */}
             <div className="mt-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">News Image</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t("newsImage")}</label>
               <div className="flex items-center space-x-4">
                 <div className="flex-1">
                   <div className="mt-1 flex items-center">
@@ -772,21 +776,21 @@ const NewsManagement = () => {
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               onClick={() => setIsAddModalOpen(false)}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
             >
               <Save size={18} className="inline mr-2" />
-              Publish News
+              {t("saveNews")}
             </button>
           </div>
         </form>
       </Modal>
 
       {/* Edit News Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit News Article">
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={t("editNews")}>
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -794,9 +798,9 @@ const NewsManagement = () => {
           }}
         >
           <div className="grid grid-cols-1 gap-4">
-            <FormField label="Title" name="title" value={formData.title} onChange={handleInputChange} required />
+            <FormField label={t("newsTitle")} name="title" value={formData.title} onChange={handleInputChange} required />
             <FormField
-              label="Content"
+              label={t("newsContent")}
               name="content"
               type="textarea"
               value={formData.content}
@@ -805,7 +809,7 @@ const NewsManagement = () => {
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Publish Date"
+                label={t("publishDate")}
                 name="publish_date"
                 type="datetime-local"
                 value={formData.publish_date ? formatDateForInput(formData.publish_date) : ""}
@@ -813,22 +817,22 @@ const NewsManagement = () => {
                 required
               />
               <FormField
-                label="Category"
+                label={t("newsCategory")}
                 name="category"
                 type="select"
                 value={formData.category}
                 onChange={handleInputChange}
                 options={[
-                  { value: "academic", label: "Academic" },
+                  { value: "academic", label: t("academic") },
                   { value: "events", label: "Events" },
-                  { value: "announcements", label: "Announcements" },
+                  { value: "announcements", label: t("announcements") },
                   { value: "research", label: "Research" },
-                  { value: "other", label: "Other" },
+                  { value: "other", label: t("other") },
                 ]}
                 required
               />
               <FormField
-                label="Faculty"
+                label={t("newsFaculty")}
                 name="faculty_id"
                 type="select"
                 value={formData.faculty_id}
@@ -843,7 +847,7 @@ const NewsManagement = () => {
 
             {/* Image Upload */}
             <div className="mt-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">News Image</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t("newsImage")}</label>
               <div className="flex items-center space-x-4">
                 <div className="flex-1">
                   <div className="mt-1 flex items-center">
@@ -880,21 +884,21 @@ const NewsManagement = () => {
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               onClick={() => setIsEditModalOpen(false)}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
             >
               <Save size={18} className="inline mr-2" />
-              Update News
+              {t("updateNews")}
             </button>
           </div>
         </form>
       </Modal>
 
       {/* View News Modal */}
-      <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title="News Article" size="lg">
+      <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title={t("newsDetails")} size="lg">
         {currentNews && (
           <div className="space-y-6">
             {/* News Image */}
@@ -928,21 +932,21 @@ const NewsManagement = () => {
                             : "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  {currentNews.category.charAt(0).toUpperCase() + currentNews.category.slice(1)}
+                  {t(currentNews.category)}
                 </span>
               </div>
-              <p className="text-sm text-gray-500">Published on {formatDate(currentNews.publish_date)}</p>
+              <p className="text-sm text-gray-500">{t("publishedOn")} {formatDate(currentNews.publish_date)}</p>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Content</h4>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("newsContent")}</h4>
               <div className="bg-white border border-gray-200 p-6 rounded-md">
                 <p className="text-gray-700 whitespace-pre-line">{currentNews.content}</p>
               </div>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Faculty</h4>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("newsFaculty")}</h4>
               <div className="bg-gray-50 p-4 rounded-md">
                 <p className="text-gray-800">{getFacultyNameById(currentNews.faculty_id)}</p>
               </div>

@@ -61,7 +61,7 @@ class ErrorBoundary extends React.Component {
 }
 
 const TeacherMarksManagement = () => {
-  const { t } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
 
   // State for data from API
   const [semesters, setSemesters] = useState([]);
@@ -565,12 +565,12 @@ const TeacherMarksManagement = () => {
     try {
       // Validate required fields
       if (!marksFormData.student_id) {
-        showError("Please select a student");
+        showError(t("pleaseSelectStudent"));
         return;
       }
 
       if (!marksFormData.subject_id) {
-        showError("Please select a subject");
+        showError(t("pleaseSelectSubject"));
         return;
       }
 
@@ -605,14 +605,12 @@ const TeacherMarksManagement = () => {
         }
 
         if (!semester_id) {
-          alert("Please select a semester");
+          alert(t("pleaseSelectSemester"));
           return;
         }
 
         if (!teacher_id) {
-          alert(
-            "The selected subject has no assigned teacher. Please assign a teacher to the subject first."
-          );
+          alert(t("noTeacherAssigned"));
           return;
         }
       }
@@ -666,12 +664,12 @@ const TeacherMarksManagement = () => {
 
         setIsAddMarksModalOpen(false);
         resetMarksForm();
-        alert(data.message || "Marks added successfully!");
+        alert(data.message || t("marksAddedSuccessfully"));
       } else {
-        alert(`Failed to add marks: ${data.message || "Please try again."}`);
+        alert(`${t("failedToAddMarks")}: ${data.message || t("pleaseSelectSubject")}`);
       }
     } catch (error) {
-      alert("Failed to add marks. Please try again.");
+      alert(t("failedToAddMarks"));
     }
   };
 
@@ -747,18 +745,18 @@ const TeacherMarksManagement = () => {
         setIsEditMarksModalOpen(false);
         setEditingMark(null);
         resetMarksForm();
-        alert("Marks updated successfully!");
+        alert(t("marksUpdatedSuccessfully"));
       } else {
-        alert(`Failed to update marks: ${data.message || "Please try again."}`);
+        alert(`${t("failedToUpdateMarks")}: ${data.message || t("pleaseSelectSubject")}`);
       }
     } catch (error) {
-      alert("Failed to update marks. Please try again.");
+      alert(t("failedToUpdateMarks"));
     }
   };
 
   // Delete marks function
   const handleDeleteMarks = async (mark) => {
-    if (!window.confirm("Are you sure you want to delete this mark record?")) {
+    if (!window.confirm(t("confirmDeleteGrades"))) {
       return;
     }
 
@@ -1046,7 +1044,7 @@ const TeacherMarksManagement = () => {
     isLoading.marks
   ) {
     return (
-      <div className='flex justify-center items-center h-64'>
+      <div className={`flex justify-center items-center h-64 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#004B87] mx-auto mb-4'></div>
           <p className='text-gray-600'>{t("loading")}</p>
@@ -1062,79 +1060,87 @@ const TeacherMarksManagement = () => {
 
   return (
     <ErrorBoundary>
-      <div className='w-full min-h-screen space-y-6'>
+      <div
+        className={`w-full min-h-screen space-y-6 ${isRTL ? 'rtl' : 'ltr'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+        style={{
+          direction: isRTL ? 'rtl' : 'ltr',
+          textAlign: isRTL ? 'right' : 'left'
+        }}
+      >
       {/* Header Section */}
       <div className='relative overflow-hidden bg-gradient-to-br from-white via-[#E8ECEF]/30 to-[#E8ECEF]/50 rounded-2xl border border-[#E8ECEF]/50 shadow-lg'>
         {/* Background Pattern */}
         <div className='absolute inset-0 bg-gradient-to-br from-[#1D3D6F]/5 via-transparent to-[#2C4F85]/5'></div>
-        <div className='absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#F7B500]/10 to-transparent rounded-full blur-3xl'></div>
-        <div className='absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[#2C4F85]/10 to-transparent rounded-full blur-2xl'></div>
+        <div className={`absolute top-0 w-64 h-64 bg-gradient-to-bl from-[#F7B500]/10 to-transparent rounded-full blur-3xl ${isRTL ? 'left-0' : 'right-0'}`}></div>
+        <div className={`absolute bottom-0 w-48 h-48 bg-gradient-to-tr from-[#2C4F85]/10 to-transparent rounded-full blur-2xl ${isRTL ? 'right-0' : 'left-0'}`}></div>
 
         <div className='relative p-8'>
-          <div className='flex items-center justify-between mb-6'>
-            <div className='flex items-center space-x-4'>
+          <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
               <div className='p-3 bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] rounded-xl shadow-lg'>
                 <BookOpen className='h-8 w-8 text-white' />
               </div>
               <div>
                 <h2 className='text-2xl font-bold bg-gradient-to-r from-[#000000] via-[#1D3D6F] to-[#2C4F85] bg-clip-text text-transparent'>
-                  Academic Grade Management System
+                  {t("academicGradeManagementSystem")}
                 </h2>
                 <p className='text-gray-600 mt-1'>
-                  Comprehensive academic records and grade management system for
-                  students and faculty
+                  {t("comprehensiveAcademicRecords")}
                 </p>
               </div>
             </div>
-            <div className='hidden md:flex items-center space-x-2 text-[#1D3D6F]'>
+            <div className={`hidden md:flex items-center text-[#1D3D6F] ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
               <BarChart3 className='h-5 w-5' />
-              <span className='text-sm font-medium'>Instructor Dashboard</span>
+              <span className='text-sm font-medium'>{t("instructorDashboard")}</span>
             </div>
           </div>
 
           {/* Filters Section */}
           <div className='bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-white/50 shadow-sm'>
-            <div className='flex items-center space-x-2 mb-4'>
+            <div className={`flex items-center mb-4 ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
               <Filter className='h-5 w-5 text-[#1D3D6F]' />
               <h3 className='text-lg font-medium text-gray-800'>
-                Filter & Search Options
+                {t("filterSearchOptions")}
               </h3>
             </div>
 
             <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-4'>
               <div>
-                <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                <label className={`text-sm font-medium text-gray-700 mb-2 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`p-1 bg-[#E8ECEF] rounded-lg ${isRTL ? 'ml-2' : 'mr-2'}`}>
                     <Calendar className='h-4 w-4 text-[#1D3D6F]' />
                   </div>
-                  Academic Semester
+                  {t("academicSemester")}
                 </label>
                 <select
-                  className='w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
+                  className={`w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200 ${isRTL ? 'text-right' : 'text-left'}`}
                   value={selectedSemester}
                   onChange={handleSemesterChange}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 >
-                  <option value=''>All Semesters</option>
+                  <option value=''>{t("allSemesters")}</option>
                   {semesters.map((semester) => (
                     <option key={semester._id} value={semester._id}>
-                      {String(semester.name || 'Unnamed Semester')}
+                      {String(semester.name || t("unknownSemester"))}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                <label className={`text-sm font-medium text-gray-700 mb-2 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`p-1 bg-[#E8ECEF] rounded-lg ${isRTL ? 'ml-2' : 'mr-2'}`}>
                     <BookOpen className='h-4 w-4 text-[#2C4F85]' />
                   </div>
-                  Course Subject
+                  {t("courseSubject")}
                 </label>
                 <select
-                  className='w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
+                  className={`w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200 ${isRTL ? 'text-right' : 'text-left'}`}
                   value={selectedSubject || ""}
                   onChange={handleSubjectChange}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 >
-                  <option value=''>All Course Subjects</option>
+                  <option value=''>{t("allCourseSubjects")}</option>
                   {subjects
                     .filter((subject) => {
                       if (!selectedSemester) return true;
@@ -1143,48 +1149,50 @@ const TeacherMarksManagement = () => {
                     })
                     .map((subject) => (
                       <option key={subject._id} value={subject._id}>
-                        {String(subject.code || 'N/A')} - {String(subject.name || 'Unnamed Subject')}
+                        {String(subject.code || 'N/A')} - {String(subject.name || t("unknownSubject"))}
                       </option>
                     ))}
                 </select>
               </div>
               <div>
-                <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                <label className={`text-sm font-medium text-gray-700 mb-2 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`p-1 bg-[#E8ECEF] rounded-lg ${isRTL ? 'ml-2' : 'mr-2'}`}>
                     <Users className='h-4 w-4 text-[#F7B500]' />
                   </div>
-                  Student
+                  {t("student")}
                 </label>
                 <select
-                  className='w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
+                  className={`w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200 ${isRTL ? 'text-right' : 'text-left'}`}
                   value={selectedStudent || ""}
                   onChange={handleStudentChange}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 >
-                  <option value=''>All Students</option>
+                  <option value=''>{t("allStudents")}</option>
                   {students.map((student) => (
                     <option key={student._id} value={student._id}>
-                      {String(student.name || 'Unnamed Student')} ({String(student.student_id_number || 'N/A')})
+                      {String(student.name || t("unknownStudent"))} ({String(student.student_id_number || 'N/A')})
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                <label className={`text-sm font-medium text-gray-700 mb-2 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`p-1 bg-[#E8ECEF] rounded-lg ${isRTL ? 'ml-2' : 'mr-2'}`}>
                     <Search className='h-4 w-4 text-[#1D3D6F]' />
                   </div>
-                  Search Records
+                  {t("searchRecords")}
                 </label>
                 <div className='relative'>
                   <input
                     type='text'
-                    placeholder='Search by student name, ID, or course subject...'
-                    className='w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
+                    placeholder={t("searchByStudentNameId")}
+                    className={`w-full py-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200 ${isRTL ? 'pr-10 pl-4 text-right' : 'pl-10 pr-4 text-left'}`}
                     value={searchTerm}
                     onChange={handleSearchChange}
+                    dir={isRTL ? 'rtl' : 'ltr'}
                   />
                   <Search
-                    className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'
+                    className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`}
                     size={18}
                   />
                 </div>
@@ -1192,23 +1200,23 @@ const TeacherMarksManagement = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className='flex flex-wrap gap-3 justify-end pt-4 border-t border-gray-100'>
+            <div className={`flex flex-wrap gap-3 pt-4 border-t border-gray-100 ${isRTL ? 'justify-start' : 'justify-end'}`}>
               <button
-                className='flex items-center px-4 py-2 bg-gradient-to-r from-[#F7B500] to-[#F7B500]/80 text-white rounded-lg hover:from-[#F7B500]/90 hover:to-[#F7B500]/70 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                className={`flex items-center px-4 py-2 bg-gradient-to-r from-[#F7B500] to-[#F7B500]/80 text-white rounded-lg hover:from-[#F7B500]/90 hover:to-[#F7B500]/70 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${isRTL ? 'flex-row-reverse' : ''}`}
                 onClick={() => setIsImportModalOpen(true)}
               >
-                <Upload size={18} className='mr-2' />
-                Import Academic Data
+                <Upload size={18} className={isRTL ? 'ml-2' : 'mr-2'} />
+                {t("importAcademicData")}
               </button>
               <button
-                className='flex items-center px-4 py-2 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                className={`flex items-center px-4 py-2 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${isRTL ? 'flex-row-reverse' : ''}`}
                 onClick={() => {
                   resetMarksForm();
                   setIsAddMarksModalOpen(true);
                 }}
               >
-                <Plus size={18} className='mr-2' />
-                Add New Academic Grades
+                <Plus size={18} className={isRTL ? 'ml-2' : 'mr-2'} />
+                {t("addNewAcademicGrades")}
               </button>
             </div>
           </div>
@@ -1223,23 +1231,22 @@ const TeacherMarksManagement = () => {
 
         {/* Academic Records Table */}
         <div className='border-t border-[#E8ECEF] pt-8'>
-          <div className='flex items-center justify-between mb-6'>
-            <div className='flex items-center space-x-3'>
+          <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
               <div className='p-2 bg-[#E8ECEF] rounded-lg'>
                 <BarChart3 className='h-5 w-5 text-[#1D3D6F]' />
               </div>
               <div>
                 <h3 className='text-xl font-semibold bg-gradient-to-r from-[#000000] to-[#1D3D6F] bg-clip-text text-transparent'>
-                  Student Academic Records
+                  {t("studentAcademicRecords")}
                   {selectedSemesterName && (
-                    <span className='ml-2 text-[#2C4F85] font-normal text-lg'>
+                    <span className={`text-[#2C4F85] font-normal text-lg ${isRTL ? 'mr-2' : 'ml-2'}`}>
                       - {selectedSemesterName}
                     </span>
                   )}
                 </h3>
                 <p className='text-sm text-gray-600 mt-1'>
-                  Comprehensive academic performance tracking and grade
-                  management
+                  {t("comprehensiveAcademicPerformanceTracking")}
                 </p>
               </div>
             </div>
@@ -1251,22 +1258,22 @@ const TeacherMarksManagement = () => {
                   <FileText className='h-12 w-12 text-[#1D3D6F]' />
                 </div>
                 <h3 className='text-xl font-semibold text-gray-800 mb-3'>
-                  No Academic Records Found
+                  {t("noAcademicRecordsFound")}
                 </h3>
                 <p className='text-gray-600 mb-6 max-w-md mx-auto'>
                   {searchTerm
-                    ? "No academic records match your search criteria. Please try different keywords."
-                    : "No academic grades have been recorded for this semester and subject yet."}
+                    ? t("noAcademicRecordsMatch")
+                    : t("noAcademicGradesRecorded")}
                 </p>
                 <button
-                  className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2 mx-auto'
+                  className={`px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center mx-auto ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}
                   onClick={() => {
                     resetMarksForm();
                     setIsAddMarksModalOpen(true);
                   }}
                 >
                   <Plus className='h-4 w-4' />
-                  <span>Add New Academic Grades</span>
+                  <span>{t("addNewAcademicGrades")}</span>
                 </button>
               </div>
             ) : (
@@ -1274,41 +1281,41 @@ const TeacherMarksManagement = () => {
                 <table className='min-w-full divide-y divide-gray-200'>
                   <thead className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85]'>
                     <tr>
-                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                        <div className='flex items-center space-x-2'>
+                      <th className={`px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                           <Users className='h-4 w-4' />
-                          <span>Student Information</span>
+                          <span>{t("studentInformation")}</span>
                         </div>
                       </th>
-                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                        <div className='flex items-center space-x-2'>
+                      <th className={`px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                           <BookOpen className='h-4 w-4' />
-                          <span>Course Subject</span>
+                          <span>{t("courseSubject")}</span>
                         </div>
                       </th>
-                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                        <div className='flex items-center space-x-2'>
+                      <th className={`px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                           <Calendar className='h-4 w-4' />
-                          <span>Academic Semester</span>
+                          <span>{t("academicSemester")}</span>
                         </div>
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        Midterm Exam
+                        {t("midtermExam")}
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        Final Exam
+                        {t("finalExam")}
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        Assignment
+                        {t("assignment")}
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        <div className='flex items-center justify-center space-x-2'>
+                        <div className={`flex items-center justify-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                           <Award className='h-4 w-4' />
-                          <span>Total Grade</span>
+                          <span>{t("totalGrade")}</span>
                         </div>
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        Actions
+                        {t("actions")}
                       </th>
                     </tr>
                   </thead>

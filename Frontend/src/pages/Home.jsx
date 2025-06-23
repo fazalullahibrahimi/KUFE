@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import MissionVisionValues from "../components/MissionVisionValues";
+import FacultyShowcase from "../components/FacultyShowcase";
 import Programs from "../components/Programs";
 import Stats from "../components/Stats";
 import Events from "../components/Events";
@@ -14,6 +15,7 @@ const Home = () => {
       <Navbar />
       <Hero />
       <MissionVisionValues />
+      <FacultyShowcase />
       <Programs />
       <Stats />
       <TopPerformers />

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
@@ -131,26 +132,25 @@ const MarksManagementPage = () => {
                   <BarChart3 className='h-12 w-12 text-white' />
                 </div>
               </div>
-              <h1 className='text-5xl font-bold mb-4 text-white'>
-                Academic Performance Hub
+              <h1 className={`text-5xl font-bold mb-4 text-white ${isRTL ? 'text-right' : ''}`}>
+                {t("Academic Performance Hub")}
               </h1>
-              <p className='text-white/90 text-xl max-w-3xl mx-auto leading-relaxed'>
-                Comprehensive academic records and grade management system for
-                students and faculty
+              <p className={`text-white/90 text-xl max-w-3xl mx-auto leading-relaxed ${isRTL ? 'text-right' : ''}`}>
+                {t("Comprehensive academic records and grade management system for students and faculty")}
               </p>
-              <div className='mt-8 flex justify-center space-x-8'>
-                <div className='flex items-center space-x-2 text-white/80'>
+              <div className={`mt-8 flex justify-center ${isRTL ? 'space-x-reverse space-x-8' : 'space-x-8'}`}>
+                <div className={`flex items-center text-white/80 ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                   <div className='w-2 h-2 bg-[#F7B500] rounded-full animate-pulse'></div>
-                  <span className='text-sm font-medium'>Real-time Updates</span>
+                  <span className='text-sm font-medium'>{t("Real-time Updates")}</span>
                 </div>
-                <div className='flex items-center space-x-2 text-white/80'>
+                <div className={`flex items-center text-white/80 ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                   <div className='w-2 h-2 bg-[#F7B500] rounded-full animate-pulse delay-300'></div>
-                  <span className='text-sm font-medium'>Secure Access</span>
+                  <span className='text-sm font-medium'>{t("Secure Access")}</span>
                 </div>
-                <div className='flex items-center space-x-2 text-white/80'>
+                <div className={`flex items-center text-white/80 ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                   <div className='w-2 h-2 bg-[#F7B500] rounded-full animate-pulse delay-700'></div>
                   <span className='text-sm font-medium'>
-                    Professional Reports
+                    {t("Professional Reports")}
                   </span>
                 </div>
               </div>
@@ -186,7 +186,7 @@ const MarksManagementPage = () => {
                         ></div>
 
                         {/* Tab Content */}
-                        <div className='relative px-6 py-4 flex items-center space-x-3'>
+                        <div className={`relative px-6 py-4 flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
                           <div
                             className={`relative p-2 rounded-lg transition-all duration-300 ${
                               activeTab === tab.id
@@ -205,7 +205,7 @@ const MarksManagementPage = () => {
                             </div>
                           </div>
 
-                          <div className='text-left'>
+                          <div className={isRTL ? 'text-right' : 'text-left'}>
                             <div
                               className={`font-bold text-base transition-colors duration-300 ${
                                 activeTab === tab.id
@@ -248,13 +248,13 @@ const MarksManagementPage = () => {
                         key={tab.id}
                         className='flex items-center justify-center'
                       >
-                        <div className='flex items-center space-x-4'>
+                        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
                           <div
                             className={`p-3 rounded-xl bg-gradient-to-r ${tab.gradient} shadow-lg`}
                           >
                             <div className='text-white'>{tab.icon}</div>
                           </div>
-                          <div className='text-center'>
+                          <div className={isRTL ? 'text-right' : 'text-center'}>
                             <div className='font-bold text-xl text-[#1D3D6F]'>
                               {tab.label}
                             </div>
@@ -388,9 +388,29 @@ const MarksManagementPage = () => {
           direction: rtl;
         }
 
+        .rtl .space-x-2 > * + * {
+          margin-left: 0;
+          margin-right: 0.5rem;
+        }
+
+        .rtl .space-x-3 > * + * {
+          margin-left: 0;
+          margin-right: 0.75rem;
+        }
+
         .rtl .space-x-4 > * + * {
           margin-left: 0;
           margin-right: 1rem;
+        }
+
+        .rtl .space-x-8 > * + * {
+          margin-left: 0;
+          margin-right: 2rem;
+        }
+
+        .rtl .space-x-reverse > * + * {
+          margin-left: 0;
+          margin-right: var(--tw-space-x-reverse);
         }
 
         /* Smooth Transitions */

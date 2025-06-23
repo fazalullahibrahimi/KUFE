@@ -8,8 +8,12 @@ import {
 import Table from "../common/Table"
 import Modal from "../common/Modal"
 import FormField from "../common/FormField"
+import { useLanguage } from "../../contexts/LanguageContext"
 
 const FacultyManagement = () => {
+  const { t, language } = useLanguage()
+  const isRTL = language === 'dr' || language === 'ps'
+
   const [faculties, setFaculties] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -116,7 +120,7 @@ const FacultyManagement = () => {
   // Table columns configuration
   const columns = [
     {
-      header: "Faculty Name",
+      header: t("facultyName"),
       accessor: "name",
       render: (row) => (
         <div className="flex items-center">
@@ -128,7 +132,7 @@ const FacultyManagement = () => {
       ),
     },
     {
-      header: "Overview",
+      header: t("overview"),
       accessor: "overview",
       render: (row) => <p className="truncate max-w-md">{row.overview}</p>,
     },
@@ -258,7 +262,7 @@ const FacultyManagement = () => {
   const checkAuthentication = () => {
     const token = getAuthToken()
     if (!token) {
-      alert("You are not logged in. Please log in to manage faculties.")
+      alert(t("notAuthenticated"))
       // Redirect to login page or show login modal
       // window.location.href = '/login';
       return false
@@ -280,26 +284,34 @@ const FacultyManagement = () => {
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
           <div className="mb-6 md:mb-0">
             <div className="flex items-center mb-4">
-              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl mr-4 border border-white/30">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl border border-white/30 mr-4">
                 <GraduationCap className="h-8 w-8 text-[#F4B400]" />
               </div>
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-                  Faculty Management
+                  {t("facultyManagement")}
                 </h1>
-                <p className="text-white/90 text-lg">Manage university faculties and academic divisions</p>
+                <p className="text-white/90 text-lg">
+                  {t("manageFaculties")}
+                </p>
               </div>
             </div>
             <div className="flex items-center text-white/70">
               <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm">Academic governance • {faculties.length} faculties</span>
+              <span className="text-sm">
+                {t("academicGovernance")} • {faculties.length} {t("faculties")}
+              </span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="text-right mb-3 sm:mb-0">
-              <div className="text-2xl font-bold text-[#F4B400]">{faculties.length}</div>
-              <div className="text-white/60 text-sm">Total Faculties</div>
+              <div className="text-2xl font-bold text-[#F4B400]">
+                {faculties.length}
+              </div>
+              <div className="text-white/60 text-sm">
+                {t("totalFaculties")}
+              </div>
             </div>
             <button
               className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
@@ -313,7 +325,7 @@ const FacultyManagement = () => {
             >
               <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
               <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
-                Add New Faculty
+                {t("addNewFaculty")}
               </span>
             </button>
           </div>
@@ -334,12 +346,18 @@ const FacultyManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <GraduationCap className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Faculties</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("totalFaculties")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{faculties.length}</p>
+              <p className="text-3xl font-bold text-white">
+                {faculties.length}
+              </p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
-                <span className="text-green-300 text-xs">+15% growth</span>
+                <span className="text-green-300 text-xs">
+                  {t("growthThisYear")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -360,12 +378,18 @@ const FacultyManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <BookOpen className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Academic Programs</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("academicPrograms")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{faculties.length * 3}</p>
+              <p className="text-3xl font-bold text-white">
+                {faculties.length * 3}
+              </p>
               <div className="flex items-center mt-2">
                 <Star className="h-4 w-4 text-white/70 mr-1" />
-                <span className="text-white/70 text-xs">Diverse offerings</span>
+                <span className="text-white/70 text-xs">
+                  {t("diverseOfferings")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -386,12 +410,18 @@ const FacultyManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <CheckCircle className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Active Faculties</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("activeFaculties")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{faculties.length}</p>
+              <p className="text-3xl font-bold text-white">
+                {faculties.length}
+              </p>
               <div className="flex items-center mt-2">
                 <Target className="h-4 w-4 text-green-200 mr-1" />
-                <span className="text-green-200 text-xs">Fully operational</span>
+                <span className="text-green-200 text-xs">
+                  {t("fullyOperational")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -412,12 +442,18 @@ const FacultyManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Award className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Research Centers</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("researchCenters")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{Math.floor(faculties.length * 1.5)}</p>
+              <p className="text-3xl font-bold text-white">
+                {Math.floor(faculties.length * 1.5)}
+              </p>
               <div className="flex items-center mt-2">
                 <Activity className="h-4 w-4 text-purple-200 mr-1" />
-                <span className="text-purple-200 text-xs">Innovation hubs</span>
+                <span className="text-purple-200 text-xs">
+                  {t("innovationHubs")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -436,14 +472,18 @@ const FacultyManagement = () => {
               <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
                 <BarChart3 className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Faculty Overview</h3>
+              <h3 className="text-lg font-semibold text-gray-800">
+                {t("facultyOverview")}
+              </h3>
             </div>
             <Eye className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             {faculties.slice(0, 3).map((faculty, index) => (
               <div key={index} className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">{faculty.name}</span>
+                <span className="text-sm text-gray-600">
+                  {faculty.name}
+                </span>
                 <div className="flex items-center">
                   <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                     <div
@@ -451,12 +491,16 @@ const FacultyManagement = () => {
                       style={{width: `${Math.min(100, (faculty.name.length * 5))}%`}}
                     ></div>
                   </div>
-                  <span className="text-sm font-medium text-gray-800">Active</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    {t("active")}
+                  </span>
                 </div>
               </div>
             ))}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total Faculties</span>
+              <span className="text-sm text-gray-600">
+                {t("totalFaculties")}
+              </span>
               <span className="text-lg font-bold text-[#EC4899]">{faculties.length}</span>
             </div>
           </div>
@@ -469,21 +513,29 @@ const FacultyManagement = () => {
               <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
                 <Building2 className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Academic Structure</h3>
+              <h3 className="text-lg font-semibold text-gray-800">
+                {t("academicStructure")}
+              </h3>
             </div>
             <Settings className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Undergraduate Programs</span>
+              <span className="text-sm text-gray-600">
+                {t("undergraduatePrograms")}
+              </span>
               <span className="text-lg font-bold text-[#06B6D4]">{faculties.length * 2}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Graduate Programs</span>
+              <span className="text-sm text-gray-600">
+                {t("graduatePrograms")}
+              </span>
               <span className="text-lg font-bold text-[#06B6D4]">{faculties.length}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Research Programs</span>
+              <span className="text-sm text-gray-600">
+                {t("researchPrograms")}
+              </span>
               <span className="text-lg font-bold text-[#06B6D4]">{Math.floor(faculties.length * 0.8)}</span>
             </div>
           </div>
@@ -496,25 +548,33 @@ const FacultyManagement = () => {
               <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
                 <Users className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Faculty Metrics</h3>
+              <h3 className="text-lg font-semibold text-gray-800">
+                {t("facultyMetrics")}
+              </h3>
             </div>
             <Activity className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">With Mission</span>
+              <span className="text-sm text-gray-600">
+                {t("withMission")}
+              </span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {faculties.filter(f => f.mission).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">With Vision</span>
+              <span className="text-sm text-gray-600">
+                {t("withVision")}
+              </span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {faculties.filter(f => f.vision).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Complete Profiles</span>
+              <span className="text-sm text-gray-600">
+                {t("completeProfiles")}
+              </span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {faculties.filter(f => f.mission && f.vision && f.overview && f.history).length}
               </span>
@@ -526,11 +586,11 @@ const FacultyManagement = () => {
       {/* Authentication Status */}
       <div className="bg-white rounded-lg shadow p-4">
         <p className="text-sm">
-          Authentication Status:{" "}
+          {t("authenticationStatus")}:{" "}
           {getAuthToken() ? (
-            <span className="text-green-600 font-medium">Authenticated</span>
+            <span className="text-green-600 font-medium">{t("authenticated")}</span>
           ) : (
-            <span className="text-red-600 font-medium">Not Authenticated</span>
+            <span className="text-red-600 font-medium">{t("notAuthenticated")}</span>
           )}
         </p>
       </div>
@@ -538,7 +598,7 @@ const FacultyManagement = () => {
       {/* Loading indicator */}
       {isLoading && (
         <div className="text-center py-4">
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">{t("loading")}</p>
         </div>
       )}
 
@@ -565,7 +625,7 @@ const FacultyManagement = () => {
       />
 
       {/* Add Faculty Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Faculty" size="lg">
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={t("addNewFaculty")} size="lg">
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -573,9 +633,9 @@ const FacultyManagement = () => {
           }}
         >
           <div className="grid grid-cols-1 gap-4">
-            <FormField label="Faculty Name" name="name" value={formData.name} onChange={handleInputChange} required />
+            <FormField label={t("facultyName")} name="name" value={formData.name} onChange={handleInputChange} required />
             <FormField
-              label="Overview"
+              label={t("overview")}
               name="overview"
               type="textarea"
               value={formData.overview}
@@ -583,7 +643,7 @@ const FacultyManagement = () => {
               required
             />
             <FormField
-              label="Mission"
+              label={t("mission")}
               name="mission"
               type="textarea"
               value={formData.mission}
@@ -591,7 +651,7 @@ const FacultyManagement = () => {
               required
             />
             <FormField
-              label="Vision"
+              label={t("vision")}
               name="vision"
               type="textarea"
               value={formData.vision}
@@ -599,7 +659,7 @@ const FacultyManagement = () => {
               required
             />
             <FormField
-              label="History"
+              label={t("history")}
               name="history"
               type="textarea"
               value={formData.history}
@@ -615,22 +675,22 @@ const FacultyManagement = () => {
               onClick={() => setIsAddModalOpen(false)}
               disabled={isLoading}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
+              className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors flex items-center"
               disabled={isLoading}
             >
               <Save size={18} className="inline mr-2" />
-              {isLoading ? "Saving..." : "Save Faculty"}
+              {isLoading ? t("saving") : t("saveFaculty")}
             </button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Faculty Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Faculty" size="lg">
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={t("editFaculty")} size="lg">
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -638,9 +698,9 @@ const FacultyManagement = () => {
           }}
         >
           <div className="grid grid-cols-1 gap-4">
-            <FormField label="Faculty Name" name="name" value={formData.name} onChange={handleInputChange} required />
+            <FormField label={t("facultyName")} name="name" value={formData.name} onChange={handleInputChange} required />
             <FormField
-              label="Overview"
+              label={t("overview")}
               name="overview"
               type="textarea"
               value={formData.overview}
@@ -648,7 +708,7 @@ const FacultyManagement = () => {
               required
             />
             <FormField
-              label="Mission"
+              label={t("mission")}
               name="mission"
               type="textarea"
               value={formData.mission}
@@ -656,7 +716,7 @@ const FacultyManagement = () => {
               required
             />
             <FormField
-              label="Vision"
+              label={t("vision")}
               name="vision"
               type="textarea"
               value={formData.vision}
@@ -664,7 +724,7 @@ const FacultyManagement = () => {
               required
             />
             <FormField
-              label="History"
+              label={t("history")}
               name="history"
               type="textarea"
               value={formData.history}
@@ -680,46 +740,64 @@ const FacultyManagement = () => {
               onClick={() => setIsEditModalOpen(false)}
               disabled={isLoading}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
+              className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors flex items-center"
               disabled={isLoading}
             >
               <Save size={18} className="inline mr-2" />
-              {isLoading ? "Updating..." : "Update Faculty"}
+              {isLoading ? t("updating") : t("updateFaculty")}
             </button>
           </div>
         </form>
       </Modal>
 
       {/* View Faculty Modal */}
-      <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title="Faculty Details" size="lg">
+      <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title={t("facultyDetails")} size="lg">
         {currentFaculty && (
           <div className="space-y-6">
             <div className="bg-blue-50 p-6 rounded-lg">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">{currentFaculty.name}</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                {currentFaculty.name}
+              </h3>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Overview</h4>
-              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentFaculty.overview}</p>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">
+                {t("overview")}
+              </h4>
+              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">
+                {currentFaculty.overview || t("overviewNotAvailable")}
+              </p>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Mission</h4>
-              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentFaculty.mission}</p>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">
+                {t("mission")}
+              </h4>
+              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">
+                {currentFaculty.mission || t("missionNotAvailable")}
+              </p>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Vision</h4>
-              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentFaculty.vision}</p>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">
+                {t("vision")}
+              </h4>
+              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">
+                {currentFaculty.vision || t("visionNotAvailable")}
+              </p>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">History</h4>
-              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentFaculty.history}</p>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">
+                {t("history")}
+              </h4>
+              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">
+                {currentFaculty.history || t("historyNotAvailable")}
+              </p>
             </div>
           </div>
         )}

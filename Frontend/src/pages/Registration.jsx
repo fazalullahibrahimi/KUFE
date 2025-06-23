@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Kandahar_Economic from "../../public/image_for_home2.jpg";
@@ -20,6 +20,31 @@ function Registration() {
   const [successMessage, setSuccessMessage] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [imagePreview, setImagePreview] = useState(null);
+  const [adminExists, setAdminExists] = useState(false);
+  const [checkingAdmin, setCheckingAdmin] = useState(true);
+
+  // Check if admin exists when component mounts
+  useEffect(() => {
+    const checkAdminExists = async () => {
+      try {
+        const response = await axios.get("http://localhost:4400/api/v1/user/check-admin-exists");
+        setAdminExists(response.data.adminExists);
+
+        // If admin exists and user had selected admin role, reset to student
+        if (response.data.adminExists && formData.role === "admin") {
+          setFormData(prev => ({ ...prev, role: "student" }));
+        }
+      } catch (error) {
+        console.error("Error checking admin existence:", error);
+        // If there's an error, assume admin doesn't exist to be safe
+        setAdminExists(false);
+      } finally {
+        setCheckingAdmin(false);
+      }
+    };
+
+    checkAdminExists();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -720,12 +745,37 @@ function Registration() {
                     backgroundSize: "1em",
                   }}
                 >
-                  <option value='admin'>Admin</option>
+                  {!checkingAdmin && !adminExists && (
+                    <option value='admin'>Admin</option>
+                  )}
                   <option value='teacher'>Teacher</option>
                   <option value='student'>Student</option>
                   <option value='committeeMember'>Committee Member</option>
                 </select>
               </div>
+              {!checkingAdmin && adminExists && (
+                <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-yellow-600 mr-2"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span className="text-sm text-yellow-800">
+                      Admin role is not available. An admin account already exists for system security.
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Image Upload */}

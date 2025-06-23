@@ -136,22 +136,71 @@ export const AuthProvider = ({ children }) => {
         if (token && userString) {
           const user = JSON.parse(userString);
 
-          // Verify token is still valid
+          // Verify token is still valid and get fresh user data
           const isValid = await authService.verifyToken(token);
 
           if (isValid) {
-            // Ensure user image is properly set
-            if (!user.image || user.image === "default-user.jpg") {
-              user.image = "default-user.jpg";
+            try {
+              // Fetch fresh user data from server
+              const freshUserResponse = await authService.getCurrentUser();
+              if (freshUserResponse.success) {
+                const freshUser = freshUserResponse.data.data;
+
+                // Use fresh data but keep the token from localStorage
+                const updatedUser = {
+                  _id: freshUser._id,
+                  fullName: freshUser.FullName || freshUser.fullName,
+                  email: freshUser.email,
+                  role: freshUser.role,
+                  image: freshUser.image,
+                };
+
+                // Ensure user image is properly set
+                if (!updatedUser.image || updatedUser.image === "default-user.jpg" || updatedUser.image.trim() === "") {
+                  updatedUser.image = "default-user.jpg";
+                }
+
+                // Set the full image URL
+                updatedUser.imageUrl = `http://localhost:4400/public/img/users/${updatedUser.image}`;
+
+                // Update localStorage with fresh data
+                localStorage.setItem("user", JSON.stringify(updatedUser));
+
+                dispatch({
+                  type: AUTH_ACTIONS.SET_USER,
+                  payload: { user: updatedUser, token },
+                });
+              } else {
+                // Fallback to stored user data if fresh data fetch fails
+                // Ensure user image is properly set
+                if (!user.image || user.image === "default-user.jpg" || user.image.trim() === "") {
+                  user.image = "default-user.jpg";
+                }
+
+                // Set the full image URL
+                user.imageUrl = `http://localhost:4400/public/img/users/${user.image}`;
+
+                dispatch({
+                  type: AUTH_ACTIONS.SET_USER,
+                  payload: { user, token },
+                });
+              }
+            } catch (error) {
+              console.error("Error fetching fresh user data:", error);
+              // Fallback to stored user data
+              // Ensure user image is properly set
+              if (!user.image || user.image === "default-user.jpg" || user.image.trim() === "") {
+                user.image = "default-user.jpg";
+              }
+
+              // Set the full image URL
+              user.imageUrl = `http://localhost:4400/public/img/users/${user.image}`;
+
+              dispatch({
+                type: AUTH_ACTIONS.SET_USER,
+                payload: { user, token },
+              });
             }
-
-            // Set the full image URL
-            user.imageUrl = `http://localhost:4400/public/img/users/${user.image}`;
-
-            dispatch({
-              type: AUTH_ACTIONS.SET_USER,
-              payload: { user, token },
-            });
           } else {
             // Token is invalid, clear storage
             localStorage.removeItem("token");
@@ -183,7 +232,7 @@ export const AuthProvider = ({ children }) => {
         const { user, token } = response.data;
 
         // Ensure user image is properly set
-        if (!user.image || user.image === "default-user.jpg") {
+        if (!user.image || user.image === "default-user.jpg" || user.image.trim() === "") {
           user.image = "default-user.jpg";
         }
 
@@ -301,12 +350,17 @@ export const AuthProvider = ({ children }) => {
 
   // Update user data
   const updateUser = (userData) => {
+    // Ensure user image is properly set
+    if (!userData.image || userData.image === "default-user.jpg" || userData.image.trim() === "") {
+      userData.image = "default-user.jpg";
+    }
+
     // Add the full image URL
     userData.imageUrl = `http://localhost:4400/public/img/users/${userData.image}`;
-    
+
     // Update localStorage
     localStorage.setItem('user', JSON.stringify(userData));
-    
+
     // Update state
     dispatch({
       type: AUTH_ACTIONS.SET_USER,

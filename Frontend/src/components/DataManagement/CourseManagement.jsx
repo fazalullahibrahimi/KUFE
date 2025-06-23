@@ -6,11 +6,13 @@ import {
   TrendingUp, Activity, Eye, Edit, Target, Award, Calendar, Clock,
   BarChart3, PieChart, Settings, Star, CheckCircle, Building2
 } from "lucide-react"
+import { useLanguage } from "../../contexts/LanguageContext"
 import Table from "../common/Table"
 import Modal from "../common/Modal"
 import FormField from "../common/FormField"
 
 const CourseManagement = () => {
+  const { t, isRTL } = useLanguage()
   const [courses, setCourses] = useState([])
   const [departments, setDepartments] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -179,7 +181,7 @@ const CourseManagement = () => {
   // Table columns configuration
   const columns = [
     {
-      header: "Course",
+      header: t("course.course_name"),
       accessor: "name",
       render: (row) => (
         <div className="flex items-center">
@@ -207,17 +209,17 @@ const CourseManagement = () => {
         </div>
       ),
     },
-    { header: "Credits", accessor: "credits" },
-    { header: "Instructor", accessor: "instructor" },
-    { header: "Semester", accessor: "semester" },
-    { header: "Level", accessor: "level" },
+    { header: t("course.credits"), accessor: "credits" },
+    { header: t("course.instructor"), accessor: "instructor" },
+    { header: t("course.semester"), accessor: "semester" },
+    { header: t("course.level"), accessor: "level" },
     {
-      header: "Department",
+      header: t("course.department"),
       accessor: "department_id",
       render: (row) => <span>{getDepartmentNameById(row.department_id)}</span>,
     },
     {
-      header: "Materials",
+      header: t("course.materials"),
       accessor: "materials",
       render: (row) => (
         <span className="text-gray-700">
@@ -711,21 +713,21 @@ const CourseManagement = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-                  Course Management
+                  {t("course.management")}
                 </h1>
-                <p className="text-white/90 text-lg">Manage academic courses and curriculum</p>
+                <p className="text-white/90 text-lg">{t("course.manage_academic")}</p>
               </div>
             </div>
             <div className="flex items-center text-white/70">
               <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm">Academic catalog • {courses.length} courses</span>
+              <span className="text-sm">{t("course.academic_catalog")} • {courses.length} {t("course.courses")}</span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="text-right mb-3 sm:mb-0">
               <div className="text-2xl font-bold text-[#F4B400]">{courses.length}</div>
-              <div className="text-white/60 text-sm">Total Courses</div>
+              <div className="text-white/60 text-sm">{t("course.total_courses")}</div>
             </div>
             <button
               className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
@@ -739,7 +741,7 @@ const CourseManagement = () => {
             >
               <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
               <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
-                Add New Course
+                {t("course.add_new")}
               </span>
             </button>
           </div>
@@ -760,7 +762,7 @@ const CourseManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <BookOpen className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Courses</p>
+                <p className="text-white/80 text-sm font-medium">{t("course.total_courses")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{courses.length}</p>
               <div className="flex items-center mt-2">
@@ -786,12 +788,12 @@ const CourseManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Users className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Unique Instructors</p>
+                <p className="text-white/80 text-sm font-medium">{t("course.unique_instructors")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{new Set(courses.map((course) => course.instructor)).size}</p>
               <div className="flex items-center mt-2">
                 <Award className="h-4 w-4 text-white/70 mr-1" />
-                <span className="text-white/70 text-xs">Teaching faculty</span>
+                <span className="text-white/70 text-xs">{t("course.teaching_faculty")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -812,12 +814,12 @@ const CourseManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <GraduationCap className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Credits</p>
+                <p className="text-white/80 text-sm font-medium">{t("course.total_credits")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{courses.reduce((total, course) => total + Number.parseInt(course.credits || 0), 0)}</p>
               <div className="flex items-center mt-2">
                 <Target className="h-4 w-4 text-green-200 mr-1" />
-                <span className="text-green-200 text-xs">Academic hours</span>
+                <span className="text-green-200 text-xs">{t("course.academic_hours")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -838,12 +840,12 @@ const CourseManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Building2 className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Departments</p>
+                <p className="text-white/80 text-sm font-medium">{t("course.departments")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{departments.length}</p>
               <div className="flex items-center mt-2">
                 <Activity className="h-4 w-4 text-purple-200 mr-1" />
-                <span className="text-purple-200 text-xs">Academic units</span>
+                <span className="text-purple-200 text-xs">{t("course.academic_units")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -862,25 +864,25 @@ const CourseManagement = () => {
               <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
                 <BarChart3 className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Course Levels</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("course.course_levels")}</h3>
             </div>
             <Eye className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Undergraduate</span>
+              <span className="text-sm text-gray-600">{t("course.undergraduate")}</span>
               <span className="text-lg font-bold text-[#EC4899]">
                 {courses.filter(c => c.level === "Undergraduate").length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Graduate</span>
+              <span className="text-sm text-gray-600">{t("course.graduate")}</span>
               <span className="text-lg font-bold text-[#EC4899]">
                 {courses.filter(c => c.level === "Graduate").length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Average Credits</span>
+              <span className="text-sm text-gray-600">{t("course.average_credits")}</span>
               <span className="text-lg font-bold text-[#EC4899]">
                 {courses.length > 0 ? Math.round((courses.reduce((total, course) => total + Number.parseInt(course.credits || 0), 0) / courses.length) * 10) / 10 : 0}
               </span>
@@ -895,7 +897,7 @@ const CourseManagement = () => {
               <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
                 <Calendar className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Semester Distribution</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("course.semester_distribution")}</h3>
             </div>
             <Clock className="h-5 w-5 text-gray-400" />
           </div>
@@ -928,27 +930,27 @@ const CourseManagement = () => {
               <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
                 <FileText className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Course Materials</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("course.course_materials")}</h3>
             </div>
             <Settings className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">With Materials</span>
+              <span className="text-sm text-gray-600">{t("course.with_materials")}</span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {courses.filter(c => c.materials && c.materials.length > 0).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total Materials</span>
+              <span className="text-sm text-gray-600">{t("course.total_materials")}</span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {courses.reduce((total, c) => total + (c.materials ? c.materials.length : 0), 0)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Auth Status</span>
+              <span className="text-sm text-gray-600">{t("course.auth_status")}</span>
               <span className={`text-lg font-bold ${getAuthToken() ? 'text-green-500' : 'text-red-500'}`}>
-                {getAuthToken() ? 'Active' : 'Inactive'}
+                {getAuthToken() ? t("course.active") : t("course.inactive")}
               </span>
             </div>
           </div>
@@ -958,7 +960,7 @@ const CourseManagement = () => {
       {/* Loading indicator */}
       {isLoading && (
         <div className="text-center py-4">
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">{t("course.loading")}</p>
         </div>
       )}
 
@@ -985,7 +987,7 @@ const CourseManagement = () => {
       />
 
       {/* Add Course Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Course">
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={t("course.add_new_course")}>
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -993,10 +995,10 @@ const CourseManagement = () => {
           }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField label="Course Code" name="code" value={formData.code} onChange={handleInputChange} required />
-            <FormField label="Course Name" name="name" value={formData.name} onChange={handleInputChange} required />
+            <FormField label={t("course.course_code")} name="code" value={formData.code} onChange={handleInputChange} required />
+            <FormField label={t("course.course_name")} name="name" value={formData.name} onChange={handleInputChange} required />
             <FormField
-              label="Credits"
+              label={t("course.credits")}
               name="credits"
               type="number"
               value={formData.credits}
@@ -1004,7 +1006,7 @@ const CourseManagement = () => {
               required
             />
             <FormField
-              label="Instructor"
+              label={t("course.instructor")}
               name="instructor"
               value={formData.instructor}
               onChange={handleInputChange}
@@ -1013,7 +1015,7 @@ const CourseManagement = () => {
 
             {/* Department Dropdown */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-medium mb-2">Department</label>
+              <label className="block text-gray-700 text-sm font-medium mb-2">{t("course.department")}</label>
               <select
                 name="department_id"
                 value={formData.department_id}
@@ -1021,7 +1023,7 @@ const CourseManagement = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="">Select a Department</option>
+                <option value="">{t("course.select_department")}</option>
                 {departments.map((department) => (
                   <option key={department._id} value={department._id}>
                     {department.name}
@@ -1031,39 +1033,39 @@ const CourseManagement = () => {
             </div>
 
             <FormField
-              label="Semester"
+              label={t("course.semester")}
               name="semester"
               type="select"
               value={formData.semester}
               onChange={handleInputChange}
               options={[
-                { value: "Fall", label: "Fall" },
-                { value: "Spring", label: "Spring" },
-                { value: "Summer", label: "Summer" },
+                { value: "Fall", label: t("course.fall") },
+                { value: "Spring", label: t("course.spring") },
+                { value: "Summer", label: t("course.summer") },
               ]}
               required
             />
             <FormField
-              label="Level"
+              label={t("course.level")}
               name="level"
               type="select"
               value={formData.level}
               onChange={handleInputChange}
               options={[
-                { value: "Undergraduate", label: "Undergraduate" },
-                { value: "Graduate", label: "Graduate" },
+                { value: "Undergraduate", label: t("course.undergraduate") },
+                { value: "Graduate", label: t("course.graduate") },
               ]}
               required
             />
             <FormField
-              label="Schedule"
+              label={t("course.schedule")}
               name="schedule"
               value={formData.schedule}
               onChange={handleInputChange}
               required
             />
             <FormField
-              label="Location"
+              label={t("course.location")}
               name="location"
               value={formData.location}
               onChange={handleInputChange}
@@ -1072,19 +1074,19 @@ const CourseManagement = () => {
 
             {/* Prerequisites */}
             <div className="mb-4 col-span-2">
-              <label className="block text-gray-700 text-sm font-medium mb-2">Prerequisites (comma separated)</label>
+              <label className="block text-gray-700 text-sm font-medium mb-2">{t("course.prerequisites_comma")}</label>
               <input
                 type="text"
                 value={formData.prerequisites.join(", ")}
                 onChange={handlePrerequisitesChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g. Intro to Statistics, Calculus I"
+                placeholder={t("course.prerequisites_placeholder")}
               />
             </div>
 
             {/* Course Image Upload */}
             <div className="mb-4 col-span-2">
-              <label className="block text-gray-700 text-sm font-medium mb-2">Course Image</label>
+              <label className="block text-gray-700 text-sm font-medium mb-2">{t("course.course_image")}</label>
               <div className="flex items-center space-x-4">
                 <input
                   type="file"
@@ -1099,7 +1101,7 @@ const CourseManagement = () => {
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 cursor-pointer flex items-center"
                 >
                   <Upload size={18} className="mr-2" />
-                  Choose Image
+                  {t("course.choose_image")}
                 </label>
                 {(imagePreview || (formData.image && typeof formData.image === "string")) && (
               <div className="w-16 h-16 overflow-hidden border border-gray-300 rounded-md">
@@ -1123,7 +1125,7 @@ const CourseManagement = () => {
           </div>
 
           <FormField
-            label="Description"
+            label={t("course.description")}
             name="description"
             type="textarea"
             value={formData.description}
@@ -1134,14 +1136,14 @@ const CourseManagement = () => {
           {/* Course Materials Section */}
           <div className="mt-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-800">Course Materials</h3>
+              <h3 className="text-lg font-medium text-gray-800">{t("course.course_materials")}</h3>
               <button
                 type="button"
                 className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 flex items-center text-sm"
                 onClick={() => setShowMaterialForm(true)}
               >
                 <Plus size={16} className="mr-1" />
-                Add Material
+                {t("course.add_material")}
               </button>
             </div>
 
@@ -1166,55 +1168,55 @@ const CourseManagement = () => {
                       className="text-red-500 hover:text-red-700"
                       onClick={() => handleRemoveMaterial(material.id)}
                     >
-                      Remove
+                      {t("course.remove")}
                     </button>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm mb-4">No materials added yet.</p>
+              <p className="text-gray-500 text-sm mb-4">{t("course.no_materials")}</p>
             )}
 
             {/* Material Form */}
             {showMaterialForm && (
               <div className="bg-gray-50 p-4 rounded-md mb-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Add New Material</h4>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">{t("course.add_new_material")}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-gray-700 text-xs font-medium mb-1">Title</label>
+                    <label className="block text-gray-700 text-xs font-medium mb-1">{t("course.title")}</label>
                     <input
                       type="text"
                       name="title"
                       value={materialForm.title}
                       onChange={handleMaterialInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      placeholder="e.g. Course Syllabus"
+                      placeholder={t("course.title_placeholder")}
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 text-xs font-medium mb-1">Type</label>
+                    <label className="block text-gray-700 text-xs font-medium mb-1">{t("course.type")}</label>
                     <select
                       name="type"
                       value={materialForm.type}
                       onChange={handleMaterialInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     >
-                      <option value="pdf">PDF</option>
-                      <option value="docx">DOCX</option>
-                      <option value="ppt">PPT</option>
-                      <option value="other">Other</option>
+                      <option value="pdf">{t("course.pdf")}</option>
+                      <option value="docx">{t("course.docx")}</option>
+                      <option value="ppt">{t("course.ppt")}</option>
+                      <option value="other">{t("course.other")}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-gray-700 text-xs font-medium mb-1">Size</label>
+                    <label className="block text-gray-700 text-xs font-medium mb-1">{t("course.size")}</label>
                     <input
                       type="text"
                       name="size"
                       value={materialForm.size}
                       onChange={handleMaterialInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      placeholder="e.g. 1.2MB"
+                      placeholder={t("course.size_placeholder")}
                       required
                     />
                   </div>
@@ -1225,14 +1227,14 @@ const CourseManagement = () => {
                     className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm"
                     onClick={() => setShowMaterialForm(false)}
                   >
-                    Cancel
+                    {t("course.cancel")}
                   </button>
                   <button
                     type="button"
                     className="px-3 py-1 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] text-sm"
                     onClick={handleAddMaterial}
                   >
-                    Add Material
+                    {t("course.add_material")}
                   </button>
                 </div>
               </div>
@@ -1246,7 +1248,7 @@ const CourseManagement = () => {
               onClick={() => setIsAddModalOpen(false)}
               disabled={isLoading}
             >
-              Cancel
+              {t("course.cancel")}
             </button>
             <button
               type="submit"
@@ -1254,14 +1256,14 @@ const CourseManagement = () => {
               disabled={isLoading}
             >
               <Save size={18} className="inline mr-2" />
-              {isLoading ? "Saving..." : "Save Course"}
+              {isLoading ? t("course.saving") : t("course.save_course")}
             </button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Course Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Course">
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={t("course.edit_course")}>
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -1375,7 +1377,7 @@ const CourseManagement = () => {
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 cursor-pointer flex items-center"
                 >
                   <Upload size={18} className="mr-2" />
-                  {formData.image ? "Change Image" : "Choose Image"}
+                  {formData.image ? t("course.change_image") : t("course.choose_image")}
                 </label>
                 {(imagePreview || formData.image) && (
                   <div className="w-16 h-16 overflow-hidden border border-gray-300">
@@ -1531,14 +1533,14 @@ const CourseManagement = () => {
               disabled={isLoading}
             >
               <Save size={18} className="inline mr-2" />
-              {isLoading ? "Updating..." : "Update Course"}
+              {isLoading ? t("course.updating") : t("course.update_course")}
             </button>
           </div>
         </form>
       </Modal>
 
       {/* View Course Modal */}
-      <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title="Course Details">
+      <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title={t("course.course_details")}>
         {currentCourse && (
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row gap-6">
@@ -1563,36 +1565,36 @@ const CourseManagement = () => {
               </div>
               <div className="md:w-2/3">
                 <h3 className="text-2xl font-bold text-gray-800">{currentCourse.name}</h3>
-                <p className="text-sm text-gray-500 mb-2">Code: {currentCourse.code}</p>
+                <p className="text-sm text-gray-500 mb-2">{t("course.code")}: {currentCourse.code}</p>
                 <p className="text-gray-700 mb-4">{currentCourse.description}</p>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Credits</p>
+                    <p className="text-sm font-medium text-gray-500">{t("course.credits")}</p>
                     <p className="text-gray-800">{currentCourse.credits}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Instructor</p>
+                    <p className="text-sm font-medium text-gray-500">{t("course.instructor")}</p>
                     <p className="text-gray-800">{currentCourse.instructor}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Semester</p>
+                    <p className="text-sm font-medium text-gray-500">{t("course.semester")}</p>
                     <p className="text-gray-800">{currentCourse.semester}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Level</p>
+                    <p className="text-sm font-medium text-gray-500">{t("course.level")}</p>
                     <p className="text-gray-800">{currentCourse.level}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Schedule</p>
+                    <p className="text-sm font-medium text-gray-500">{t("course.schedule")}</p>
                     <p className="text-gray-800">{currentCourse.schedule}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Location</p>
+                    <p className="text-sm font-medium text-gray-500">{t("course.location")}</p>
                     <p className="text-gray-800">{currentCourse.location}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Department</p>
+                    <p className="text-sm font-medium text-gray-500">{t("course.department")}</p>
                     <p className="text-gray-800">{getDepartmentNameById(currentCourse.department_id)}</p>
                   </div>
                 </div>
@@ -1600,7 +1602,7 @@ const CourseManagement = () => {
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Prerequisites</h4>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("course.prerequisites")}</h4>
               {currentCourse.prerequisites && currentCourse.prerequisites.length > 0 ? (
                 <ul className="list-disc pl-5">
                   {Array.isArray(currentCourse.prerequisites) ? (
@@ -1614,12 +1616,12 @@ const CourseManagement = () => {
                   )}
                 </ul>
               ) : (
-                <p className="text-gray-700">No prerequisites</p>
+                <p className="text-gray-700">{t("course.no_prerequisites")}</p>
               )}
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Course Materials</h4>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("course.course_materials")}</h4>
               {currentCourse.materials && currentCourse.materials.length > 0 ? (
                 <div className="space-y-2">
                   {currentCourse.materials.map((material, index) => (
@@ -1635,7 +1637,7 @@ const CourseManagement = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-700">No materials available</p>
+                <p className="text-gray-700">{t("course.no_materials_available")}</p>
               )}
             </div>
           </div>

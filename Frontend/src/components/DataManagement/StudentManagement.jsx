@@ -8,8 +8,11 @@ import {
 import Table from "../common/Table";
 import Modal from "../common/Modal";
 import FormField from "../common/FormField";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const StudentManagement = () => {
+  const { t } = useLanguage()
+
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -256,11 +259,11 @@ const StudentManagement = () => {
   // Table columns configuration
   const columns = [
     {
-      header: "Student",
+      header: t("studentName"),
       accessor: "name",
       render: (row) => (
-        <div className='flex items-center'>
-          <div className='w-8 h-8 rounded-full bg-gray-200 mr-3 overflow-hidden'>
+        <div className="flex items-center">
+          <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden mr-3">
             {row.profile_image ? (
               <img
                 src={`http://localhost:4400/public/img/students/${row.profile_image}`}
@@ -290,10 +293,10 @@ const StudentManagement = () => {
         </div>
       ),
     },
-    { header: "Email", accessor: "email" },
-    { header: "Phone", accessor: "phone" },
+    { header: t("email"), accessor: "email" },
+    { header: t("phone"), accessor: "phone" },
     {
-      header: "Department",
+      header: t("department"),
       accessor: "department_id",
       render: (row) => {
         // Ensure we're returning a string, not an object
@@ -304,11 +307,11 @@ const StudentManagement = () => {
       },
     },
     {
-      header: "Enrollment Year",
+      header: t("enrollmentYear"),
       accessor: "enrollment_year",
     },
     {
-      header: "Status",
+      header: t("status"),
       accessor: "status",
       render: (row) => (
         <span
@@ -319,7 +322,7 @@ const StudentManagement = () => {
           }`}
         >
           {row.status && typeof row.status === "string"
-            ? row.status.charAt(0).toUpperCase() + row.status.slice(1)
+            ? t(row.status)
             : "Unknown"}
         </span>
       ),
@@ -621,7 +624,7 @@ const StudentManagement = () => {
   };
 
   return (
-    <div className='space-y-8'>
+    <div className="space-y-8">
       {/* Enhanced Header Section */}
       <div className="relative bg-gradient-to-br from-[#004B87] via-[#1D3D6F] to-[#2C4F85] rounded-3xl p-8 text-white overflow-hidden shadow-2xl">
         {/* Animated Background Elements */}
@@ -634,26 +637,34 @@ const StudentManagement = () => {
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
           <div className="mb-6 md:mb-0">
             <div className="flex items-center mb-4">
-              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl mr-4 border border-white/30">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl border border-white/30 mr-4">
                 <Users className="h-8 w-8 text-[#F4B400]" />
               </div>
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-                  Student Management
+                  {t("studentManagement")}
                 </h1>
-                <p className="text-white/90 text-lg">Manage student enrollment and records</p>
+                <p className="text-white/90 text-lg">
+                  {t("manageStudentEnrollment")}
+                </p>
               </div>
             </div>
             <div className="flex items-center text-white/70">
               <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm">Student registry • {students.length} enrolled students</span>
+              <span className="text-sm">
+                {t("studentRegistry")} • {students.length} {t("students")}
+              </span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="text-right mb-3 sm:mb-0">
-              <div className="text-2xl font-bold text-[#F4B400]">{students.length}</div>
-              <div className="text-white/60 text-sm">Total Students</div>
+              <div className="text-2xl font-bold text-[#F4B400]">
+                {students.length}
+              </div>
+              <div className="text-white/60 text-sm">
+                {t("totalStudents")}
+              </div>
             </div>
             <button
               className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
@@ -665,7 +676,7 @@ const StudentManagement = () => {
             >
               <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
               <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
-                Add New Student
+                {t("addNewStudent")}
               </span>
             </button>
           </div>
@@ -686,12 +697,18 @@ const StudentManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Users className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Students</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("totalStudents")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{students.length}</p>
+              <p className="text-3xl font-bold text-white">
+                {students.length}
+              </p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
-                <span className="text-green-300 text-xs">+25% this year</span>
+                <span className="text-green-300 text-xs">
+                  +25% {t("thisYear")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -712,12 +729,18 @@ const StudentManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <UserCheck className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Male Students</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("male")} {t("students")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{students.filter((student) => student.gender === "Male").length}</p>
+              <p className="text-3xl font-bold text-white">
+                {students.filter((student) => student.gender === "Male").length}
+              </p>
               <div className="flex items-center mt-2">
                 <Award className="h-4 w-4 text-white/70 mr-1" />
-                <span className="text-white/70 text-xs">{students.length > 0 ? Math.round((students.filter(s => s.gender === "Male").length / students.length) * 100) : 0}% of total</span>
+                <span className="text-white/70 text-xs">
+                  {students.length > 0 ? Math.round((students.filter(s => s.gender === "Male").length / students.length) * 100) : 0}% {t("ofTotal")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -738,12 +761,18 @@ const StudentManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Star className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Female Students</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("female")} {t("students")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{students.filter((student) => student.gender === "Female").length}</p>
+              <p className="text-3xl font-bold text-white">
+                {students.filter((student) => student.gender === "Female").length}
+              </p>
               <div className="flex items-center mt-2">
                 <Target className="h-4 w-4 text-green-200 mr-1" />
-                <span className="text-green-200 text-xs">{students.length > 0 ? Math.round((students.filter(s => s.gender === "Female").length / students.length) * 100) : 0}% of total</span>
+                <span className="text-green-200 text-xs">
+                  {students.length > 0 ? Math.round((students.filter(s => s.gender === "Female").length / students.length) * 100) : 0}% {t("ofTotal")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -764,12 +793,18 @@ const StudentManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <CheckCircle className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Active Students</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("activeStudents")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{students.filter((student) => student.status === "active").length}</p>
+              <p className="text-3xl font-bold text-white">
+                {students.filter((student) => student.status === "active").length}
+              </p>
               <div className="flex items-center mt-2">
                 <Activity className="h-4 w-4 text-purple-200 mr-1" />
-                <span className="text-purple-200 text-xs">Currently enrolled</span>
+                <span className="text-purple-200 text-xs">
+                  {t("currentlyEnrolled")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -899,7 +934,7 @@ const StudentManagement = () => {
           {/* Email Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+              {t("email")}
             </label>
             <input
               type="text"
@@ -914,7 +949,7 @@ const StudentManagement = () => {
           {/* Phone Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone
+              {t("phone")}
             </label>
             <input
               type="text"
@@ -929,7 +964,7 @@ const StudentManagement = () => {
           {/* Department Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Department
+              {t("department")}
             </label>
             <input
               type="text"
@@ -944,7 +979,7 @@ const StudentManagement = () => {
           {/* Enrollment Year Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Enrollment Year
+              {t("enrollmentYear")}
             </label>
             <select
               name="enrollmentYear"
@@ -962,7 +997,7 @@ const StudentManagement = () => {
           {/* Status Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
+              {t("status")}
             </label>
             <select
               name="status"
@@ -1004,7 +1039,7 @@ const StudentManagement = () => {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title='Add New Student'
+        title={t('addNewStudent')}
       >
         <form
           onSubmit={(e) => {
@@ -1014,14 +1049,14 @@ const StudentManagement = () => {
         >
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <FormField
-              label='Full Name'
+              label={t('fullName')}
               name='name'
               value={formData.name}
               onChange={handleInputChange}
               required
             />
             <FormField
-              label='Student ID Number'
+              label={t('studentIdNumber')}
               name='student_id_number'
               value={formData.student_id_number}
               onChange={handleInputChange}
@@ -1031,7 +1066,7 @@ const StudentManagement = () => {
             {/* Department Dropdown */}
             <div className='mb-4'>
               <label className='block text-gray-700 text-sm font-medium mb-2'>
-                Department
+                {t('department')}
               </label>
               <select
                 name='department_id'
@@ -1040,7 +1075,7 @@ const StudentManagement = () => {
                 className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                 required
               >
-                <option value=''>Select a Department</option>
+                <option value=''>{t('selectDepartment')}</option>
                 {departments.map((department) => (
                   <option key={department._id} value={department._id}>
                     {department.name}
@@ -1050,7 +1085,7 @@ const StudentManagement = () => {
             </div>
 
             <FormField
-              label='Enrollment Year'
+              label={t('enrollmentYear')}
               name='enrollment_year'
               type='number'
               value={formData.enrollment_year}
@@ -1058,7 +1093,7 @@ const StudentManagement = () => {
               required
             />
             <FormField
-              label='Date of Birth'
+              label={t('dateOfBirth')}
               name='date_of_birth'
               type='date'
               value={
@@ -1070,20 +1105,20 @@ const StudentManagement = () => {
               required
             />
             <FormField
-              label='Gender'
+              label={t('gender')}
               name='gender'
               type='select'
               value={formData.gender}
               onChange={handleInputChange}
               options={[
-                { value: "Male", label: "Male" },
-                { value: "Female", label: "Female" },
-                { value: "Other", label: "Other" },
+                { value: "Male", label: t("male") },
+                { value: "Female", label: t("female") },
+                { value: "Other", label: t("other") },
               ]}
               required
             />
             <FormField
-              label='Email'
+              label={t('email')}
               name='email'
               type='email'
               value={formData.email}
@@ -1091,22 +1126,22 @@ const StudentManagement = () => {
               required
             />
             <FormField
-              label='Phone'
+              label={t('phone')}
               name='phone'
               value={formData.phone}
               onChange={handleInputChange}
               required
             />
             <FormField
-              label='Status'
+              label={t('status')}
               name='status'
               type='select'
               value={formData.status}
               onChange={handleInputChange}
               options={[
-                { value: "active", label: "Active" },
-                { value: "inactive", label: "Inactive" },
-                { value: "suspended", label: "Suspended" },
+                { value: "active", label: t("active") },
+                { value: "inactive", label: t("inactive") },
+                { value: "suspended", label: t("suspended") },
               ]}
               required
             />
@@ -1114,7 +1149,7 @@ const StudentManagement = () => {
             {/* Profile Image Upload */}
             <div className='mb-4 col-span-2'>
               <label className='block text-gray-700 text-sm font-medium mb-2'>
-                Profile Image
+                {t('profileImage')}
               </label>
               <div className='flex items-center space-x-4'>
                 <input
@@ -1130,13 +1165,13 @@ const StudentManagement = () => {
                   className='px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 cursor-pointer flex items-center'
                 >
                   <Upload size={18} className='mr-2' />
-                  Choose Image
+                  {t('chooseImage')}
                 </label>
                 {imagePreview && (
                   <div className='w-16 h-16 rounded-full overflow-hidden border border-gray-300'>
                     <img
                       src={imagePreview || "/placeholder.svg"}
-                      alt='Profile Preview'
+                      alt={t('profilePreview')}
                       className='w-full h-full object-cover'
                     />
                   </div>
@@ -1146,23 +1181,23 @@ const StudentManagement = () => {
           </div>
 
           <h3 className='font-medium text-gray-800 mt-4 mb-2'>
-            Address Information
+            {t('addressInformation')}
           </h3>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
             <FormField
-              label='Street'
+              label={t('street')}
               name='address.street'
               value={formData.address.street}
               onChange={handleInputChange}
             />
             <FormField
-              label='City'
+              label={t('city')}
               name='address.city'
               value={formData.address.city}
               onChange={handleInputChange}
             />
             <FormField
-              label='Country'
+              label={t('country')}
               name='address.country'
               value={formData.address.country}
               onChange={handleInputChange}
@@ -1176,7 +1211,7 @@ const StudentManagement = () => {
               onClick={() => setIsAddModalOpen(false)}
               disabled={isLoading}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type='submit'
@@ -1184,7 +1219,7 @@ const StudentManagement = () => {
               disabled={isLoading}
             >
               <Save size={18} className='inline mr-2' />
-              {isLoading ? "Saving..." : "Save Student"}
+              {isLoading ? t("saving") : t("saveStudent")}
             </button>
           </div>
         </form>
@@ -1194,7 +1229,7 @@ const StudentManagement = () => {
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title='Edit Student'
+        title={t('editStudent')}
       >
         <form
           onSubmit={(e) => {
@@ -1204,14 +1239,14 @@ const StudentManagement = () => {
         >
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <FormField
-              label='Full Name'
+              label={t('fullName')}
               name='name'
               value={formData.name}
               onChange={handleInputChange}
               required
             />
             <FormField
-              label='Student ID Number'
+              label={t('studentIdNumber')}
               name='student_id_number'
               value={formData.student_id_number}
               onChange={handleInputChange}
@@ -1221,7 +1256,7 @@ const StudentManagement = () => {
             {/* Department Dropdown */}
             <div className='mb-4'>
               <label className='block text-gray-700 text-sm font-medium mb-2'>
-                Department
+                {t('department')}
               </label>
               <select
                 name='department_id'
@@ -1230,7 +1265,7 @@ const StudentManagement = () => {
                 className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                 required
               >
-                <option value=''>Select a Department</option>
+                <option value=''>{t('selectDepartment')}</option>
                 {departments.map((department) => (
                   <option key={department._id} value={department._id}>
                     {department.name}
@@ -1240,7 +1275,7 @@ const StudentManagement = () => {
             </div>
 
             <FormField
-              label='Enrollment Year'
+              label={t('enrollmentYear')}
               name='enrollment_year'
               type='number'
               value={formData.enrollment_year}
@@ -1248,7 +1283,7 @@ const StudentManagement = () => {
               required
             />
             <FormField
-              label='Date of Birth'
+              label={t('dateOfBirth')}
               name='date_of_birth'
               type='date'
               value={
@@ -1260,20 +1295,20 @@ const StudentManagement = () => {
               required
             />
             <FormField
-              label='Gender'
+              label={t('gender')}
               name='gender'
               type='select'
               value={formData.gender}
               onChange={handleInputChange}
               options={[
-                { value: "Male", label: "Male" },
-                { value: "Female", label: "Female" },
-                { value: "Other", label: "Other" },
+                { value: "Male", label: t("male") },
+                { value: "Female", label: t("female") },
+                { value: "Other", label: t("other") },
               ]}
               required
             />
             <FormField
-              label='Email'
+              label={t('email')}
               name='email'
               type='email'
               value={formData.email}
@@ -1281,22 +1316,22 @@ const StudentManagement = () => {
               required
             />
             <FormField
-              label='Phone'
+              label={t('phone')}
               name='phone'
               value={formData.phone}
               onChange={handleInputChange}
               required
             />
             <FormField
-              label='Status'
+              label={t('status')}
               name='status'
               type='select'
               value={formData.status}
               onChange={handleInputChange}
               options={[
-                { value: "active", label: "Active" },
-                { value: "inactive", label: "Inactive" },
-                { value: "suspended", label: "Suspended" },
+                { value: "active", label: t("active") },
+                { value: "inactive", label: t("inactive") },
+                { value: "suspended", label: t("suspended") },
               ]}
               required
             />
@@ -1304,7 +1339,7 @@ const StudentManagement = () => {
             {/* Profile Image Upload */}
             <div className='mb-4 col-span-2'>
               <label className='block text-gray-700 text-sm font-medium mb-2'>
-                Profile Image
+                {t('profileImage')}
               </label>
               <div className='flex items-center space-x-4'>
                 <input
@@ -1320,13 +1355,13 @@ const StudentManagement = () => {
                   className='px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 cursor-pointer flex items-center'
                 >
                   <Upload size={18} className='mr-2' />
-                  {formData.profile_image ? "Change Image" : "Choose Image"}
+                  {formData.profile_image ? t("changeImage") : t("chooseImage")}
                 </label>
                 {imagePreview && (
                   <div className='w-16 h-16 rounded-full overflow-hidden border border-gray-300'>
                     <img
                       src={imagePreview || "/placeholder.svg"}
-                      alt='Profile Preview'
+                      alt={t('profilePreview')}
                       className='w-full h-full object-cover'
                     />
                   </div>
@@ -1336,23 +1371,23 @@ const StudentManagement = () => {
           </div>
 
           <h3 className='font-medium text-gray-800 mt-4 mb-2'>
-            Address Information
+            {t('addressInformation')}
           </h3>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
             <FormField
-              label='Street'
+              label={t('street')}
               name='address.street'
               value={formData.address.street}
               onChange={handleInputChange}
             />
             <FormField
-              label='City'
+              label={t('city')}
               name='address.city'
               value={formData.address.city}
               onChange={handleInputChange}
             />
             <FormField
-              label='Country'
+              label={t('country')}
               name='address.country'
               value={formData.address.country}
               onChange={handleInputChange}
@@ -1366,7 +1401,7 @@ const StudentManagement = () => {
               onClick={() => setIsEditModalOpen(false)}
               disabled={isLoading}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type='submit'
@@ -1374,7 +1409,7 @@ const StudentManagement = () => {
               disabled={isLoading}
             >
               <Save size={18} className='inline mr-2' />
-              {isLoading ? "Updating..." : "Update Student"}
+              {isLoading ? t("updating") : t("updateStudent")}
             </button>
           </div>
         </form>
@@ -1384,7 +1419,7 @@ const StudentManagement = () => {
       <Modal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
-        title='Student Details'
+        title={t('studentDetails')}
       >
         {currentStudent && (
           <div className='space-y-4'>
@@ -1416,21 +1451,20 @@ const StudentManagement = () => {
                   >
                     {currentStudent.status &&
                     typeof currentStudent.status === "string"
-                      ? currentStudent.status.charAt(0).toUpperCase() +
-                        currentStudent.status.slice(1)
-                      : "Unknown"}
+                      ? t(currentStudent.status)
+                      : t("unknown")}
                   </span>
                 </div>
               </div>
               <div className='md:w-2/3'>
                 <h3 className='text-lg font-medium text-gray-800 mb-4'>
-                  Personal Information
+                  {t('personalInformation')}
                 </h3>
 
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
                     <p className='text-sm font-medium text-gray-500'>
-                      Date of Birth
+                      {t('dateOfBirth')}
                     </p>
                     <p className='text-gray-800'>
                       {formatDate(currentStudent.date_of_birth)}
