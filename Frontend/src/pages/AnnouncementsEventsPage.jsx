@@ -62,7 +62,11 @@ const useElementOnScreen = (options) => {
 };
 
 function AnnouncementsEventsPage() {
+
   const { t, language, direction } = useLanguage();
+
+  const { t, isRTL } = useLanguage();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
@@ -113,6 +117,7 @@ function AnnouncementsEventsPage() {
     events: null,
     news: null,
   });
+
 
   // API base URL
   const API_BASE_URL = "http://localhost:4400/api/v1";
@@ -303,11 +308,52 @@ function AnnouncementsEventsPage() {
       announcements: t("news.announcements") || "Announcements",
       events: t("news.events") || "Events",
       news: t("news.news") || "News",
+
+  // Translated content
+  const content = {
+    title: t("News & Events"),
+    subtitle: t("Stay updated with the latest news and upcoming events from the Faculty of Economics"),
+    search: t("Search announcements and events..."),
+    filter: t("Filter by category"),
+    categories: {
+      all: t("All Categories"),
+      academic: t("Academic"),
+      admission: t("Admission"),
+      conference: t("Conference"),
+      workshop: t("Workshop"),
+      seminar: t("Seminar"),
+      cultural: t("Cultural"),
+      research: t("Research"),
+    },
+    featured: {
+      title: t("Featured Announcements"),
+      viewAll: t("View All Announcements"),
+    },
+    upcoming: {
+      title: t("Upcoming Events"),
+      viewAll: t("View All Events"),
+      today: t("Today"),
+      tomorrow: t("Tomorrow"),
+      register: t("Register"),
+      moreInfo: t("More Info"),
+    },
+    news: {
+      title: t("Latest News"),
+      viewAll: t("View All News"),
+      readMore: t("Read More"),
+    },
+    tabs: {
+      all: t("All"),
+      announcements: t("Announcements"),
+      events: t("Events"),
+      news: t("News"),
+
     },
     archive: {
       title: t("news.archive") || "Archive",
       viewMore: t("news.view_more") || "View More",
     },
+
     noResults: t("news.no_results") || "No results found for your search criteria.",
     loading: t("news.loading") || "Loading data...",
     error: t("news.error") || "Error loading data. Please try again later.",
@@ -323,6 +369,17 @@ function AnnouncementsEventsPage() {
     recentAchievements: t("news.recent_achievements") || "Recent updates and achievements",
     registerNow: t("news.register_now") || "Register Now",
     facultyOfEconomics: t("news.faculty_of_economics") || "Faculty of Economics",
+
+    noResults: t("No results found for your search criteria."),
+    loading: t("Loading..."),
+    error: t("Error loading content"),
+    tryAgain: t("Try again"),
+    browseContent: t("Browse Content"),
+    filterContent: t("Filter content by type or use the search above"),
+    importantAnnouncements: t("Important announcements from the faculty"),
+    joinUpcomingEvents: t("Join our upcoming events and activities"),
+    recentUpdates: t("Recent updates and achievements"),
+
   };
 
   // Filter functions
@@ -492,9 +549,16 @@ function AnnouncementsEventsPage() {
 
   // Error component
   const ErrorComponent = () => (
-    <div className='flex items-center justify-center py-12'>
-      <AlertCircle className='h-8 w-8 text-red-500' />
-      <span className='ml-2 text-red-600'>{content.error}</span>
+    <div className='flex flex-col items-center justify-center py-12'>
+      <AlertCircle className='h-8 w-8 text-red-500 mb-2' />
+      <span className='text-red-600 mb-4'>{content.error}</span>
+      <Button
+        variant="outline"
+        onClick={() => window.location.reload()}
+        className="text-red-600 border-red-600 hover:bg-red-50"
+      >
+        {content.tryAgain}
+      </Button>
     </div>
   );
 
@@ -535,8 +599,13 @@ function AnnouncementsEventsPage() {
           <div className='container mx-auto px-4 py-20 md:py-28 relative z-10'>
             <div className={`max-w-4xl ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
               <div className='inline-flex items-center px-3 py-1 rounded-full bg-[#F7B500]/20 text-[#F7B500] text-sm font-medium mb-6'>
+
                 <span className={`${direction === 'rtl' ? 'ml-2' : 'mr-2'}`}>•</span>
                 <span>{content.facultyOfEconomics}</span>
+
+                <span className='mr-2'>•</span>
+                <span>{t("faculty_of_economics")}</span>
+
               </div>
               <h1 className='text-4xl md:text-6xl font-bold tracking-tight mb-4 text-white'>
                 {content.title}
@@ -545,6 +614,23 @@ function AnnouncementsEventsPage() {
                 {content.subtitle}
               </p>
 
+
+              <div className='flex flex-wrap gap-4 mt-10'>
+                <a
+                  href='#announcements'
+                  className='inline-flex items-center px-6 py-3 bg-[#F7B500] hover:bg-[#F7B500]/90 text-[#1D3D6F] font-medium rounded-lg shadow-lg hover:shadow-[#F7B500]/30 transition-all duration-300'
+                >
+                  <Megaphone className='h-5 w-5 mr-2' />
+                  {content.featured.viewAll}
+                </a>
+                <a
+                  href='#events'
+                  className='inline-flex items-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm font-medium rounded-lg transition-all duration-300'
+                >
+                  <CalendarIcon className='h-5 w-5 mr-2' />
+                  {content.upcoming.viewAll}
+                </a>
+              </div>
 
             </div>
           </div>
@@ -650,7 +736,11 @@ function AnnouncementsEventsPage() {
               </div>
               <div className={`${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
                 <p className='text-sm text-[#64748B] font-medium'>
+
                   {content.totalAnnouncements}
+
+                  {content.tabs.announcements}
+
                 </p>
                 <p className='text-2xl font-bold text-[#1D3D6F]'>
                   {announcements.length}
@@ -663,7 +753,11 @@ function AnnouncementsEventsPage() {
               </div>
               <div className={`${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
                 <p className='text-sm text-[#64748B] font-medium'>
+
                   {content.upcomingEventsCount}
+
+                  {content.upcoming.title}
+
                 </p>
                 <p className='text-2xl font-bold text-[#1D3D6F]'>
                   {events.length}
@@ -676,7 +770,11 @@ function AnnouncementsEventsPage() {
               </div>
               <div className={`${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
                 <p className='text-sm text-[#64748B] font-medium'>
+
                   {content.latestNewsCount}
+
+                  {content.news.title}
+
                 </p>
                 <p className='text-2xl font-bold text-[#1D3D6F]'>
                   {news.length}
@@ -796,9 +894,15 @@ function AnnouncementsEventsPage() {
                     }`}
                     style={{ transitionDelay: "0.3s" }}
                   >
+
                     <div className={`flex justify-between items-center mb-6 ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <div className={`flex items-center ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
                         <div className={`bg-[#F7B500]/20 p-2 rounded-lg ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`}>
+
+                    <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={`bg-[#F7B500]/20 p-2 rounded-lg ${isRTL ? 'ml-3' : 'mr-3'}`}>
+
                           <Bell className='h-6 w-6 text-[#F7B500]' />
                         </div>
                         <div className={`${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
@@ -917,9 +1021,15 @@ function AnnouncementsEventsPage() {
                     }`}
                     style={{ transitionDelay: "0.5s" }}
                   >
+
                     <div className={`flex justify-between items-center mb-6 ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <div className={`flex items-center ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
                         <div className={`bg-[#1D3D6F]/10 p-2 rounded-lg ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`}>
+
+                    <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={`bg-[#1D3D6F]/10 p-2 rounded-lg ${isRTL ? 'ml-3' : 'mr-3'}`}>
+
                           <CalendarIcon className='h-6 w-6 text-[#1D3D6F]' />
                         </div>
                         <div className={`${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
@@ -1080,10 +1190,16 @@ function AnnouncementsEventsPage() {
                       : "translate-y-10 opacity-0"
                   }`}
                   style={{ transitionDelay: "0.7s" }}
-                >
+                
+
                   <div className={`flex justify-between items-center mb-6 ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
                     <div className={`flex items-center ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <div className={`bg-[#F7B500]/20 p-2 rounded-lg ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`}>
+
+                  <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className={`bg-[#F7B500]/20 p-2 rounded-lg ${isRTL ? 'ml-3' : 'mr-3'}`}>
+
                         <Newspaper className='h-6 w-6 text-[#F7B500]' />
                       </div>
                       <div className={`${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
@@ -1091,7 +1207,11 @@ function AnnouncementsEventsPage() {
                           {content.news.title}
                         </h2>
                         <p className='text-[#64748B] text-sm'>
+
                           {content.recentAchievements}
+
+                          {content.recentUpdates}
+
                         </p>
                       </div>
                     </div>
@@ -1229,6 +1349,7 @@ function AnnouncementsEventsPage() {
               {error.announcements && <ErrorComponent />}
               {!loading.announcements && !error.announcements && (
                 <>
+
                   {filteredAnnouncements.length === 0 ? (
                     <div className="text-center py-12">
                       <div className="text-gray-400 mb-4">
@@ -1246,6 +1367,72 @@ function AnnouncementsEventsPage() {
                       }}
                     >
                       {filteredAnnouncements.map((announcement) => (
+
+                  {filteredAnnouncements.length > 0 ? (
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                      {filteredAnnouncements.map((announcement) => (
+                    <Card
+                      key={announcement.id}
+                      className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden'
+                    >
+                      <CardContent className='p-6'>
+                        <div className='flex justify-between items-start mb-4'>
+                          <div
+                            className={`text-xs font-medium px-2.5 py-1 rounded-full ${getCategoryColor(
+                              announcement.category
+                            )}`}
+                          >
+                            {content.categories[announcement.category] ||
+                              announcement.category}
+                          </div>
+                          <div className='text-sm text-[#64748B]'>
+                            {formatDate(announcement.date)}
+                          </div>
+                        </div>
+                        <h3 className='text-xl font-bold text-[#1D3D6F] mb-3'>
+                          {announcement.title}
+                        </h3>
+                        <p className='text-[#334155] mb-4'>
+                          {announcement.content}
+                        </p>
+                        <Button
+                          variant='link'
+                          className={`text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}
+                        >
+                          {content.news.readMore}
+                          <ArrowRight className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
+                        </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    </div>
+                  ) : (
+                    <div className='flex flex-col items-center justify-center py-16'>
+                      <Megaphone className='h-16 w-16 text-[#64748B] mb-4' />
+                      <h3 className='text-xl font-semibold text-[#1D3D6F] mb-2'>
+                        {t("No announcements found")}
+                      </h3>
+                      <p className='text-[#64748B] text-center max-w-md'>
+                        {content.noResults}
+                      </p>
+                      <p className='text-[#64748B] text-center max-w-md mt-2'>
+                        {t("Try adjusting your search or filter criteria")}
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+            </TabsContent>
+
+            <TabsContent value='events'>
+              {loading.events && <LoadingComponent />}
+              {error.events && <ErrorComponent />}
+              {!loading.events && !error.events && (
+                <>
+                  {filteredEvents.length > 0 ? (
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                      {filteredEvents.map((event) => (
+
                     <Card
                       key={announcement.id}
                       className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden'
@@ -1282,6 +1469,7 @@ function AnnouncementsEventsPage() {
                           <p className={`text-[#334155] mb-4 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
                             {announcement.content}
                           </p>
+
                           <Button
                             variant='link'
                             className='text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1'
@@ -1417,6 +1605,42 @@ function AnnouncementsEventsPage() {
                           </CardContent>
                         </Card>
                       ))}
+
+                          <div className='space-y-2 mb-4'>
+                            <div className={`flex items-center text-sm text-[#64748B] ${isRTL ? 'flex-row-reverse' : ''}`}>
+                              <CalendarIcon className={`h-4 w-4 text-[#1D3D6F] ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                              <span>{formatDate(event.date)}</span>
+                            </div>
+                            <div className={`flex items-center text-sm text-[#64748B] ${isRTL ? 'flex-row-reverse' : ''}`}>
+                              <Clock className={`h-4 w-4 text-[#1D3D6F] ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                              <span>{event.time}</span>
+                            </div>
+                            <div className={`flex items-center text-sm text-[#64748B] ${isRTL ? 'flex-row-reverse' : ''}`}>
+                              <MapPin className={`h-4 w-4 text-[#1D3D6F] ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                              <span>{event.location}</span>
+                            </div>
+                          </div>
+                          <Button className='w-full bg-[#1D3D6F] hover:bg-[#2C4F85] text-white'>
+                            {content.upcoming.register}
+                          </Button>
+                        </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    </div>
+                  ) : (
+                    <div className='flex flex-col items-center justify-center py-16'>
+                      <CalendarIcon className='h-16 w-16 text-[#64748B] mb-4' />
+                      <h3 className='text-xl font-semibold text-[#1D3D6F] mb-2'>
+                        {t("No events found")}
+                      </h3>
+                      <p className='text-[#64748B] text-center max-w-md'>
+                        {content.noResults}
+                      </p>
+                      <p className='text-[#64748B] text-center max-w-md mt-2'>
+                        {t("Try adjusting your search or filter criteria")}
+                      </p>
+
                     </div>
                   )}
                 </>
@@ -1428,6 +1652,7 @@ function AnnouncementsEventsPage() {
               {error.news && <ErrorComponent />}
               {!loading.news && !error.news && (
                 <>
+
                   {filteredNews.length === 0 ? (
                     <div className="text-center py-12">
                       <div className="text-gray-400 mb-4">
@@ -1548,6 +1773,59 @@ function AnnouncementsEventsPage() {
                           </CardContent>
                         </Card>
                       ))}
+
+                  {filteredNews.length > 0 ? (
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                      {filteredNews.map((item) => (
+                    <Card
+                      key={item.id}
+                      className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden'
+                    >
+                      <CardContent className='p-0'>
+                        <div className='relative h-48 overflow-hidden'>
+                          <img
+                            src={
+                              `http://localhost:4400/public/img/news/${
+                                item.image || "/placeholder.svg"
+                              }` || "/placeholder.svg?height=200&width=400"
+                            }
+                            alt={item.title}
+                            className='w-full h-full object-cover'
+                          />
+                        </div>
+                        <div className='p-6'>
+                          <div className='text-sm text-[#64748B] mb-2'>
+                            {formatDate(item.date)}
+                          </div>
+                          <h3 className='text-xl font-bold text-[#1D3D6F] mb-3'>
+                            {item.title}
+                          </h3>
+                          <p className='text-[#334155] mb-4'>{item.summary}</p>
+                          <Button
+                            variant='link'
+                            className={`text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}
+                          >
+                            {content.news.readMore}
+                            <ArrowRight className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
+                          </Button>
+                        </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    </div>
+                  ) : (
+                    <div className='flex flex-col items-center justify-center py-16'>
+                      <Newspaper className='h-16 w-16 text-[#64748B] mb-4' />
+                      <h3 className='text-xl font-semibold text-[#1D3D6F] mb-2'>
+                        {t("No news found")}
+                      </h3>
+                      <p className='text-[#64748B] text-center max-w-md'>
+                        {content.noResults}
+                      </p>
+                      <p className='text-[#64748B] text-center max-w-md mt-2'>
+                        {t("Try adjusting your search or filter criteria")}
+                      </p>
+
                     </div>
                   )}
                 </>
