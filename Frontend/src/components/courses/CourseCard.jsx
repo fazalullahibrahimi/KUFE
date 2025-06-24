@@ -1,7 +1,10 @@
 import React from "react";
 import { Calendar, User, BookOpen } from "lucide-react";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 export default function CourseCard({ course, onClick }) {
+  const { t, isRTL } = useLanguage();
+
   return (
     <div
       className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer'
@@ -14,7 +17,7 @@ export default function CourseCard({ course, onClick }) {
           className='w-full'
         />
         <div className='absolute top-0 right-0 bg-[#004B87] text-white px-3 py-1 text-sm font-medium rounded-bl-lg'>
-          {course.credits} Credits
+          {course.credits} {t("course.credits")}
         </div>
       </div>
 
@@ -64,7 +67,7 @@ export default function CourseCard({ course, onClick }) {
             onClick(course);
           }}
         >
-          View Details
+          {t("course.view_details")}
         </button>
       </div>
     </div>

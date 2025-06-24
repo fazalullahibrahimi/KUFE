@@ -17,20 +17,30 @@ import {
 import Modal from "./common/Modal";
 import FormField from "./common/FormField";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useAuth } from "../contexts/AuthContext";
 
 const AdminProfile = ({ isOpen, onClose }) => {
   const { t, isRTL } = useLanguage();
+  const { user } = useAuth();
 
-  // State for admin profile data
+  // Helper function to get user image URL
+  const getUserImageUrl = () => {
+    if (user?.image && user.image !== 'default-user.jpg' && user.image.trim() !== '') {
+      return `http://localhost:4400/public/img/users/${user.image}`;
+    }
+    return null;
+  };
+
+  // State for admin profile data - initialize with actual user data
   const [adminData, setAdminData] = useState({
-    name: "Admin User",
-    email: "admin@university.edu",
-    phone: "+1234567890",
-    address: "University Campus, Main Building",
-    role: "System Administrator",
-    department: "Information Technology",
-    joinDate: "2020-01-15",
-    avatar: "/placeholder.svg?height=120&width=120",
+    name: user?.fullName || "User",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    address: user?.address || "",
+    role: user?.role || "User",
+    department: user?.department || "",
+    joinDate: user?.joinDate || "",
+    avatar: getUserImageUrl() || "/placeholder.svg?height=120&width=120",
   });
 
   // State for editing mode
@@ -69,10 +79,30 @@ const AdminProfile = ({ isOpen, onClose }) => {
 
   // Load admin profile data
   useEffect(() => {
-    if (isOpen) {
-      fetchAdminProfile();
+    if (isOpen && user) {
+      // Update adminData when user data changes
+      setAdminData({
+        name: user?.fullName || "User",
+        email: user?.email || "",
+        phone: user?.phone || "",
+        address: user?.address || "",
+        role: user?.role || "User",
+        department: user?.department || "",
+        joinDate: user?.joinDate || "",
+        avatar: getUserImageUrl() || "/placeholder.svg?height=120&width=120",
+      });
+      setEditData({
+        name: user?.fullName || "User",
+        email: user?.email || "",
+        phone: user?.phone || "",
+        address: user?.address || "",
+        role: user?.role || "User",
+        department: user?.department || "",
+        joinDate: user?.joinDate || "",
+        avatar: getUserImageUrl() || "/placeholder.svg?height=120&width=120",
+      });
     }
-  }, [isOpen]);
+  }, [isOpen, user]);
 
   const fetchAdminProfile = async () => {
     try {
@@ -203,7 +233,7 @@ const AdminProfile = ({ isOpen, onClose }) => {
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title="Admin Profile Management"
+        title="Profile Management"
         size="lg"
       >
         <div className={`space-y-6 ${isRTL ? "rtl" : "ltr"}`}>
@@ -212,11 +242,29 @@ const AdminProfile = ({ isOpen, onClose }) => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-4">
                 <div className="relative">
-                  <img
-                    src={isEditing ? editData.avatar : adminData.avatar}
-                    alt="Admin Avatar"
-                    className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
-                  />
+                  <div className="w-20 h-20 bg-[#1D3D6F] rounded-full flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
+                    {(isEditing ? editData.avatar : adminData.avatar) &&
+                     (isEditing ? editData.avatar : adminData.avatar) !== "/placeholder.svg?height=120&width=120" ? (
+                      <img
+                        src={isEditing ? editData.avatar : adminData.avatar}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          const fallbackDiv = e.target.parentElement.querySelector('.fallback-icon');
+                          if (fallbackDiv) {
+                            fallbackDiv.style.display = 'flex';
+                          }
+                        }}
+                      />
+                    ) : null}
+                    <div className={`fallback-icon w-full h-full flex items-center justify-center ${
+                      (isEditing ? editData.avatar : adminData.avatar) &&
+                      (isEditing ? editData.avatar : adminData.avatar) !== "/placeholder.svg?height=120&width=120" ? 'hidden' : 'flex'
+                    }`}>
+                      <User className="h-10 w-10 text-white" />
+                    </div>
+                  </div>
                   {isEditing && (
                     <label className="absolute bottom-0 right-0 bg-[#1D3D6F] text-white p-2 rounded-full cursor-pointer hover:bg-[#2C4F85] transition-colors">
                       <Camera className="h-4 w-4" />
@@ -233,8 +281,12 @@ const AdminProfile = ({ isOpen, onClose }) => {
                   <h3 className="text-2xl font-bold text-[#1D3D6F]">
                     {adminData.name}
                   </h3>
-                  <p className="text-[#2C4F85] font-medium">{adminData.role}</p>
-                  <p className="text-gray-600 text-sm">{adminData.department}</p>
+                  <p className="text-[#2C4F85] font-medium capitalize">
+                    {adminData.role === 'admin' ? 'System Administrator' : adminData.role}
+                  </p>
+                  {adminData.department && (
+                    <p className="text-gray-600 text-sm">{adminData.department}</p>
+                  )}
                 </div>
               </div>
               <div className="flex space-x-2">

@@ -21,27 +21,28 @@ const markSchema = new mongoose.Schema(
     midterm: {
       type: Number,
       min: 0,
-      max: 50,
+      max: 20,
       default: 0,
     },
     final: {
       type: Number,
       min: 0,
-      max: 100,
+      max: 60,
       default: 0,
     },
     assignment: {
       type: Number,
       min: 0,
-      max: 50,
+      max: 20,
       default: 0,
     },
     total: {
       type: Number,
       min: 0,
-      max: 200,
+      max: 100,
       default: function () {
-        return this.midterm + this.final + this.assignment;
+        // Direct sum: midterm (20) + final (60) + assignment (20) = 100 max
+        return (this.midterm || 0) + (this.final || 0) + (this.assignment || 0);
       },
     },
     grade: {

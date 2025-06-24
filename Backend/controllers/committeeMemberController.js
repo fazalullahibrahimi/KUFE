@@ -40,7 +40,12 @@ const createCommitteeMember = async (req, res) => {
 // Update a committee member
 const updateCommitteeMember = async (req, res) => {
   try {
+    console.log('Update committee member request received');
+    console.log('Request params ID:', req.params.id);
+    console.log('Request body:', req.body);
+
     const {
+      userId,
       department,
       academicRank,
       committeePosition,
@@ -48,29 +53,50 @@ const updateCommitteeMember = async (req, res) => {
       phoneNumber,
     } = req.body;
 
+    // Check if the department exists
     const departmentExists = await Department.findById(department);
     if (!departmentExists) {
+      console.log('Department not found:', department);
       return res.status(400).json({ message: 'Department not found' });
     }
 
+    // Check if the user exists (if userId is provided)
+    if (userId) {
+      const User = require('../models/User');
+      const userExists = await User.findById(userId);
+      if (!userExists) {
+        console.log('User not found:', userId);
+        return res.status(400).json({ message: 'User not found' });
+      }
+    }
+
+    console.log('Attempting to update committee member with ID:', req.params.id);
+
+    const updateData = {
+      userId,
+      department,
+      academicRank,
+      committeePosition,
+      email,
+      phoneNumber,
+    };
+
+    console.log('Update data:', updateData);
+
     const updatedMember = await CommitteeMember.findByIdAndUpdate(
-      req.params.id, // use _id instead of userId
-      {
-        department,
-        academicRank,
-        committeePosition,
-        email,
-        phoneNumber,
-      },
+      req.params.id,
+      updateData,
       { new: true }
     )
     .populate('department', 'name')
     .populate('userId', 'fullName email');
 
     if (!updatedMember) {
+      console.log('Committee member not found with ID:', req.params.id);
       return res.status(404).json({ message: 'Committee member not found' });
     }
 
+    console.log('Committee member updated successfully:', updatedMember);
     res.status(200).json(updatedMember);
   } catch (error) {
     console.error(error);

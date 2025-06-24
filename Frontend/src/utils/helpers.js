@@ -54,3 +54,40 @@ export const formatDate = (dateString) => {
 export const isValidObjectId = (id) => {
   return /^[0-9a-fA-F]{24}$/.test(id);
 };
+
+/**
+ * Get the user profile image URL
+ * @param {Object} user - The user object
+ * @param {string} baseUrl - The base URL for images (default: http://localhost:4400/public/img/users)
+ * @returns {string|null} The image URL or null if no valid image
+ */
+export const getUserImageUrl = (user, baseUrl = "http://localhost:4400/public/img/users") => {
+  if (!user?.image || user.image === 'default-user.jpg' || user.image.trim() === '') {
+    return null;
+  }
+  return `${baseUrl}/${user.image}`;
+};
+
+/**
+ * Get the student profile image URL
+ * @param {Object} student - The student object
+ * @returns {string|null} The image URL or null if no valid image
+ */
+export const getStudentImageUrl = (student) => {
+  if (!student?.profile_image || student.profile_image === 'default-student.jpg' || student.profile_image.trim() === '') {
+    return null;
+  }
+  return `http://localhost:4400/public/img/students/${student.profile_image}`;
+};
+
+/**
+ * Get the teacher profile image URL
+ * @param {Object} teacher - The teacher object
+ * @returns {string|null} The image URL or null if no valid image
+ */
+export const getTeacherImageUrl = (teacher) => {
+  if (!teacher?.image || teacher.image === 'default-event.jpg' || teacher.image.trim() === '') {
+    return null;
+  }
+  return `http://localhost:4400/public/img/teachers/${teacher.image}`;
+};

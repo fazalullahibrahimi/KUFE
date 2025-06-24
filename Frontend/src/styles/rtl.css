@@ -1,48 +1,94 @@
-/* RTL Support Styles */
-.rtl {
+/* Sidebar specific RTL styles */
+.rtl .sidebar-item {
+    flex-direction: row-reverse;
+}
+
+.rtl .sidebar-icon {
+    margin-left: 0.75rem;
+    margin-right: 0;
+}
+
+/* Sidebar RTL adjustments */
+.rtl .border-l-4 {
+    border-left: none;
+    border-right: 4px solid;
+}
+
+.rtl .border-r-4 {
+    border-right: none;
+    border-left: 4px solid;
+}
+
+/* Force RTL dashboard layout */
+[dir="rtl"] .flex {
     direction: rtl;
-    text-align: right;
-  }
+}
+
+/* Ensure sidebar appears on right in RTL */
+[dir="rtl"] .min-h-screen.flex {
+    flex-direction: row-reverse !important;
+}
+
+/* RTL flex container adjustments */
+.rtl .flex {
+    direction: rtl;
+}
+
+.rtl .flex-row-reverse {
+    flex-direction: row-reverse !important;
+}
+
+
+
+.rtl .space-x-4 > * + * {
+    margin-left: 0;
+    margin-right: 1rem;
+}
+
+.rtl .space-x-reverse > * + * {
+    margin-left: 0.5rem;
+    margin-right: 0;
+}
   
   /* Flip margins and paddings for RTL */
   .rtl .ml-1 {
-    margin-left: 0;
-    margin-right: 0.25rem;
+    margin-left: 0 !important;
+    margin-right: 0.25rem !important;
   }
-  
+
   .rtl .ml-2 {
-    margin-left: 0;
-    margin-right: 0.5rem;
+    margin-left: 0 !important;
+    margin-right: 0.5rem !important;
   }
-  
+
   .rtl .ml-3 {
-    margin-left: 0;
-    margin-right: 0.75rem;
+    margin-left: 0 !important;
+    margin-right: 0.75rem !important;
   }
-  
+
   .rtl .ml-4 {
-    margin-left: 0;
-    margin-right: 1rem;
+    margin-left: 0 !important;
+    margin-right: 1rem !important;
   }
-  
+
   .rtl .mr-1 {
-    margin-right: 0;
-    margin-left: 0.25rem;
+    margin-right: 0 !important;
+    margin-left: 0.25rem !important;
   }
-  
+
   .rtl .mr-2 {
-    margin-right: 0;
-    margin-left: 0.5rem;
+    margin-right: 0 !important;
+    margin-left: 0.5rem !important;
   }
-  
+
   .rtl .mr-3 {
-    margin-right: 0;
-    margin-left: 0.75rem;
+    margin-right: 0 !important;
+    margin-left: 0.75rem !important;
   }
-  
+
   .rtl .mr-4 {
-    margin-right: 0;
-    margin-left: 1rem;
+    margin-right: 0 !important;
+    margin-left: 1rem !important;
   }
   
   .rtl .pl-10 {
@@ -147,10 +193,247 @@
     border-top-right-radius: 0.5rem;
     border-bottom-right-radius: 0.5rem;
   }
-  
+
   .rtl .rounded-r-lg {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-top-left-radius: 0.5rem;
     border-bottom-left-radius: 0.5rem;
+  }
+
+  /* Dashboard specific RTL improvements */
+  .rtl .dropdown-menu {
+    left: 0;
+    right: auto;
+  }
+
+  .rtl .absolute.right-0 {
+    right: auto;
+    left: 0;
+  }
+
+  .rtl .absolute.left-0 {
+    left: auto;
+    right: 0;
+  }
+
+  /* Sidebar RTL adjustments */
+  .rtl .border-l-4 {
+    border-left: none;
+    border-right: 4px solid;
+  }
+
+  .rtl .border-r-4 {
+    border-right: none;
+    border-left: 4px solid;
+  }
+
+  /* Form and input RTL */
+  .rtl input, .rtl textarea, .rtl select {
+    text-align: right;
+  }
+
+  .rtl .text-left {
+    text-align: right;
+  }
+
+  .rtl .text-right {
+    text-align: left;
+  }
+
+  /* Table RTL */
+  .rtl table {
+    direction: rtl;
+  }
+
+  .rtl th, .rtl td {
+    text-align: right;
+  }
+
+  /* Button and link RTL */
+  .rtl .justify-between {
+    flex-direction: row-reverse;
+  }
+
+  /* Icon positioning RTL */
+  .rtl .icon-left {
+    order: 2;
+    margin-left: 0.5rem;
+    margin-right: 0;
+  }
+
+  .rtl .icon-right {
+    order: -1;
+    margin-right: 0.5rem;
+    margin-left: 0;
+  }
+
+  /* Slider and Carousel RTL Support */
+  .rtl .slider-container {
+    direction: rtl;
+  }
+
+  .rtl .slider-track {
+    direction: rtl;
+  }
+
+  /* Transform adjustments for RTL sliders */
+  .rtl .slider-transform-rtl {
+    transform: scaleX(-1);
+  }
+
+  .rtl .slider-content {
+    direction: rtl;
+  }
+
+  /* Carousel navigation RTL */
+  .rtl .carousel-prev {
+    right: auto;
+    left: 1rem;
+  }
+
+  .rtl .carousel-next {
+    left: auto;
+    right: 1rem;
+  }
+
+  /* Flex row reverse for RTL sliders */
+  .rtl .slider-flex {
+    flex-direction: row-reverse;
+  }
+
+  /* Dashboard slider specific RTL */
+  .rtl .dashboard-slider {
+    direction: rtl;
+  }
+
+  .rtl .dashboard-slider .flex {
+    flex-direction: row-reverse;
+  }
+
+  /* Horizontal scroll containers RTL */
+  .rtl .overflow-x-auto {
+    direction: rtl;
+  }
+
+  .rtl .overflow-x-scroll {
+    direction: rtl;
+  }
+
+  /* Transform adjustments for horizontal sliders */
+  .rtl .translate-x-0 {
+    transform: translateX(0);
+  }
+
+  /* Swiper and carousel specific RTL */
+  .rtl .swiper-container {
+    direction: rtl;
+  }
+
+  .rtl .swiper-wrapper {
+    direction: rtl;
+  }
+
+  /* Featured courses slider RTL */
+  .rtl .featured-courses-slider {
+    direction: rtl;
+  }
+
+  .rtl .featured-courses-slider .flex {
+    flex-direction: row-reverse;
+  }
+
+  /* Navigation buttons RTL positioning */
+  .rtl .slider-nav-prev {
+    right: auto;
+    left: 0;
+  }
+
+  .rtl .slider-nav-next {
+    left: auto;
+    right: 0;
+  }
+
+  /* Ensure proper spacing in RTL sliders */
+  .rtl .gap-6 > * + * {
+    margin-left: 0;
+    margin-right: 1.5rem;
+  }
+
+  .rtl .gap-4 > * + * {
+    margin-left: 0;
+    margin-right: 1rem;
+  }
+
+  /* Dashboard grid RTL adjustments */
+  .rtl .grid {
+    direction: rtl;
+  }
+
+  /* Ensure charts and graphs work in RTL */
+  .rtl .chart-container {
+    direction: ltr; /* Keep charts LTR for proper data display */
+  }
+
+  .rtl canvas {
+    direction: ltr; /* Keep canvas elements LTR */
+  }
+
+  /* Dashboard specific RTL improvements */
+  .rtl .dashboard-card {
+    direction: rtl;
+  }
+
+  .rtl .dashboard-card .flex {
+    flex-direction: row-reverse;
+  }
+
+  /* Notification positioning for RTL */
+  .rtl .fixed.right-4 {
+    right: auto;
+    left: 1rem;
+  }
+
+  .rtl .fixed.left-4 {
+    left: auto;
+    right: 1rem;
+  }
+
+  /* Chart legend positioning for RTL */
+  .rtl .chart-legend {
+    direction: rtl;
+    text-align: right;
+  }
+
+  /* Dashboard grid improvements for RTL */
+  .rtl .grid {
+    direction: rtl;
+  }
+
+  .rtl .grid > * {
+    direction: inherit;
+  }
+
+  /* Ensure proper text alignment in RTL dashboard cards */
+  .rtl .dashboard-card h1,
+  .rtl .dashboard-card h2,
+  .rtl .dashboard-card h3,
+  .rtl .dashboard-card h4,
+  .rtl .dashboard-card h5,
+  .rtl .dashboard-card h6 {
+    text-align: right;
+  }
+
+  .rtl .dashboard-card p,
+  .rtl .dashboard-card span {
+    text-align: right;
+  }
+
+  /* Dashboard button alignment for RTL */
+  .rtl .dashboard-button {
+    direction: rtl;
+  }
+
+  .rtl .dashboard-button .flex {
+    flex-direction: row-reverse;
   }

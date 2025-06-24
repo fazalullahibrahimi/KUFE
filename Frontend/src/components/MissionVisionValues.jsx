@@ -140,15 +140,15 @@ const MissionVisionValues = () => {
   const missionVisionData = [
     {
       id: "mission",
-      title: t("Our Mission") || "Our Mission",
-      content: t("mission_content") || "To provide exceptional economic education and research opportunities that prepare students to become leaders in the global economy.",
-      detailedContent: t("mission_detailed") || "Our mission is to provide world-class economic education that combines theoretical knowledge with practical application. We are committed to developing critical thinking skills, fostering innovation, and preparing our students to tackle complex economic challenges in an increasingly interconnected world. Through rigorous academic programs, cutting-edge research, and industry partnerships, we aim to produce graduates who will become leaders in government, business, and academia.",
+      title: t("about.mission_statement") || "Our Mission",
+      content: t("about.mission_detailed") || "To prepare professional and competent graduates in economics, business administration, national economics, statistics, finance and banking and other economics-promoting fields that better suits the needs of society.",
+      detailedContent: t("about.mission_detailed") || "To prepare professional and competent graduates in economics, business administration, national economics, statistics, finance and banking and other economics-promoting fields that better suits the needs of society. Our mission encompasses providing comprehensive education that combines theoretical knowledge with practical application, ensuring our graduates are well-equipped to contribute meaningfully to Afghanistan's economic development and meet the evolving needs of society.",
       objectives: [
-        "Deliver high-quality undergraduate and graduate programs in economics",
-        "Conduct innovative research that contributes to economic knowledge",
-        "Foster critical thinking and analytical skills in our students",
-        "Prepare graduates for successful careers in various economic sectors",
-        "Promote ethical decision-making in economic practices"
+        t("about.objective_1") || "Identify the role of supply and demand in a market economy",
+        t("about.objective_2") || "Develop academic & administrative professional skills",
+        t("about.objective_3") || "Identify the necessary conditions for market economies to function well",
+        t("about.objective_4") || "Understanding the economic role of government policy and the Central Bank",
+        t("about.objective_5") || "Analyze the economic role of the banking system in economic development"
       ],
       icon: Target,
       gradient: "from-[#004B87] to-[#003366]",
@@ -158,15 +158,15 @@ const MissionVisionValues = () => {
     },
     {
       id: "vision",
-      title: t("Our Vision") || "Our Vision",
-      content: t("vision_content") || "To be recognized as a leading faculty of economics in the region, known for academic excellence and innovative research.",
-      detailedContent: t("vision_detailed") || "We envision becoming the premier destination for economic education in Afghanistan and the broader region. Our vision encompasses being recognized internationally for our academic excellence, groundbreaking research, and the success of our graduates. We strive to be at the forefront of economic thought, contributing to policy development and economic growth while maintaining our commitment to serving our local community and addressing regional economic challenges.",
+      title: t("about.vision_statement") || "Our Vision",
+      content: t("about.vision_detailed") || "Economics Faculty shall be a competitive faculty both locally and nationally by training young professionals in related economics spheres.",
+      detailedContent: t("about.vision_detailed") || "Economics Faculty shall be a competitive faculty both locally and nationally by training young professionals in related economics spheres. We envision becoming a leading institution that sets the standard for economic education in Afghanistan, producing graduates who are not only academically excellent but also practically skilled and ethically grounded to lead economic development initiatives at local, national, and regional levels.",
       objectives: [
-        "Achieve regional recognition for academic excellence",
-        "Establish strong international partnerships and collaborations",
-        "Become a leading center for economic research in Central Asia",
-        "Produce graduates who lead economic development initiatives",
-        "Influence economic policy at national and regional levels"
+        t("about.vision_objective_1") || "Achieve local and national recognition for academic excellence",
+        t("about.vision_objective_2") || "Train young professionals in economics-related fields",
+        t("about.vision_objective_3") || "Establish competitive programs that meet international standards",
+        t("about.vision_objective_4") || "Develop partnerships with industry and government institutions",
+        t("about.vision_objective_5") || "Contribute to Afghanistan's economic policy development"
       ],
       icon: Eye,
       gradient: "from-[#F4B400] to-[#E6A200]",
@@ -180,12 +180,12 @@ const MissionVisionValues = () => {
       content: t("values_content") || "Excellence in education, integrity in research, diversity and inclusion, innovation in teaching methods, and commitment to sustainable development.",
       detailedContent: t("values_detailed") || "Our core values guide every aspect of our work and define our institutional character. We believe in excellence as a standard, not an exception. Integrity forms the foundation of our research and teaching practices. We embrace diversity and promote inclusion, recognizing that different perspectives enrich our academic environment. Innovation drives our teaching methods and research approaches, while our commitment to sustainable development ensures that our work contributes to a better future for all.",
       objectives: [
-        "Maintain the highest standards of academic excellence",
-        "Uphold integrity and ethical practices in all activities",
-        "Promote diversity, inclusion, and equal opportunities",
-        "Foster innovation in teaching and research methodologies",
-        "Commit to sustainable economic development practices",
-        "Build strong partnerships with industry and community"
+        t("about.values_objective_1") || "Maintain the highest standards of academic excellence",
+        t("about.values_objective_2") || "Uphold integrity and ethical practices in all activities",
+        t("about.values_objective_3") || "Promote diversity, inclusion, and equal opportunities",
+        t("about.values_objective_4") || "Foster innovation in teaching and research methodologies",
+        t("about.values_objective_5") || "Commit to sustainable economic development practices",
+        t("about.values_objective_6") || "Build strong partnerships with industry and community"
       ],
       icon: Heart,
       gradient: "from-[#004B87] via-[#003366] to-[#002244]",

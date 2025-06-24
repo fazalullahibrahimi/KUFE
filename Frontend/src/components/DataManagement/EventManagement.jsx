@@ -8,8 +8,12 @@ import {
 import Table from "../common/Table"
 import Modal from "../common/Modal"
 import FormField from "../common/FormField"
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const EventManagement = () => {
+  const { language, t } = useLanguage();
+  const isRTL = language === 'ps' || language === 'dr';
+
   const [events, setEvents] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -111,7 +115,7 @@ const EventManagement = () => {
   // Table columns configuration
   const columns = [
     {
-      header: "Title",
+      header: t("eventTitle"),
       accessor: "title",
       render: (row) => (
         <div className="flex items-center">
@@ -120,19 +124,19 @@ const EventManagement = () => {
           </div>
           <div>
             <p className="font-medium text-gray-800">{row.title}</p>
-            <p className="text-xs text-gray-500">{row.type}</p>
+            <p className="text-xs text-gray-500">{t(row.type)}</p>
           </div>
         </div>
       ),
     },
     {
-      header: "Date",
+      header: t("eventDate"),
       accessor: "date",
       render: (row) => formatDate(row.date),
     },
-    { header: "Location", accessor: "location" },
+    { header: t("eventLocation"), accessor: "location" },
     {
-      header: "Type",
+      header: t("eventType"),
       accessor: "type",
       render: (row) => (
         <span
@@ -144,12 +148,12 @@ const EventManagement = () => {
                 : "bg-green-100 text-green-800"
           }`}
         >
-          {row.type.charAt(0).toUpperCase() + row.type.slice(1)}
+          {t(row.type)}
         </span>
       ),
     },
     {
-      header: "Image",
+      header: t("eventImage"),
       accessor: "image",
       render: (row) => (
         <div className="flex items-center">
@@ -298,7 +302,7 @@ const EventManagement = () => {
   }
 
   const handleDeleteEvent = async (event) => {
-    if (window.confirm(`Are you sure you want to delete "${event.title}"?`)) {
+    if (window.confirm(t('confirmDeleteEvent'))) {
       try {
         const response = await fetch(`http://127.0.0.1:4400/api/v1/events/${event._id}`, {
           method: "DELETE",
@@ -411,21 +415,21 @@ const EventManagement = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-                  Event Management
+                  {t("eventsManagement")}
                 </h1>
-                <p className="text-white/90 text-lg">Organize and manage university events</p>
+                <p className="text-white/90 text-lg">{t("manageEvents")}</p>
               </div>
             </div>
             <div className="flex items-center text-white/70">
               <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm">Event coordination • {events.length} events</span>
+              <span className="text-sm">{t("eventPortfolio")} • {events.length} {t("totalEvents")}</span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="text-right mb-3 sm:mb-0">
               <div className="text-2xl font-bold text-[#F4B400]">{events.length}</div>
-              <div className="text-white/60 text-sm">Total Events</div>
+              <div className="text-white/60 text-sm">{t("totalEvents")}</div>
             </div>
             <button
               className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
@@ -436,7 +440,7 @@ const EventManagement = () => {
             >
               <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
               <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
-                Add New Event
+                {t("addNewEvent")}
               </span>
             </button>
           </div>
@@ -457,12 +461,12 @@ const EventManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Calendar className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Events</p>
+                <p className="text-white/80 text-sm font-medium">{t("totalEvents")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{events.length}</p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
-                <span className="text-green-300 text-xs">+18% this year</span>
+                <span className="text-green-300 text-xs">{t("thisYear")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -483,12 +487,12 @@ const EventManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Clock className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Upcoming Events</p>
+                <p className="text-white/80 text-sm font-medium">{t("upcomingEvents")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{events.filter((event) => new Date(event.date) > new Date()).length}</p>
               <div className="flex items-center mt-2">
                 <Star className="h-4 w-4 text-white/70 mr-1" />
-                <span className="text-white/70 text-xs">Next 30 days</span>
+                <span className="text-white/70 text-xs">{t("eventSchedule")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -509,12 +513,12 @@ const EventManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <CheckCircle className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Event Types</p>
+                <p className="text-white/80 text-sm font-medium">{t("eventsByType")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{new Set(events.map((event) => event.type)).size}</p>
               <div className="flex items-center mt-2">
                 <Target className="h-4 w-4 text-green-200 mr-1" />
-                <span className="text-green-200 text-xs">Diverse categories</span>
+                <span className="text-green-200 text-xs">{t("diverseFields")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -535,12 +539,12 @@ const EventManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <MapPin className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Locations</p>
+                <p className="text-white/80 text-sm font-medium">{t("eventsByLocation")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{new Set(events.map((event) => event.location)).size}</p>
               <div className="flex items-center mt-2">
                 <Building2 className="h-4 w-4 text-purple-200 mr-1" />
-                <span className="text-purple-200 text-xs">Venues used</span>
+                <span className="text-purple-200 text-xs">{t("eventCapacity")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -559,7 +563,7 @@ const EventManagement = () => {
               <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
                 <BarChart3 className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Event Types</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("eventsByType")}</h3>
             </div>
             <Eye className="h-5 w-5 text-gray-400" />
           </div>
@@ -569,7 +573,7 @@ const EventManagement = () => {
               const percentage = events.length > 0 ? ((count / events.length) * 100).toFixed(1) : 0;
               return (
                 <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 capitalize">{type}</span>
+                  <span className="text-sm text-gray-600 capitalize">{t(type)}</span>
                   <div className="flex items-center">
                     <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                       <div
@@ -592,19 +596,19 @@ const EventManagement = () => {
               <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
                 <Clock className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Event Timeline</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("eventSchedule")}</h3>
             </div>
             <Calendar className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Past Events</span>
+              <span className="text-sm text-gray-600">{t("pastEvents")}</span>
               <span className="text-lg font-bold text-[#06B6D4]">
                 {events.filter(e => new Date(e.date) < new Date()).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">This Month</span>
+              <span className="text-sm text-gray-600">{t("thisMonth")}</span>
               <span className="text-lg font-bold text-[#06B6D4]">
                 {events.filter(e => {
                   const eventDate = new Date(e.date);
@@ -614,7 +618,7 @@ const EventManagement = () => {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Next Month</span>
+              <span className="text-sm text-gray-600">{t("nextMonth")}</span>
               <span className="text-lg font-bold text-[#06B6D4]">
                 {events.filter(e => {
                   const eventDate = new Date(e.date);
@@ -634,7 +638,7 @@ const EventManagement = () => {
               <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
                 <MapPin className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Popular Locations</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("popularLocations")}</h3>
             </div>
             <Settings className="h-5 w-5 text-gray-400" />
           </div>
@@ -655,7 +659,7 @@ const EventManagement = () => {
       {/* Event Table */}
       {isLoading ? (
         <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p>Loading events...</p>
+          <p>{t("loadingEvents")}</p>
         </div>
       ) : events.length > 0 ? (
         <Table
@@ -668,12 +672,12 @@ const EventManagement = () => {
         />
       ) : (
         <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p>No events found. Add your first event.</p>
+          <p>{t("noEventsFound")}. {t("addFirstEvent")}.</p>
         </div>
       )}
 
       {/* Add Event Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Event">
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={t("addNewEvent")}>
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -681,9 +685,9 @@ const EventManagement = () => {
           }}
         >
           <div className="grid grid-cols-1 gap-4">
-            <FormField label="Event Title" name="title" value={formData.title} onChange={handleInputChange} required />
+            <FormField label={t("eventTitle")} name="title" value={formData.title} onChange={handleInputChange} required />
             <FormField
-              label="Description"
+              label={t("eventDescription")}
               name="description"
               type="textarea"
               value={formData.description}
@@ -692,7 +696,7 @@ const EventManagement = () => {
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Date and Time"
+                label={t("eventDate")}
                 name="date"
                 type="datetime-local"
                 value={formData.date ? formatDateForInput(formData.date) : ""}
@@ -700,29 +704,29 @@ const EventManagement = () => {
                 required
               />
               <FormField
-                label="Location"
+                label={t("eventLocation")}
                 name="location"
                 value={formData.location}
                 onChange={handleInputChange}
                 required
               />
               <FormField
-                label="Event Type"
+                label={t("eventType")}
                 name="type"
                 type="select"
                 value={formData.type}
                 onChange={handleInputChange}
                 options={[
-                  { value: "seminar", label: "Seminar" },
-                  { value: "conference", label: "Conference" },
+                  { value: "seminar", label: t("seminar") },
+                  { value: "conference", label: t("conference") },
                   { value: "lecture", label: "Lecture" },
-                  { value: "workshop", label: "Workshop" },
-                  { value: "other", label: "Other" },
+                  { value: "workshop", label: t("workshop") },
+                  { value: "other", label: t("other") },
                 ]}
                 required
               />
               <FormField
-                label="Faculty"
+                label={t("eventFaculty")}
                 name="faculty_id"
                 type="select"
                 value={formData.faculty_id}
@@ -737,7 +741,7 @@ const EventManagement = () => {
 
             {/* Image Upload */}
             <div className="mt-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Event Image</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t("eventImage")}</label>
               <div className="flex items-center space-x-4">
                 <div className="flex-1">
                   <div className="mt-1 flex items-center">
@@ -774,21 +778,21 @@ const EventManagement = () => {
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               onClick={() => setIsAddModalOpen(false)}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
             >
               <Save size={18} className="inline mr-2" />
-              Save Event
+              {t("saveEvent")}
             </button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Event Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Event">
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={t("editEvent")}>
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -796,9 +800,9 @@ const EventManagement = () => {
           }}
         >
           <div className="grid grid-cols-1 gap-4">
-            <FormField label="Event Title" name="title" value={formData.title} onChange={handleInputChange} required />
+            <FormField label={t("eventTitle")} name="title" value={formData.title} onChange={handleInputChange} required />
             <FormField
-              label="Description"
+              label={t("eventDescription")}
               name="description"
               type="textarea"
               value={formData.description}
@@ -807,7 +811,7 @@ const EventManagement = () => {
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Date and Time"
+                label={t("eventDate")}
                 name="date"
                 type="datetime-local"
                 value={formData.date ? formatDateForInput(formData.date) : ""}
@@ -815,29 +819,29 @@ const EventManagement = () => {
                 required
               />
               <FormField
-                label="Location"
+                label={t("eventLocation")}
                 name="location"
                 value={formData.location}
                 onChange={handleInputChange}
                 required
               />
               <FormField
-                label="Event Type"
+                label={t("eventType")}
                 name="type"
                 type="select"
                 value={formData.type}
                 onChange={handleInputChange}
                 options={[
-                  { value: "seminar", label: "Seminar" },
-                  { value: "conference", label: "Conference" },
+                  { value: "seminar", label: t("seminar") },
+                  { value: "conference", label: t("conference") },
                   { value: "lecture", label: "Lecture" },
-                  { value: "workshop", label: "Workshop" },
-                  { value: "other", label: "Other" },
+                  { value: "workshop", label: t("workshop") },
+                  { value: "other", label: t("other") },
                 ]}
                 required
               />
               <FormField
-                label="Faculty"
+                label={t("eventFaculty")}
                 name="faculty_id"
                 type="select"
                 value={formData.faculty_id}
@@ -852,7 +856,7 @@ const EventManagement = () => {
 
             {/* Image Upload */}
             <div className="mt-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Event Image</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t("eventImage")}</label>
               <div className="flex items-center space-x-4">
                 <div className="flex-1">
                   <div className="mt-1 flex items-center">
@@ -889,21 +893,21 @@ const EventManagement = () => {
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               onClick={() => setIsEditModalOpen(false)}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
             >
               <Save size={18} className="inline mr-2" />
-              Update Event
+              {t("updateEvent")}
             </button>
           </div>
         </form>
       </Modal>
 
       {/* View Event Modal */}
-      <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title="Event Details">
+      <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title={t("eventDetails")}>
         {currentEvent && (
           <div className="space-y-6">
             {/* Event Image */}
@@ -933,21 +937,21 @@ const EventManagement = () => {
                         : "bg-green-100 text-green-800"
                   }`}
                 >
-                  {currentEvent.type.charAt(0).toUpperCase() + currentEvent.type.slice(1)}
+                  {t(currentEvent.type)}
                 </span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="text-lg font-medium text-gray-800 mb-2">Date & Time</h4>
+                <h4 className="text-lg font-medium text-gray-800 mb-2">{t("eventDate")}</h4>
                 <div className="bg-gray-50 p-4 rounded-md flex items-center">
                   <Calendar size={20} className="text-[#004B87] mr-3" />
                   <p className="text-gray-800">{formatDate(currentEvent.date)}</p>
                 </div>
               </div>
               <div>
-                <h4 className="text-lg font-medium text-gray-800 mb-2">Location</h4>
+                <h4 className="text-lg font-medium text-gray-800 mb-2">{t("eventLocation")}</h4>
                 <div className="bg-gray-50 p-4 rounded-md">
                   <p className="text-gray-800">{currentEvent.location}</p>
                 </div>
@@ -955,12 +959,12 @@ const EventManagement = () => {
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Description</h4>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("eventDescription")}</h4>
               <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentEvent.description}</p>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Faculty</h4>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("eventFaculty")}</h4>
               <div className="bg-gray-50 p-4 rounded-md">
                 <p className="text-gray-800">
                   {faculties.find((f) => f._id === currentEvent.faculty_id)?.name ||

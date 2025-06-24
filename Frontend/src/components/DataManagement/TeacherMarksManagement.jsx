@@ -61,7 +61,7 @@ class ErrorBoundary extends React.Component {
 }
 
 const TeacherMarksManagement = () => {
-  const { t } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
 
   // State for data from API
   const [semesters, setSemesters] = useState([]);
@@ -167,7 +167,7 @@ const TeacherMarksManagement = () => {
     const fetchStudents = async () => {
       try {
         setIsLoading((prev) => ({ ...prev, students: true }));
-        const response = await fetch("http://localhost:4400/api/v1/students/", {
+        const response = await fetch("http://127.0.0.1:4400/api/v1/students/", {
           headers: createHeaders(),
         });
         const data = await response.json();
@@ -546,10 +546,11 @@ const TeacherMarksManagement = () => {
     const finalValue = Number(final) || 0;
     const assignmentValue = Number(assignment) || 0;
 
+    // Direct sum calculation (out of 100)
+    // Midterm (0-20) + Final (0-60) + Assignment (0-20) = Total (0-100)
     const total = midtermValue + finalValue + assignmentValue;
 
-    // Modified grade calculation to match server's expected enum values
-    // Assuming the server accepts: A, B, C, D, F (without + or -)
+    // Grade calculation based on total score (0-100)
     let grade = "F";
     if (total >= 90) grade = "A";
     else if (total >= 80) grade = "B";
@@ -565,12 +566,12 @@ const TeacherMarksManagement = () => {
     try {
       // Validate required fields
       if (!marksFormData.student_id) {
-        showError("Please select a student");
+        showError(t("pleaseSelectStudent"));
         return;
       }
 
       if (!marksFormData.subject_id) {
-        showError("Please select a subject");
+        showError(t("pleaseSelectSubject"));
         return;
       }
 
@@ -605,14 +606,12 @@ const TeacherMarksManagement = () => {
         }
 
         if (!semester_id) {
-          alert("Please select a semester");
+          alert(t("pleaseSelectSemester"));
           return;
         }
 
         if (!teacher_id) {
-          alert(
-            "The selected subject has no assigned teacher. Please assign a teacher to the subject first."
-          );
+          alert(t("noTeacherAssigned"));
           return;
         }
       }
@@ -636,7 +635,7 @@ const TeacherMarksManagement = () => {
       };
 
       const response = await fetch(
-        `http://localhost:4400/api/v1/students/${marksFormData.student_id}/marks`,
+        `http://127.0.0.1:4400/api/v1/students/${marksFormData.student_id}/marks`,
         {
           method: "POST",
           headers: createHeaders(),
@@ -649,7 +648,7 @@ const TeacherMarksManagement = () => {
       if (data.status === "success") {
         // Refresh students data to get updated marks
         const refreshResponse = await fetch(
-          "http://localhost:4400/api/v1/students/",
+          "http://127.0.0.1:4400/api/v1/students/",
           {
             headers: createHeaders(),
           }
@@ -666,12 +665,12 @@ const TeacherMarksManagement = () => {
 
         setIsAddMarksModalOpen(false);
         resetMarksForm();
-        alert(data.message || "Marks added successfully!");
+        alert(data.message || t("marksAddedSuccessfully"));
       } else {
-        alert(`Failed to add marks: ${data.message || "Please try again."}`);
+        alert(`${t("failedToAddMarks")}: ${data.message || t("pleaseSelectSubject")}`);
       }
     } catch (error) {
-      alert("Failed to add marks. Please try again.");
+      alert(t("failedToAddMarks"));
     }
   };
 
@@ -716,7 +715,7 @@ const TeacherMarksManagement = () => {
       };
 
       const response = await fetch(
-        `http://localhost:4400/api/v1/students/${editingMark.student_id}/marks/${editingMark.markIndex}`,
+        `http://127.0.0.1:4400/api/v1/students/${editingMark.student_id}/marks/${editingMark.markIndex}`,
         {
           method: "PATCH",
           headers: createHeaders(),
@@ -729,7 +728,7 @@ const TeacherMarksManagement = () => {
       if (data.status === "success") {
         // Refresh students data to get updated marks
         const refreshResponse = await fetch(
-          "http://localhost:4400/api/v1/students/",
+          "http://127.0.0.1:4400/api/v1/students/",
           {
             headers: createHeaders(),
           }
@@ -747,18 +746,18 @@ const TeacherMarksManagement = () => {
         setIsEditMarksModalOpen(false);
         setEditingMark(null);
         resetMarksForm();
-        alert("Marks updated successfully!");
+        alert(t("marksUpdatedSuccessfully"));
       } else {
-        alert(`Failed to update marks: ${data.message || "Please try again."}`);
+        alert(`${t("failedToUpdateMarks")}: ${data.message || t("pleaseSelectSubject")}`);
       }
     } catch (error) {
-      alert("Failed to update marks. Please try again.");
+      alert(t("failedToUpdateMarks"));
     }
   };
 
   // Delete marks function
   const handleDeleteMarks = async (mark) => {
-    if (!window.confirm("Are you sure you want to delete this mark record?")) {
+    if (!window.confirm(t("confirmDeleteGrades"))) {
       return;
     }
 
@@ -771,7 +770,7 @@ const TeacherMarksManagement = () => {
       }
 
       const response = await fetch(
-        `http://localhost:4400/api/v1/students/${mark.student_id}/marks/${actualMarkIndex}`,
+        `http://127.0.0.1:4400/api/v1/students/${mark.student_id}/marks/${actualMarkIndex}`,
         {
           method: "DELETE",
           headers: createHeaders(),
@@ -783,7 +782,7 @@ const TeacherMarksManagement = () => {
       if (data.status === "success") {
         // Refresh students data to get updated marks
         const refreshResponse = await fetch(
-          "http://localhost:4400/api/v1/students/",
+          "http://127.0.0.1:4400/api/v1/students/",
           {
             headers: createHeaders(),
           }
@@ -921,7 +920,7 @@ const TeacherMarksManagement = () => {
         // Add to import promises
         importPromises.push(
           fetch(
-            `http://localhost:4400/api/v1/students/${rowData.student_id}/marks`,
+            `http://127.0.0.1:4400/api/v1/students/${rowData.student_id}/marks`,
             {
               method: "POST",
               headers: createHeaders(),
@@ -940,7 +939,7 @@ const TeacherMarksManagement = () => {
       Promise.all(importPromises)
         .then(() => {
           // Refresh students data
-          return fetch("http://localhost:4400/api/v1/students/", {
+          return fetch("http://127.0.0.1:4400/api/v1/students/", {
             headers: createHeaders(),
           });
         })
@@ -1046,7 +1045,7 @@ const TeacherMarksManagement = () => {
     isLoading.marks
   ) {
     return (
-      <div className='flex justify-center items-center h-64'>
+      <div className={`flex justify-center items-center h-64 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-[#004B87] mx-auto mb-4'></div>
           <p className='text-gray-600'>{t("loading")}</p>
@@ -1062,79 +1061,87 @@ const TeacherMarksManagement = () => {
 
   return (
     <ErrorBoundary>
-      <div className='w-full min-h-screen space-y-6'>
+      <div
+        className={`w-full min-h-screen space-y-6 ${isRTL ? 'rtl' : 'ltr'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+        style={{
+          direction: isRTL ? 'rtl' : 'ltr',
+          textAlign: isRTL ? 'right' : 'left'
+        }}
+      >
       {/* Header Section */}
       <div className='relative overflow-hidden bg-gradient-to-br from-white via-[#E8ECEF]/30 to-[#E8ECEF]/50 rounded-2xl border border-[#E8ECEF]/50 shadow-lg'>
         {/* Background Pattern */}
         <div className='absolute inset-0 bg-gradient-to-br from-[#1D3D6F]/5 via-transparent to-[#2C4F85]/5'></div>
-        <div className='absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#F7B500]/10 to-transparent rounded-full blur-3xl'></div>
-        <div className='absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[#2C4F85]/10 to-transparent rounded-full blur-2xl'></div>
+        <div className={`absolute top-0 w-64 h-64 bg-gradient-to-bl from-[#F7B500]/10 to-transparent rounded-full blur-3xl ${isRTL ? 'left-0' : 'right-0'}`}></div>
+        <div className={`absolute bottom-0 w-48 h-48 bg-gradient-to-tr from-[#2C4F85]/10 to-transparent rounded-full blur-2xl ${isRTL ? 'right-0' : 'left-0'}`}></div>
 
         <div className='relative p-8'>
-          <div className='flex items-center justify-between mb-6'>
-            <div className='flex items-center space-x-4'>
+          <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
               <div className='p-3 bg-gradient-to-br from-[#1D3D6F] to-[#2C4F85] rounded-xl shadow-lg'>
                 <BookOpen className='h-8 w-8 text-white' />
               </div>
               <div>
                 <h2 className='text-2xl font-bold bg-gradient-to-r from-[#000000] via-[#1D3D6F] to-[#2C4F85] bg-clip-text text-transparent'>
-                  Academic Grade Management System
+                  {t("academicGradeManagementSystem")}
                 </h2>
                 <p className='text-gray-600 mt-1'>
-                  Comprehensive academic records and grade management system for
-                  students and faculty
+                  {t("comprehensiveAcademicRecords")}
                 </p>
               </div>
             </div>
-            <div className='hidden md:flex items-center space-x-2 text-[#1D3D6F]'>
+            <div className={`hidden md:flex items-center text-[#1D3D6F] ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
               <BarChart3 className='h-5 w-5' />
-              <span className='text-sm font-medium'>Instructor Dashboard</span>
+              <span className='text-sm font-medium'>{t("instructorDashboard")}</span>
             </div>
           </div>
 
           {/* Filters Section */}
           <div className='bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-white/50 shadow-sm'>
-            <div className='flex items-center space-x-2 mb-4'>
+            <div className={`flex items-center mb-4 ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
               <Filter className='h-5 w-5 text-[#1D3D6F]' />
               <h3 className='text-lg font-medium text-gray-800'>
-                Filter & Search Options
+                {t("filterSearchOptions")}
               </h3>
             </div>
 
             <div className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-4'>
               <div>
-                <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                <label className={`text-sm font-medium text-gray-700 mb-2 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`p-1 bg-[#E8ECEF] rounded-lg ${isRTL ? 'ml-2' : 'mr-2'}`}>
                     <Calendar className='h-4 w-4 text-[#1D3D6F]' />
                   </div>
-                  Academic Semester
+                  {t("academicSemester")}
                 </label>
                 <select
-                  className='w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
+                  className={`w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200 ${isRTL ? 'text-right' : 'text-left'}`}
                   value={selectedSemester}
                   onChange={handleSemesterChange}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 >
-                  <option value=''>All Semesters</option>
+                  <option value=''>{t("allSemesters")}</option>
                   {semesters.map((semester) => (
                     <option key={semester._id} value={semester._id}>
-                      {String(semester.name || 'Unnamed Semester')}
+                      {String(semester.name || t("unknownSemester"))}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                <label className={`text-sm font-medium text-gray-700 mb-2 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`p-1 bg-[#E8ECEF] rounded-lg ${isRTL ? 'ml-2' : 'mr-2'}`}>
                     <BookOpen className='h-4 w-4 text-[#2C4F85]' />
                   </div>
-                  Course Subject
+                  {t("courseSubject")}
                 </label>
                 <select
-                  className='w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
+                  className={`w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200 ${isRTL ? 'text-right' : 'text-left'}`}
                   value={selectedSubject || ""}
                   onChange={handleSubjectChange}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 >
-                  <option value=''>All Course Subjects</option>
+                  <option value=''>{t("allCourseSubjects")}</option>
                   {subjects
                     .filter((subject) => {
                       if (!selectedSemester) return true;
@@ -1143,48 +1150,50 @@ const TeacherMarksManagement = () => {
                     })
                     .map((subject) => (
                       <option key={subject._id} value={subject._id}>
-                        {String(subject.code || 'N/A')} - {String(subject.name || 'Unnamed Subject')}
+                        {String(subject.code || 'N/A')} - {String(subject.name || t("unknownSubject"))}
                       </option>
                     ))}
                 </select>
               </div>
               <div>
-                <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                <label className={`text-sm font-medium text-gray-700 mb-2 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`p-1 bg-[#E8ECEF] rounded-lg ${isRTL ? 'ml-2' : 'mr-2'}`}>
                     <Users className='h-4 w-4 text-[#F7B500]' />
                   </div>
-                  Student
+                  {t("student")}
                 </label>
                 <select
-                  className='w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
+                  className={`w-full p-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200 ${isRTL ? 'text-right' : 'text-left'}`}
                   value={selectedStudent || ""}
                   onChange={handleStudentChange}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 >
-                  <option value=''>All Students</option>
+                  <option value=''>{t("allStudents")}</option>
                   {students.map((student) => (
                     <option key={student._id} value={student._id}>
-                      {String(student.name || 'Unnamed Student')} ({String(student.student_id_number || 'N/A')})
+                      {String(student.name || t("unknownStudent"))} ({String(student.student_id_number || 'N/A')})
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
-                  <div className='p-1 bg-[#E8ECEF] rounded-lg mr-2'>
+                <label className={`text-sm font-medium text-gray-700 mb-2 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`p-1 bg-[#E8ECEF] rounded-lg ${isRTL ? 'ml-2' : 'mr-2'}`}>
                     <Search className='h-4 w-4 text-[#1D3D6F]' />
                   </div>
-                  Search Records
+                  {t("searchRecords")}
                 </label>
                 <div className='relative'>
                   <input
                     type='text'
-                    placeholder='Search by student name, ID, or course subject...'
-                    className='w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200'
+                    placeholder={t("searchByStudentNameId")}
+                    className={`w-full py-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-[#1D3D6F] focus:border-transparent transition-all duration-200 ${isRTL ? 'pr-10 pl-4 text-right' : 'pl-10 pr-4 text-left'}`}
                     value={searchTerm}
                     onChange={handleSearchChange}
+                    dir={isRTL ? 'rtl' : 'ltr'}
                   />
                   <Search
-                    className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'
+                    className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`}
                     size={18}
                   />
                 </div>
@@ -1192,23 +1201,23 @@ const TeacherMarksManagement = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className='flex flex-wrap gap-3 justify-end pt-4 border-t border-gray-100'>
+            <div className={`flex flex-wrap gap-3 pt-4 border-t border-gray-100 ${isRTL ? 'justify-start' : 'justify-end'}`}>
               <button
-                className='flex items-center px-4 py-2 bg-gradient-to-r from-[#F7B500] to-[#F7B500]/80 text-white rounded-lg hover:from-[#F7B500]/90 hover:to-[#F7B500]/70 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                className={`flex items-center px-4 py-2 bg-gradient-to-r from-[#F7B500] to-[#F7B500]/80 text-white rounded-lg hover:from-[#F7B500]/90 hover:to-[#F7B500]/70 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${isRTL ? 'flex-row-reverse' : ''}`}
                 onClick={() => setIsImportModalOpen(true)}
               >
-                <Upload size={18} className='mr-2' />
-                Import Academic Data
+                <Upload size={18} className={isRTL ? 'ml-2' : 'mr-2'} />
+                {t("importAcademicData")}
               </button>
               <button
-                className='flex items-center px-4 py-2 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                className={`flex items-center px-4 py-2 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${isRTL ? 'flex-row-reverse' : ''}`}
                 onClick={() => {
                   resetMarksForm();
                   setIsAddMarksModalOpen(true);
                 }}
               >
-                <Plus size={18} className='mr-2' />
-                Add New Academic Grades
+                <Plus size={18} className={isRTL ? 'ml-2' : 'mr-2'} />
+                {t("addNewAcademicGrades")}
               </button>
             </div>
           </div>
@@ -1223,23 +1232,22 @@ const TeacherMarksManagement = () => {
 
         {/* Academic Records Table */}
         <div className='border-t border-[#E8ECEF] pt-8'>
-          <div className='flex items-center justify-between mb-6'>
-            <div className='flex items-center space-x-3'>
+          <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
               <div className='p-2 bg-[#E8ECEF] rounded-lg'>
                 <BarChart3 className='h-5 w-5 text-[#1D3D6F]' />
               </div>
               <div>
                 <h3 className='text-xl font-semibold bg-gradient-to-r from-[#000000] to-[#1D3D6F] bg-clip-text text-transparent'>
-                  Student Academic Records
+                  {t("studentAcademicRecords")}
                   {selectedSemesterName && (
-                    <span className='ml-2 text-[#2C4F85] font-normal text-lg'>
+                    <span className={`text-[#2C4F85] font-normal text-lg ${isRTL ? 'mr-2' : 'ml-2'}`}>
                       - {selectedSemesterName}
                     </span>
                   )}
                 </h3>
                 <p className='text-sm text-gray-600 mt-1'>
-                  Comprehensive academic performance tracking and grade
-                  management
+                  {t("comprehensiveAcademicPerformanceTracking")}
                 </p>
               </div>
             </div>
@@ -1251,22 +1259,22 @@ const TeacherMarksManagement = () => {
                   <FileText className='h-12 w-12 text-[#1D3D6F]' />
                 </div>
                 <h3 className='text-xl font-semibold text-gray-800 mb-3'>
-                  No Academic Records Found
+                  {t("noAcademicRecordsFound")}
                 </h3>
                 <p className='text-gray-600 mb-6 max-w-md mx-auto'>
                   {searchTerm
-                    ? "No academic records match your search criteria. Please try different keywords."
-                    : "No academic grades have been recorded for this semester and subject yet."}
+                    ? t("noAcademicRecordsMatch")
+                    : t("noAcademicGradesRecorded")}
                 </p>
                 <button
-                  className='px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2 mx-auto'
+                  className={`px-6 py-3 bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white rounded-lg hover:from-[#2C4F85] hover:to-[#1D3D6F] transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center mx-auto ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}
                   onClick={() => {
                     resetMarksForm();
                     setIsAddMarksModalOpen(true);
                   }}
                 >
                   <Plus className='h-4 w-4' />
-                  <span>Add New Academic Grades</span>
+                  <span>{t("addNewAcademicGrades")}</span>
                 </button>
               </div>
             ) : (
@@ -1274,41 +1282,41 @@ const TeacherMarksManagement = () => {
                 <table className='min-w-full divide-y divide-gray-200'>
                   <thead className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85]'>
                     <tr>
-                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                        <div className='flex items-center space-x-2'>
+                      <th className={`px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                           <Users className='h-4 w-4' />
-                          <span>Student Information</span>
+                          <span>{t("studentInformation")}</span>
                         </div>
                       </th>
-                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                        <div className='flex items-center space-x-2'>
+                      <th className={`px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                           <BookOpen className='h-4 w-4' />
-                          <span>Course Subject</span>
+                          <span>{t("courseSubject")}</span>
                         </div>
                       </th>
-                      <th className='px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider'>
-                        <div className='flex items-center space-x-2'>
+                      <th className={`px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                           <Calendar className='h-4 w-4' />
-                          <span>Academic Semester</span>
+                          <span>{t("academicSemester")}</span>
                         </div>
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        Midterm Exam
+                        {t("midtermExam")} (/20)
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        Final Exam
+                        {t("finalExam")} (/60)
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        Assignment
+                        {t("assignment")} (/20)
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        <div className='flex items-center justify-center space-x-2'>
+                        <div className={`flex items-center justify-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                           <Award className='h-4 w-4' />
-                          <span>Total Grade</span>
+                          <span>{t("totalGrade")} (/100)</span>
                         </div>
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        Actions
+                        {t("actions")}
                       </th>
                     </tr>
                   </thead>
@@ -1373,24 +1381,24 @@ const TeacherMarksManagement = () => {
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#2C4F85]/10 text-[#2C4F85]'>
-                              {midterm}
+                              {midterm}/20
                             </span>
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#1D3D6F]/10 text-[#1D3D6F]'>
-                              {final}
+                              {final}/60
                             </span>
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#F7B500]/10 text-[#F7B500]'>
-                              {assignment}
+                              {assignment}/20
                             </span>
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <div className='flex items-center justify-center'>
                               <span className='inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-[#E8ECEF] to-[#E8ECEF]/80 text-[#1D3D6F] border border-[#E8ECEF]'>
                                 <Award className='h-4 w-4 mr-2 text-[#F7B500]' />
-                                {total}
+                                {total}/100
                               </span>
                             </div>
                           </td>
@@ -1610,23 +1618,23 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label='Midterm Examination (Max: 30 points)'
+                label='Midterm Examination (Max: 20 points)'
                 name='midterm'
                 type='number'
                 value={marksFormData.midterm}
                 onChange={handleMarksInputChange}
                 min='0'
-                max='30'
+                max='20'
                 required
               />
               <FormField
-                label='Final Examination (Max: 70 points)'
+                label='Final Examination (Max: 60 points)'
                 name='final'
                 type='number'
                 value={marksFormData.final}
                 onChange={handleMarksInputChange}
                 min='0'
-                max='70'
+                max='60'
                 required
               />
 
@@ -1637,6 +1645,24 @@ const TeacherMarksManagement = () => {
                 onChange={handleMarksInputChange}
                 placeholder='Optional academic performance remarks'
               />
+            </div>
+
+            {/* Scoring System Info */}
+            <div className='bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6'>
+              <div className='flex items-start space-x-3'>
+                <div className='p-2 bg-blue-100 rounded-lg'>
+                  <BookOpen className='h-4 w-4 text-blue-600' />
+                </div>
+                <div>
+                  <h5 className='text-sm font-semibold text-blue-800 mb-1'>Scoring System</h5>
+                  <p className='text-xs text-blue-700'>
+                    <strong>Midterm:</strong> 0-20 points • <strong>Final:</strong> 0-60 points • <strong>Assignment:</strong> 0-20 points
+                  </p>
+                  <p className='text-xs text-blue-600 mt-1'>
+                    Total out of 100: A (90+), B (80-89), C (70-79), D (60-69), F (&lt;60)
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Grade Preview Section */}
@@ -1677,7 +1703,7 @@ const TeacherMarksManagement = () => {
                           marksFormData.assignment
                         ).total
                       : "0"}
-                    <span className='text-lg text-gray-500 ml-1'>/120</span>
+                    <span className='text-lg text-gray-500 ml-1'>/100</span>
                   </p>
                   <div className='mt-2 flex items-center'>
                     <TrendingUp className='h-4 w-4 text-[#F7B500] mr-1' />
@@ -1759,33 +1785,33 @@ const TeacherMarksManagement = () => {
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             <FormField
-              label={t("marks.midterm")}
+              label={`${t("marks.midterm")} (Max: 20)`}
               type='number'
               name='midterm'
               value={marksFormData.midterm}
               onChange={handleMarksInputChange}
               min='0'
-              max='100'
+              max='20'
             />
 
             <FormField
-              label={t("marks.final")}
+              label={`${t("marks.final")} (Max: 60)`}
               type='number'
               name='final'
               value={marksFormData.final}
               onChange={handleMarksInputChange}
               min='0'
-              max='100'
+              max='60'
             />
 
             <FormField
-              label={t("marks.assignment")}
+              label={`${t("marks.assignment")} (Max: 20)`}
               type='number'
               name='assignment'
               value={marksFormData.assignment}
               onChange={handleMarksInputChange}
               min='0'
-              max='100'
+              max='20'
             />
           </div>
 

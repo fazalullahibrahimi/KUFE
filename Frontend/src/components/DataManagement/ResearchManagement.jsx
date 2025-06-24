@@ -8,8 +8,12 @@ import {
 import Table from "../common/Table"
 import Modal from "../common/Modal"
 import FormField from "../common/FormField"
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const ResearchManagement = () => {
+  const { language, t } = useLanguage();
+  const isRTL = language === 'ps' || language === 'dr';
+
   const [researches, setResearches] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -72,7 +76,7 @@ const ResearchManagement = () => {
   // Table columns configuration
   const columns = [
     {
-      header: "Title",
+      header: t("researchTitle"),
       accessor: "title",
       render: (row) => (
         <div className="flex items-center">
@@ -87,16 +91,16 @@ const ResearchManagement = () => {
       ),
     },
     {
-      header: "Publication Date",
+      header: t("publicationDate"),
       accessor: "publication_date",
       render: (row) => formatDate(row.publication_date),
     },
     {
-      header: "Pages",
+      header: t("researchPages"),
       accessor: "pages",
     },
     {
-      header: "Status",
+      header: t("researchStatus"),
       accessor: "status",
       render: (row) => (
         <span
@@ -108,7 +112,7 @@ const ResearchManagement = () => {
                 : "bg-yellow-100 text-yellow-800"
           }`}
         >
-          {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+          {t(row.status)}
         </span>
       ),
     },
@@ -133,7 +137,7 @@ const ResearchManagement = () => {
         pages: Number.parseInt(formData.pages, 10) || 0,
       }
 
-      const response = await fetch("http://localhost:4400/api/v1/research/", {
+      const response = await fetch("http://127.0.0.1:4400/api/v1/research/", {
         method: "POST",
         headers: createHeaders(),
         body: JSON.stringify(payload),
@@ -143,7 +147,7 @@ const ResearchManagement = () => {
 
       if (data.status === "success") {
         // Refresh the research list
-        const refreshResponse = await fetch("http://localhost:4400/api/v1/research/", {
+        const refreshResponse = await fetch("http://127.0.0.1:4400/api/v1/research/", {
           headers: createHeaders(),
         })
         const refreshData = await refreshResponse.json()
@@ -176,7 +180,7 @@ const ResearchManagement = () => {
         pages: Number.parseInt(formData.pages, 10) || 0,
       }
 
-      const response = await fetch(`http://localhost:4400/api/v1/research/${currentResearch._id}`, {
+      const response = await fetch(`http://127.0.0.1:4400/api/v1/research/${currentResearch._id}`, {
         method: "PATCH",
         headers: createHeaders(),
         body: JSON.stringify(payload),
@@ -186,7 +190,7 @@ const ResearchManagement = () => {
 
       if (data.status === "success") {
         // Refresh the research list
-        const refreshResponse = await fetch("http://localhost:4400/api/v1/research/", {
+        const refreshResponse = await fetch("http://127.0.0.1:4400/api/v1/research/", {
           headers: createHeaders(),
         })
         const refreshData = await refreshResponse.json()
@@ -207,9 +211,9 @@ const ResearchManagement = () => {
   }
 
   const handleDeleteResearch = async (research) => {
-    if (window.confirm(`Are you sure you want to delete "${research.title}"?`)) {
+    if (window.confirm(t('confirmDeleteResearch'))) {
       try {
-        const response = await fetch(`http://localhost:4400/api/v1/research/${research._id}`, {
+        const response = await fetch(`http://127.0.0.1:4400/api/v1/research/${research._id}`, {
           method: "DELETE",
           headers: createHeaders(),
         })
@@ -218,7 +222,7 @@ const ResearchManagement = () => {
 
         if (data.status === "success") {
           // Refresh the research list
-          const refreshResponse = await fetch("http://localhost:4400/api/v1/research/", {
+          const refreshResponse = await fetch("http://127.0.0.1:4400/api/v1/research/", {
             headers: createHeaders(),
           })
           const refreshData = await refreshResponse.json()
@@ -313,21 +317,21 @@ const ResearchManagement = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-                  Research Management
+                  {t("researchManagement")}
                 </h1>
-                <p className="text-white/90 text-lg">Manage research publications and academic papers</p>
+                <p className="text-white/90 text-lg">{t("manageResearchPublications")}</p>
               </div>
             </div>
             <div className="flex items-center text-white/70">
               <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm">Research portfolio • {researches.length} publications</span>
+              <span className="text-sm">{t("researchPortfolio")} • {researches.length} {t("totalPublications")}</span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="text-right mb-3 sm:mb-0">
               <div className="text-2xl font-bold text-[#F4B400]">{researches.length}</div>
-              <div className="text-white/60 text-sm">Total Publications</div>
+              <div className="text-white/60 text-sm">{t("totalPublications")}</div>
             </div>
             <button
               className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
@@ -338,7 +342,7 @@ const ResearchManagement = () => {
             >
               <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
               <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
-                Add New Research
+                {t("addNewResearch")}
               </span>
             </button>
           </div>
@@ -359,12 +363,12 @@ const ResearchManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <BookOpen className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Publications</p>
+                <p className="text-white/80 text-sm font-medium">{t("totalPublications")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{researches.length}</p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
-                <span className="text-green-300 text-xs">+30% this year</span>
+                <span className="text-green-300 text-xs">{t("thisYear")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -385,12 +389,12 @@ const ResearchManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <CheckCircle className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Accepted Papers</p>
+                <p className="text-white/80 text-sm font-medium">{t("acceptedPapers")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{researches.filter((research) => research.status === "accepted").length}</p>
               <div className="flex items-center mt-2">
                 <Star className="h-4 w-4 text-white/70 mr-1" />
-                <span className="text-white/70 text-xs">High quality research</span>
+                <span className="text-white/70 text-xs">{t("highQualityResearch")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -411,12 +415,12 @@ const ResearchManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Users className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Unique Authors</p>
+                <p className="text-white/80 text-sm font-medium">{t("uniqueAuthors")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{countUniqueAuthors()}</p>
               <div className="flex items-center mt-2">
                 <Target className="h-4 w-4 text-green-200 mr-1" />
-                <span className="text-green-200 text-xs">Research community</span>
+                <span className="text-green-200 text-xs">{t("researchCommunity")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -437,12 +441,12 @@ const ResearchManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Award className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Research Areas</p>
+                <p className="text-white/80 text-sm font-medium">{t("researchAreas")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{new Set(researches.map(r => r.category).filter(Boolean)).size}</p>
               <div className="flex items-center mt-2">
                 <Activity className="h-4 w-4 text-purple-200 mr-1" />
-                <span className="text-purple-200 text-xs">Diverse fields</span>
+                <span className="text-purple-200 text-xs">{t("diverseFields")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -461,7 +465,7 @@ const ResearchManagement = () => {
               <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
                 <BarChart3 className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Research Status</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("researchStatusDistribution")}</h3>
             </div>
             <Eye className="h-5 w-5 text-gray-400" />
           </div>
@@ -471,7 +475,7 @@ const ResearchManagement = () => {
               const percentage = researches.length > 0 ? ((count / researches.length) * 100).toFixed(1) : 0;
               return (
                 <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 capitalize">{status}</span>
+                  <span className="text-sm text-gray-600 capitalize">{t(status)}</span>
                   <div className="flex items-center">
                     <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                       <div
@@ -494,7 +498,7 @@ const ResearchManagement = () => {
               <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
                 <Calendar className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Publication Timeline</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("publicationTimeline")}</h3>
             </div>
             <Clock className="h-5 w-5 text-gray-400" />
           </div>
@@ -527,7 +531,7 @@ const ResearchManagement = () => {
               <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
                 <Settings className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Research Areas</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("researchAreas")}</h3>
             </div>
             <Activity className="h-5 w-5 text-gray-400" />
           </div>
@@ -554,7 +558,7 @@ const ResearchManagement = () => {
       {/* Research Table */}
       {isLoading ? (
         <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p>Loading research papers...</p>
+          <p>{t("loadingResearch")}</p>
         </div>
       ) : researches.length > 0 ? (
         <Table
@@ -567,12 +571,12 @@ const ResearchManagement = () => {
         />
       ) : (
         <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p>No research papers found. Add your first research paper.</p>
+          <p>{t("noResearchFound")}. {t("addFirstResearch")}.</p>
         </div>
       )}
 
       {/* Add Research Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Research">
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={t("addNewResearch")}>
         <form
           onSubmit={(e) => {
             e.preventDefault()

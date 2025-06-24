@@ -9,8 +9,10 @@ import {
 import Table from "../common/Table"
 import Modal from "../common/Modal"
 import FormField from "../common/FormField"
+import { useLanguage } from "../../contexts/LanguageContext"
 
 const DepartmentManagement = () => {
+  const { t, isRTL, language } = useLanguage();
   const [departments, setDepartments] = useState([])
   const [faculties, setFaculties] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -121,7 +123,7 @@ const DepartmentManagement = () => {
   // Table columns configuration
   const columns = [
     {
-      header: "Department Name",
+      header: t("departmentName"),
       accessor: "name",
       render: (row) => (
         <div className="flex items-center">
@@ -133,12 +135,12 @@ const DepartmentManagement = () => {
       ),
     },
     {
-      header: "Description",
+      header: t("description"),
       accessor: "description",
       render: (row) => <p className="truncate max-w-md">{row.description}</p>,
     },
     {
-      header: "Faculty",
+      header: t("faculty"),
       accessor: "faculty",
       render: (row) => <p>{getFacultyNameById(row.faculty)}</p>,
     },
@@ -170,11 +172,11 @@ const DepartmentManagement = () => {
         setIsAddModalOpen(false)
         resetForm()
       } else {
-        alert(`Failed to create department: ${result.message}`)
+        alert(`${t("errorOccurred")}: ${result.message}`)
       }
     } catch (error) {
       console.error("Error creating department:", error)
-      alert("Failed to create department. Please try again.")
+      alert(t("errorOccurred"))
     } finally {
       setIsLoading(false)
     }
@@ -197,18 +199,18 @@ const DepartmentManagement = () => {
         fetchDepartments()
         setIsEditModalOpen(false)
       } else {
-        alert(`Failed to update department: ${result.message}`)
+        alert(`${t("errorOccurred")}: ${result.message}`)
       }
     } catch (error) {
       console.error("Error updating department:", error)
-      alert("Failed to update department. Please try again.")
+      alert(t("errorOccurred"))
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleDeleteDepartment = async (department) => {
-    if (window.confirm(`Are you sure you want to delete "${department.name}"?`)) {
+    if (window.confirm(`${t("confirmDelete")} "${department.name}"?`)) {
       try {
         setIsLoading(true)
 
@@ -225,7 +227,7 @@ const DepartmentManagement = () => {
         if (result.status === "success") {
           // Update the departments list by removing the deleted department
           setDepartments((prevDepartments) => prevDepartments.filter((dep) => dep._id !== department._id))
-          alert("Department deleted successfully")
+          alert(t("deleteSuccess"))
         } else {
           // Try alternative approach if the first one fails
           const alternativeResponse = await fetch(`http://127.0.0.1:4400/api/v1/departments/delete/${department._id}`, {
@@ -237,14 +239,14 @@ const DepartmentManagement = () => {
 
           if (alternativeResult.status === "success") {
             setDepartments((prevDepartments) => prevDepartments.filter((dep) => dep._id !== department._id))
-            alert("Department deleted successfully")
+            alert(t("deleteSuccess"))
           } else {
-            alert(`Failed to delete department: ${result.message || alternativeResult.message}`)
+            alert(`${t("errorOccurred")}: ${result.message || alternativeResult.message}`)
           }
         }
       } catch (error) {
         console.error("Error deleting department:", error)
-        alert("Failed to delete department. Please try again.")
+        alert(t("errorOccurred"))
       } finally {
         setIsLoading(false)
       }
@@ -284,7 +286,7 @@ const DepartmentManagement = () => {
   const checkAuthentication = () => {
     const token = getAuthToken()
     if (!token) {
-      alert("You are not logged in. Please log in to manage departments.")
+      alert(t("errorOccurred"))
       // Redirect to login page or show login modal
       // window.location.href = '/login';
       return false
@@ -306,26 +308,34 @@ const DepartmentManagement = () => {
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
           <div className="mb-6 md:mb-0">
             <div className="flex items-center mb-4">
-              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl mr-4 border border-white/30">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl border border-white/30 mr-4">
                 <Building2 className="h-8 w-8 text-[#F4B400]" />
               </div>
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-                  Department Management
+                  {t("departmentManagement")}
                 </h1>
-                <p className="text-white/90 text-lg">Organize and manage academic departments</p>
+                <p className="text-white/90 text-lg">
+                  {t("organizeManageDepartments")}
+                </p>
               </div>
             </div>
             <div className="flex items-center text-white/70">
               <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm">Complete department administration • {departments.length} departments</span>
+              <span className="text-sm">
+                {t("organizeManageDepartments")} • {departments.length} {t("departments")}
+              </span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="text-right mb-3 sm:mb-0">
-              <div className="text-2xl font-bold text-[#F4B400]">{departments.length}</div>
-              <div className="text-white/60 text-sm">Total Departments</div>
+              <div className="text-2xl font-bold text-[#F4B400]">
+                {departments.length}
+              </div>
+              <div className="text-white/60 text-sm">
+                {t("totalDepartments")}
+              </div>
             </div>
             <button
               className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
@@ -339,7 +349,7 @@ const DepartmentManagement = () => {
             >
               <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
               <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
-                Add New Department
+                {t("addNewDepartment")}
               </span>
             </button>
           </div>
@@ -360,12 +370,18 @@ const DepartmentManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Building2 className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Departments</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("totalDepartments")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{departments.length}</p>
+              <p className="text-3xl font-bold text-white">
+                {departments.length}
+              </p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
-                <span className="text-green-300 text-xs">+8% this year</span>
+                <span className="text-green-300 text-xs">
+                  {t("thisYear")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -386,12 +402,18 @@ const DepartmentManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <GraduationCap className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Faculties</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("totalFaculty")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{faculties.length}</p>
+              <p className="text-3xl font-bold text-white">
+                {faculties.length}
+              </p>
               <div className="flex items-center mt-2">
                 <Award className="h-4 w-4 text-white/70 mr-1" />
-                <span className="text-white/70 text-xs">Academic divisions</span>
+                <span className="text-white/70 text-xs">
+                  {t("academicDivisions")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -412,12 +434,18 @@ const DepartmentManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Activity className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Active Departments</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("activeDepartments")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{departments.length}</p>
+              <p className="text-3xl font-bold text-white">
+                {departments.length}
+              </p>
               <div className="flex items-center mt-2">
                 <Target className="h-4 w-4 text-green-200 mr-1" />
-                <span className="text-green-200 text-xs">Fully operational</span>
+                <span className="text-green-200 text-xs">
+                  {t("fullyOperational")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -438,12 +466,18 @@ const DepartmentManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <BookOpen className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Academic Programs</p>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("academicPrograms")}
+                </p>
               </div>
-              <p className="text-3xl font-bold text-white">{departments.length * 3}</p>
+              <p className="text-3xl font-bold text-white">
+                {departments.length * 3}
+              </p>
               <div className="flex items-center mt-2">
                 <Calendar className="h-4 w-4 text-purple-200 mr-1" />
-                <span className="text-purple-200 text-xs">Degree programs</span>
+                <span className="text-purple-200 text-xs">
+                  {t("degreePrograms")}
+                </span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -462,25 +496,25 @@ const DepartmentManagement = () => {
               <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
                 <BarChart3 className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Department Overview</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("departmentOverview")}</h3>
             </div>
             <Eye className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">With Mission Statement</span>
+              <span className="text-sm text-gray-600">{t("withMissionStatement")}</span>
               <span className="text-lg font-bold text-[#EC4899]">
                 {departments.filter(d => d.mission).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">With Vision Statement</span>
+              <span className="text-sm text-gray-600">{t("withVisionStatement")}</span>
               <span className="text-lg font-bold text-[#EC4899]">
                 {departments.filter(d => d.vision).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">With Values</span>
+              <span className="text-sm text-gray-600">{t("withValues")}</span>
               <span className="text-lg font-bold text-[#EC4899]">
                 {departments.filter(d => d.values).length}
               </span>
@@ -495,25 +529,25 @@ const DepartmentManagement = () => {
               <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
                 <PieChart className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Faculty Distribution</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("facultyDistribution")}</h3>
             </div>
             <Users className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Departments per Faculty</span>
+              <span className="text-sm text-gray-600">{t("departmentsPerFaculty")}</span>
               <span className="text-lg font-bold text-[#06B6D4]">
                 {faculties.length > 0 ? Math.round(departments.length / faculties.length * 10) / 10 : 0}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Largest Faculty</span>
+              <span className="text-sm text-gray-600">{t("largestFaculty")}</span>
               <span className="text-lg font-bold text-[#06B6D4]">
                 {faculties.length > 0 ? Math.ceil(departments.length / faculties.length) : 0}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Coverage Rate</span>
+              <span className="text-sm text-gray-600">{t("coverageRate")}</span>
               <span className="text-lg font-bold text-[#06B6D4]">100%</span>
             </div>
           </div>
@@ -526,24 +560,24 @@ const DepartmentManagement = () => {
               <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
                 <Settings className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">System Status</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("systemStatus")}</h3>
             </div>
             <Activity className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Authentication</span>
+              <span className="text-sm text-gray-600">{t("authentication")}</span>
               <span className={`text-lg font-bold ${getAuthToken() ? 'text-green-500' : 'text-red-500'}`}>
-                {getAuthToken() ? 'Active' : 'Inactive'}
+                {getAuthToken() ? t("active") : t("inactive")}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Data Sync</span>
-              <span className="text-lg font-bold text-[#F59E0B]">Live</span>
+              <span className="text-sm text-gray-600">{t("dataSync")}</span>
+              <span className="text-lg font-bold text-[#F59E0B]">{t("live")}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Last Update</span>
-              <span className="text-lg font-bold text-[#F59E0B]">Now</span>
+              <span className="text-sm text-gray-600">{t("lastUpdate")}</span>
+              <span className="text-lg font-bold text-[#F59E0B]">{t("now")}</span>
             </div>
           </div>
         </div>
@@ -554,7 +588,7 @@ const DepartmentManagement = () => {
       {/* Loading indicator */}
       {isLoading && (
         <div className="text-center py-4">
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">{t("loading")}</p>
         </div>
       )}
 
@@ -581,7 +615,7 @@ const DepartmentManagement = () => {
       />
 
       {/* Add Department Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Department">
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={t("addNewDepartment")}>
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -590,14 +624,14 @@ const DepartmentManagement = () => {
         >
           <div className="grid grid-cols-1 gap-4">
             <FormField
-              label="Department Name"
+              label={t("departmentName")}
               name="name"
               value={formData.name}
               onChange={handleInputChange}
               required
             />
             <FormField
-              label="Description"
+              label={t("description")}
               name="description"
               type="textarea"
               value={formData.description}
@@ -605,7 +639,7 @@ const DepartmentManagement = () => {
               required
             />
             <FormField
-              label="Mission"
+              label={t("mission")}
               name="mission"
               type="textarea"
               value={formData.mission}
@@ -613,7 +647,7 @@ const DepartmentManagement = () => {
               required
             />
             <FormField
-              label="Vision"
+              label={t("vision")}
               name="vision"
               type="textarea"
               value={formData.vision}
@@ -621,7 +655,7 @@ const DepartmentManagement = () => {
               required
             />
             <FormField
-              label="Values"
+              label={t("values")}
               name="values"
               type="textarea"
               value={formData.values}
@@ -631,7 +665,7 @@ const DepartmentManagement = () => {
 
             {/* Faculty Dropdown */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-medium mb-2">Faculty</label>
+              <label className="block text-gray-700 text-sm font-medium mb-2">{t("faculty")}</label>
               <select
                 name="faculty"
                 value={formData.faculty}
@@ -639,7 +673,7 @@ const DepartmentManagement = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="">Select a Faculty</option>
+                <option value="">{t("selectFaculty")}</option>
                 {faculties.map((faculty) => (
                   <option key={faculty._id} value={faculty._id}>
                     {faculty.name}
@@ -656,22 +690,22 @@ const DepartmentManagement = () => {
               onClick={() => setIsAddModalOpen(false)}
               disabled={isLoading}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
+              className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors flex items-center"
               disabled={isLoading}
             >
               <Save size={18} className="inline mr-2" />
-              {isLoading ? "Saving..." : "Save Department"}
+              {isLoading ? t("loading") : t("addDepartment")}
             </button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Department Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Department">
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title={t("editDepartment")}>
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -680,14 +714,14 @@ const DepartmentManagement = () => {
         >
           <div className="grid grid-cols-1 gap-4">
             <FormField
-              label="Department Name"
+              label={t("departmentName")}
               name="name"
               value={formData.name}
               onChange={handleInputChange}
               required
             />
             <FormField
-              label="Description"
+              label={t("description")}
               name="description"
               type="textarea"
               value={formData.description}
@@ -695,7 +729,7 @@ const DepartmentManagement = () => {
               required
             />
             <FormField
-              label="Mission"
+              label={t("mission")}
               name="mission"
               type="textarea"
               value={formData.mission}
@@ -703,7 +737,7 @@ const DepartmentManagement = () => {
               required
             />
             <FormField
-              label="Vision"
+              label={t("vision")}
               name="vision"
               type="textarea"
               value={formData.vision}
@@ -711,7 +745,7 @@ const DepartmentManagement = () => {
               required
             />
             <FormField
-              label="Values"
+              label={t("values")}
               name="values"
               type="textarea"
               value={formData.values}
@@ -721,7 +755,7 @@ const DepartmentManagement = () => {
 
             {/* Faculty Dropdown */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-medium mb-2">Faculty</label>
+              <label className="block text-gray-700 text-sm font-medium mb-2">{t("faculty")}</label>
               <select
                 name="faculty"
                 value={formData.faculty}
@@ -729,7 +763,7 @@ const DepartmentManagement = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="">Select a Faculty</option>
+                <option value="">{t("selectFaculty")}</option>
                 {faculties.map((faculty) => (
                   <option key={faculty._id} value={faculty._id}>
                     {faculty.name}
@@ -746,22 +780,22 @@ const DepartmentManagement = () => {
               onClick={() => setIsEditModalOpen(false)}
               disabled={isLoading}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
+              className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors flex items-center"
               disabled={isLoading}
             >
               <Save size={18} className="inline mr-2" />
-              {isLoading ? "Updating..." : "Update Department"}
+              {isLoading ? t("loading") : t("editDepartment")}
             </button>
           </div>
         </form>
       </Modal>
 
       {/* View Department Modal */}
-      <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title="Department Details">
+      <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title={t("departmentDetails")}>
         {currentDepartment && (
           <div className="space-y-6">
             <div className="bg-blue-50 p-6 rounded-lg">
@@ -769,27 +803,27 @@ const DepartmentManagement = () => {
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Description</h4>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("description")}</h4>
               <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.description}</p>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Mission</h4>
-              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.mission || "No mission statement available"}</p>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("mission")}</h4>
+              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.mission || t("missionNotAvailable")}</p>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Vision</h4>
-              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.vision || "No vision statement available"}</p>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("vision")}</h4>
+              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.vision || t("visionNotAvailable")}</p>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Values</h4>
-              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.values || "No values statement available"}</p>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("values")}</h4>
+              <p className="text-gray-700 bg-gray-50 p-4 rounded-md">{currentDepartment.values || t("valuesNotAvailable")}</p>
             </div>
 
             <div>
-              <h4 className="text-lg font-medium text-gray-800 mb-2">Faculty</h4>
+              <h4 className="text-lg font-medium text-gray-800 mb-2">{t("faculty")}</h4>
               <div className="bg-gray-50 p-4 rounded-md">
                 <p className="text-gray-800">{getFacultyNameById(currentDepartment.faculty)}</p>
               </div>

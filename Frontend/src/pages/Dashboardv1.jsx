@@ -17,11 +17,12 @@ import CommitteeMemberManagement from "../components/DataManagement/CommitteeMem
 import QualityAssuranceManagement from "../components/DataManagement/QualityAssuranceManagement";
 import SemesterManagement from "../components/DataManagement/SemesterManagement";
 import SubjectManagement from "../components/DataManagement/SubjectManagement";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const Dashboardv1 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [language, setLanguage] = useState("en");
+  const { language, isRTL } = useLanguage();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -64,22 +65,35 @@ const Dashboardv1 = () => {
   };
 
   return (
-    <div className='flex min-h-screen bg-gray-50'>
+    <div
+      className={`flex min-h-screen bg-gray-50 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+      style={{
+        direction: isRTL ? 'rtl' : 'ltr',
+        flexDirection: isRTL ? 'row-reverse' : 'row'
+      }}
+    >
+      {/* Sidebar - will appear on right in RTL due to flex-row-reverse */}
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
 
+      {/* Main Content Area */}
       <div className='flex-1 flex flex-col overflow-hidden'>
         <Header
           toggleSidebar={toggleSidebar}
           activeTab={activeTab}
           language={language}
-          setLanguage={setLanguage}
         />
-
-        <div className='flex-1 overflow-y-auto p-6'>{renderContent()}</div>
+        <div
+          className="flex-1 overflow-y-auto p-6"
+          dir={isRTL ? 'rtl' : 'ltr'}
+          style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+        >
+          {renderContent()}
+        </div>
       </div>
     </div>
   );

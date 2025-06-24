@@ -1,25 +1,29 @@
 import React from "react";
+import { useLanguage } from "../../contexts/LanguageContext";
+
 export default function CourseFilter({ activeFilters, onFilterChange }) {
+  const { t, isRTL } = useLanguage();
+
   const departments = [
-    { value: "all", label: "All Departments" },
-    { value: "Economics", label: "Economics" },
-    { value: "Finance", label: "Finance" },
-    { value: "Management", label: "Management" },
-    { value: "Statistics", label: "Statistics" },
-    { value: "Accounting", label: "Accounting" },
+    { value: "all", label: t("course.all_departments") },
+    { value: "Economics", label: t("course.economics") },
+    { value: "Finance", label: t("course.finance") },
+    { value: "Management", label: t("course.management") },
+    { value: "Statistics", label: t("course.statistics") },
+    { value: "Accounting", label: t("course.accounting") },
   ];
 
   const semesters = [
-    { value: "all", label: "All Semesters" },
-    { value: "Fall", label: "Fall" },
-    { value: "Spring", label: "Spring" },
-    { value: "Summer", label: "Summer" },
+    { value: "all", label: t("course.all_semesters") },
+    { value: "Fall", label: t("course.fall") },
+    { value: "Spring", label: t("course.spring") },
+    { value: "Summer", label: t("course.summer") },
   ];
 
   const levels = [
-    { value: "all", label: "All Levels" },
-    { value: "Undergraduate", label: "Undergraduate" },
-    { value: "Graduate", label: "Graduate" },
+    { value: "all", label: t("course.all_levels") },
+    { value: "Undergraduate", label: t("course.undergraduate") },
+    { value: "Graduate", label: t("course.graduate") },
   ];
 
   return (
@@ -30,7 +34,7 @@ export default function CourseFilter({ activeFilters, onFilterChange }) {
           htmlFor='department-filter'
           className='block text-sm font-medium text-gray-700 mb-1 font-[Roboto]'
         >
-          Department
+          {t("course.department")}
         </label>
         <select
           id='department-filter'
@@ -52,7 +56,7 @@ export default function CourseFilter({ activeFilters, onFilterChange }) {
           htmlFor='semester-filter'
           className='block text-sm font-medium text-gray-700 mb-1 font-[Roboto]'
         >
-          Semester
+          {t("course.semester")}
         </label>
         <select
           id='semester-filter'
@@ -74,7 +78,7 @@ export default function CourseFilter({ activeFilters, onFilterChange }) {
           htmlFor='level-filter'
           className='block text-sm font-medium text-gray-700 mb-1 font-[Roboto]'
         >
-          Level
+          {t("course.level")}
         </label>
         <select
           id='level-filter'

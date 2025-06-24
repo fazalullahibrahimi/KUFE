@@ -8,6 +8,12 @@ import {
   Activity,
   RefreshCw,
   BookOpen,
+  TrendingUp,
+  Award,
+  Target,
+  Eye,
+  CheckCircle,
+  Settings,
 } from "lucide-react";
 import {
   Chart as ChartJS,
@@ -23,6 +29,7 @@ import {
 } from 'chart.js';
 import { Bar, Pie, Line, Doughnut } from 'react-chartjs-2';
 import axios from 'axios';
+import { useLanguage } from "../contexts/LanguageContext";
 
 // Register Chart.js components
 ChartJS.register(
@@ -38,6 +45,13 @@ ChartJS.register(
 );
 
 const DashboardHome = () => {
+  const { t, isRTL, language } = useLanguage();
+
+  // Debug: Log language changes
+  useEffect(() => {
+    console.log("DashboardHome - Language changed:", language, "isRTL:", isRTL);
+  }, [language, isRTL]);
+
   // State for API data
   const [departmentData, setDepartmentData] = useState([]);
   const [yearData, setYearData] = useState([]);
@@ -964,16 +978,16 @@ const DashboardHome = () => {
   }
 
   return (
-    <div className='space-y-8'>
+    <div key={`dashboard-${language}-${isRTL}`} className="space-y-6">
       {/* Success Notification */}
       {refreshSuccess && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center animate-slide-in-right">
           <div className="w-2 h-2 bg-white rounded-full mr-3 animate-pulse"></div>
-          <span className="font-medium">✅ Data refreshed successfully!</span>
+          <span className="font-medium">✅ {t("dataRefreshedSuccessfully")}</span>
         </div>
       )}
 
-      {/* Enhanced Header with Beautiful Gradient */}
+      {/* Enhanced Header with Beautiful Gradient - Matching Courses Design */}
       <div className="relative bg-gradient-to-br from-[#004B87] via-[#1D3D6F] to-[#2C4F85] rounded-3xl p-8 text-white overflow-hidden shadow-2xl">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 opacity-10">
@@ -982,202 +996,338 @@ const DashboardHome = () => {
           <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16 animate-ping delay-2000"></div>
         </div>
 
-        <div className="relative z-10 flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-              Faculty Of Economics Analytics Dashboard
-            </h1>
-            <p className="text-white/90 text-lg">Real-time insights into your complete university ecosystem</p>
-            <div className="flex items-center mt-3 text-white/70">
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div className="mb-6 md:mb-0">
+            <div className="flex items-center mb-4">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl mr-4 border border-white/30">
+                <Activity className="h-8 w-8 text-[#F4B400]" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
+                  {t("facultyOfEconomicsAnalyticsDashboard")}
+                </h1>
+                <p className="text-white/90 text-lg">
+                  {t("realTimeInsights")}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center text-white/70">
               <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm">Live data • Updated every minute</span>
+              <span className="text-sm">
+                {t("liveDataUpdated")} • {overviewStats.totalStudents} {t("totalStudents")}
+              </span>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <div className="text-2xl font-bold text-[#F4B400]">{overviewStats.totalStudents.toLocaleString()}</div>
-              <div className="text-white/60 text-sm">Total Students</div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="text-right mb-3 sm:mb-0">
+              <div className="text-2xl font-bold text-[#F4B400]">
+                {overviewStats.totalStudents.toLocaleString()}
+              </div>
+              <div className="text-white/60 text-sm">
+                {t("totalStudents")}
+              </div>
             </div>
             <button
               onClick={refreshData}
               disabled={loading}
-              className={`group bg-white/20 hover:bg-[#F4B400] p-4 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 ${
-                loading ? 'cursor-not-allowed opacity-50' : 'hover:scale-110 hover:shadow-xl hover:border-[#F4B400]'
+              className={`group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center ${
+                loading ? 'cursor-not-allowed opacity-50' : ''
               }`}
-              title={loading ? "Refreshing data..." : "Refresh Data"}
             >
-              <RefreshCw className={`h-6 w-6 transition-all duration-500 ${
+              <RefreshCw className={`h-5 w-5 mr-2 transition-all duration-500 ${
                 loading ? 'animate-spin text-white' : 'group-hover:rotate-180 group-hover:text-[#004B87] text-white'
               }`} />
+              <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
+                {loading ? t("refreshingData") : t("refreshData")}
+              </span>
             </button>
           </div>
         </div>
+      </div>
 
-        <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {/* Students Card */}
-          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-[#F4B400] to-[#E6A200] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Users className="h-6 w-6 text-[#004B87]" />
+      {/* Enhanced Dashboard Analytics - Matching Courses Design */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Students Card */}
+        <div className="group bg-gradient-to-br from-[#004B87] to-[#1D3D6F] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("totalStudents")}
+                </p>
               </div>
-              <p className="text-white/90 text-sm font-medium">Total Students</p>
-              <p className="text-2xl font-bold text-[#F4B400] mt-1">{overviewStats.totalStudents.toLocaleString()}</p>
-              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
-                <div className="bg-[#F4B400] h-1 rounded-full" style={{width: '85%'}}></div>
+              <p className="text-3xl font-bold text-white">
+                {overviewStats.totalStudents.toLocaleString()}
+              </p>
+              <div className="flex items-center mt-2">
+                <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
+                <span className="text-green-300 text-xs">
+                  +15% {t("thisYear")}
+                </span>
               </div>
             </div>
-          </div>
-
-          {/* Departments Card */}
-          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-[#16A085] to-[#1ABC9C] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <GraduationCap className="h-6 w-6 text-white" />
-              </div>
-              <p className="text-white/90 text-sm font-medium">Departments</p>
-              <p className="text-2xl font-bold text-[#16A085] mt-1">{overviewStats.totalDepartments}</p>
-              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
-                <div className="bg-[#16A085] h-1 rounded-full" style={{width: '70%'}}></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Cities Card */}
-          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-[#8B5CF6] to-[#A855F7] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <MapPin className="h-6 w-6 text-white" />
-              </div>
-              <p className="text-white/90 text-sm font-medium">Cities</p>
-              <p className="text-2xl font-bold text-[#8B5CF6] mt-1">{cityData.length}</p>
-              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
-                <div className="bg-[#8B5CF6] h-1 rounded-full" style={{width: '60%'}}></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Courses Card */}
-          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <BookOpen className="h-6 w-6 text-white" />
-              </div>
-              <p className="text-white/90 text-sm font-medium">Total Courses</p>
-              <p className="text-2xl font-bold text-[#EC4899] mt-1">{overviewStats.totalCourses}</p>
-              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
-                <div className="bg-[#EC4899] h-1 rounded-full" style={{width: '75%'}}></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Faculty Card */}
-          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Users className="h-6 w-6 text-white" />
-              </div>
-              <p className="text-white/90 text-sm font-medium">Faculty Members</p>
-              <p className="text-2xl font-bold text-[#06B6D4] mt-1">{overviewStats.totalFaculty}</p>
-              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
-                <div className="bg-[#06B6D4] h-1 rounded-full" style={{width: '65%'}}></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Research Card */}
-          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-[#10B981] to-[#059669] p-3 rounded-xl mx-auto mb-3 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Activity className="h-6 w-6 text-white" />
-              </div>
-              <p className="text-white/90 text-sm font-medium">Research Papers</p>
-              <p className="text-2xl font-bold text-[#10B981] mt-1">{overviewStats.totalResearch}</p>
-              <div className="w-full bg-white/20 rounded-full h-1 mt-2">
-                <div className="bg-[#10B981] h-1 rounded-full" style={{width: '80%'}}></div>
-              </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-[#F4B400]">{overviewStats.totalStudents}</span>
             </div>
           </div>
         </div>
 
-        {/* Additional Metrics Row */}
-        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          {/* Events Card */}
-          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-xl mx-auto mb-2 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Calendar className="h-5 w-5 text-white" />
+        {/* Total Courses Card */}
+        <div className="group bg-gradient-to-br from-[#F4B400] to-[#E6A200] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#004B87] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <BookOpen className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("totalCourses")}
+                </p>
               </div>
-              <p className="text-white/90 text-xs font-medium">Events</p>
-              <p className="text-xl font-bold text-[#F59E0B] mt-1">{overviewStats.totalEvents}</p>
+              <p className="text-3xl font-bold text-white">
+                {overviewStats.totalCourses}
+              </p>
+              <div className="flex items-center mt-2">
+                <Award className="h-4 w-4 text-white/70 mr-1" />
+                <span className="text-white/70 text-xs">
+                  {t("academicPrograms")}
+                </span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-white">{overviewStats.totalCourses}</span>
             </div>
           </div>
+        </div>
 
-          {/* News Card */}
-          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-[#EF4444] to-[#DC2626] p-2 rounded-xl mx-auto mb-2 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
+        {/* Departments Card */}
+        <div className="group bg-gradient-to-br from-[#10B981] to-[#059669] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <GraduationCap className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("departments")}
+                </p>
+              </div>
+              <p className="text-3xl font-bold text-white">
+                {overviewStats.totalDepartments}
+              </p>
+              <div className="flex items-center mt-2">
+                <Target className="h-4 w-4 text-green-200 mr-1" />
+                <span className="text-green-200 text-xs">
+                  {t("academicUnits")}
+                </span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-white">{overviewStats.totalDepartments}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Faculty Members Card */}
+        <div className="group bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#F4B400] rounded-full translate-y-8 -translate-x-8"></div>
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center mb-2">
+                <div className="bg-white/20 p-2 rounded-lg mr-3">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-white/80 text-sm font-medium">
+                  {t("facultyMembers")}
+                </p>
+              </div>
+              <p className="text-3xl font-bold text-white">
+                {overviewStats.totalFaculty}
+              </p>
+              <div className="flex items-center mt-2">
+                <Activity className="h-4 w-4 text-purple-200 mr-1" />
+                <span className="text-purple-200 text-xs">
+                  {t("teachingStaff")}
+                </span>
+              </div>
+            </div>
+            <div className="bg-white/10 p-3 rounded-full">
+              <span className="text-2xl font-bold text-white">{overviewStats.totalFaculty}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Analytics Row - Matching Courses Design */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Research & Events */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
                 <Activity className="h-5 w-5 text-white" />
               </div>
-              <p className="text-white/90 text-xs font-medium">News</p>
-              <p className="text-xl font-bold text-[#EF4444] mt-1">{overviewStats.totalNews}</p>
+              <h3 className="text-lg font-semibold text-gray-800">
+                {t("researchAndEvents")}
+              </h3>
+            </div>
+            <Eye className="h-5 w-5 text-gray-400" />
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">
+                {t("researchPapers")}
+              </span>
+              <span className="text-lg font-bold text-[#EC4899]">{overviewStats.totalResearch}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">
+                {t("events")}
+              </span>
+              <span className="text-lg font-bold text-[#EC4899]">{overviewStats.totalEvents}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">
+                {t("news")}
+              </span>
+              <span className="text-lg font-bold text-[#EC4899]">{overviewStats.totalNews}</span>
             </div>
           </div>
+        </div>
 
-          {/* Active Programs Card */}
-          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-[#3B82F6] to-[#2563EB] p-2 rounded-xl mx-auto mb-2 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <GraduationCap className="h-5 w-5 text-white" />
+        {/* Geographic Distribution */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
+                <MapPin className="h-5 w-5 text-white" />
               </div>
-              <p className="text-white/90 text-xs font-medium">Programs</p>
-              <p className="text-xl font-bold text-[#3B82F6] mt-1">{overviewStats.activePrograms}</p>
+              <h3 className="text-lg font-semibold text-gray-800">
+                {t("geographicDistribution")}
+              </h3>
+            </div>
+            <Calendar className="h-5 w-5 text-gray-400" />
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">
+                {t("cities")}
+              </span>
+              <span className="text-lg font-bold text-[#06B6D4]">{cityData.length}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">
+                {t("faculties")}
+              </span>
+              <span className="text-lg font-bold text-[#06B6D4]">{overviewStats.totalFaculties}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">
+                {t("programs")}
+              </span>
+              <span className="text-lg font-bold text-[#06B6D4]">{overviewStats.activePrograms}</span>
             </div>
           </div>
+        </div>
 
-          {/* Faculties Card */}
-          <div className="group bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/30 hover:bg-white/25 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-br from-[#A855F7] to-[#9333EA] p-2 rounded-xl mx-auto mb-2 w-fit shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Users className="h-5 w-5 text-white" />
+        {/* System Status */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
+                <CheckCircle className="h-5 w-5 text-white" />
               </div>
-              <p className="text-white/90 text-xs font-medium">Faculties</p>
-              <p className="text-xl font-bold text-[#A855F7] mt-1">{overviewStats.totalFaculties}</p>
+              <h3 className="text-lg font-semibold text-gray-800">
+                {t("systemStatus")}
+              </h3>
+            </div>
+            <Settings className="h-5 w-5 text-gray-400" />
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">
+                {t("dataStatus")}
+              </span>
+              <span className="text-lg font-bold text-green-500">{t("active")}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">
+                {t("lastUpdate")}
+              </span>
+              <span className="text-lg font-bold text-[#F59E0B]">{t("now")}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">
+                {t("totalRecords")}
+              </span>
+              <span className="text-lg font-bold text-[#F59E0B]">{overviewStats.totalStudents + overviewStats.totalCourses + overviewStats.totalFaculty}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Section Title */}
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-[#004B87] mb-3">Student Distribution Analytics</h2>
-        <p className="text-gray-600 text-lg">Detailed insights into student enrollment patterns</p>
-        <div className="w-24 h-1 bg-gradient-to-r from-[#F4B400] to-[#16A085] mx-auto mt-4 rounded-full"></div>
+      <div className="mb-8 text-center">
+        <h2 className="text-3xl font-bold text-[#004B87] mb-3">
+          {t("studentDistributionAnalytics")}
+        </h2>
+        <p className="text-gray-600 text-lg">
+          {t("detailedInsights")}
+        </p>
+        <div className="w-24 h-1 bg-gradient-to-r from-[#F4B400] to-[#16A085] mt-4 rounded-full mx-auto"></div>
       </div>
 
       {/* Enhanced Analytics Section */}
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Students by Department - Advanced Bar Chart */}
         <div className='group bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20 hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] relative'>
           {/* Animated Background Pattern */}
           <div className='absolute inset-0 opacity-5'>
-            <div className='absolute top-0 right-0 w-32 h-32 bg-[#F4B400] rounded-full -translate-y-16 translate-x-16 animate-pulse'></div>
-            <div className='absolute bottom-0 left-0 w-24 h-24 bg-[#004B87] rounded-full translate-y-12 -translate-x-12 animate-pulse delay-1000'></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#F4B400] rounded-full -translate-y-16 translate-x-16 animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#004B87] rounded-full translate-y-12 -translate-x-12 animate-pulse delay-1000"></div>
           </div>
 
           <div className='relative bg-gradient-to-br from-[#004B87] via-[#1D3D6F] to-[#2C4F85] p-4 text-white'>
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center'>
-                <div className='bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3 border border-white/30'>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3 border border-white/30">
                   <Users className='h-5 w-5 text-[#F4B400]' />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold'>Students by Department</h3>
-                  <p className='text-white/80 text-xs'>Academic distribution</p>
+                  <h3 className="text-lg font-bold">
+                    {t("studentsByDepartment")}
+                  </h3>
+                  <p className="text-white/80 text-xs">
+                    {t("academicDistribution")}
+                  </p>
                 </div>
               </div>
-              <div className='text-right'>
-                <div className='text-xl font-bold text-[#F4B400]'>{departmentData.length}</div>
-                <div className='text-white/60 text-xs'>Depts</div>
+              <div className="text-right">
+                <div className="text-xl font-bold text-[#F4B400]">
+                  {departmentData.length}
+                </div>
+                <div className="text-white/60 text-xs">
+                  {t("depts")}
+                </div>
               </div>
             </div>
           </div>
@@ -1190,15 +1340,15 @@ const DashboardHome = () => {
                     options={getAdvancedBarOptions()}
                     key={`dept-chart-${departmentData.length}`}
                   />
-                  <div className='absolute top-2 right-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded'>
-                    {departmentData.length} departments • Hover for details
+                  <div className="absolute top-2 right-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded">
+                    {departmentData.length} {t("departments")} • {t("hoverForDetails")}
                   </div>
                 </>
               ) : (
                 <div className='flex items-center justify-center h-full text-gray-500'>
                   <div className='text-center'>
                     <Users className='h-12 w-12 mx-auto mb-4 text-gray-300' />
-                    <p>No department data available</p>
+                    <p>{t("noDepartmentData")}</p>
                   </div>
                 </div>
               )}
@@ -1210,24 +1360,32 @@ const DashboardHome = () => {
         <div className='group bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20 hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] relative'>
           {/* Animated Background Pattern */}
           <div className='absolute inset-0 opacity-5'>
-            <div className='absolute top-0 left-0 w-28 h-28 bg-[#004B87] rounded-full -translate-y-14 -translate-x-14 animate-bounce'></div>
-            <div className='absolute bottom-0 right-0 w-20 h-20 bg-[#F4B400] rounded-full translate-y-10 translate-x-10 animate-bounce delay-500'></div>
+            <div className="absolute top-0 left-0 w-28 h-28 bg-[#004B87] rounded-full -translate-y-14 -translate-x-14 animate-bounce"></div>
+            <div className="absolute bottom-0 right-0 w-20 h-20 bg-[#F4B400] rounded-full translate-y-10 translate-x-10 animate-bounce delay-500"></div>
           </div>
 
           <div className='relative bg-gradient-to-br from-[#F4B400] via-[#E6A200] to-[#D97706] p-4 text-white'>
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center'>
-                <div className='bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3 border border-white/30'>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3 border border-white/30">
                   <MapPin className='h-5 w-5 text-white' />
                 </div>
                 <div>
-                  <h3 className='text-lg font-bold text-[#004B87]'>Students by City</h3>
-                  <p className='text-[#004B87]/80 text-xs'>Geographic distribution</p>
+                  <h3 className="text-lg font-bold text-[#004B87]">
+                    {t("studentsByCity")}
+                  </h3>
+                  <p className="text-[#004B87]/80 text-xs">
+                    {t("geographicDistribution")}
+                  </p>
                 </div>
               </div>
-              <div className='text-right'>
-                <div className='text-xl font-bold text-white'>{cityData.length}</div>
-                <div className='text-white/60 text-xs'>Cities</div>
+              <div className="text-right">
+                <div className="text-xl font-bold text-white">
+                  {cityData.length}
+                </div>
+                <div className="text-white/60 text-xs">
+                  {t("cities")}
+                </div>
               </div>
             </div>
           </div>
@@ -1240,15 +1398,15 @@ const DashboardHome = () => {
                     options={getAdvancedPieOptions()}
                     key={`city-chart-${cityData.length}`}
                   />
-                  <div className='absolute top-2 right-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded'>
-                    {cityData.length} cities • Hover for details
+                  <div className="absolute top-2 right-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded">
+                    {cityData.length} {t("cities")} • {t("hoverForDetails")}
                   </div>
                 </>
               ) : (
                 <div className='flex items-center justify-center h-full text-gray-500'>
                   <div className='text-center'>
                     <MapPin className='h-12 w-12 mx-auto mb-4 text-gray-300' />
-                    <p>No city data available</p>
+                    <p>{t("noCityData")}</p>
                   </div>
                 </div>
               )}
@@ -1256,7 +1414,63 @@ const DashboardHome = () => {
           </div>
         </div>
 
+        {/* Enrollment Trends - Third Chart */}
+        <div className='group bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20 hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] relative'>
+          {/* Animated Background Pattern */}
+          <div className='absolute inset-0 opacity-5'>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#16A085] rounded-full -translate-y-12 translate-x-12 animate-bounce"></div>
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-[#F4B400] rounded-full translate-y-10 -translate-x-10 animate-bounce delay-700"></div>
+          </div>
 
+          <div className='relative bg-gradient-to-br from-[#16A085] via-[#1ABC9C] to-[#48C9B0] p-4 text-white'>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3 border border-white/30">
+                  <Calendar className='h-5 w-5 text-white' />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">
+                    {t("enrollmentTrends")}
+                  </h3>
+                  <p className="text-white/80 text-xs">
+                    {t("yearOverYearGrowth")}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-xl font-bold text-white">
+                  {yearData.length}
+                </div>
+                <div className="text-white/60 text-xs">
+                  {t("years")}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className='p-4'>
+            <div className='h-48 relative'>
+              {yearData.length > 0 ? (
+                <>
+                  <Line
+                    data={yearChartData}
+                    options={getAdvancedLineOptions()}
+                    key={`year-chart-${yearData.length}`}
+                  />
+                  <div className="absolute top-2 right-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded">
+                    {yearData.length} {t("years")} • {t("hoverForTrends")}
+                  </div>
+                </>
+              ) : (
+                <div className='flex items-center justify-center h-full text-gray-500'>
+                  <div className='text-center'>
+                    <Calendar className='h-12 w-12 mx-auto mb-4 text-gray-300' />
+                    <p>{t("noEnrollmentData")}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Full-width Enrollment Trends Chart */}
@@ -1268,19 +1482,27 @@ const DashboardHome = () => {
         </div>
 
         <div className='relative bg-gradient-to-br from-[#16A085] via-[#1ABC9C] to-[#48C9B0] p-4 text-white'>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center'>
-              <div className='bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3 border border-white/30'>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg mr-3 border border-white/30">
                 <Calendar className='h-5 w-5 text-white' />
               </div>
               <div>
-                <h3 className='text-lg font-bold'>Enrollment Trends</h3>
-                <p className='text-white/80 text-xs'>Year-over-year growth patterns</p>
+                <h3 className="text-lg font-bold">
+                  {t("enrollmentTrends")}
+                </h3>
+                <p className="text-white/80 text-xs">
+                  {t("yearOverYearGrowth")}
+                </p>
               </div>
             </div>
-            <div className='text-right'>
-              <div className='text-xl font-bold text-white'>{yearData.length}</div>
-              <div className='text-white/60 text-xs'>Years</div>
+            <div className="text-right">
+              <div className="text-xl font-bold text-white">
+                {yearData.length}
+              </div>
+              <div className="text-white/60 text-xs">
+                {t("years")}
+              </div>
             </div>
           </div>
         </div>
@@ -1293,15 +1515,15 @@ const DashboardHome = () => {
                   options={getAdvancedLineOptions()}
                   key={`year-chart-${yearData.length}`}
                 />
-                <div className='absolute top-2 right-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded'>
-                  {yearData.length} years • Hover for trends
+                <div className="absolute top-2 right-2 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded">
+                  {yearData.length} {t("years")} • {t("hoverForTrends")}
                 </div>
               </>
             ) : (
               <div className='flex items-center justify-center h-full text-gray-500'>
                 <div className='text-center'>
                   <Calendar className='h-8 w-8 mx-auto mb-2 text-gray-300' />
-                  <p className='text-sm'>No enrollment data</p>
+                  <p className='text-sm'>{t("noEnrollmentData")}</p>
                 </div>
               </div>
             )}
@@ -1310,34 +1532,46 @@ const DashboardHome = () => {
       </div>
 
       {/* Section Title for Comprehensive Analytics */}
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-[#004B87] mb-3">Ecconomic Faculty Overview</h2>
-        <p className="text-gray-600 text-lg">Complete analytics across all ecconomic faculty modules</p>
-        <div className="w-32 h-1 bg-gradient-to-r from-[#004B87] via-[#F4B400] to-[#16A085] mx-auto mt-4 rounded-full"></div>
+      <div className="mb-8 text-center">
+        <h2 className="text-3xl font-bold text-[#004B87] mb-3">
+          {t("economicFacultyOverview")}
+        </h2>
+        <p className="text-gray-600 text-lg">
+          {t("completeAnalytics")}
+        </p>
+        <div className="w-32 h-1 bg-gradient-to-r from-[#004B87] via-[#F4B400] to-[#16A085] mt-4 rounded-full mx-auto"></div>
       </div>
 
       {/* Enhanced Comprehensive Dashboard Charts */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8'>
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {/* University Overview Chart */}
         <div className='group bg-white rounded-3xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] relative overflow-hidden'>
           {/* Subtle Background Pattern */}
           <div className='absolute inset-0 opacity-5'>
-            <div className='absolute top-0 right-0 w-32 h-32 bg-[#F4B400] rounded-full -translate-y-16 translate-x-16'></div>
-            <div className='absolute bottom-0 left-0 w-24 h-24 bg-[#004B87] rounded-full translate-y-12 -translate-x-12'></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#F4B400] rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#004B87] rounded-full translate-y-12 -translate-x-12"></div>
           </div>
-          <div className='relative z-10 flex items-center justify-between mb-6'>
-            <div className='flex items-center'>
-              <div className='bg-gradient-to-br from-[#F4B400] to-[#E6A200] p-3 rounded-xl mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300'>
+          <div className="relative z-10 flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-[#F4B400] to-[#E6A200] p-3 rounded-xl mr-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <Activity className='h-6 w-6 text-white' />
               </div>
               <div>
-                <h3 className='text-xl font-bold text-[#004B87]'>Economic Faculty Overview</h3>
-                <p className='text-gray-600 text-sm'>Complete system metrics</p>
+                <h3 className="text-xl font-bold text-[#004B87]">
+                  {t("economicFacultyOverview")}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {t("completeSystemMetrics")}
+                </p>
               </div>
             </div>
-            <div className='text-right'>
-              <div className='text-sm text-gray-500'>Total Metrics</div>
-              <div className='text-lg font-bold text-[#F4B400]'>9</div>
+            <div className="text-right">
+              <div className="text-sm text-gray-500">
+                {t("totalMetrics")}
+              </div>
+              <div className="text-lg font-bold text-[#F4B400]">
+                9
+              </div>
             </div>
           </div>
           <div className='h-64 relative'>
@@ -1372,14 +1606,18 @@ const DashboardHome = () => {
 
         {/* Course Statistics Chart */}
         <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='flex items-center'>
-              <div className='bg-[#16A085] p-2 rounded-lg mr-3'>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-[#16A085] p-2 rounded-lg mr-3">
                 <BookOpen className='h-5 w-5 text-white' />
               </div>
               <div>
-                <h3 className='text-lg font-bold text-[#004B87]'>Courses by Department</h3>
-                <p className='text-gray-600 text-sm'>Course distribution</p>
+                <h3 className="text-lg font-bold text-[#004B87]">
+                  {t("coursesByDepartment")}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {t("courseDistribution")}
+                </p>
               </div>
             </div>
           </div>
@@ -1413,7 +1651,7 @@ const DashboardHome = () => {
               <div className='flex items-center justify-center h-full text-gray-500'>
                 <div className='text-center'>
                   <BookOpen className='h-12 w-12 mx-auto mb-2 text-gray-300' />
-                  <p className='text-sm'>No course data available</p>
+                  <p className='text-sm'>{t("noCourseData")}</p>
                 </div>
               </div>
             )}
@@ -1422,14 +1660,14 @@ const DashboardHome = () => {
 
         {/* Teacher Statistics Chart */}
         <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='flex items-center'>
-              <div className='bg-[#8B5CF6] p-2 rounded-lg mr-3'>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="bg-[#8B5CF6] p-2 rounded-lg mr-3">
                 <Users className='h-5 w-5 text-white' />
               </div>
               <div>
-                <h3 className='text-lg font-bold text-[#004B87]'>Teachers by Department</h3>
-                <p className='text-gray-600 text-sm'>Faculty distribution</p>
+                <h3 className="text-lg font-bold text-[#004B87]">{t("teachersByDepartment")}</h3>
+                <p className="text-gray-600 text-sm">{t("facultyDistribution")}</p>
               </div>
             </div>
           </div>
@@ -1461,7 +1699,7 @@ const DashboardHome = () => {
               <div className='flex items-center justify-center h-full text-gray-500'>
                 <div className='text-center'>
                   <Users className='h-12 w-12 mx-auto mb-2 text-gray-300' />
-                  <p className='text-sm'>No teacher data available</p>
+                  <p className='text-sm'>{t("noTeacherData")}</p>
                 </div>
               </div>
             )}
@@ -1470,14 +1708,14 @@ const DashboardHome = () => {
 
         {/* Research Statistics Chart */}
         <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='flex items-center'>
-              <div className='bg-[#10B981] p-2 rounded-lg mr-3'>
+          <div className={`flex items-center justify-between mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`bg-[#10B981] p-2 rounded-lg ${isRTL ? 'ml-3' : 'mr-3'}`}>
                 <Activity className='h-5 w-5 text-white' />
               </div>
-              <div>
-                <h3 className='text-lg font-bold text-[#004B87]'>Research by Department</h3>
-                <p className='text-gray-600 text-sm'>Research distribution</p>
+              <div className={`${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                <h3 className={`text-lg font-bold text-[#004B87] ${isRTL ? 'text-right' : 'text-left'}`} style={{ textAlign: isRTL ? 'right' : 'left' }}>{t("researchByDepartment")}</h3>
+                <p className={`text-gray-600 text-sm ${isRTL ? 'text-right' : 'text-left'}`} style={{ textAlign: isRTL ? 'right' : 'left' }}>{t("researchDistribution")}</p>
               </div>
             </div>
           </div>
@@ -1509,9 +1747,9 @@ const DashboardHome = () => {
               />
             ) : (
               <div className='flex items-center justify-center h-full text-gray-500'>
-                <div className='text-center'>
+                <div className='text-center' dir={isRTL ? 'rtl' : 'ltr'}>
                   <Activity className='h-12 w-12 mx-auto mb-2 text-gray-300' />
-                  <p className='text-sm'>No research data available</p>
+                  <p className='text-sm' style={{ textAlign: 'center' }}>{t("noResearchData")}</p>
                 </div>
               </div>
             )}
@@ -1520,14 +1758,14 @@ const DashboardHome = () => {
 
         {/* Activity Statistics Chart */}
         <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='flex items-center'>
-              <div className='bg-[#F59E0B] p-2 rounded-lg mr-3'>
+          <div className={`flex items-center justify-between mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`bg-[#F59E0B] p-2 rounded-lg ${isRTL ? 'ml-3' : 'mr-3'}`}>
                 <Calendar className='h-5 w-5 text-white' />
               </div>
-              <div>
-                <h3 className='text-lg font-bold text-[#004B87]'>Events & News</h3>
-                <p className='text-gray-600 text-sm'>Activity statistics</p>
+              <div className={`${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                <h3 className={`text-lg font-bold text-[#004B87] ${isRTL ? 'text-right' : 'text-left'}`} style={{ textAlign: isRTL ? 'right' : 'left' }}>{t("eventsAndNews")}</h3>
+                <p className={`text-gray-600 text-sm ${isRTL ? 'text-right' : 'text-left'}`} style={{ textAlign: isRTL ? 'right' : 'left' }}>{t("activityStatistics")}</p>
               </div>
             </div>
           </div>
@@ -1558,38 +1796,38 @@ const DashboardHome = () => {
 
         {/* Recent Activities Summary */}
         <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='flex items-center'>
-              <div className='bg-[#EC4899] p-2 rounded-lg mr-3'>
+          <div className={`flex items-center justify-between mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`bg-[#EC4899] p-2 rounded-lg ${isRTL ? 'ml-3' : 'mr-3'}`}>
                 <Activity className='h-5 w-5 text-white' />
               </div>
-              <div>
-                <h3 className='text-lg font-bold text-[#004B87]'>Recent Activities</h3>
-                <p className='text-gray-600 text-sm'>Latest updates</p>
+              <div className={`${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                <h3 className={`text-lg font-bold text-[#004B87] ${isRTL ? 'text-right' : 'text-left'}`} style={{ textAlign: isRTL ? 'right' : 'left' }}>{t("recentActivities")}</h3>
+                <p className={`text-gray-600 text-sm ${isRTL ? 'text-right' : 'text-left'}`} style={{ textAlign: isRTL ? 'right' : 'left' }}>{t("latestUpdates")}</p>
               </div>
             </div>
           </div>
-          <div className='space-y-4'>
-            <div className='flex items-center justify-between p-3 bg-blue-50 rounded-lg'>
-              <span className='text-sm font-medium text-gray-700'>New Students</span>
+          <div className='space-y-4' dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className={`flex items-center justify-between p-3 bg-blue-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <span className={`text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`} style={{ textAlign: isRTL ? 'right' : 'left' }}>{t("newStudents")}</span>
               <span className='bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold'>
                 {overviewStats.totalStudents}
               </span>
             </div>
-            <div className='flex items-center justify-between p-3 bg-green-50 rounded-lg'>
-              <span className='text-sm font-medium text-gray-700'>Total Courses</span>
+            <div className={`flex items-center justify-between p-3 bg-green-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <span className={`text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`} style={{ textAlign: isRTL ? 'right' : 'left' }}>{t("totalCourses")}</span>
               <span className='bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold'>
                 {overviewStats.totalCourses}
               </span>
             </div>
-            <div className='flex items-center justify-between p-3 bg-purple-50 rounded-lg'>
-              <span className='text-sm font-medium text-gray-700'>Research Papers</span>
+            <div className={`flex items-center justify-between p-3 bg-purple-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <span className={`text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`} style={{ textAlign: isRTL ? 'right' : 'left' }}>{t("researchPapers")}</span>
               <span className='bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold'>
                 {overviewStats.totalResearch}
               </span>
             </div>
-            <div className='flex items-center justify-between p-3 bg-yellow-50 rounded-lg'>
-              <span className='text-sm font-medium text-gray-700'>Active Events</span>
+            <div className={`flex items-center justify-between p-3 bg-yellow-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <span className={`text-sm font-medium text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`} style={{ textAlign: isRTL ? 'right' : 'left' }}>{t("activeEvents")}</span>
               <span className='bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold'>
                 {overviewStats.totalEvents}
               </span>
@@ -1599,29 +1837,76 @@ const DashboardHome = () => {
       </div>
 
       {/* Quick Data Summary */}
-      <div className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'>
-        <div className='flex items-center justify-between mb-6'>
-          <div className='flex items-center'>
-            <div className='bg-[#6C5CE7] p-3 rounded-lg mr-4'>
+      <div
+        className='bg-white rounded-2xl shadow-lg p-6 border border-gray-100'
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
+        <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`bg-[#6C5CE7] p-3 rounded-lg ${isRTL ? 'ml-4' : 'mr-4'}`}>
               <Activity className='h-6 w-6 text-white' />
             </div>
-            <div>
-              <h2 className='text-xl font-bold text-[#004B87]'>Quick Overview</h2>
-              <p className='text-gray-600 text-sm'>Key statistics at a glance</p>
+            <div
+              className={`${isRTL ? 'text-right' : 'text-left'}`}
+              dir={isRTL ? 'rtl' : 'ltr'}
+              style={{
+                direction: isRTL ? 'rtl' : 'ltr',
+                textAlign: isRTL ? 'right' : 'left'
+              }}
+            >
+              <h2
+                className={`text-xl font-bold text-[#004B87] ${isRTL ? 'text-right' : 'text-left'}`}
+                dir={isRTL ? 'rtl' : 'ltr'}
+                style={{
+                  direction: isRTL ? 'rtl' : 'ltr',
+                  textAlign: isRTL ? 'right' : 'left'
+                }}
+              >
+                {t("quickOverview")}
+              </h2>
+              <p
+                className={`text-gray-600 text-sm ${isRTL ? 'text-right' : 'text-left'}`}
+                dir={isRTL ? 'rtl' : 'ltr'}
+                style={{
+                  direction: isRTL ? 'rtl' : 'ltr',
+                  textAlign: isRTL ? 'right' : 'left'
+                }}
+              >
+                {t("keyStatistics")}
+              </p>
             </div>
           </div>
         </div>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+        <div
+          className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${isRTL ? 'rtl' : 'ltr'}`}
+          dir={isRTL ? 'rtl' : 'ltr'}
+        >
           {/* Top Departments */}
-          <div>
-            <h3 className='text-lg font-semibold text-[#004B87] mb-3 flex items-center'>
-              <Users className='h-5 w-5 mr-2' />
-              Top Departments
+          <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
+            <h3
+              className={`text-lg font-semibold text-[#004B87] mb-3 flex items-center ${isRTL ? 'flex-row-reverse justify-end' : 'justify-start'}`}
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              <Users className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              <span
+                className={`${isRTL ? 'text-right' : 'text-left'}`}
+                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              >
+                {t("topDepartments")}
+              </span>
             </h3>
             <div className='space-y-2'>
               {departmentData.slice(0, 3).map((dept, index) => (
-                <div key={index} className='flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'>
-                  <span className='font-medium text-gray-700 text-sm'>{dept.departmentName}</span>
+                <div
+                  key={index}
+                  className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                >
+                  <span
+                    className={`font-medium text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}
+                    style={{ textAlign: isRTL ? 'right' : 'left' }}
+                  >
+                    {dept.departmentName}
+                  </span>
                   <span className='bg-[#004B87] text-white px-3 py-1 rounded-full text-xs font-bold'>
                     {dept.count}
                   </span>
@@ -1631,15 +1916,31 @@ const DashboardHome = () => {
           </div>
 
           {/* Top Cities */}
-          <div>
-            <h3 className='text-lg font-semibold text-[#004B87] mb-3 flex items-center'>
-              <MapPin className='h-5 w-5 mr-2' />
-              Top Cities
+          <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
+            <h3
+              className={`text-lg font-semibold text-[#004B87] mb-3 flex items-center ${isRTL ? 'flex-row-reverse justify-end' : 'justify-start'}`}
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              <MapPin className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              <span
+                className={`${isRTL ? 'text-right' : 'text-left'}`}
+                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              >
+                {t("topCities")}
+              </span>
             </h3>
             <div className='space-y-2'>
               {cityData.slice(0, 3).map((city, index) => (
-                <div key={index} className='flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'>
-                  <span className='font-medium text-gray-700 text-sm'>{city.city}</span>
+                <div
+                  key={index}
+                  className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                >
+                  <span
+                    className={`font-medium text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}
+                    style={{ textAlign: isRTL ? 'right' : 'left' }}
+                  >
+                    {city.city}
+                  </span>
                   <span className='bg-[#F4B400] text-[#004B87] px-3 py-1 rounded-full text-xs font-bold'>
                     {city.count}
                   </span>
@@ -1649,15 +1950,31 @@ const DashboardHome = () => {
           </div>
 
           {/* Recent Years */}
-          <div>
-            <h3 className='text-lg font-semibold text-[#004B87] mb-3 flex items-center'>
-              <Calendar className='h-5 w-5 mr-2' />
-              Recent Years
+          <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
+            <h3
+              className={`text-lg font-semibold text-[#004B87] mb-3 flex items-center ${isRTL ? 'flex-row-reverse justify-end' : 'justify-start'}`}
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              <Calendar className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              <span
+                className={`${isRTL ? 'text-right' : 'text-left'}`}
+                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              >
+                {t("recentYears")}
+              </span>
             </h3>
             <div className='space-y-2'>
               {yearData.slice(0, 3).map((year, index) => (
-                <div key={index} className='flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'>
-                  <span className='font-medium text-gray-700 text-sm'>{year.year}</span>
+                <div
+                  key={index}
+                  className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                >
+                  <span
+                    className={`font-medium text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}
+                    style={{ textAlign: isRTL ? 'right' : 'left' }}
+                  >
+                    {year.year}
+                  </span>
                   <span className='bg-[#16A085] text-white px-3 py-1 rounded-full text-xs font-bold'>
                     {year.count}
                   </span>

@@ -8,8 +8,12 @@ import {
 import Table from "../common/Table"
 import Modal from "../common/Modal"
 import FormField from "../common/FormField"
+import { useLanguage } from '../../contexts/LanguageContext.jsx';
 
 const AnnouncementManagement = () => {
+  const { language, t } = useLanguage();
+  const isRTL = language === 'ps' || language === 'dr';
+
   const [announcements, setAnnouncements] = useState([])
   const [faculties, setFaculties] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -104,7 +108,7 @@ const AnnouncementManagement = () => {
   // Table columns configuration
   const columns = [
     {
-      header: "Title",
+      header: t("announcementTitle"),
       accessor: "title",
       render: (row) => (
         <div className="flex items-center">
@@ -113,23 +117,23 @@ const AnnouncementManagement = () => {
           </div>
           <div>
             <p className="font-medium text-gray-800">{row.title}</p>
-            <p className="text-xs text-gray-500">{row.category}</p>
+            <p className="text-xs text-gray-500">{t(row.category)}</p>
           </div>
         </div>
       ),
     },
     {
-      header: "Publish Date",
+      header: t("publishDate"),
       accessor: "publish_date",
       render: (row) => formatDate(row.publish_date),
     },
     {
-      header: "Expiry Date",
+      header: t("expiryDate"),
       accessor: "expiry_date",
       render: (row) => formatDate(row.expiry_date),
     },
     {
-      header: "Featured",
+      header: t("featured"),
       accessor: "is_featured",
       render: (row) => (
         <span
@@ -137,12 +141,12 @@ const AnnouncementManagement = () => {
             row.is_featured ? "bg-yellow-100 text-yellow-800" : "bg-gray-100 text-gray-800"
           }`}
         >
-          {row.is_featured ? "Featured" : "Regular"}
+          {row.is_featured ? t("featured") : t("regular")}
         </span>
       ),
     },
     {
-      header: "Status",
+      header: t("status"),
       accessor: "status",
       render: (row) => (
         <span
@@ -154,7 +158,7 @@ const AnnouncementManagement = () => {
                 : "bg-red-100 text-red-800"
           }`}
         >
-          {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+          {t(row.status)}
         </span>
       ),
     },
@@ -344,21 +348,21 @@ const AnnouncementManagement = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-                  Announcement Management
+                  {t("announcementManagement")}
                 </h1>
-                <p className="text-white/90 text-lg">Create and manage university announcements</p>
+                <p className="text-white/90 text-lg">{t("createAndManageAnnouncements")}</p>
               </div>
             </div>
             <div className="flex items-center text-white/70">
               <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm">Communication hub • {announcements.length} announcements</span>
+              <span className="text-sm">{t("communicationHub")} • {announcements.length} {t("totalAnnouncements")}</span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="text-right mb-3 sm:mb-0">
               <div className="text-2xl font-bold text-[#F4B400]">{announcements.length}</div>
-              <div className="text-white/60 text-sm">Total Announcements</div>
+              <div className="text-white/60 text-sm">{t("totalAnnouncements")}</div>
             </div>
             <button
               className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
@@ -369,7 +373,7 @@ const AnnouncementManagement = () => {
             >
               <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
               <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
-                Add New Announcement
+                {t("addAnnouncement")}
               </span>
             </button>
           </div>
@@ -390,12 +394,12 @@ const AnnouncementManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Megaphone className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Announcements</p>
+                <p className="text-white/80 text-sm font-medium">{t("totalAnnouncements")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{announcements.length}</p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
-                <span className="text-green-300 text-xs">+15% this month</span>
+                <span className="text-green-300 text-xs">{t("thisMonth")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -416,12 +420,12 @@ const AnnouncementManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Star className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Featured Items</p>
+                <p className="text-white/80 text-sm font-medium">{t("featuredItems")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{announcements.filter((item) => item.is_featured).length}</p>
               <div className="flex items-center mt-2">
                 <Award className="h-4 w-4 text-white/70 mr-1" />
-                <span className="text-white/70 text-xs">Priority announcements</span>
+                <span className="text-white/70 text-xs">{t("priorityAnnouncements")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -442,12 +446,12 @@ const AnnouncementManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <CheckCircle className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Published</p>
+                <p className="text-white/80 text-sm font-medium">{t("published")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{announcements.filter((item) => item.status === "published").length}</p>
               <div className="flex items-center mt-2">
                 <Activity className="h-4 w-4 text-green-200 mr-1" />
-                <span className="text-green-200 text-xs">Live announcements</span>
+                <span className="text-green-200 text-xs">{t("liveAnnouncements")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -468,12 +472,12 @@ const AnnouncementManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <BarChart3 className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Categories</p>
+                <p className="text-white/80 text-sm font-medium">{t("announcementsByCategory")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{new Set(announcements.map((item) => item.category)).size}</p>
               <div className="flex items-center mt-2">
                 <Target className="h-4 w-4 text-purple-200 mr-1" />
-                <span className="text-purple-200 text-xs">Content types</span>
+                <span className="text-purple-200 text-xs">{t("contentTypes")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -492,25 +496,25 @@ const AnnouncementManagement = () => {
               <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
                 <PieChart className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Status Distribution</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("announcementsByStatus")}</h3>
             </div>
             <Eye className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Published</span>
+              <span className="text-sm text-gray-600">{t("published")}</span>
               <span className="text-lg font-bold text-[#10B981]">
                 {announcements.filter(a => a.status === "published").length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Draft</span>
+              <span className="text-sm text-gray-600">{t("draft")}</span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {announcements.filter(a => a.status === "draft").length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Archived</span>
+              <span className="text-sm text-gray-600">{t("archived")}</span>
               <span className="text-lg font-bold text-[#6B7280]">
                 {announcements.filter(a => a.status === "archived").length}
               </span>
@@ -525,7 +529,7 @@ const AnnouncementManagement = () => {
               <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
                 <BarChart3 className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Category Breakdown</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("announcementsByCategory")}</h3>
             </div>
             <Users className="h-5 w-5 text-gray-400" />
           </div>
@@ -535,7 +539,7 @@ const AnnouncementManagement = () => {
               const percentage = ((count / announcements.length) * 100).toFixed(1);
               return (
                 <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 capitalize">{category}</span>
+                  <span className="text-sm text-gray-600 capitalize">{t(category)}</span>
                   <div className="flex items-center">
                     <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                       <div
@@ -558,13 +562,13 @@ const AnnouncementManagement = () => {
               <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
                 <Calendar className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Timing Analytics</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("timingAnalytics")}</h3>
             </div>
             <Clock className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Active Now</span>
+              <span className="text-sm text-gray-600">{t("activeNow")}</span>
               <span className="text-lg font-bold text-[#10B981]">
                 {announcements.filter(a => {
                   const now = new Date();
@@ -575,13 +579,13 @@ const AnnouncementManagement = () => {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Upcoming</span>
+              <span className="text-sm text-gray-600">{t("upcoming")}</span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {announcements.filter(a => new Date(a.publish_date) > new Date()).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Expired</span>
+              <span className="text-sm text-gray-600">{t("expired")}</span>
               <span className="text-lg font-bold text-[#EF4444]">
                 {announcements.filter(a => new Date(a.expiry_date) < new Date()).length}
               </span>
@@ -593,7 +597,7 @@ const AnnouncementManagement = () => {
       {/* Announcements Table */}
       {isLoading ? (
         <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p>Loading announcements...</p>
+          <p>{t("loadingAnnouncements")}</p>
         </div>
       ) : announcements.length > 0 ? (
         <Table
@@ -606,12 +610,12 @@ const AnnouncementManagement = () => {
         />
       ) : (
         <div className="bg-white p-8 rounded-lg shadow text-center">
-          <p>No announcements found. Add your first announcement.</p>
+          <p>{t("noAnnouncementsFound")}. {t("addFirstAnnouncement")}.</p>
         </div>
       )}
 
       {/* Add Announcement Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Announcement">
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={t("addAnnouncement")}>
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -619,9 +623,9 @@ const AnnouncementManagement = () => {
           }}
         >
           <div className="grid grid-cols-1 gap-4">
-            <FormField label="Title" name="title" value={formData.title} onChange={handleInputChange} required />
+            <FormField label={t("announcementTitle")} name="title" value={formData.title} onChange={handleInputChange} required />
             <FormField
-              label="Content"
+              label={t("content")}
               name="content"
               type="textarea"
               value={formData.content}
@@ -630,7 +634,7 @@ const AnnouncementManagement = () => {
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                label="Publish Date"
+                label={t("publishDate")}
                 name="publish_date"
                 type="datetime-local"
                 value={formData.publish_date ? formatDateForInput(formData.publish_date) : ""}
@@ -638,7 +642,7 @@ const AnnouncementManagement = () => {
                 required
               />
               <FormField
-                label="Expiry Date"
+                label={t("expiryDate")}
                 name="expiry_date"
                 type="datetime-local"
                 value={formData.expiry_date ? formatDateForInput(formData.expiry_date) : ""}
@@ -646,21 +650,21 @@ const AnnouncementManagement = () => {
                 required
               />
               <FormField
-                label="Category"
+                label={t("category")}
                 name="category"
                 type="select"
                 value={formData.category}
                 onChange={handleInputChange}
                 options={[
-                  { value: "academic", label: "Academic" },
-                  { value: "workshop", label: "Workshop" },
-                  { value: "seminar", label: "Seminar" },
-                  { value: "other", label: "Other" },
+                  { value: "academic", label: t("academic") },
+                  { value: "workshop", label: t("workshop") },
+                  { value: "seminar", label: t("seminar") },
+                  { value: "other", label: t("other") },
                 ]}
                 required
               />
               <FormField
-                label="Faculty"
+                label={t("faculty")}
                 name="faculty_id"
                 type="select"
                 value={formData.faculty_id}
@@ -682,19 +686,19 @@ const AnnouncementManagement = () => {
                 className="h-4 w-4 text-[#004B87] focus:ring-[#004B87] border-gray-300 rounded"
               />
               <label htmlFor="is_featured" className="text-sm font-medium text-gray-700">
-                Feature this announcement
+                {t("featured")} {t("announcementTitle")}
               </label>
             </div>
             <FormField
-              label="Status"
+              label={t("status")}
               name="status"
               type="select"
               value={formData.status}
               onChange={handleInputChange}
               options={[
-                { value: "draft", label: "Draft" },
-                { value: "published", label: "Published" },
-                { value: "archived", label: "Archived" },
+                { value: "draft", label: t("draft") },
+                { value: "published", label: t("published") },
+                { value: "archived", label: t("archived") },
               ]}
               required
             />
@@ -706,14 +710,14 @@ const AnnouncementManagement = () => {
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               onClick={() => setIsAddModalOpen(false)}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors"
             >
               <Save size={18} className="inline mr-2" />
-              Save Announcement
+              {t("save")} {t("announcementTitle")}
             </button>
           </div>
         </form>

@@ -35,6 +35,7 @@ const subjectRoutes = require("./routes/subjectRoutes");
 const committeeMemberRoutes = require("./routes/committeeMemberRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const qualityAssuranceRoutes = require("./routes/qualityAssuranceRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 const app = express();
 app.use("/public", express.static(path.join(__dirname, "public")));
 // Security headereventRoutess
@@ -120,6 +121,7 @@ app.use("/api/v1/subjects", subjectRoutes);
 app.use("/api/v1/committee-members", committeeMemberRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/quality-assurance", qualityAssuranceRoutes);
+app.use("/api/v1/notifications", notificationRoutes);
 
 // Error handler middleware
 app.use(errorHandler);

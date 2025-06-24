@@ -49,6 +49,7 @@ function App() {
             style: {
               background: "#1D3D6F",
               color: "#fff",
+              zIndex: 99990,
             },
             success: {
               duration: 3000,

@@ -9,6 +9,7 @@ import {
   BookOpen,
   LogOut,
   User,
+  FileText,
 } from "lucide-react";
 import Logo from "/KufeLogo.jpeg";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -20,7 +21,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
   const { isAuthenticated, user, logout } = useAuth();
-  const { isStudent, isTeacher, isAdmin } = useRoleAccess();
+  const { isStudent, isTeacher, isAdmin, isCommittee } = useRoleAccess();
 
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -167,6 +168,23 @@ const Navbar = () => {
                 </Link>
               </li>
             )}
+
+            {/* Committee Research Button - Only visible to committee members and admins */}
+            {(isCommittee() || isAdmin()) && (
+              <li>
+                <Link
+                  to='/committee-research'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${
+                    location.pathname === "/committee-research"
+                      ? "bg-[#F7B500] text-[#004B87] font-medium"
+                      : "bg-white/10 hover:bg-white/20 text-white hover:text-[#F7B500]"
+                  }`}
+                >
+                  <FileText size={16} />
+                  <span>Research Review</span>
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
 
@@ -246,6 +264,17 @@ const Navbar = () => {
                       >
                         <BookOpen className='h-4 w-4 mr-3 text-[#1D3D6F]' />
                         Admin Dashboard
+                      </Link>
+                    )}
+
+                    {(isCommittee() || isAdmin()) && (
+                      <Link
+                        to='/committee-research'
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className='flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors'
+                      >
+                        <FileText className='h-4 w-4 mr-3 text-[#1D3D6F]' />
+                        Research Review
                       </Link>
                     )}
 
@@ -418,6 +447,27 @@ const Navbar = () => {
                 </Link>
               </li>
             )}
+
+            {/* Committee Research Button - Only visible to committee members and admins in mobile menu */}
+            {(isCommittee() || isAdmin()) && (
+              <li>
+                <Link
+                  to='/committee-research'
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex justify-between items-center px-6 py-3 hover:bg-gray-50 ${
+                    location.pathname === "/committee-research"
+                      ? "bg-blue-50 text-[#004B87] font-medium"
+                      : "text-gray-700"
+                  }`}
+                >
+                  <div className='flex items-center gap-2'>
+                    <FileText size={18} />
+                    <span>Research Review</span>
+                  </div>
+                  <ChevronRight className='h-4 w-4' />
+                </Link>
+              </li>
+            )}
           </ul>
 
           {/* Authentication Section in Mobile Menu */}
@@ -447,6 +497,17 @@ const Navbar = () => {
                   >
                     <BookOpen className='h-4 w-4 mr-3 text-[#1D3D6F]' />
                     Admin Dashboard
+                  </Link>
+                )}
+
+                {(isCommittee() || isAdmin()) && (
+                  <Link
+                    to='/committee-research'
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className='flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition-colors'
+                  >
+                    <FileText className='h-4 w-4 mr-3 text-[#1D3D6F]' />
+                    Research Review
                   </Link>
                 )}
 

@@ -19,6 +19,7 @@ router.post("/verify-email-otp", userController.verifyEmailWithOTP)
 router.get("/verify-email/:token", userController.verifyEmail)
 router.post("/resend-verification-otp", userController.resendVerificationOTP)
 router.get('/justNameOfComiteeMembers', userController.getAllCommitteeMembers);
+router.get("/check-admin-exists", userController.checkAdminExists);
 // Protected routes (require authentication)
 router.use(authMiddleware) // Corrected middleware name
 

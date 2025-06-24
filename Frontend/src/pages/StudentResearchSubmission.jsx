@@ -19,6 +19,7 @@ import Modal from "../components/common/Modal";
 import FormField from "../components/common/FormField";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useLanguage } from "../contexts/LanguageContext";
 import {
   notifyTeacherOfSubmission,
   notifyStudentOfFeedback,
@@ -28,6 +29,8 @@ import {
 } from "../services/emailService";
 
 const StudentResearchSubmission = () => {
+  const { t, language, isRTL } = useLanguage();
+
   // State for research submissions
   const [researchSubmissions, setResearchSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -292,7 +295,7 @@ const StudentResearchSubmission = () => {
   // Table columns configuration
   const studentColumns = [
     {
-      header: "Title",
+      header: t("Title"),
       accessor: "title",
       render: (row) => (
         <div className='flex items-center'>
@@ -302,14 +305,14 @@ const StudentResearchSubmission = () => {
           <div>
             <p className='font-medium text-gray-800'>{row.title}</p>
             <p className='text-xs text-gray-500'>
-              Submitted: {formatDate(row.submission_date || row.createdAt)}
+              {t("Submitted")}: {formatDate(row.submission_date || row.createdAt)}
             </p>
           </div>
         </div>
       ),
     },
     {
-      header: "Keywords",
+      header: t("Keywords"),
       accessor: "keywords",
       render: (row) => (
         <div className='flex flex-wrap gap-1'>
@@ -323,13 +326,13 @@ const StudentResearchSubmission = () => {
               </span>
             ))
           ) : (
-            <span className='text-gray-500'>No keywords</span>
+            <span className='text-gray-500'>{t("No keywords")}</span>
           )}
         </div>
       ),
     },
     {
-      header: "Status",
+      header: t("Status"),
       accessor: "status",
       render: (row) => (
         <span
@@ -341,9 +344,11 @@ const StudentResearchSubmission = () => {
               : "bg-yellow-100 text-yellow-800"
           }`}
         >
-          {row.status
-            ? row.status.charAt(0).toUpperCase() + row.status.slice(1)
-            : "Pending"}
+          {row.status === "accepted"
+            ? t("Accepted")
+            : row.status === "rejected"
+            ? t("Rejected")
+            : t("Pending")}
         </span>
       ),
     },
@@ -726,88 +731,114 @@ const StudentResearchSubmission = () => {
   }
 
   return (
-    <>
+    <div
+      className={`min-h-screen ${isRTL ? 'rtl' : 'ltr'}`}
+      style={{ fontFamily: "'Roboto', sans-serif", backgroundColor: "#F9F9F9" }}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <Navbar />
       <div className='container mx-auto px-4 pt-20 pb-16 space-y-6'>
         {/* Back button */}
         <div className='mb-4'>
           <button
             onClick={() => (window.location.href = "/research")}
-            className='flex items-center text-[#004B87] hover:underline'
+            className={`flex items-center font-medium hover:underline ${isRTL ? 'flex-row-reverse' : ''}`}
+            style={{ color: "#004B87" }}
           >
-            <ArrowLeft size={16} className='mr-1' />
-            Back to Research
+            <ArrowLeft size={16} className={isRTL ? 'ml-1' : 'mr-1'} />
+            {t("Back to Research")}
           </button>
         </div>
 
-        <div className='flex justify-between items-center'>
-          <h2 className='text-xl font-semibold text-gray-800'>
-            My Research Submissions
-          </h2>
+        <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center ${isRTL ? 'ml-4' : 'mr-4'}`}
+              style={{ backgroundColor: "rgba(0, 75, 135, 0.1)" }}
+            >
+              <FileText size={24} style={{ color: "#004B87" }} />
+            </div>
+            <h2
+              className={`text-xl font-semibold ${isRTL ? 'text-right' : ''}`}
+              style={{
+                color: "#333333",
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: "700",
+                fontSize: "28px"
+              }}
+            >
+              {t("My Research Submissions")}
+            </h2>
+          </div>
           <button
-            className='flex items-center px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
+            className={`flex items-center px-6 py-3 rounded-lg text-white transition-colors shadow-sm ${isRTL ? 'flex-row-reverse' : ''}`}
+            style={{
+              backgroundColor: "#004B87",
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: "600",
+            }}
             onClick={() => {
               resetForm();
               setIsSubmitModalOpen(true);
             }}
           >
-            <Plus size={18} className='mr-2' />
-            Submit New Research
+            <Plus size={18} className={isRTL ? 'ml-2' : 'mr-2'} />
+            {t("Submit New Research")}
           </button>
         </div>
 
         {/* Stats Cards */}
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-          <div className='bg-white rounded-lg shadow p-6 flex items-center'>
-            <div className='w-12 h-12 rounded-full bg-[#004B87] bg-opacity-10 flex items-center justify-center mr-4'>
+          <div className='bg-white rounded-xl shadow-lg p-6 flex items-center'>
+            <div className={`w-12 h-12 rounded-full bg-[#004B87] bg-opacity-10 flex items-center justify-center ${isRTL ? 'ml-4' : 'mr-4'}`}>
               <span className='text-[#004B87] font-bold'>
                 {researchSubmissions.length}
               </span>
             </div>
-            <div>
-              <p className='text-gray-500 text-sm'>Total Submissions</p>
+            <div className={isRTL ? 'text-right' : ''}>
+              <p className='text-gray-500 text-sm'>{t("Total Submissions")}</p>
               <p className='text-lg font-semibold text-gray-800'>
                 {researchSubmissions.length}
               </p>
             </div>
           </div>
 
-          <div className='bg-white rounded-lg shadow p-6 flex items-center'>
-            <div className='w-12 h-12 rounded-full bg-yellow-500 bg-opacity-10 flex items-center justify-center mr-4'>
+          <div className='bg-white rounded-xl shadow-lg p-6 flex items-center'>
+            <div className={`w-12 h-12 rounded-full bg-yellow-500 bg-opacity-10 flex items-center justify-center ${isRTL ? 'ml-4' : 'mr-4'}`}>
               <span className='text-yellow-500 font-bold'>
                 {statusCounts.pending}
               </span>
             </div>
-            <div>
-              <p className='text-gray-500 text-sm'>Pending Review</p>
+            <div className={isRTL ? 'text-right' : ''}>
+              <p className='text-gray-500 text-sm'>{t("Pending Review")}</p>
               <p className='text-lg font-semibold text-gray-800'>
                 {statusCounts.pending}
               </p>
             </div>
           </div>
 
-          <div className='bg-white rounded-lg shadow p-6 flex items-center'>
-            <div className='w-12 h-12 rounded-full bg-green-500 bg-opacity-10 flex items-center justify-center mr-4'>
+          <div className='bg-white rounded-xl shadow-lg p-6 flex items-center'>
+            <div className={`w-12 h-12 rounded-full bg-green-500 bg-opacity-10 flex items-center justify-center ${isRTL ? 'ml-4' : 'mr-4'}`}>
               <span className='text-green-500 font-bold'>
                 {statusCounts.accepted}
               </span>
             </div>
-            <div>
-              <p className='text-gray-500 text-sm'>Accepted</p>
+            <div className={isRTL ? 'text-right' : ''}>
+              <p className='text-gray-500 text-sm'>{t("Accepted")}</p>
               <p className='text-lg font-semibold text-gray-800'>
                 {statusCounts.accepted}
               </p>
             </div>
           </div>
 
-          <div className='bg-white rounded-lg shadow p-6 flex items-center'>
-            <div className='w-12 h-12 rounded-full bg-red-500 bg-opacity-10 flex items-center justify-center mr-4'>
+          <div className='bg-white rounded-xl shadow-lg p-6 flex items-center'>
+            <div className={`w-12 h-12 rounded-full bg-red-500 bg-opacity-10 flex items-center justify-center ${isRTL ? 'ml-4' : 'mr-4'}`}>
               <span className='text-red-500 font-bold'>
                 {statusCounts.rejected}
               </span>
             </div>
-            <div>
-              <p className='text-gray-500 text-sm'>Rejected</p>
+            <div className={isRTL ? 'text-right' : ''}>
+              <p className='text-gray-500 text-sm'>{t("Rejected")}</p>
               <p className='text-lg font-semibold text-gray-800'>
                 {statusCounts.rejected}
               </p>
@@ -877,11 +908,11 @@ const StudentResearchSubmission = () => {
         )}
 
         {/* Action Bar */}
-        <div className='bg-white rounded-lg shadow p-4 flex flex-col md:flex-row gap-4 justify-between items-center'>
+        <div className='bg-white rounded-xl shadow-lg p-4 flex flex-col md:flex-row gap-4 justify-between items-center'>
           <div className='relative flex-grow'>
             <input
               type='text'
-              placeholder='Search by title, abstract, or keywords...'
+              placeholder={t('Search by title, abstract, or keywords...')}
               className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#004B87]'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -899,7 +930,7 @@ const StudentResearchSubmission = () => {
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
               >
                 <Filter size={18} />
-                <span>Filters</span>
+                <span>{t('Filters')}</span>
                 <ChevronDown
                   size={16}
                   className={`transition-transform ${
@@ -912,29 +943,29 @@ const StudentResearchSubmission = () => {
                 <div className='absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-10 p-4'>
                   <div className='mb-4'>
                     <label className='block text-sm font-medium text-gray-700 mb-1'>
-                      Status
+                      {t("Status")}
                     </label>
                     <select
                       className='w-full p-2 border border-gray-300 rounded-md'
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
                     >
-                      <option value='all'>All Statuses</option>
-                      <option value='pending'>Pending</option>
-                      <option value='accepted'>Accepted</option>
-                      <option value='rejected'>Rejected</option>
+                      <option value='all'>{t("All Statuses")}</option>
+                      <option value='pending'>{t("Pending")}</option>
+                      <option value='accepted'>{t("Accepted")}</option>
+                      <option value='rejected'>{t("Rejected")}</option>
                     </select>
                   </div>
                   <div className='mb-4'>
                     <label className='block text-sm font-medium text-gray-700 mb-1'>
-                      Department
+                      {t("Department")}
                     </label>
                     <select
                       className='w-full p-2 border border-gray-300 rounded-md'
                       value={departmentFilter}
                       onChange={(e) => setDepartmentFilter(e.target.value)}
                     >
-                      <option value='all'>All Departments</option>
+                      <option value='all'>{t("All Departments")}</option>
                       {departmentsList.map((dept) => (
                         <option key={dept._id} value={dept._id}>
                           {dept.name}
@@ -951,42 +982,33 @@ const StudentResearchSubmission = () => {
                         setDepartmentFilter("all");
                       }}
                     >
-                      Clear filters
+                      {t("Clear filters")}
                     </button>
                     <button
                       className='text-sm bg-[#004B87] text-white px-3 py-1 rounded-md hover:bg-[#003a6a]'
                       onClick={() => setIsFilterOpen(false)}
                     >
-                      Apply
+                      {t("Apply")}
                     </button>
                   </div>
                 </div>
               )}
             </div>
 
-            <button
-              className='flex items-center px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
-              onClick={() => {
-                resetForm();
-                setIsSubmitModalOpen(true);
-              }}
-            >
-              <Plus size={18} className='mr-2' />
-              Submit Research
-            </button>
+
           </div>
         </div>
 
         {/* Research Submissions Table */}
-        <div className='bg-white rounded-lg shadow overflow-hidden'>
+        <div className='bg-white rounded-xl shadow-lg overflow-hidden'>
           {filteredSubmissions.length === 0 ? (
             <div className='p-8 text-center'>
               <FileText size={48} className='mx-auto text-gray-300 mb-4' />
               <h3 className='text-lg font-medium text-gray-800 mb-2'>
-                No research submissions found
+                {t("No research submissions found")}
               </h3>
               <p className='text-gray-600 mb-4'>
-                You haven't submitted any research papers yet.
+                {t("You haven't submitted any research papers yet.")}
               </p>
               <button
                 className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
@@ -995,7 +1017,7 @@ const StudentResearchSubmission = () => {
                   setIsSubmitModalOpen(true);
                 }}
               >
-                Submit Your First Research Paper
+                {t("Submit Your First Research Paper")}
               </button>
             </div>
           ) : (
@@ -1012,7 +1034,7 @@ const StudentResearchSubmission = () => {
                       </th>
                     ))}
                     <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                      Actions
+                      {t("Actions")}
                     </th>
                   </tr>
                 </thead>
@@ -1077,7 +1099,7 @@ const StudentResearchSubmission = () => {
         <Modal
           isOpen={isSubmitModalOpen}
           onClose={() => setIsSubmitModalOpen(false)}
-          title='Submit Research Paper'
+          title={t('Submit Research Paper')}
           size='lg'
         >
           <form
@@ -1088,14 +1110,14 @@ const StudentResearchSubmission = () => {
           >
             <div className='grid grid-cols-1 gap-6'>
               <FormField
-                label='Paper Title'
+                label={t('Paper Title')}
                 name='title'
                 value={formData.title}
                 onChange={handleInputChange}
                 required
               />
               <FormField
-                label='Abstract'
+                label={t('Abstract')}
                 name='abstract'
                 type='textarea'
                 value={formData.abstract}
@@ -1105,7 +1127,7 @@ const StudentResearchSubmission = () => {
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
                   <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    Student
+                    {t('Student')}
                   </label>
                   <select
                     name='student_id'
@@ -1128,7 +1150,7 @@ const StudentResearchSubmission = () => {
                     className='w-full p-2 border border-gray-300 rounded-md'
                     required
                   >
-                    <option value=''>Select Student</option>
+                    <option value=''>{t('Select Student')}</option>
                     {students.map((student) => (
                       <option key={student._id} value={student._id}>
                         {student.name} ({student.student_id_number})
@@ -1137,7 +1159,7 @@ const StudentResearchSubmission = () => {
                   </select>
                 </div>
                 <FormField
-                  label='Student Name'
+                  label={t('Student Name')}
                   name='student_name'
                   value={formData.student_name}
                   onChange={handleInputChange}
@@ -1145,7 +1167,7 @@ const StudentResearchSubmission = () => {
                 />
                 <div>
                   <label className='block text-sm font-medium text-gray-700 mb-1'>
-                    Department
+                    {t('Department')}
                   </label>
                   <select
                     name='department_id'
@@ -1163,7 +1185,7 @@ const StudentResearchSubmission = () => {
                     className='w-full p-2 border border-gray-300 rounded-md'
                     required
                   >
-                    <option value=''>Select Department</option>
+                    <option value=''>{t('Select Department')}</option>
                     {departmentsList.map((dept) => (
                       <option key={dept._id} value={dept._id}>
                         {dept.name}
@@ -1172,7 +1194,7 @@ const StudentResearchSubmission = () => {
                   </select>
                 </div>
                 <FormField
-                  label='Keywords (comma separated)'
+                  label={t('Keywords (comma separated)')}
                   name='keywords'
                   value={formData.keywords}
                   onChange={handleKeywordsChange}
@@ -1184,11 +1206,10 @@ const StudentResearchSubmission = () => {
                 <div className='flex flex-col items-center justify-center'>
                   <FileText size={48} className='text-gray-400 mb-4' />
                   <h3 className='text-lg font-medium text-gray-800 mb-2'>
-                    Upload Research Paper
+                    {t('Upload Research Paper')}
                   </h3>
                   <p className='text-gray-500 text-sm mb-4 text-center'>
-                    Upload your research paper in PDF format. Maximum file size:
-                    10MB
+                    {t('Upload your research paper in PDF format. Maximum file size: 10MB')}
                   </p>
                   <input
                     type='file'
@@ -1206,7 +1227,7 @@ const StudentResearchSubmission = () => {
                     htmlFor='file_upload'
                     className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors cursor-pointer'
                   >
-                    Select File
+                    {t('Select File')}
                   </label>
                   {formData.file && (
                     <div className='mt-4 flex items-center'>
@@ -1222,13 +1243,10 @@ const StudentResearchSubmission = () => {
                   <Mail size={20} className='text-blue-500 mr-2 mt-0.5' />
                   <div>
                     <h4 className='text-sm font-medium text-blue-800'>
-                      Email Notifications
+                      {t('Email Notifications')}
                     </h4>
                     <p className='text-sm text-blue-600'>
-                      Your department teacher will be notified by email when you
-                      submit your research. You will also receive an email
-                      notification when the committee provides feedback on your
-                      submission.
+                      {t('Your department teacher will be notified by email when you submit your research. You will also receive an email notification when the committee provides feedback on your submission.')}
                     </p>
                   </div>
                 </div>
@@ -1240,14 +1258,14 @@ const StudentResearchSubmission = () => {
                   className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
                   onClick={() => setIsSubmitModalOpen(false)}
                 >
-                  Cancel
+                  {t('Cancel')}
                 </button>
                 <button
                   type='submit'
                   className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003a6a] transition-colors'
                 >
                   <Save size={18} className='inline mr-2' />
-                  Submit Research
+                  {t('Submit Research')}
                 </button>
               </div>
             </div>
@@ -1616,7 +1634,7 @@ const StudentResearchSubmission = () => {
         </Modal>
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 

@@ -57,7 +57,7 @@ const CommitteeMemberManagement = () => {
 
         // Fetch users
         const usersResponse = await fetch(
-          "http://localhost:4400/api/v1/user/justNameOfComiteeMembers",
+          "http://127.0.0.1:4400/api/v1/user/justNameOfComiteeMembers",
           {
             headers,
           }
@@ -68,7 +68,7 @@ const CommitteeMemberManagement = () => {
 
         // Fetch departments
         const departmentsResponse = await fetch(
-          "http://localhost:4400/api/v1/departments/",
+          "http://127.0.0.1:4400/api/v1/departments/",
           {
             headers,
           }
@@ -250,6 +250,16 @@ const CommitteeMemberManagement = () => {
 
     if (!validateForm()) return;
 
+    console.log("Editing committee member with ID:", selectedMember._id);
+    console.log("Form data being sent:", {
+      userId: formData.userId,
+      department: formData.department,
+      academicRank: formData.academicRank,
+      committeePosition: formData.committeePosition,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+    });
+
     try {
       const response = await fetch(
         `http://127.0.0.1:4400/api/v1/committee-members/${selectedMember._id}`,
@@ -266,6 +276,9 @@ const CommitteeMemberManagement = () => {
           }),
         }
       );
+
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
 
       if (response.ok) {
         // Refresh the committee members list
@@ -294,12 +307,15 @@ const CommitteeMemberManagement = () => {
 
         setIsEditModalOpen(false);
         resetForm();
+        alert("Committee member updated successfully!");
       } else {
         const errorData = await response.json();
         console.error("Error updating committee member:", errorData);
+        alert(`Failed to update committee member: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error updating committee member:", error);
+      alert(`Failed to update committee member: ${error.message}`);
     }
   };
 
@@ -433,29 +449,29 @@ const CommitteeMemberManagement = () => {
   // Table columns configuration
   const columns = [
     {
-      header: "Name",
+      header: t("memberName"),
       accessor: "userId.fullName",
       render: (row) => row.userId?.fullName || "N/A",
     },
     {
-      header: "Department",
+      header: t("department"),
       accessor: "department.name",
       render: (row) => row.department?.name || "N/A",
     },
     {
-      header: "Academic Rank",
+      header: t("academicRank"),
       accessor: "academicRank",
     },
     {
-      header: "Committee Position",
+      header: t("committeePosition"),
       accessor: "committeePosition",
     },
     {
-      header: "Email",
+      header: t("email"),
       accessor: "email",
     },
     {
-      header: "Phone",
+      header: t("phoneNumber"),
       accessor: "phoneNumber",
     },
   ];
@@ -487,21 +503,21 @@ const CommitteeMemberManagement = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-[#F4B400] to-white bg-clip-text text-transparent">
-                  {t("Committee Member Management")}
+                  {t("committeeMemberManagement")}
                 </h1>
-                <p className="text-white/90 text-lg">{t("Manage committee members, their roles, and contact information")}</p>
+                <p className="text-white/90 text-lg">{t("manageCommitteeMembers")}</p>
               </div>
             </div>
             <div className="flex items-center text-white/70">
               <div className="w-2 h-2 bg-[#F4B400] rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm">Committee governance • {committeeMembers.length} members</span>
+              <span className="text-sm">{t("committeeGovernance")} • {committeeMembers.length} {t("totalMembers")}</span>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="text-right mb-3 sm:mb-0">
               <div className="text-2xl font-bold text-[#F4B400]">{committeeMembers.length}</div>
-              <div className="text-white/60 text-sm">Total Members</div>
+              <div className="text-white/60 text-sm">{t("totalMembers")}</div>
             </div>
             <button
               className="group bg-white/20 hover:bg-[#F4B400] px-6 py-3 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/30 hover:border-[#F4B400] hover:scale-105 hover:shadow-xl flex items-center"
@@ -512,7 +528,7 @@ const CommitteeMemberManagement = () => {
             >
               <Plus className="h-5 w-5 mr-2 transition-all duration-300 group-hover:text-[#004B87] text-white" />
               <span className="font-medium transition-all duration-300 group-hover:text-[#004B87] text-white">
-                {t("Add Committee Member")}
+                {t("addCommitteeMember")}
               </span>
             </button>
           </div>
@@ -533,12 +549,12 @@ const CommitteeMemberManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Users className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Total Members</p>
+                <p className="text-white/80 text-sm font-medium">{t("totalMembers")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{committeeMembers.length}</p>
               <div className="flex items-center mt-2">
                 <TrendingUp className="h-4 w-4 text-green-300 mr-1" />
-                <span className="text-green-300 text-xs">+10% this year</span>
+                <span className="text-green-300 text-xs">{t("thisYear")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -559,12 +575,12 @@ const CommitteeMemberManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Award className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Academic Ranks</p>
+                <p className="text-white/80 text-sm font-medium">{t("membersByRank")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{new Set(committeeMembers.map(m => m.academicRank)).size}</p>
               <div className="flex items-center mt-2">
                 <Star className="h-4 w-4 text-white/70 mr-1" />
-                <span className="text-white/70 text-xs">Diverse expertise</span>
+                <span className="text-white/70 text-xs">{t("diverseFields")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -585,12 +601,12 @@ const CommitteeMemberManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <CheckCircle className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Committee Positions</p>
+                <p className="text-white/80 text-sm font-medium">{t("committeePosition")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{new Set(committeeMembers.map(m => m.committeePosition)).size}</p>
               <div className="flex items-center mt-2">
                 <Target className="h-4 w-4 text-green-200 mr-1" />
-                <span className="text-green-200 text-xs">Leadership roles</span>
+                <span className="text-green-200 text-xs">{t("activeMembers")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -611,12 +627,12 @@ const CommitteeMemberManagement = () => {
                 <div className="bg-white/20 p-2 rounded-lg mr-3">
                   <Building2 className="h-6 w-6 text-white" />
                 </div>
-                <p className="text-white/80 text-sm font-medium">Departments</p>
+                <p className="text-white/80 text-sm font-medium">{t("membersByDepartment")}</p>
               </div>
               <p className="text-3xl font-bold text-white">{new Set(committeeMembers.map(m => m.department?.name).filter(Boolean)).size}</p>
               <div className="flex items-center mt-2">
                 <Activity className="h-4 w-4 text-purple-200 mr-1" />
-                <span className="text-purple-200 text-xs">Cross-departmental</span>
+                <span className="text-purple-200 text-xs">{t("diverseFields")}</span>
               </div>
             </div>
             <div className="bg-white/10 p-3 rounded-full">
@@ -635,7 +651,7 @@ const CommitteeMemberManagement = () => {
               <div className="bg-gradient-to-br from-[#EC4899] to-[#DB2777] p-2 rounded-lg mr-3">
                 <BarChart3 className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Academic Ranks</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("membersByRank")}</h3>
             </div>
             <Eye className="h-5 w-5 text-gray-400" />
           </div>
@@ -668,7 +684,7 @@ const CommitteeMemberManagement = () => {
               <div className="bg-gradient-to-br from-[#06B6D4] to-[#0891B2] p-2 rounded-lg mr-3">
                 <PieChart className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Committee Positions</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("committeePosition")}</h3>
             </div>
             <UserCheck className="h-5 w-5 text-gray-400" />
           </div>
@@ -692,25 +708,25 @@ const CommitteeMemberManagement = () => {
               <div className="bg-gradient-to-br from-[#F59E0B] to-[#D97706] p-2 rounded-lg mr-3">
                 <Settings className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Contact Coverage</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{t("contactCoverage")}</h3>
             </div>
             <Activity className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">With Email</span>
+              <span className="text-sm text-gray-600">{t("withEmail")}</span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {committeeMembers.filter(m => m.email).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">With Phone</span>
+              <span className="text-sm text-gray-600">{t("withPhone")}</span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {committeeMembers.filter(m => m.phoneNumber).length}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Complete Profiles</span>
+              <span className="text-sm text-gray-600">{t("completeProfiles")}</span>
               <span className="text-lg font-bold text-[#F59E0B]">
                 {committeeMembers.filter(m => m.email && m.phoneNumber && m.academicRank && m.committeePosition).length}
               </span>
@@ -725,7 +741,7 @@ const CommitteeMemberManagement = () => {
           <div className='relative w-full md:w-96'>
             <input
               type='text'
-              placeholder={t("Search committee members...")}
+              placeholder={t("searchCommitteeMembers")}
               className='w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004B87] focus:border-transparent transition-all duration-300'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -737,7 +753,7 @@ const CommitteeMemberManagement = () => {
         {/* Committee Members Table */}
         {isLoading ? (
           <div className='bg-white p-8 rounded-lg shadow text-center'>
-            <p>{t("Loading committee members...")}</p>
+            <p>{t("loadingCommitteeMembers")}</p>
           </div>
         ) : filteredMembers.length > 0 ? (
           <Table
@@ -752,10 +768,8 @@ const CommitteeMemberManagement = () => {
           <div className='bg-white p-8 rounded-lg shadow text-center'>
             <p>
               {searchTerm
-                ? t("No committee members found matching your search.")
-                : t(
-                    "No committee members found. Add your first committee member."
-                  )}
+                ? t("noCommitteeMembersMatchingSearch")
+                : t("noCommitteeMembersFound") + ". " + t("addFirstCommitteeMember") + "."}
             </p>
           </div>
         )}
@@ -765,12 +779,12 @@ const CommitteeMemberManagement = () => {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title={t("Add Committee Member")}
+        title={t("addCommitteeMember")}
       >
         <form onSubmit={handleAddMember}>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <FormField
-              label={t("User")}
+              label={t("selectUser")}
               name='userId'
               type='select'
               value={formData.userId}
@@ -783,7 +797,7 @@ const CommitteeMemberManagement = () => {
               error={formErrors.userId}
             />
             <FormField
-              label={t("Department")}
+              label={t("selectDepartment")}
               name='department'
               type='select'
               value={formData.department}
@@ -796,27 +810,27 @@ const CommitteeMemberManagement = () => {
               error={formErrors.department}
             />
             <FormField
-              label={t("Academic Rank")}
+              label={t("academicRank")}
               name='academicRank'
               type='text'
               value={formData.academicRank}
               onChange={handleInputChange}
-              placeholder='Enter academic rank'
+              placeholder={t("enterAcademicRank")}
               required
               error={formErrors.academicRank}
             />
             <FormField
-              label={t("Committee Position")}
+              label={t("committeePosition")}
               name='committeePosition'
               type='text'
               value={formData.committeePosition}
               onChange={handleInputChange}
-              placeholder='Enter committee position'
+              placeholder={t("enterCommitteePosition")}
               required
               error={formErrors.committeePosition}
             />
             <FormField
-              label={t("Email")}
+              label={t("email")}
               name='email'
               type='email'
               value={formData.email}
@@ -826,12 +840,12 @@ const CommitteeMemberManagement = () => {
               error={formErrors.email}
             />
             <FormField
-              label={t("Phone Number")}
+              label={t("phoneNumber")}
               name='phoneNumber'
               type='tel'
               value={formData.phoneNumber}
               onChange={handleInputChange}
-              placeholder='+1234567890'
+              placeholder={t("enterPhoneNumber")}
               required
               error={formErrors.phoneNumber}
             />
@@ -842,13 +856,13 @@ const CommitteeMemberManagement = () => {
               className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
               onClick={() => setIsAddModalOpen(false)}
             >
-              {t("Cancel")}
+              {t("cancel")}
             </button>
             <button
               type='submit'
               className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003b6a]'
             >
-              {t("Add Committee Member")}
+              {t("addCommitteeMember")}
             </button>
           </div>
         </form>
@@ -858,13 +872,13 @@ const CommitteeMemberManagement = () => {
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title={t("Edit Committee Member")}
+        title={t("editCommitteeMember")}
         onOpen={debugUserSelection} // Debug when modal opens
       >
         <form onSubmit={handleEditMember}>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <FormField
-              label={t("User")}
+              label={t("selectUser")}
               name='userId'
               type='select'
               value={formData.userId}
@@ -877,7 +891,7 @@ const CommitteeMemberManagement = () => {
               error={formErrors.userId}
             />
             <FormField
-              label={t("Department")}
+              label={t("selectDepartment")}
               name='department'
               type='select'
               value={formData.department}
@@ -890,27 +904,27 @@ const CommitteeMemberManagement = () => {
               error={formErrors.department}
             />
             <FormField
-              label={t("Academic Rank")}
+              label={t("academicRank")}
               name='academicRank'
               type='text'
               value={formData.academicRank}
               onChange={handleInputChange}
-              placeholder='Enter academic rank'
+              placeholder={t("enterAcademicRank")}
               required
               error={formErrors.academicRank}
             />
             <FormField
-              label={t("Committee Position")}
+              label={t("committeePosition")}
               name='committeePosition'
               type='text'
               value={formData.committeePosition}
               onChange={handleInputChange}
-              placeholder='Enter committee position'
+              placeholder={t("enterCommitteePosition")}
               required
               error={formErrors.committeePosition}
             />
             <FormField
-              label={t("Email")}
+              label={t("email")}
               name='email'
               type='email'
               value={formData.email}
@@ -920,12 +934,12 @@ const CommitteeMemberManagement = () => {
               error={formErrors.email}
             />
             <FormField
-              label={t("Phone Number")}
+              label={t("phoneNumber")}
               name='phoneNumber'
               type='tel'
               value={formData.phoneNumber}
               onChange={handleInputChange}
-              placeholder='+1234567890'
+              placeholder={t("enterPhoneNumber")}
               required
               error={formErrors.phoneNumber}
             />
@@ -936,13 +950,13 @@ const CommitteeMemberManagement = () => {
               className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
               onClick={() => setIsEditModalOpen(false)}
             >
-              {t("Cancel")}
+              {t("cancel")}
             </button>
             <button
               type='submit'
               className='px-4 py-2 bg-[#004B87] text-white rounded-md hover:bg-[#003b6a]'
             >
-              {t("Update Committee Member")}
+              {t("updateCommitteeMember")}
             </button>
           </div>
         </form>
@@ -952,7 +966,7 @@ const CommitteeMemberManagement = () => {
       <Modal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
-        title={t("Committee Member Details")}
+        title={t("committeeMemberDetails")}
       >
         {selectedMember && (
           <div className='space-y-4'>
@@ -962,29 +976,29 @@ const CommitteeMemberManagement = () => {
               </h3>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
-                  <p className='text-sm text-gray-500'>{t("Department")}</p>
+                  <p className='text-sm text-gray-500'>{t("department")}</p>
                   <p>{selectedMember.department?.name || "N/A"}</p>
                 </div>
                 <div>
-                  <p className='text-sm text-gray-500'>{t("Academic Rank")}</p>
+                  <p className='text-sm text-gray-500'>{t("academicRank")}</p>
                   <p>{selectedMember.academicRank}</p>
                 </div>
                 <div>
                   <p className='text-sm text-gray-500'>
-                    {t("Committee Position")}
+                    {t("committeePosition")}
                   </p>
                   <p>{selectedMember.committeePosition}</p>
                 </div>
                 <div>
-                  <p className='text-sm text-gray-500'>{t("Email")}</p>
+                  <p className='text-sm text-gray-500'>{t("email")}</p>
                   <p>{selectedMember.email}</p>
                 </div>
                 <div>
-                  <p className='text-sm text-gray-500'>{t("Phone Number")}</p>
+                  <p className='text-sm text-gray-500'>{t("phoneNumber")}</p>
                   <p>{selectedMember.phoneNumber}</p>
                 </div>
                 <div>
-                  <p className='text-sm text-gray-500'>{t("Member Since")}</p>
+                  <p className='text-sm text-gray-500'>{t("memberSince")}</p>
                   <p>
                     {new Date(selectedMember.createdAt).toLocaleDateString()}
                   </p>
@@ -996,7 +1010,7 @@ const CommitteeMemberManagement = () => {
                 className='px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300'
                 onClick={() => setIsViewModalOpen(false)}
               >
-                {t("Close")}
+                {t("close")}
               </button>
             </div>
           </div>
@@ -1007,34 +1021,34 @@ const CommitteeMemberManagement = () => {
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        title={t("Confirm Deletion")}
+        title={t("confirmDeletion")}
       >
         <div className='p-4'>
           <p className='mb-4'>
-            {t("Are you sure you want to delete this committee member?")}
+            {t("confirmDeleteCommitteeMember")}
             {selectedMember && (
               <span className='font-medium'>
                 {" "}
-                {selectedMember.userId?.fullName || t("This member")}
+                {selectedMember.userId?.fullName || t("member")}
               </span>
             )}
             ?
           </p>
           <p className='text-red-500 mb-4'>
-            {t("This action cannot be undone.")}
+            {t("actionCannotBeUndone")}
           </p>
           <div className='flex justify-end gap-3'>
             <button
               className='px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50'
               onClick={() => setIsDeleteModalOpen(false)}
             >
-              {t("Cancel")}
+              {t("cancel")}
             </button>
             <button
               className='px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700'
               onClick={handleDeleteMember}
             >
-              {t("Delete")}
+              {t("delete")}
             </button>
           </div>
         </div>

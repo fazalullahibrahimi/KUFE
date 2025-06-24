@@ -47,17 +47,17 @@ const Hero = () => {
         const formattedStats = [
           {
             icon: <FaUserGraduate className='text-[#F4B400] text-2xl' />,
-            title: "Students",
+            title: t("Students") || "Students",
             value: `${studentResponse.data}+`,
           },
           {
             icon: <FaChalkboardTeacher className='text-[#F4B400] text-2xl' />,
-            title: "Faculty Members",
+            title: t("Faculty Members") || "Faculty Members",
             value: `${facultyResponse.data}+`,
           },
           {
             icon: <FaBook className='text-[#F4B400] text-2xl' />,
-            title: "Programs",
+            title: t("Programs") || "Programs",
             value: programResponse.data.toString(),
           },
         ];
@@ -71,17 +71,17 @@ const Hero = () => {
         setStatsData([
           {
             icon: <FaUserGraduate className='text-[#F4B400] text-2xl' />,
-            title: "Students",
+            title: t("Students") || "Students",
             value: "5,000+",
           },
           {
             icon: <FaChalkboardTeacher className='text-[#F4B400] text-2xl' />,
-            title: "Faculty Members",
+            title: t("Faculty Members") || "Faculty Members",
             value: "50+",
           },
           {
             icon: <FaBook className='text-[#F4B400] text-2xl' />,
-            title: "Programs",
+            title: t("Programs") || "Programs",
             value: "12",
           },
         ]);
@@ -91,7 +91,7 @@ const Hero = () => {
     };
 
     fetchStats();
-  }, []);
+  }, [t]); // Re-fetch when language changes to update translations
 
   return (
     <section
