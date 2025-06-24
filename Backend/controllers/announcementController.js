@@ -2,6 +2,70 @@ const Announcement = require("../models/Announcement")
 const asyncHandler = require("../middleware/asyncHandler")
 const ErrorResponse = require("../utils/errorResponse")
 
+const multer = require("multer");
+const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs");
+
+const multerStorage = multer.memoryStorage();
+
+// Filter to ensure only images are uploaded
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb("Not an image! Please upload only images.", false);
+  }
+};
+
+// Multer upload configuration
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// Middleware to handle single image file upload with name 'image'
+const uploadAnnouncementPhoto = upload.single("image");
+
+// Resize uploaded announcement photo
+const resizeAnnouncementPhoto = asyncHandler(async (req, res, next) => {
+  if (!req.file) return next();
+
+  const dir = path.join(__dirname, '.././public/img/announcements');
+  if (!fs.existsSync(dir)) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+    } catch (error) {
+      console.error('Error creating image directory:', error);
+      return res.status(500).send({
+        success: false,
+        message: "Failed to create image directory"
+      });
+    }
+  }
+
+  const filename = `announcement-${Date.now()}-${Math.random()
+    .toString(36)
+    .substr(2, 9)}.jpeg`;
+  req.file.filename = filename;
+
+  try {
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(path.join(dir, filename));
+  } catch (error) {
+    console.error('Error processing image:', error);
+    return res.status(500).send({
+      success: false,
+      message: "Error processing image"
+    });
+  }
+
+  next();
+});
+
 // @desc    Get all announcements
 // @route   GET /api/v1/announcements
 // @access  Public
@@ -102,6 +166,10 @@ exports.createAnnouncement = asyncHandler(async (req, res, next) => {
     req.body.user = req.user.id
   }
 
+  // Handle uploaded image
+  const image = req.file ? req.file.filename : "default-announcement.jpg"
+  req.body.image = image
+
   const announcement = await Announcement.create(req.body)
 
   res.status(201).json({
@@ -171,3 +239,7 @@ exports.getFeaturedAnnouncements = asyncHandler(async (req, res, next) => {
     data: announcements,
   })
 })
+
+// Export upload functions
+exports.uploadAnnouncementPhoto = uploadAnnouncementPhoto
+exports.resizeAnnouncementPhoto = resizeAnnouncementPhoto

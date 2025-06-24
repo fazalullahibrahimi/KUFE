@@ -94,230 +94,18 @@ function AnnouncementsEventsPage() {
     rootMargin: "0px 0px -100px 0px",
   });
 
-  // Sample data
-  const [announcements, setAnnouncements] = useState([
-    {
-      id: 1,
-      title: "New Semester Registration Open",
-      content:
-        "Registration for the upcoming semester is now open. Students can register online through the student portal.",
-      fullContent: `The Faculty of Economics is pleased to announce that registration for the Spring 2024 semester is now officially open. All current and prospective students are encouraged to complete their registration as soon as possible to secure their preferred courses and schedules.
+  // Dynamic data states
+  const [announcements, setAnnouncements] = useState([]);
 
-Registration Process:
-1. Log into the student portal using your university credentials
-2. Review the available courses for your program
-3. Select your desired courses and sections
-4. Confirm your registration and pay any required fees
-5. Print your registration confirmation for your records
+  const [events, setEvents] = useState([]);
 
-Important Dates:
-- Early Registration: January 15-20, 2024
-- Regular Registration: January 21-30, 2024
-- Late Registration: February 1-5, 2024 (additional fees apply)
-
-Course offerings include core economics courses, electives, and specialized seminars. Students are advised to consult with their academic advisors to ensure proper course selection that aligns with their degree requirements.`,
-      date: "2024-01-15",
-      category: "academic",
-      featured: true,
-      contactInfo: "For assistance, contact the Registrar's Office at registrar@ku.edu.af or visit Room 201, Administration Building.",
-      importantNotes: "Students who fail to register by the deadline may lose their enrollment status. Financial aid recipients must maintain full-time enrollment to retain their aid eligibility."
-    },
-    {
-      id: 2,
-      title: "Scholarship Applications Available",
-      content:
-        "Merit-based scholarships are now available for eligible students. Apply before the deadline.",
-      fullContent: `The Faculty of Economics is proud to announce the availability of merit-based scholarships for the 2024-2025 academic year. These scholarships are designed to support outstanding students who demonstrate academic excellence and financial need.
-
-Available Scholarships:
-- Dean's Excellence Scholarship: Full tuition coverage for top 5% of students
-- Academic Merit Award: 50% tuition reduction for students with GPA 3.5+
-- Need-Based Grant: Variable amounts based on financial circumstances
-- Research Assistant Scholarship: Tuition waiver plus monthly stipend
-
-Eligibility Requirements:
-- Minimum GPA of 3.0 for continuing students
-- Demonstrated financial need (documentation required)
-- Full-time enrollment status
-- Afghan citizenship or permanent residency
-- No outstanding academic or financial obligations
-
-Application Requirements:
-- Completed scholarship application form
-- Official transcripts
-- Two letters of recommendation
-- Personal statement (500 words maximum)
-- Financial need documentation
-- Copy of national ID card`,
-      date: "2024-01-10",
-      category: "admission",
-      featured: false,
-      contactInfo: "Submit applications to the Financial Aid Office, Room 105, Student Services Building, or email scholarships@ku.edu.af",
-      importantNotes: "Application deadline is February 28, 2024. Incomplete applications will not be considered. Recipients must maintain a minimum GPA of 3.0 to retain their scholarship."
-    },
-  ]);
-
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "Economics Conference 2024",
-      description:
-        "Annual conference featuring leading economists and industry experts.",
-      fullDescription: `Join us for the most anticipated economics conference of the year! This comprehensive event brings together renowned economists, industry leaders, policy makers, and students to discuss current economic trends, challenges, and opportunities.
-
-Conference Highlights:
-- Keynote speeches by international economic experts
-- Panel discussions on global economic trends
-- Workshops on economic research methodologies
-- Networking opportunities with industry professionals
-- Student presentation sessions
-- Awards ceremony for outstanding research
-
-Featured Speakers:
-- Dr. Ahmad Rashid - Former Economic Advisor to the Government
-- Prof. Sarah Johnson - International Monetary Fund
-- Dr. Mohammad Karimi - Central Bank of Afghanistan
-- Ms. Elena Rodriguez - World Bank Representative
-
-Topics to be Covered:
-- Post-pandemic economic recovery strategies
-- Digital transformation in banking and finance
-- Sustainable development and green economics
-- Regional trade and economic cooperation
-- Monetary policy in developing economies`,
-      date: "2024-02-15",
-      time: "9:00 AM - 5:00 PM",
-      location: "Main Auditorium",
-      category: "conference",
-      image: "/placeholder.svg?height=200&width=400",
-      registrationRequired: true,
-      capacity: 300,
-      registrationDeadline: "2024-02-10",
-      contactInfo: "For registration and inquiries, contact events@ku.edu.af or call +93-40-222-3456",
-      requirements: "Business attire required. Students must bring valid ID cards. Light refreshments will be provided."
-    },
-    {
-      id: 2,
-      title: "Career Fair",
-      description: "Meet with top employers and explore career opportunities.",
-      fullDescription: `The Faculty of Economics Career Fair is your gateway to exciting career opportunities in the economic and business sectors. This annual event connects students and recent graduates with leading employers from various industries.
-
-Participating Organizations:
-- Afghanistan International Bank
-- Da Afghanistan Bank (Central Bank)
-- Ministry of Finance
-- USAID Afghanistan
-- World Bank Afghanistan Office
-- Local and international NGOs
-- Private sector companies
-- Government agencies
-
-What to Expect:
-- Direct interaction with hiring managers
-- On-the-spot interviews for qualified candidates
-- Career counseling sessions
-- Resume review services
-- Professional networking opportunities
-- Information about internship programs
-- Graduate program presentations
-
-Career Opportunities Available:
-- Economic Analysts
-- Financial Advisors
-- Banking Associates
-- Research Assistants
-- Project Coordinators
-- Data Analysts
-- Policy Researchers`,
-      date: "2024-02-20",
-      time: "10:00 AM - 4:00 PM",
-      location: "Student Center",
-      category: "cultural",
-      image: "/placeholder.svg?height=200&width=400",
-      registrationRequired: false,
-      capacity: 500,
-      contactInfo: "For more information, visit the Career Services Office or email careers@ku.edu.af",
-      requirements: "Bring multiple copies of your resume. Professional attire recommended. Students should bring their student ID cards."
-    },
-  ]);
-
-  const [news, setNews] = useState([
-    {
-      id: 1,
-      title: "Faculty Research Published",
-      summary:
-        "Our faculty's latest research on economic trends has been published in a prestigious journal.",
-      fullContent: `The Faculty of Economics is proud to announce that groundbreaking research conducted by our faculty members has been published in the International Journal of Economic Development, one of the most prestigious academic publications in the field.
-
-Research Details:
-The study, titled "Economic Resilience in Post-Conflict Societies: A Case Study of Afghanistan's Recovery Path," was conducted by Dr. Mohammad Hashim, Professor of Economics, in collaboration with Dr. Fatima Ahmadi, Associate Professor of Development Economics.
-
-Key Findings:
-- Analysis of Afghanistan's economic recovery patterns over the past two decades
-- Identification of key factors contributing to economic resilience
-- Policy recommendations for sustainable economic growth
-- Comparative analysis with other post-conflict economies
-- Assessment of international aid effectiveness
-
-Research Impact:
-This research provides valuable insights for policymakers, international organizations, and academic institutions working on post-conflict economic recovery. The findings have already been cited by several international development agencies and are being used to inform policy decisions.
-
-Publication Recognition:
-The International Journal of Economic Development has an impact factor of 3.2 and is indexed in major academic databases including Scopus and Web of Science. This publication significantly enhances the international reputation of our faculty and university.
-
-Future Research:
-Building on this success, the research team is planning follow-up studies focusing on specific sectors of the Afghan economy and their recovery trajectories.`,
-      date: "2024-01-12",
-      image: "news1.jpg",
-      author: "Dr. Mohammad Hashim & Dr. Fatima Ahmadi",
-      category: "research",
-      tags: ["research", "publication", "economic development", "post-conflict recovery"]
-    },
-    {
-      id: 2,
-      title: "Student Achievement Recognition",
-      summary:
-        "Several students have been recognized for their outstanding academic performance.",
-      fullContent: `The Faculty of Economics is delighted to announce the outstanding achievements of our students who have been recognized for their exceptional academic performance and contributions to the university community.
-
-Academic Excellence Awards:
-- Hamid Karimi (4th Year) - Dean's List for maintaining 4.0 GPA
-- Maryam Sultani (3rd Year) - Outstanding Research Award for thesis on microfinance
-- Ahmad Shah Durrani (2nd Year) - Best Student Presentation at National Economics Symposium
-- Zahra Mohammadi (4th Year) - Excellence in Statistics and Data Analysis
-
-Research Achievements:
-Several students have had their research work accepted for presentation at national and international conferences:
-- "Impact of Digital Banking on Rural Communities" by Hamid Karimi
-- "Women's Economic Empowerment through Microfinance" by Maryam Sultani
-- "Agricultural Economics and Food Security" by Ahmad Shah Durrani
-
-Scholarship Recipients:
-The following students have been awarded prestigious scholarships:
-- Zahra Mohammadi - World Bank Scholarship for Graduate Studies
-- Hamid Karimi - Government Merit Scholarship
-- Maryam Sultani - USAID Women's Leadership Scholarship
-
-Community Service Recognition:
-Our students have also been recognized for their community service:
-- Economic literacy programs in rural communities
-- Financial education workshops for women's groups
-- Volunteer work with local NGOs on development projects
-
-These achievements reflect the high quality of education and the dedication of our students. The faculty is proud of their accomplishments and looks forward to their continued success.`,
-      date: "2024-01-08",
-      image: "news2.jpg",
-      author: "Faculty Administration",
-      category: "achievement",
-      tags: ["students", "achievement", "awards", "recognition", "scholarship"]
-    },
-  ]);
+  const [news, setNews] = useState([]);
 
   // Loading and error states
   const [loading, setLoading] = useState({
-    announcements: false,
-    events: false,
-    news: false,
+    announcements: true,
+    events: true,
+    news: true,
   });
 
   const [error, setError] = useState({
@@ -325,6 +113,157 @@ These achievements reflect the high quality of education and the dedication of o
     events: null,
     news: null,
   });
+
+  // API base URL
+  const API_BASE_URL = "http://localhost:4400/api/v1";
+
+  // Fetch announcements from API
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        setLoading(prev => ({ ...prev, announcements: true }));
+        setError(prev => ({ ...prev, announcements: null }));
+
+        const response = await fetch(`${API_BASE_URL}/announcement`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Announcements API response:', data);
+
+        if (data.success && Array.isArray(data.data)) {
+          // Transform the data to match the expected format
+          const transformedAnnouncements = data.data.map(announcement => ({
+            id: announcement._id || announcement.id,
+            title: announcement.title,
+            content: announcement.content,
+            fullContent: announcement.content, // Use content as fullContent if no separate field
+            date: announcement.createdAt || announcement.date,
+            category: announcement.category || 'academic',
+            featured: announcement.is_featured || false,
+            image: announcement.image || 'default-announcement.jpg',
+            contactInfo: announcement.contactInfo || '',
+            importantNotes: announcement.importantNotes || ''
+          }));
+          setAnnouncements(transformedAnnouncements);
+        } else {
+          console.error('Unexpected announcements data structure:', data);
+          setError(prev => ({ ...prev, announcements: 'Invalid data format received' }));
+        }
+      } catch (error) {
+        console.error('Error fetching announcements:', error);
+        setError(prev => ({ ...prev, announcements: error.message }));
+      } finally {
+        setLoading(prev => ({ ...prev, announcements: false }));
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
+
+  // Fetch events from API
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(prev => ({ ...prev, events: true }));
+        setError(prev => ({ ...prev, events: null }));
+
+        const response = await fetch(`${API_BASE_URL}/events`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Events API response:', data);
+        console.log('Events data structure check:', {
+          hasStatus: !!data.status,
+          status: data.status,
+          hasData: !!data.data,
+          hasEvents: !!(data.data && data.data.events),
+          eventsLength: data.data && data.data.events ? data.data.events.length : 0
+        });
+
+        if (data.status === 'success' && data.data && Array.isArray(data.data.events)) {
+          // Transform the data to match the expected format
+          const transformedEvents = data.data.events.map(event => ({
+            id: event._id || event.id,
+            title: event.title,
+            description: event.description,
+            fullDescription: event.description, // Use description as fullDescription if no separate field
+            date: event.date,
+            time: event.time || '',
+            location: event.location || '',
+            category: event.type || event.category || 'conference',
+            image: event.image || 'Hero_BackGroundImage.jpg',
+            registrationRequired: event.registrationRequired || false,
+            capacity: event.capacity || 0,
+            registrationDeadline: event.registrationDeadline || '',
+            contactInfo: event.contactInfo || '',
+            requirements: event.requirements || ''
+          }));
+          setEvents(transformedEvents);
+        } else {
+          console.error('Unexpected events data structure:', data);
+          setError(prev => ({ ...prev, events: 'Invalid data format received' }));
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        setError(prev => ({ ...prev, events: error.message }));
+      } finally {
+        setLoading(prev => ({ ...prev, events: false }));
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // Fetch news from API
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setLoading(prev => ({ ...prev, news: true }));
+        setError(prev => ({ ...prev, news: null }));
+
+        const response = await fetch(`${API_BASE_URL}/news`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('News API response:', data);
+
+        if (data.status === 'success' && data.data && Array.isArray(data.data.news)) {
+          // Transform the data to match the expected format
+          const transformedNews = data.data.news.map(newsItem => ({
+            id: newsItem._id || newsItem.id,
+            title: newsItem.title,
+            summary: newsItem.summary || newsItem.content?.substring(0, 200) + '...',
+            fullContent: newsItem.content,
+            date: newsItem.createdAt || newsItem.date,
+            image: newsItem.image || 'default-news.jpg',
+            author: newsItem.author || 'Faculty Administration',
+            category: newsItem.category || 'news',
+            tags: newsItem.tags || []
+          }));
+          setNews(transformedNews);
+        } else {
+          console.error('Unexpected news data structure:', data);
+          setError(prev => ({ ...prev, news: 'Invalid data format received' }));
+        }
+      } catch (error) {
+        console.error('Error fetching news:', error);
+        setError(prev => ({ ...prev, news: error.message }));
+      } finally {
+        setLoading(prev => ({ ...prev, news: false }));
+      }
+    };
+
+    fetchNews();
+  }, []);
 
   // Localized content
   const content = {
@@ -458,16 +397,37 @@ These achievements reflect the high quality of education and the dedication of o
   const handleViewAllAnnouncements = () => {
     setShowAllAnnouncements(true);
     setActiveTab("announcements");
+    // Smooth scroll to tabs section
+    setTimeout(() => {
+      const tabsSection = document.querySelector('[role="tablist"]');
+      if (tabsSection) {
+        tabsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   const handleViewAllEvents = () => {
     setShowAllEvents(true);
     setActiveTab("events");
+    // Smooth scroll to tabs section
+    setTimeout(() => {
+      const tabsSection = document.querySelector('[role="tablist"]');
+      if (tabsSection) {
+        tabsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   const handleViewAllNews = () => {
     setShowAllNews(true);
     setActiveTab("news");
+    // Smooth scroll to tabs section
+    setTimeout(() => {
+      const tabsSection = document.querySelector('[role="tablist"]');
+      if (tabsSection) {
+        tabsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   // Handle ESC key to close modals
@@ -729,7 +689,7 @@ These achievements reflect the high quality of education and the dedication of o
         {/* Main content */}
         <div className='container mx-auto px-4 py-8'>
           <Tabs
-            defaultValue='all'
+            value={activeTab}
             className='w-full'
             onValueChange={handleTabChange}
           >
@@ -875,14 +835,25 @@ These achievements reflect the high quality of education and the dedication of o
                             className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden transform hover:-translate-y-1 w-full'
                           >
                             <CardContent className='p-0'>
-                              <div className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] p-6 text-white'>
-                                <div className='flex justify-between items-start'>
-                                  <div className='inline-flex items-center px-2 py-1 rounded-full bg-white/20 text-white text-xs font-medium mb-3'>
+                              <div className='relative h-48 overflow-hidden'>
+                                <img
+                                  src={
+                                    `http://localhost:4400/public/img/announcements/${
+                                      announcement.image || "default-announcement.jpg"
+                                    }`
+                                  }
+                                  alt={announcement.title}
+                                  className='w-full h-full object-cover'
+                                />
+                                <div className={`absolute top-4 ${direction === 'rtl' ? 'left-4' : 'right-4'}`}>
+                                  <div className='inline-flex items-center px-2 py-1 rounded-full bg-white/20 text-white text-xs font-medium'>
                                     <span className={`${direction === 'rtl' ? 'ml-1' : 'mr-1'}`}>•</span>
                                     <span>{content.featured}</span>
                                   </div>
+                                </div>
+                                <div className={`absolute top-4 ${direction === 'rtl' ? 'right-4' : 'left-4'}`}>
                                   <div
-                                    className={`text-xs font-medium px-2.5 py-1 rounded-full ${getCategoryColor(
+                                    className={`text-xs font-medium px-2.5 py-1 rounded-full shadow-md ${getCategoryColor(
                                       announcement.category
                                     )}`}
                                   >
@@ -891,12 +862,16 @@ These achievements reflect the high quality of education and the dedication of o
                                     ] || announcement.category}
                                   </div>
                                 </div>
-                                <h3 className={`text-xl font-bold mb-2 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
-                                  {announcement.title}
-                                </h3>
-                                <div className='text-white text-sm opacity-80 flex items-center'>
-                                  <CalendarIcon className={`h-4 w-4 opacity-70 ${direction === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                                  <span>{formatDate(announcement.date)}</span>
+                                <div className='absolute inset-0 bg-gradient-to-t from-[#1D3D6F]/90 to-transparent flex items-end'>
+                                  <div className='p-6'>
+                                    <div className='text-white text-sm opacity-80 flex items-center mb-2'>
+                                      <CalendarIcon className={`h-4 w-4 opacity-70 ${direction === 'rtl' ? 'ml-2' : 'mr-2'}`} />
+                                      <span>{formatDate(announcement.date)}</span>
+                                    </div>
+                                    <h3 className={`text-xl font-bold text-white ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
+                                      {announcement.title}
+                                    </h3>
+                                  </div>
                                 </div>
                               </div>
                               <div className='p-6 bg-white'>
@@ -967,7 +942,7 @@ These achievements reflect the high quality of education and the dedication of o
                     </div>
 
                     <div
-                      className='grid grid-cols-1 md:grid-cols-3 gap-6'
+                      className='grid grid-cols-1 md:grid-cols-3 gap-3'
                       style={{
                         direction: direction,
                         justifyItems: direction === 'rtl' ? 'end' : 'start'
@@ -983,73 +958,110 @@ These achievements reflect the high quality of education and the dedication of o
                         .map((event) => (
                           <Card
                             key={event.id}
-                            className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden transform hover:-translate-y-1'
+                            className='group relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 rounded-3xl overflow-hidden transform hover:-translate-y-3 hover:scale-[1.03] bg-white/95 backdrop-blur-sm'
                           >
-                            <CardContent className='p-0'>
-                              <div className='relative h-48 overflow-hidden'>
+                            <CardContent className='p-0 relative'>
+                              {/* Image Section with Enhanced Overlay */}
+                              <div className='relative h-64 overflow-hidden'>
                                 <img
                                   src={
-                                    event.image ||
-                                    "/placeholder.svg?height=200&width=400"
+                                    `http://localhost:4400/public/img/event/${
+                                      event.image || "Hero_BackGroundImage.jpg"
+                                    }`
                                   }
                                   alt={event.title}
-                                  className='w-full h-full object-cover'
+                                  className='w-full h-full object-cover transition-all duration-700 group-hover:scale-125 group-hover:rotate-1'
+                                  onError={(e) => {
+                                    e.target.src = "/placeholder.svg?height=200&width=400";
+                                  }}
                                 />
-                                <div className='absolute top-4 right-4'>
+
+                                {/* Enhanced Badge */}
+                                <div className={`absolute top-6 ${direction === 'rtl' ? 'left-6' : 'right-6'} z-10`}>
                                   {event.date === today ? (
-                                    <div className='bg-[#F7B500] text-[#1D3D6F] text-xs font-bold px-2.5 py-1 rounded-full shadow-md'>
-                                      {content.upcoming.today}
+                                    <div className='bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-2xl backdrop-blur-md border border-white/30 animate-pulse'>
+                                      <span className='flex items-center gap-2'>
+                                        <div className='w-2 h-2 bg-white rounded-full animate-ping'></div>
+                                        {content.upcoming.today}
+                                      </span>
                                     </div>
                                   ) : event.date === tomorrowStr ? (
-                                    <div className='bg-[#F7B500] text-[#1D3D6F] text-xs font-bold px-2.5 py-1 rounded-full shadow-md'>
-                                      {content.upcoming.tomorrow}
+                                    <div className='bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-2xl backdrop-blur-md border border-white/30'>
+                                      <span className='flex items-center gap-2'>
+                                        <div className='w-2 h-2 bg-white rounded-full'></div>
+                                        {content.upcoming.tomorrow}
+                                      </span>
                                     </div>
                                   ) : (
-                                    <div
-                                      className={`text-xs font-medium px-2.5 py-1 rounded-full shadow-md ${getCategoryColor(
-                                        event.category
-                                      )}`}
-                                    >
-                                      {content.categories[event.category] ||
-                                        event.category}
+                                    <div className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white text-xs font-bold px-4 py-2 rounded-full shadow-2xl backdrop-blur-md border border-white/30'>
+                                      <span className='flex items-center gap-2'>
+                                        <CalendarIcon className='h-3 w-3' />
+                                        {content.categories[event.category] || event.category}
+                                      </span>
                                     </div>
                                   )}
                                 </div>
-                                <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent'></div>
-                                <div className='absolute bottom-0 left-0 w-full p-4'>
-                                  <div className='flex items-center text-white mb-1'>
-                                    <CalendarIcon className={`h-4 w-4 ${direction === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                                    <span className='text-sm'>
-                                      {formatDate(event.date)}
-                                    </span>
+
+                                {/* Enhanced Gradient Overlay */}
+                                <div className='absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500'></div>
+
+                                {/* Content Over Image */}
+                                <div className='absolute bottom-0 left-0 right-0 p-6 text-white'>
+                                  <div className={`flex items-center mb-3 ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                    <div className={`bg-white/20 backdrop-blur-md p-2 rounded-xl ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`}>
+                                      <CalendarIcon className='h-4 w-4' />
+                                    </div>
+                                    <div>
+                                      <span className='text-sm font-semibold opacity-90'>
+                                        {formatDate(event.date)}
+                                      </span>
+                                    </div>
                                   </div>
-                                  <h3 className={`text-xl font-bold text-white ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
+                                  <h3 className={`text-2xl font-bold leading-tight mb-2 ${direction === 'rtl' ? 'text-right' : 'text-left'} group-hover:text-[#F7B500] transition-colors duration-300`}>
                                     {event.title}
                                   </h3>
+                                  <p className={`text-white/80 text-sm line-clamp-2 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
+                                    {event.description}
+                                  </p>
                                 </div>
                               </div>
-                              <div className='p-6 bg-white'>
-                                <p className={`text-[#334155] mb-4 line-clamp-2 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
-                                  {event.description}
-                                </p>
-                                <div className='space-y-2 mb-4'>
-                                  <div className='flex items-center text-sm text-[#64748B]'>
-                                    <Clock className={`h-4 w-4 ${direction === 'rtl' ? 'ml-2' : 'mr-2'} text-[#1D3D6F]`} />
-                                    <span>{event.time}</span>
+
+                              {/* Content Section with Enhanced Design */}
+                              <div className='p-8 bg-gradient-to-br from-white via-gray-50/50 to-white'>
+                                {/* Event Details with Icons */}
+                                <div className='space-y-4 mb-8'>
+                                  <div className={`flex items-center ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'} group/item`}>
+                                    <div className={`bg-gradient-to-r from-[#1D3D6F]/10 to-[#2C4F85]/10 p-3 rounded-2xl ${direction === 'rtl' ? 'ml-4' : 'mr-4'} group-hover/item:from-[#1D3D6F]/20 group-hover/item:to-[#2C4F85]/20 transition-all duration-300`}>
+                                      <Clock className='h-5 w-5 text-[#1D3D6F] group-hover/item:scale-110 transition-transform duration-300' />
+                                    </div>
+                                    <div>
+                                      <p className='text-xs text-[#64748B] font-medium uppercase tracking-wide'>Time</p>
+                                      <p className='text-[#1D3D6F] font-bold text-lg'>{event.time || 'Time TBA'}</p>
+                                    </div>
                                   </div>
-                                  <div className='flex items-center text-sm text-[#64748B]'>
-                                    <MapPin className={`h-4 w-4 ${direction === 'rtl' ? 'ml-2' : 'mr-2'} text-[#1D3D6F]`} />
-                                    <span>{event.location}</span>
+
+                                  <div className={`flex items-center ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'} group/item`}>
+                                    <div className={`bg-gradient-to-r from-[#1D3D6F]/10 to-[#2C4F85]/10 p-3 rounded-2xl ${direction === 'rtl' ? 'ml-4' : 'mr-4'} group-hover/item:from-[#1D3D6F]/20 group-hover/item:to-[#2C4F85]/20 transition-all duration-300`}>
+                                      <MapPin className='h-5 w-5 text-[#1D3D6F] group-hover/item:scale-110 transition-transform duration-300' />
+                                    </div>
+                                    <div>
+                                      <p className='text-xs text-[#64748B] font-medium uppercase tracking-wide'>Location</p>
+                                      <p className='text-[#1D3D6F] font-bold text-lg'>{event.location || 'Location TBA'}</p>
+                                    </div>
                                   </div>
                                 </div>
-                                <div className='flex gap-2'>
-                                  <Button
-                                    className='bg-[#1D3D6F] hover:bg-[#2C4F85] text-white flex-1 transition-colors duration-300'
-                                    onClick={() => handleEventMoreInfo(event)}
-                                  >
-                                    {content.upcoming.moreInfo}
-                                  </Button>
-                                </div>
+
+                                {/* Enhanced Action Button */}
+                                <Button
+                                  className='w-full bg-gradient-to-r from-[#1D3D6F] via-[#2C4F85] to-[#1D3D6F] hover:from-[#F7B500] hover:via-[#FFD700] hover:to-[#F7B500] text-white hover:text-[#1D3D6F] transition-all duration-500 shadow-xl hover:shadow-2xl rounded-2xl font-bold py-4 text-lg relative overflow-hidden group/btn'
+                                  onClick={() => handleEventMoreInfo(event)}
+                                >
+                                  <span className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000'></span>
+                                  <span className={`flex items-center justify-center gap-3 relative z-10 ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                    <span className='font-bold'>{content.upcoming.moreInfo}</span>
+                                    <ArrowRight className={`h-5 w-5 transition-all duration-300 group-hover/btn:translate-x-1 group-hover/btn:scale-110 ${direction === 'rtl' ? 'rotate-180' : ''}`} />
+                                  </span>
+                                </Button>
                               </div>
                             </CardContent>
                           </Card>
@@ -1093,7 +1105,7 @@ These achievements reflect the high quality of education and the dedication of o
                     </Button>
                   </div>
                   <div
-                    className='grid grid-cols-1 md:grid-cols-3 gap-6'
+                    className='grid grid-cols-1 md:grid-cols-3 gap-3'
                     style={{
                       direction: direction,
                       justifyItems: direction === 'rtl' ? 'end' : 'start'
@@ -1102,10 +1114,11 @@ These achievements reflect the high quality of education and the dedication of o
                     {filteredNews.slice(0, 3).map((item) => (
                       <Card
                         key={item.id}
-                        className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden transform hover:-translate-y-1'
+                        className='group relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 rounded-3xl overflow-hidden transform hover:-translate-y-3 hover:scale-[1.03] bg-white/95 backdrop-blur-sm'
                       >
-                        <CardContent className='p-0'>
-                          <div className='relative h-48 overflow-hidden'>
+                        <CardContent className='p-0 relative'>
+                          {/* Image Section with Enhanced Overlay */}
+                          <div className='relative h-64 overflow-hidden'>
                             <img
                               src={
                                 `http://localhost:4400/public/img/news/${
@@ -1113,41 +1126,90 @@ These achievements reflect the high quality of education and the dedication of o
                                 }` || "/placeholder.svg?height=200&width=400"
                               }
                               alt={item.title}
-                              className='w-full h-full object-cover'
+                              className='w-full h-full object-cover transition-all duration-700 group-hover:scale-125 group-hover:rotate-1'
                             />
-                            <div className='absolute inset-0 bg-gradient-to-t from-[#1D3D6F]/90 to-transparent flex items-end'>
-                              <div className='p-6'>
-                                <div className='flex items-center text-white opacity-80 mb-2'>
-                                  <CalendarIcon className={`h-4 w-4 ${direction === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-                                  <span className='text-sm'>
-                                    {formatDate(item.date)}
-                                  </span>
-                                </div>
-                                <h3 className={`text-xl font-bold text-white ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
-                                  {item.title}
-                                </h3>
+
+                            {/* Enhanced News Badge */}
+                            <div className={`absolute top-6 ${direction === 'rtl' ? 'left-6' : 'right-6'} z-10`}>
+                              <div className='bg-gradient-to-r from-[#F7B500] to-[#FFD700] text-[#1D3D6F] text-xs font-bold px-4 py-2 rounded-full shadow-2xl backdrop-blur-md border border-white/30'>
+                                <span className='flex items-center gap-2'>
+                                  <Newspaper className='h-3 w-3' />
+                                  <span className='font-bold'>NEWS</span>
+                                </span>
                               </div>
                             </div>
+
+                            {/* Enhanced Gradient Overlay */}
+                            <div className='absolute inset-0 bg-gradient-to-t from-[#1D3D6F]/95 via-[#1D3D6F]/50 to-transparent opacity-90 group-hover:opacity-95 transition-opacity duration-500'></div>
+
+                            {/* Content Over Image */}
+                            <div className='absolute bottom-0 left-0 right-0 p-6 text-white'>
+                              <div className={`flex items-center mb-3 ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <div className={`bg-white/20 backdrop-blur-md p-2 rounded-xl ${direction === 'rtl' ? 'ml-3' : 'mr-3'}`}>
+                                  <CalendarIcon className='h-4 w-4' />
+                                </div>
+                                <div>
+                                  <span className='text-sm font-semibold opacity-90'>
+                                    {formatDate(item.date)}
+                                  </span>
+                                  {item.author && (
+                                    <span className='block text-xs text-white/70 font-medium'>
+                                      By {item.author}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <h3 className={`text-2xl font-bold leading-tight mb-2 ${direction === 'rtl' ? 'text-right' : 'text-left'} group-hover:text-[#F7B500] transition-colors duration-300 line-clamp-2`}>
+                                {item.title}
+                              </h3>
+                            </div>
                           </div>
-                          <div className='p-6 bg-white'>
-                            <p className={`text-[#334155] mb-4 line-clamp-3 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
+
+                          {/* Content Section with Enhanced Design */}
+                          <div className='p-8 bg-gradient-to-br from-white via-gray-50/50 to-white'>
+                            {/* Category Badge */}
+                            <div className={`mb-6 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
+                              <div className='inline-flex items-center px-4 py-2 rounded-2xl text-xs font-bold bg-gradient-to-r from-[#1D3D6F]/10 to-[#2C4F85]/10 text-[#1D3D6F] border border-[#1D3D6F]/20'>
+                                <span className='uppercase tracking-wider'>{item.category}</span>
+                              </div>
+                            </div>
+
+                            {/* Summary */}
+                            <p className={`text-[#334155] mb-8 line-clamp-3 leading-relaxed text-lg ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
                               {item.summary}
                             </p>
+
+                            {/* Action Buttons */}
                             <div className={`flex ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'} justify-between items-center`}>
                               <Button
                                 variant='link'
-                                className='text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1 transition-colors duration-300'
+                                className='text-[#1D3D6F] hover:text-[#F7B500] p-0 h-auto flex items-center gap-3 transition-all duration-300 font-bold text-lg group/btn'
                                 onClick={() => handleNewsReadMore(item)}
                               >
-                                {content.news.readMore}
-                                <ArrowRight className='h-4 w-4' />
+                                <span className='relative'>
+                                  {content.news.readMore}
+                                  <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-[#F7B500] group-hover/btn:w-full transition-all duration-300'></span>
+                                </span>
+                                <ArrowRight className={`h-5 w-5 transition-all duration-300 group-hover/btn:translate-x-1 group-hover/btn:scale-110 ${direction === 'rtl' ? 'rotate-180' : ''}`} />
                               </Button>
+
                               <Button
                                 variant='ghost'
                                 size='sm'
-                                className='text-[#64748B] hover:text-[#1D3D6F] p-2 h-8 w-8 rounded-full'
+                                className='text-[#64748B] hover:text-[#1D3D6F] hover:bg-gradient-to-r hover:from-[#1D3D6F]/10 hover:to-[#2C4F85]/10 p-3 h-12 w-12 rounded-2xl transition-all duration-300 group/share'
+                                onClick={() => {
+                                  if (navigator.share) {
+                                    navigator.share({
+                                      title: item.title,
+                                      text: item.summary,
+                                      url: window.location.href
+                                    });
+                                  } else {
+                                    navigator.clipboard.writeText(`${item.title}\n\n${item.summary}\n\n${window.location.href}`);
+                                  }
+                                }}
                               >
-                                <Share2 className='h-4 w-4' />
+                                <Share2 className='h-5 w-5 group-hover/share:scale-110 transition-transform duration-300' />
                               </Button>
                             </div>
                           </div>
@@ -1166,165 +1228,64 @@ These achievements reflect the high quality of education and the dedication of o
               {loading.announcements && <LoadingComponent />}
               {error.announcements && <ErrorComponent />}
               {!loading.announcements && !error.announcements && (
-                <div
-                  className='grid grid-cols-1 md:grid-cols-2 gap-6'
-                  style={{
-                    direction: direction,
-                    justifyItems: direction === 'rtl' ? 'end' : 'start'
-                  }}
-                >
-                  {filteredAnnouncements.map((announcement) => (
+                <>
+                  {filteredAnnouncements.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="text-gray-400 mb-4">
+                        <Bell className="h-16 w-16 mx-auto" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No announcements found</h3>
+                      <p className="text-gray-500">There are currently no announcements to display.</p>
+                    </div>
+                  ) : (
+                    <div
+                      className='grid grid-cols-1 md:grid-cols-2 gap-6'
+                      style={{
+                        direction: direction,
+                        justifyItems: direction === 'rtl' ? 'end' : 'start'
+                      }}
+                    >
+                      {filteredAnnouncements.map((announcement) => (
                     <Card
                       key={announcement.id}
-                      className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden'
-                    >
-                      <CardContent className='p-6'>
-                        <div className={`flex ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'} justify-between items-start mb-4`}>
-                          <div
-                            className={`text-xs font-medium px-2.5 py-1 rounded-full ${getCategoryColor(
-                              announcement.category
-                            )}`}
-                          >
-                            {content.categories[announcement.category] ||
-                              announcement.category}
-                          </div>
-                          <div className={`text-sm text-[#64748B] ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
-                            {formatDate(announcement.date)}
-                          </div>
-                        </div>
-                        <h3 className={`text-xl font-bold text-[#1D3D6F] mb-3 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
-                          {announcement.title}
-                        </h3>
-                        <p className={`text-[#334155] mb-4 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
-                          {announcement.content}
-                        </p>
-                        <Button
-                          variant='link'
-                          className='text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1'
-                          onClick={() => handleReadFullAnnouncement(announcement)}
-                        >
-                          {content.news.readMore}
-                          <ArrowRight className='h-4 w-4' />
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value='events' className={`${direction === 'rtl' ? 'text-right' : 'text-left'}`} dir={direction}>
-              {loading.events && <LoadingComponent />}
-              {error.events && <ErrorComponent />}
-              {!loading.events && !error.events && (
-                <div
-                  className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-                  style={{
-                    direction: direction,
-                    justifyItems: direction === 'rtl' ? 'end' : 'start'
-                  }}
-                >
-                  {filteredEvents.map((event) => (
-                    <Card
-                      key={event.id}
                       className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden'
                     >
                       <CardContent className='p-0'>
                         <div className='relative h-48 overflow-hidden'>
                           <img
                             src={
-                              event.image ||
-                              "/placeholder.svg?height=200&width=400"
+                              `http://localhost:4400/public/img/announcements/${
+                                announcement.image || "default-announcement.jpg"
+                              }`
                             }
-                            alt={event.title}
+                            alt={announcement.title}
                             className='w-full h-full object-cover'
                           />
                           <div className={`absolute top-4 ${direction === 'rtl' ? 'left-4' : 'right-4'}`}>
                             <div
                               className={`text-xs font-medium px-2.5 py-1 rounded-full shadow-md ${getCategoryColor(
-                                event.category
+                                announcement.category
                               )}`}
                             >
-                              {content.categories[event.category] ||
-                                event.category}
+                              {content.categories[announcement.category] ||
+                                announcement.category}
                             </div>
                           </div>
-                        </div>
-                        <div className='p-6'>
-                          <h3 className={`text-xl font-bold text-[#1D3D6F] mb-2 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
-                            {event.title}
-                          </h3>
-                          <p className={`text-[#334155] mb-4 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
-                            {event.description}
-                          </p>
-                          <div className='space-y-2 mb-4'>
-                            <div className='flex items-center text-sm text-[#64748B]'>
-                              <CalendarIcon className={`h-4 w-4 ${direction === 'rtl' ? 'ml-2' : 'mr-2'} text-[#1D3D6F]`} />
-                              <span>{formatDate(event.date)}</span>
-                            </div>
-                            <div className='flex items-center text-sm text-[#64748B]'>
-                              <Clock className={`h-4 w-4 ${direction === 'rtl' ? 'ml-2' : 'mr-2'} text-[#1D3D6F]`} />
-                              <span>{event.time}</span>
-                            </div>
-                            <div className='flex items-center text-sm text-[#64748B]'>
-                              <MapPin className={`h-4 w-4 ${direction === 'rtl' ? 'ml-2' : 'mr-2'} text-[#1D3D6F]`} />
-                              <span>{event.location}</span>
-                            </div>
-                          </div>
-                          <Button
-                            className='w-full bg-[#1D3D6F] hover:bg-[#2C4F85] text-white'
-                            onClick={() => handleEventMoreInfo(event)}
-                          >
-                            {content.upcoming.moreInfo}
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value='news' className={`${direction === 'rtl' ? 'text-right' : 'text-left'}`} dir={direction}>
-              {loading.news && <LoadingComponent />}
-              {error.news && <ErrorComponent />}
-              {!loading.news && !error.news && (
-                <div
-                  className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-                  style={{
-                    direction: direction,
-                    justifyItems: direction === 'rtl' ? 'end' : 'start'
-                  }}
-                >
-                  {filteredNews.map((item) => (
-                    <Card
-                      key={item.id}
-                      className='border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden'
-                    >
-                      <CardContent className='p-0'>
-                        <div className='relative h-48 overflow-hidden'>
-                          <img
-                            src={
-                              `http://localhost:4400/public/img/news/${
-                                item.image || "/placeholder.svg"
-                              }` || "/placeholder.svg?height=200&width=400"
-                            }
-                            alt={item.title}
-                            className='w-full h-full object-cover'
-                          />
                         </div>
                         <div className='p-6'>
                           <div className={`text-sm text-[#64748B] mb-2 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
-                            {formatDate(item.date)}
+                            {formatDate(announcement.date)}
                           </div>
                           <h3 className={`text-xl font-bold text-[#1D3D6F] mb-3 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
-                            {item.title}
+                            {announcement.title}
                           </h3>
-                          <p className={`text-[#334155] mb-4 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>{item.summary}</p>
+                          <p className={`text-[#334155] mb-4 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
+                            {announcement.content}
+                          </p>
                           <Button
                             variant='link'
                             className='text-[#1D3D6F] hover:text-[#2C4F85] p-0 h-auto flex items-center gap-1'
-                            onClick={() => handleNewsReadMore(item)}
+                            onClick={() => handleReadFullAnnouncement(announcement)}
                           >
                             {content.news.readMore}
                             <ArrowRight className='h-4 w-4' />
@@ -1332,8 +1293,264 @@ These achievements reflect the high quality of education and the dedication of o
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </TabsContent>
+
+            <TabsContent value='events' className={`${direction === 'rtl' ? 'text-right' : 'text-left'}`} dir={direction}>
+              {loading.events && <LoadingComponent />}
+              {error.events && <ErrorComponent />}
+              {!loading.events && !error.events && (
+                <>
+                  {filteredEvents.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="text-gray-400 mb-4">
+                        <CalendarIcon className="h-16 w-16 mx-auto" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No events found</h3>
+                      <p className="text-gray-500">There are currently no events to display.</p>
+                    </div>
+                  ) : (
+                    <div
+                      className='grid grid-cols-1 md:grid-cols-3 gap-3'
+                      style={{
+                        direction: direction,
+                        justifyItems: direction === 'rtl' ? 'end' : 'start'
+                      }}
+                    >
+                      {filteredEvents.map((event) => (
+                        <Card
+                          key={event.id}
+                          className='group relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 rounded-3xl overflow-hidden transform hover:-translate-y-3 hover:scale-[1.03] bg-white/95 backdrop-blur-sm'
+                        >
+                          <CardContent className='p-0 relative'>
+                            {/* Image Section */}
+                            <div className='relative h-64 overflow-hidden'>
+                              <img
+                                src={
+                                  `http://localhost:4400/public/img/event/${
+                                    event.image || "Hero_BackGroundImage.jpg"
+                                  }`
+                                }
+                                alt={event.title}
+                                className='w-full h-full object-cover transition-all duration-700 group-hover:scale-125 group-hover:rotate-1'
+                                onError={(e) => {
+                                  e.target.src = "/placeholder.svg?height=200&width=400";
+                                }}
+                              />
+
+                              {/* Category Badge */}
+                              <div className={`absolute top-6 ${direction === 'rtl' ? 'left-6' : 'right-6'} z-10`}>
+                                <div className='bg-gradient-to-r from-[#1D3D6F] to-[#2C4F85] text-white text-xs font-bold px-4 py-2 rounded-full shadow-2xl backdrop-blur-md border border-white/30'>
+                                  <span className='flex items-center gap-2'>
+                                    <CalendarIcon className='h-3 w-3' />
+                                    {content.categories[event.category] || event.category}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Gradient Overlay */}
+                              <div className='absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500'></div>
+
+                              {/* Title Over Image */}
+                              <div className='absolute bottom-0 left-0 right-0 p-6 text-white'>
+                                <h3 className={`text-2xl font-bold leading-tight ${direction === 'rtl' ? 'text-right' : 'text-left'} group-hover:text-[#F7B500] transition-colors duration-300`}>
+                                  {event.title}
+                                </h3>
+                              </div>
+                            </div>
+
+                            {/* Content Section */}
+                            <div className='p-8 bg-gradient-to-br from-white via-gray-50/50 to-white'>
+                              <p className={`text-[#334155] mb-6 line-clamp-2 leading-relaxed text-lg ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
+                                {event.description}
+                              </p>
+
+                              {/* Event Details */}
+                              <div className='space-y-4 mb-8'>
+                                <div className={`flex items-center ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'} group/item`}>
+                                  <div className={`bg-gradient-to-r from-[#1D3D6F]/10 to-[#2C4F85]/10 p-3 rounded-2xl ${direction === 'rtl' ? 'ml-4' : 'mr-4'} group-hover/item:from-[#1D3D6F]/20 group-hover/item:to-[#2C4F85]/20 transition-all duration-300`}>
+                                    <CalendarIcon className='h-5 w-5 text-[#1D3D6F] group-hover/item:scale-110 transition-transform duration-300' />
+                                  </div>
+                                  <div>
+                                    <p className='text-xs text-[#64748B] font-medium uppercase tracking-wide'>Date</p>
+                                    <p className='text-[#1D3D6F] font-bold text-lg'>{formatDate(event.date)}</p>
+                                  </div>
+                                </div>
+
+                                <div className={`flex items-center ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'} group/item`}>
+                                  <div className={`bg-gradient-to-r from-[#1D3D6F]/10 to-[#2C4F85]/10 p-3 rounded-2xl ${direction === 'rtl' ? 'ml-4' : 'mr-4'} group-hover/item:from-[#1D3D6F]/20 group-hover/item:to-[#2C4F85]/20 transition-all duration-300`}>
+                                    <Clock className='h-5 w-5 text-[#1D3D6F] group-hover/item:scale-110 transition-transform duration-300' />
+                                  </div>
+                                  <div>
+                                    <p className='text-xs text-[#64748B] font-medium uppercase tracking-wide'>Time</p>
+                                    <p className='text-[#1D3D6F] font-bold text-lg'>{event.time || 'Time TBA'}</p>
+                                  </div>
+                                </div>
+
+                                <div className={`flex items-center ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'} group/item`}>
+                                  <div className={`bg-gradient-to-r from-[#1D3D6F]/10 to-[#2C4F85]/10 p-3 rounded-2xl ${direction === 'rtl' ? 'ml-4' : 'mr-4'} group-hover/item:from-[#1D3D6F]/20 group-hover/item:to-[#2C4F85]/20 transition-all duration-300`}>
+                                    <MapPin className='h-5 w-5 text-[#1D3D6F] group-hover/item:scale-110 transition-transform duration-300' />
+                                  </div>
+                                  <div>
+                                    <p className='text-xs text-[#64748B] font-medium uppercase tracking-wide'>Location</p>
+                                    <p className='text-[#1D3D6F] font-bold text-lg'>{event.location || 'Location TBA'}</p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action Button */}
+                              <Button
+                                className='w-full bg-gradient-to-r from-[#1D3D6F] via-[#2C4F85] to-[#1D3D6F] hover:from-[#F7B500] hover:via-[#FFD700] hover:to-[#F7B500] text-white hover:text-[#1D3D6F] transition-all duration-500 shadow-xl hover:shadow-2xl rounded-2xl font-bold py-4 text-lg relative overflow-hidden group/btn'
+                                onClick={() => handleEventMoreInfo(event)}
+                              >
+                                <span className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000'></span>
+                                <span className={`flex items-center justify-center gap-3 relative z-10 ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                  <span className='font-bold'>{content.upcoming.moreInfo}</span>
+                                  <ArrowRight className={`h-5 w-5 transition-all duration-300 group-hover/btn:translate-x-1 group-hover/btn:scale-110 ${direction === 'rtl' ? 'rotate-180' : ''}`} />
+                                </span>
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </TabsContent>
+
+            <TabsContent value='news' className={`${direction === 'rtl' ? 'text-right' : 'text-left'}`} dir={direction}>
+              {loading.news && <LoadingComponent />}
+              {error.news && <ErrorComponent />}
+              {!loading.news && !error.news && (
+                <>
+                  {filteredNews.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="text-gray-400 mb-4">
+                        <BookOpen className="h-16 w-16 mx-auto" />
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No news found</h3>
+                      <p className="text-gray-500">There are currently no news articles to display.</p>
+                    </div>
+                  ) : (
+                    <div
+                      className='grid grid-cols-1 md:grid-cols-3 gap-3'
+                      style={{
+                        direction: direction,
+                        justifyItems: direction === 'rtl' ? 'end' : 'start'
+                      }}
+                    >
+                      {filteredNews.map((item) => (
+                        <Card
+                          key={item.id}
+                          className='group relative border-0 shadow-xl hover:shadow-2xl transition-all duration-700 rounded-3xl overflow-hidden transform hover:-translate-y-3 hover:scale-[1.03] bg-white/95 backdrop-blur-sm'
+                        >
+                          <CardContent className='p-0 relative'>
+                            {/* Image Section */}
+                            <div className='relative h-64 overflow-hidden'>
+                              <img
+                                src={
+                                  `http://localhost:4400/public/img/news/${
+                                    item.image || "/placeholder.svg"
+                                  }` || "/placeholder.svg?height=200&width=400"
+                                }
+                                alt={item.title}
+                                className='w-full h-full object-cover transition-all duration-700 group-hover:scale-125 group-hover:rotate-1'
+                              />
+
+                              {/* News Badge */}
+                              <div className={`absolute top-6 ${direction === 'rtl' ? 'left-6' : 'right-6'} z-10`}>
+                                <div className='bg-gradient-to-r from-[#F7B500] to-[#FFD700] text-[#1D3D6F] text-xs font-bold px-4 py-2 rounded-full shadow-2xl backdrop-blur-md border border-white/30'>
+                                  <span className='flex items-center gap-2'>
+                                    <Newspaper className='h-3 w-3' />
+                                    <span className='font-bold'>NEWS</span>
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Gradient Overlay */}
+                              <div className='absolute inset-0 bg-gradient-to-t from-[#1D3D6F]/95 via-[#1D3D6F]/50 to-transparent opacity-90 group-hover:opacity-95 transition-opacity duration-500'></div>
+
+                              {/* Title Over Image */}
+                              <div className='absolute bottom-0 left-0 right-0 p-6 text-white'>
+                                <h3 className={`text-2xl font-bold leading-tight ${direction === 'rtl' ? 'text-right' : 'text-left'} group-hover:text-[#F7B500] transition-colors duration-300 line-clamp-2`}>
+                                  {item.title}
+                                </h3>
+                              </div>
+                            </div>
+
+                            {/* Content Section */}
+                            <div className='p-8 bg-gradient-to-br from-white via-gray-50/50 to-white'>
+                              {/* Date and Author */}
+                              <div className={`flex items-center mb-6 ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <div className={`bg-gradient-to-r from-[#1D3D6F]/10 to-[#2C4F85]/10 p-3 rounded-2xl ${direction === 'rtl' ? 'ml-4' : 'mr-4'}`}>
+                                  <CalendarIcon className='h-5 w-5 text-[#1D3D6F]' />
+                                </div>
+                                <div>
+                                  <p className='text-xs text-[#64748B] font-medium uppercase tracking-wide'>Published</p>
+                                  <p className='text-[#1D3D6F] font-bold text-lg'>{formatDate(item.date)}</p>
+                                  {item.author && (
+                                    <p className='text-sm text-[#64748B] font-medium'>By {item.author}</p>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Category Badge */}
+                              <div className={`mb-6 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
+                                <div className='inline-flex items-center px-4 py-2 rounded-2xl text-xs font-bold bg-gradient-to-r from-[#1D3D6F]/10 to-[#2C4F85]/10 text-[#1D3D6F] border border-[#1D3D6F]/20'>
+                                  <span className='uppercase tracking-wider'>{item.category}</span>
+                                </div>
+                              </div>
+
+                              {/* Summary */}
+                              <p className={`text-[#334155] mb-8 line-clamp-3 leading-relaxed text-lg ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
+                                {item.summary}
+                              </p>
+
+                              {/* Action Buttons */}
+                              <div className={`flex ${direction === 'rtl' ? 'flex-row-reverse' : 'flex-row'} justify-between items-center`}>
+                                <Button
+                                  variant='link'
+                                  className='text-[#1D3D6F] hover:text-[#F7B500] p-0 h-auto flex items-center gap-3 transition-all duration-300 font-bold text-lg group/btn'
+                                  onClick={() => handleNewsReadMore(item)}
+                                >
+                                  <span className='relative'>
+                                    {content.news.readMore}
+                                    <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-[#F7B500] group-hover/btn:w-full transition-all duration-300'></span>
+                                  </span>
+                                  <ArrowRight className={`h-5 w-5 transition-all duration-300 group-hover/btn:translate-x-1 group-hover/btn:scale-110 ${direction === 'rtl' ? 'rotate-180' : ''}`} />
+                                </Button>
+
+                                <Button
+                                  variant='ghost'
+                                  size='sm'
+                                  className='text-[#64748B] hover:text-[#1D3D6F] hover:bg-gradient-to-r hover:from-[#1D3D6F]/10 hover:to-[#2C4F85]/10 p-3 h-12 w-12 rounded-2xl transition-all duration-300 group/share'
+                                  onClick={() => {
+                                    if (navigator.share) {
+                                      navigator.share({
+                                        title: item.title,
+                                        text: item.summary,
+                                        url: window.location.href
+                                      });
+                                    } else {
+                                      navigator.clipboard.writeText(`${item.title}\n\n${item.summary}\n\n${window.location.href}`);
+                                    }
+                                  }}
+                                >
+                                  <Share2 className='h-5 w-5 group-hover/share:scale-110 transition-transform duration-300' />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
           </Tabs>

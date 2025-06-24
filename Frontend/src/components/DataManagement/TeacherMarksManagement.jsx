@@ -167,7 +167,7 @@ const TeacherMarksManagement = () => {
     const fetchStudents = async () => {
       try {
         setIsLoading((prev) => ({ ...prev, students: true }));
-        const response = await fetch("http://localhost:4400/api/v1/students/", {
+        const response = await fetch("http://127.0.0.1:4400/api/v1/students/", {
           headers: createHeaders(),
         });
         const data = await response.json();
@@ -546,10 +546,11 @@ const TeacherMarksManagement = () => {
     const finalValue = Number(final) || 0;
     const assignmentValue = Number(assignment) || 0;
 
+    // Direct sum calculation (out of 100)
+    // Midterm (0-20) + Final (0-60) + Assignment (0-20) = Total (0-100)
     const total = midtermValue + finalValue + assignmentValue;
 
-    // Modified grade calculation to match server's expected enum values
-    // Assuming the server accepts: A, B, C, D, F (without + or -)
+    // Grade calculation based on total score (0-100)
     let grade = "F";
     if (total >= 90) grade = "A";
     else if (total >= 80) grade = "B";
@@ -634,7 +635,7 @@ const TeacherMarksManagement = () => {
       };
 
       const response = await fetch(
-        `http://localhost:4400/api/v1/students/${marksFormData.student_id}/marks`,
+        `http://127.0.0.1:4400/api/v1/students/${marksFormData.student_id}/marks`,
         {
           method: "POST",
           headers: createHeaders(),
@@ -647,7 +648,7 @@ const TeacherMarksManagement = () => {
       if (data.status === "success") {
         // Refresh students data to get updated marks
         const refreshResponse = await fetch(
-          "http://localhost:4400/api/v1/students/",
+          "http://127.0.0.1:4400/api/v1/students/",
           {
             headers: createHeaders(),
           }
@@ -714,7 +715,7 @@ const TeacherMarksManagement = () => {
       };
 
       const response = await fetch(
-        `http://localhost:4400/api/v1/students/${editingMark.student_id}/marks/${editingMark.markIndex}`,
+        `http://127.0.0.1:4400/api/v1/students/${editingMark.student_id}/marks/${editingMark.markIndex}`,
         {
           method: "PATCH",
           headers: createHeaders(),
@@ -727,7 +728,7 @@ const TeacherMarksManagement = () => {
       if (data.status === "success") {
         // Refresh students data to get updated marks
         const refreshResponse = await fetch(
-          "http://localhost:4400/api/v1/students/",
+          "http://127.0.0.1:4400/api/v1/students/",
           {
             headers: createHeaders(),
           }
@@ -769,7 +770,7 @@ const TeacherMarksManagement = () => {
       }
 
       const response = await fetch(
-        `http://localhost:4400/api/v1/students/${mark.student_id}/marks/${actualMarkIndex}`,
+        `http://127.0.0.1:4400/api/v1/students/${mark.student_id}/marks/${actualMarkIndex}`,
         {
           method: "DELETE",
           headers: createHeaders(),
@@ -781,7 +782,7 @@ const TeacherMarksManagement = () => {
       if (data.status === "success") {
         // Refresh students data to get updated marks
         const refreshResponse = await fetch(
-          "http://localhost:4400/api/v1/students/",
+          "http://127.0.0.1:4400/api/v1/students/",
           {
             headers: createHeaders(),
           }
@@ -919,7 +920,7 @@ const TeacherMarksManagement = () => {
         // Add to import promises
         importPromises.push(
           fetch(
-            `http://localhost:4400/api/v1/students/${rowData.student_id}/marks`,
+            `http://127.0.0.1:4400/api/v1/students/${rowData.student_id}/marks`,
             {
               method: "POST",
               headers: createHeaders(),
@@ -938,7 +939,7 @@ const TeacherMarksManagement = () => {
       Promise.all(importPromises)
         .then(() => {
           // Refresh students data
-          return fetch("http://localhost:4400/api/v1/students/", {
+          return fetch("http://127.0.0.1:4400/api/v1/students/", {
             headers: createHeaders(),
           });
         })
@@ -1300,18 +1301,18 @@ const TeacherMarksManagement = () => {
                         </div>
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        {t("midtermExam")}
+                        {t("midtermExam")} (/20)
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        {t("finalExam")}
+                        {t("finalExam")} (/60)
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                        {t("assignment")}
+                        {t("assignment")} (/20)
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
                         <div className={`flex items-center justify-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                           <Award className='h-4 w-4' />
-                          <span>{t("totalGrade")}</span>
+                          <span>{t("totalGrade")} (/100)</span>
                         </div>
                       </th>
                       <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
@@ -1380,24 +1381,24 @@ const TeacherMarksManagement = () => {
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#2C4F85]/10 text-[#2C4F85]'>
-                              {midterm}
+                              {midterm}/20
                             </span>
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#1D3D6F]/10 text-[#1D3D6F]'>
-                              {final}
+                              {final}/60
                             </span>
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#F7B500]/10 text-[#F7B500]'>
-                              {assignment}
+                              {assignment}/20
                             </span>
                           </td>
                           <td className='px-6 py-5 text-center'>
                             <div className='flex items-center justify-center'>
                               <span className='inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-[#E8ECEF] to-[#E8ECEF]/80 text-[#1D3D6F] border border-[#E8ECEF]'>
                                 <Award className='h-4 w-4 mr-2 text-[#F7B500]' />
-                                {total}
+                                {total}/100
                               </span>
                             </div>
                           </td>
@@ -1617,23 +1618,23 @@ const TeacherMarksManagement = () => {
                 required
               />
               <FormField
-                label='Midterm Examination (Max: 30 points)'
+                label='Midterm Examination (Max: 20 points)'
                 name='midterm'
                 type='number'
                 value={marksFormData.midterm}
                 onChange={handleMarksInputChange}
                 min='0'
-                max='30'
+                max='20'
                 required
               />
               <FormField
-                label='Final Examination (Max: 70 points)'
+                label='Final Examination (Max: 60 points)'
                 name='final'
                 type='number'
                 value={marksFormData.final}
                 onChange={handleMarksInputChange}
                 min='0'
-                max='70'
+                max='60'
                 required
               />
 
@@ -1644,6 +1645,24 @@ const TeacherMarksManagement = () => {
                 onChange={handleMarksInputChange}
                 placeholder='Optional academic performance remarks'
               />
+            </div>
+
+            {/* Scoring System Info */}
+            <div className='bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6'>
+              <div className='flex items-start space-x-3'>
+                <div className='p-2 bg-blue-100 rounded-lg'>
+                  <BookOpen className='h-4 w-4 text-blue-600' />
+                </div>
+                <div>
+                  <h5 className='text-sm font-semibold text-blue-800 mb-1'>Scoring System</h5>
+                  <p className='text-xs text-blue-700'>
+                    <strong>Midterm:</strong> 0-20 points • <strong>Final:</strong> 0-60 points • <strong>Assignment:</strong> 0-20 points
+                  </p>
+                  <p className='text-xs text-blue-600 mt-1'>
+                    Total out of 100: A (90+), B (80-89), C (70-79), D (60-69), F (&lt;60)
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Grade Preview Section */}
@@ -1684,7 +1703,7 @@ const TeacherMarksManagement = () => {
                           marksFormData.assignment
                         ).total
                       : "0"}
-                    <span className='text-lg text-gray-500 ml-1'>/120</span>
+                    <span className='text-lg text-gray-500 ml-1'>/100</span>
                   </p>
                   <div className='mt-2 flex items-center'>
                     <TrendingUp className='h-4 w-4 text-[#F7B500] mr-1' />
@@ -1766,33 +1785,33 @@ const TeacherMarksManagement = () => {
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             <FormField
-              label={t("marks.midterm")}
+              label={`${t("marks.midterm")} (Max: 20)`}
               type='number'
               name='midterm'
               value={marksFormData.midterm}
               onChange={handleMarksInputChange}
               min='0'
-              max='100'
+              max='20'
             />
 
             <FormField
-              label={t("marks.final")}
+              label={`${t("marks.final")} (Max: 60)`}
               type='number'
               name='final'
               value={marksFormData.final}
               onChange={handleMarksInputChange}
               min='0'
-              max='100'
+              max='60'
             />
 
             <FormField
-              label={t("marks.assignment")}
+              label={`${t("marks.assignment")} (Max: 20)`}
               type='number'
               name='assignment'
               value={marksFormData.assignment}
               onChange={handleMarksInputChange}
               min='0'
-              max='100'
+              max='20'
             />
           </div>
 

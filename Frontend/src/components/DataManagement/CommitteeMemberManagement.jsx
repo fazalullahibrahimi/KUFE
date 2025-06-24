@@ -57,7 +57,7 @@ const CommitteeMemberManagement = () => {
 
         // Fetch users
         const usersResponse = await fetch(
-          "http://localhost:4400/api/v1/user/justNameOfComiteeMembers",
+          "http://127.0.0.1:4400/api/v1/user/justNameOfComiteeMembers",
           {
             headers,
           }
@@ -68,7 +68,7 @@ const CommitteeMemberManagement = () => {
 
         // Fetch departments
         const departmentsResponse = await fetch(
-          "http://localhost:4400/api/v1/departments/",
+          "http://127.0.0.1:4400/api/v1/departments/",
           {
             headers,
           }
@@ -250,6 +250,16 @@ const CommitteeMemberManagement = () => {
 
     if (!validateForm()) return;
 
+    console.log("Editing committee member with ID:", selectedMember._id);
+    console.log("Form data being sent:", {
+      userId: formData.userId,
+      department: formData.department,
+      academicRank: formData.academicRank,
+      committeePosition: formData.committeePosition,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+    });
+
     try {
       const response = await fetch(
         `http://127.0.0.1:4400/api/v1/committee-members/${selectedMember._id}`,
@@ -266,6 +276,9 @@ const CommitteeMemberManagement = () => {
           }),
         }
       );
+
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
 
       if (response.ok) {
         // Refresh the committee members list
@@ -294,12 +307,15 @@ const CommitteeMemberManagement = () => {
 
         setIsEditModalOpen(false);
         resetForm();
+        alert("Committee member updated successfully!");
       } else {
         const errorData = await response.json();
         console.error("Error updating committee member:", errorData);
+        alert(`Failed to update committee member: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error updating committee member:", error);
+      alert(`Failed to update committee member: ${error.message}`);
     }
   };
 

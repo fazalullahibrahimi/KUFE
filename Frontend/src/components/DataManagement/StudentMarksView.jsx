@@ -610,18 +610,18 @@ const StudentMarksView = () => {
                               {t("courseCreditHours")}
                             </th>
                             <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                              {t("midtermExamination")}
+                              {t("midtermExamination")} (/20)
                             </th>
                             <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                              {t("finalExamination")}
+                              {t("finalExamination")} (/60)
                             </th>
                             <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
-                              {t("courseAssignment")}
+                              {t("courseAssignment")} (/20)
                             </th>
                             <th className='px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider'>
                               <div className={`flex items-center justify-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                                 <Award className='h-4 w-4' />
-                                <span>{t("totalGrade")}</span>
+                                <span>{t("totalGrade")} (/100)</span>
                               </div>
                             </th>
                           </tr>
@@ -659,24 +659,24 @@ const StudentMarksView = () => {
                                   </td>
                                   <td className='px-6 py-5 text-center'>
                                     <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#2C4F85]/10 text-[#2C4F85]'>
-                                      {subjectData.midterm}
+                                      {subjectData.midterm}/20
                                     </span>
                                   </td>
                                   <td className='px-6 py-5 text-center'>
                                     <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#1D3D6F]/10 text-[#1D3D6F]'>
-                                      {subjectData.final}
+                                      {subjectData.final}/60
                                     </span>
                                   </td>
                                   <td className='px-6 py-5 text-center'>
                                     <span className='inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold bg-[#F7B500]/10 text-[#F7B500]'>
-                                      {subjectData.assignment}
+                                      {subjectData.assignment}/20
                                     </span>
                                   </td>
                                   <td className='px-6 py-5 text-center'>
                                     <div className='flex items-center justify-center space-x-2'>
                                       <span className='inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-[#E8ECEF] to-[#E8ECEF]/80 text-[#1D3D6F] border border-[#E8ECEF]'>
                                         <Award className='h-4 w-4 mr-2 text-[#F7B500]' />
-                                        {subjectData.total}
+                                        {subjectData.total}/100
                                       </span>
                                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${getGradeColor(subjectData.grade)} bg-gray-100`}>
                                         {subjectData.grade}

@@ -6,6 +6,8 @@ const {
   updateAnnouncement,
   deleteAnnouncement,
   getFeaturedAnnouncements,
+  uploadAnnouncementPhoto,
+  resizeAnnouncementPhoto,
 } = require("../controllers/announcementController")
 
 const router = express.Router()
@@ -24,7 +26,7 @@ router.route("/").get(getAnnouncements)
 
 // Protected routes
 // Create announcement - Admin or Faculty can create
-router.route("/").post(authMiddleware, authorizeAdminOrFaculty, createAnnouncement)
+router.route("/").post(authMiddleware, authorizeAdminOrFaculty, uploadAnnouncementPhoto, resizeAnnouncementPhoto, createAnnouncement)
 
 // Update announcement - Admin or Faculty can update
 router.route("/:id").patch(authMiddleware, authorizeAdminOrFaculty, updateAnnouncement)

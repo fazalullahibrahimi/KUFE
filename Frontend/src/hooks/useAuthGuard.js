@@ -128,7 +128,7 @@ const getDefaultRedirectPath = (role) => {
     admin: '/dashboardv1',
     teacher: '/',
     student: '/',
-    committee: '/',
+    committeeMember: '/committee-research',
   };
   
   return rolePaths[role] || '/';
@@ -143,7 +143,7 @@ export const useRoleAccess = () => {
   const isAdmin = () => hasRole('admin');
   const isTeacher = () => hasRole('teacher');
   const isStudent = () => hasRole('student');
-  const isCommittee = () => hasRole('committee');
+  const isCommittee = () => hasRole('committeeMember');
   
   const isTeacherOrAdmin = () => hasAnyRole(['teacher', 'admin']);
   const isStudentOrTeacher = () => hasAnyRole(['student', 'teacher']);

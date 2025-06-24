@@ -38,7 +38,7 @@ const CommitteeResearchView = () => {
   };
 
   // API base URL
-  const API_BASE_URL = "http://localhost:4400/api/v1";
+  const API_BASE_URL = "http://127.0.0.1:4400/api/v1";
 
   // Fetch research submissions with auth token
   useEffect(() => {

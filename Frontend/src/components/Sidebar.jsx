@@ -23,7 +23,10 @@ import FacultyDirectoryManagement from "./DataManagement/FacultyDirectoryManagem
 const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const { t, isRTL } = useLanguage();
+  const { t, language } = useLanguage();
+
+  // Check if current language is RTL
+  const isRTL = language === 'dr' || language === 'ps';
 
   // Handle logout
   const handleLogout = async () => {
@@ -82,9 +85,9 @@ const Sidebar = ({ isSidebarOpen, activeTab, setActiveTab }) => {
       <div className={`flex items-center p-4 border-b border-opacity-10 border-white ${isRTL ? 'flex-row-reverse' : ''}`}>
         <div className={`w-10 h-10 bg-white rounded-full flex items-center justify-center ${isRTL ? 'order-2 ml-3' : 'order-1 mr-3'}`}>
           <img
-            src='/placeholder.svg?height=40&width=40'
+            src='/KufeLogo.jpeg'
             alt='KUFE Logo'
-            className='w-8 h-8'
+            className='w-8 h-8 rounded-full object-cover'
           />
         </div>
         <h2

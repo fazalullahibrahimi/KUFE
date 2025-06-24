@@ -37,6 +37,10 @@ const AnnouncementSchema = new mongoose.Schema(
       enum: ["draft", "published", "archived"],
       default: "published",
     },
+    image: {
+      type: String,
+      default: 'default-announcement.jpg',
+    },
   },
   { timestamps: true },
 )

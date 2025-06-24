@@ -445,8 +445,17 @@ const getStudentCountByCity = asyncHandler(async (req, res) => {
 // });
 
 
+// Helper function to calculate grade based on percentage
+const calculateGrade = (percentage) => {
+  if (percentage >= 90) return "A";
+  else if (percentage >= 80) return "B";
+  else if (percentage >= 70) return "C";
+  else if (percentage >= 60) return "D";
+  else return "F";
+};
+
 const createMarks = asyncHandler(async (req, res) => {
-  const { subject_id, semester_id, teacher_id, midterm, final, assignment, grade, remarks } = req.body;
+  const { subject_id, semester_id, teacher_id, midterm, final, assignment, remarks } = req.body;
 
   const studentId = req.params.id;
   const student = await Student.findById(studentId);
@@ -455,7 +464,12 @@ const createMarks = asyncHandler(async (req, res) => {
     return res.status(404).json(apiResponse.error("Student not found", 404));
   }
 
+  // Direct sum calculation (out of 100)
+  // Midterm (0-20) + Final (0-60) + Assignment (0-20) = Total (0-100)
   const total = (midterm || 0) + (final || 0) + (assignment || 0);
+
+  // Calculate grade based on total score
+  const grade = calculateGrade(total);
 
   const newMark = {
     subject_id,
@@ -540,9 +554,14 @@ const updateMarks = asyncHandler(async (req, res) => {
   mark.midterm = req.body.midterm ?? mark.midterm;
   mark.final = req.body.final ?? mark.final;
   mark.assignment = req.body.assignment ?? mark.assignment;
-  mark.grade = req.body.grade || mark.grade;
   mark.remarks = req.body.remarks || mark.remarks;
+
+  // Direct sum calculation (out of 100)
+  // Midterm (0-20) + Final (0-60) + Assignment (0-20) = Total (0-100)
   mark.total = (mark.midterm || 0) + (mark.final || 0) + (mark.assignment || 0);
+
+  // Calculate grade based on total score
+  mark.grade = calculateGrade(mark.total);
 
   await student.save();
 

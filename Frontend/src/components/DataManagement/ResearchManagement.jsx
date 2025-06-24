@@ -137,7 +137,7 @@ const ResearchManagement = () => {
         pages: Number.parseInt(formData.pages, 10) || 0,
       }
 
-      const response = await fetch("http://localhost:4400/api/v1/research/", {
+      const response = await fetch("http://127.0.0.1:4400/api/v1/research/", {
         method: "POST",
         headers: createHeaders(),
         body: JSON.stringify(payload),
@@ -147,7 +147,7 @@ const ResearchManagement = () => {
 
       if (data.status === "success") {
         // Refresh the research list
-        const refreshResponse = await fetch("http://localhost:4400/api/v1/research/", {
+        const refreshResponse = await fetch("http://127.0.0.1:4400/api/v1/research/", {
           headers: createHeaders(),
         })
         const refreshData = await refreshResponse.json()
@@ -180,7 +180,7 @@ const ResearchManagement = () => {
         pages: Number.parseInt(formData.pages, 10) || 0,
       }
 
-      const response = await fetch(`http://localhost:4400/api/v1/research/${currentResearch._id}`, {
+      const response = await fetch(`http://127.0.0.1:4400/api/v1/research/${currentResearch._id}`, {
         method: "PATCH",
         headers: createHeaders(),
         body: JSON.stringify(payload),
@@ -190,7 +190,7 @@ const ResearchManagement = () => {
 
       if (data.status === "success") {
         // Refresh the research list
-        const refreshResponse = await fetch("http://localhost:4400/api/v1/research/", {
+        const refreshResponse = await fetch("http://127.0.0.1:4400/api/v1/research/", {
           headers: createHeaders(),
         })
         const refreshData = await refreshResponse.json()
@@ -213,7 +213,7 @@ const ResearchManagement = () => {
   const handleDeleteResearch = async (research) => {
     if (window.confirm(t('confirmDeleteResearch'))) {
       try {
-        const response = await fetch(`http://localhost:4400/api/v1/research/${research._id}`, {
+        const response = await fetch(`http://127.0.0.1:4400/api/v1/research/${research._id}`, {
           method: "DELETE",
           headers: createHeaders(),
         })
@@ -222,7 +222,7 @@ const ResearchManagement = () => {
 
         if (data.status === "success") {
           // Refresh the research list
-          const refreshResponse = await fetch("http://localhost:4400/api/v1/research/", {
+          const refreshResponse = await fetch("http://127.0.0.1:4400/api/v1/research/", {
             headers: createHeaders(),
           })
           const refreshData = await refreshResponse.json()

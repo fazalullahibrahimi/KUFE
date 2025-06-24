@@ -333,7 +333,7 @@ export const AuthProvider = ({ children }) => {
         "create_content",
       ],
       student: ["view_marks", "view_courses", "submit_assignments"],
-      committee: ["review_research", "manage_quality"],
+      committeeMember: ["review_research", "manage_quality"],
     };
 
     return permissions[role] || [];

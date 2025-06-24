@@ -165,7 +165,7 @@ export const StudentRoute = ({ children, ...props }) => (
 );
 
 export const CommitteeRoute = ({ children, ...props }) => (
-  <ProtectedRoute requiredRoles={["committee", "admin"]} {...props}>
+  <ProtectedRoute requiredRoles={["committeeMember", "admin"]} {...props}>
     {children}
   </ProtectedRoute>
 );
